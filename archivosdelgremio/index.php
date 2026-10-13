@@ -8,6 +8,7 @@ header('Pragma: no-cache');
 require_once __DIR__ . '/auth.php';
 require_once dirname(__DIR__) . '/includes/assets.php';
 require_once dirname(__DIR__) . '/includes/migrations.php';
+require_once dirname(__DIR__) . '/includes/ficha-import.php';
 guild_session_start();
 $csrf = guild_csrf();
 $isAdmin = guild_is_admin();
@@ -166,6 +167,15 @@ SQL;
     }
     $result->free();
 
+    // Personajes con ficha PDF importada (botón "Hoja" en el folio).
+    ficha_ensure_schema($db);
+    $sheetIds = [];
+    $sheetResult = $db->query('SELECT PersonajeID FROM PersonajeFicha');
+    while ($sheetRow = $sheetResult->fetch_row()) $sheetIds[(string)$sheetRow[0]] = true;
+    $sheetResult->free();
+    foreach ($characters as &$characterRef) $characterRef['hasSheet'] = isset($sheetIds[$characterRef['id']]);
+    unset($characterRef);
+
     $tableCheck = $db->query("SHOW TABLES LIKE 'Mision'");
     $hasMission = $tableCheck && $tableCheck->num_rows > 0;
     if ($tableCheck) $tableCheck->free();
@@ -272,6 +282,7 @@ SQL;
         <button type="button" class="book-tab" data-view="charts">Gráficos</button>
         <button type="button" class="book-tab" data-view="missions">Registro de Misiones</button>
         <a class="book-tab relation-link" href="relaciones.php">Relaciones</a>
+        <?php if ($isLogged): ?><a class="book-tab relation-link" href="importar-ficha.php">Importar ficha</a><?php endif; ?>
         <?php if ($isAdmin): ?>
             <button type="button" class="book-tab admin-tab" data-view="admin">Mesa del Archivero</button>
         <?php endif; ?>
@@ -424,7 +435,8 @@ SQL;
 
                         <div class="admin-actions-row admin-character-actions">
                             <button class="ink-button" type="button" id="newCharacter">+ Añadir personaje</button>
-                            <span>Crear el personaje, su expediente y su retrato desde una sola pantalla.</span>
+                            <a class="ink-button" href="importar-ficha.php">📜 Importar ficha PDF</a>
+                            <span>Crear el personaje, su expediente y su retrato desde una sola pantalla, o leerlo de su ficha PDF.</span>
                         </div>
 
                         <div class="admin-filter-panel">

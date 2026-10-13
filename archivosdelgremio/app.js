@@ -303,6 +303,7 @@
                         <a class="folio-action primary" href="/favordejack/bancadigital/?character=${encodeURIComponent(c.id)}">◈ Ir a su Banca</a>
                         <a class="folio-action" href="/favordejack/inventario/?character=${encodeURIComponent(c.id)}">▣ Inventario</a>
                         <a class="folio-action" href="relaciones.php?character=${encodeURIComponent(c.id)}">⌁ Relaciones</a>
+                        ${c.hasSheet ? `<a class="folio-action" href="hoja.php?id=${encodeURIComponent(c.id)}">📜 Hoja</a>` : ''}
                     </div>
                     ${c.updated ? `<p class="folio-footer">Última anotación: ${esc(c.updated)}</p>` : ''}
                 </div>

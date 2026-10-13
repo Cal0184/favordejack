@@ -140,6 +140,7 @@ $config = [
                     <div class="character-hero__actions">
                         <a class="hero-button" id="bankLink" href="#"><span aria-hidden="true">▣</span> Banca</a>
                         <a class="hero-button" id="archiveLink" href="#"><span aria-hidden="true">▤</span> Archivo</a>
+                        <a class="hero-button" id="importSheetLink" href="#" hidden><span aria-hidden="true">📜</span> Importar ficha</a>
                         <button class="hero-button hero-button--primary" id="addItemBtn" type="button" hidden><span aria-hidden="true">＋</span> Añadir objeto</button>
                     </div>
                 </header>

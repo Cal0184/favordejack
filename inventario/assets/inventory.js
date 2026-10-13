@@ -29,6 +29,7 @@
         heroQuote: $('heroQuote'),
         bankLink: $('bankLink'),
         archiveLink: $('archiveLink'),
+        importSheetLink: $('importSheetLink'),
         addItemBtn: $('addItemBtn'),
         refreshInventoryBtn: $('refreshInventoryBtn'),
         inventorySummary: $('inventorySummary'),
@@ -376,6 +377,10 @@
         dom.bankLink.href = `${config.links?.bank || '#'}${encodeURIComponent(character.id)}`;
         dom.archiveLink.href = `${config.links?.archive || '#'}${encodeURIComponent(character.id)}`;
         dom.addItemBtn.hidden = !payload.canEdit;
+        if (dom.importSheetLink) {
+            dom.importSheetLink.href = `/favordejack/archivosdelgremio/importar-ficha.php?character=${encodeURIComponent(character.id)}`;
+            dom.importSheetLink.hidden = !payload.canEdit;
+        }
     }
 
     function updateSummary(items) {
