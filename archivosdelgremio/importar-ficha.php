@@ -10,10 +10,10 @@ require_once dirname(__DIR__) . '/includes/migrations.php';
 require_once dirname(__DIR__) . '/includes/ficha-import.php';
 
 favor_session_start();
-$self = '/favordejack/archivosdelgremio/importar-ficha.php';
+$self = favor_base_path() . 'archivosdelgremio/importar-ficha.php';
 $user = favor_current_user(true);
 if (!$user) {
-    header('Location: /favordejack/login.php?next=' . rawurlencode($self), true, 303);
+    header('Location: ' . favor_base_path() . 'login.php?next=' . rawurlencode($self), true, 303);
     exit;
 }
 $isAdmin = ($user['role'] ?? '') === 'admin';
@@ -125,7 +125,7 @@ $sheet = $parsed['sheet'] ?? [];
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#2b1a10">
     <title>Importar ficha · Archivos del Gremio</title>
-    <link rel="icon" href="/favordejack/favicon.ico">
+    <link rel="icon" href="<?= favor_base_path() ?>favicon.ico">
     <style>
         :root { --ink:#2b1a10; --paper:#f3e6c8; --paper2:#e9d6ac; --gold:#b8862b; --muted:#6b5338; --line:#c9ad78; --ok:#2f6b3a; --bad:#9b2b22; }
         * { box-sizing:border-box; }
@@ -169,7 +169,7 @@ $sheet = $parsed['sheet'] ?? [];
 <div class="wrap">
     <div class="top">
         <h1>📜 Importar ficha de personaje</h1>
-        <a href="/favordejack/archivosdelgremio/">← Archivos del Gremio</a>
+        <a href="<?= favor_base_path() ?>archivosdelgremio/">← Archivos del Gremio</a>
     </div>
 
     <?php if ($error !== ''): ?><div class="error" role="alert"><?= h($error) ?></div><?php endif; ?>
@@ -196,10 +196,10 @@ $sheet = $parsed['sheet'] ?? [];
                 <?php foreach ($result['summary'] as $line): ?><div>✓ <?= h($line) ?></div><?php endforeach; ?>
             </div>
             <p class="actions" style="margin-top:16px">
-                <a class="btn" href="/favordejack/archivosdelgremio/?character=<?= h(rawurlencode($result['id'])) ?>">Ver en el Archivo</a>
-                <a class="btn secondary" href="/favordejack/archivosdelgremio/hoja.php?id=<?= h(rawurlencode($result['id'])) ?>">Ver hoja</a>
-                <a class="btn secondary" href="/favordejack/inventario/?character=<?= h(rawurlencode($result['id'])) ?>">Inventario</a>
-                <a class="btn secondary" href="/favordejack/bancadigital/?character=<?= h(rawurlencode($result['id'])) ?>">Banca</a>
+                <a class="btn" href="<?= favor_base_path() ?>archivosdelgremio/?character=<?= h(rawurlencode($result['id'])) ?>">Ver en el Archivo</a>
+                <a class="btn secondary" href="<?= favor_base_path() ?>archivosdelgremio/hoja.php?id=<?= h(rawurlencode($result['id'])) ?>">Ver hoja</a>
+                <a class="btn secondary" href="<?= favor_base_path() ?>inventario/?character=<?= h(rawurlencode($result['id'])) ?>">Inventario</a>
+                <a class="btn secondary" href="<?= favor_base_path() ?>bancadigital/?character=<?= h(rawurlencode($result['id'])) ?>">Banca</a>
                 <a href="<?= h($self) ?>">Importar otra</a>
             </p>
         </div>

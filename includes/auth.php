@@ -1,9 +1,11 @@
 <?php
 declare(strict_types=1);
 
+require_once __DIR__ . '/paths.php';
+
 /**
  * Favor de Jack · autenticación global.
- * Una sola sesión para todo /favordejack/.
+ * Una sola sesión para toda la web.
  */
 
 function favor_session_start(): void
@@ -13,7 +15,7 @@ function favor_session_start(): void
     session_name('FAVOR_DE_JACK');
     session_set_cookie_params([
         'lifetime' => 0,
-        'path' => '/favordejack/',
+        'path' => favor_base_path(),
         'domain' => '',
         'secure' => (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'),
         'httponly' => true,
@@ -54,10 +56,13 @@ function favor_verify_csrf(?string $token): void
     }
 }
 
-function favor_safe_next(?string $next, string $fallback = '/favordejack/'): string
+function favor_safe_next(?string $next, ?string $fallback = null): string
 {
+    $fallback ??= favor_base_path();
     $next = trim((string)$next);
-    if ($next === '' || !str_starts_with($next, '/favordejack/')) return $fallback;
+    if ($next === '' || !str_starts_with($next, favor_base_path())) return $fallback;
+    // Evita redirecciones a otro dominio («//sitio» o barras invertidas).
+    if (str_starts_with($next, '//') || str_contains($next, '\\')) return $fallback;
     if (str_contains($next, "\r") || str_contains($next, "\n")) return $fallback;
     return $next;
 }

@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+require_once dirname(__DIR__, 2) . '/includes/paths.php';
 
 header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
 header('Pragma: no-cache');
@@ -269,7 +270,7 @@ footer{padding:35px 20px 50px;border-top:1px solid #2f2117;color:#6f6456;text-al
         <button id="catalogTab" type="button">Catálogo</button>
         <button id="servicesTab" type="button">Servicios</button>
         <a href="admin.php">Admin</a>
-        <a href="/favordejack/">Volver</a>
+        <a href="<?= favor_base_path() ?>">Volver</a>
     </div>
 </header>
 

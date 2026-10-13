@@ -24,7 +24,7 @@ $shopData = [
     'shop' => [
         'name' => 'La Poción Picante',
         'seller' => 'Yamo-Yamo',
-        'backUrl' => '/favordejack/mapa/',
+        'backUrl' => favor_base_path() . 'mapa/',
     ],
 ];
 ?>
@@ -41,7 +41,7 @@ $shopData = [
 <body>
 <?php favor_auth_widget(); ?>
 <header class="topbar">
-    <a class="back-link" href="/favordejack/mapa/">← Mapa de Waterdeep</a>
+    <a class="back-link" href="<?= favor_base_path() ?>mapa/">← Mapa de Waterdeep</a>
     <a class="brand" href="#inicio">
         <span class="brand-bottle" aria-hidden="true">◈</span>
         <span><strong>La Poción Picante</strong><small>Botica · Elixires · Alquimia</small></span>
@@ -190,7 +190,7 @@ $shopData = [
 </section>
 </main>
 
-<footer class="footer"><span>La Poción Picante · Catálogo digital del Favor de Jack</span><a href="/favordejack/mapa/">Volver al mapa de Waterdeep</a></footer>
+<footer class="footer"><span>La Poción Picante · Catálogo digital del Favor de Jack</span><a href="<?= favor_base_path() ?>mapa/">Volver al mapa de Waterdeep</a></footer>
 
 <div class="modal" id="productModal" aria-hidden="true">
     <div class="modal-backdrop" data-close-modal></div>

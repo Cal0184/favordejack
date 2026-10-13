@@ -1,3 +1,4 @@
+<?php require_once dirname(__DIR__) . '/includes/paths.php'; ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -1001,21 +1002,21 @@ body{display:flex;flex-direction:column;min-height:100vh}
 <div class="sticky-shell">
 <header class="topbar">
   <div class="topbar-inner new-topbar-inner">
-    <a class="topbar-back-link" href="/favordejack/" aria-label="Volver a Favor de Jack">← <span>Favor de Jack</span></a>
+    <a class="topbar-back-link" href="<?= favor_base_path() ?>" aria-label="Volver a Favor de Jack">← <span>Favor de Jack</span></a>
     <div class="compact-brand">
       <div class="seal compact-seal" aria-hidden="true"><img src="iconhand.webp" alt=""></div>
       <h1 class="app-title wordmark">Banca Per-Favore</h1>
     </div>
     <div class="account-slot">
-      <a id="session-login" class="header-login" href="/favordejack/login.php?next=%2Ffavordejack%2Fbancadigital%2F" hidden>Iniciar sesión</a>
+      <a id="session-login" class="header-login" href="<?= favor_base_path() ?>login.php?next=<?= rawurlencode(favor_base_path()) ?>bancadigital%2F" hidden>Iniciar sesión</a>
       <details id="session-menu" class="user-menu" hidden>
         <summary>
           <span class="header-user-avatar"><img id="session-avatar" src="iconhand.webp" alt=""></span>
           <span id="session-name">Mi cuenta</span><span class="user-chevron">⌄</span>
         </summary>
         <div class="user-menu-panel">
-          <a id="session-account" href="/favordejack/cuenta.php">Mi cuenta</a>
-          <a id="session-logout" href="/favordejack/logout.php?next=%2Ffavordejack%2Fbancadigital%2F">Cerrar sesión</a>
+          <a id="session-account" href="<?= favor_base_path() ?>cuenta.php">Mi cuenta</a>
+          <a id="session-logout" href="<?= favor_base_path() ?>logout.php?next=<?= rawurlencode(favor_base_path()) ?>bancadigital%2F">Cerrar sesión</a>
         </div>
       </details>
     </div>
@@ -1174,14 +1175,14 @@ function canEditPlayer(playerId){ return isLoggedIn() && (isAdminUser() || state
 function canEditCharacter(character){ return !!character && canEditPlayer(character.playerId); }
 function requireClientLogin(){
   if(isLoggedIn()) return true;
-  window.location.href='/favordejack/login.php?next='+encodeURIComponent('/favordejack/bancadigital/');
+  window.location.href='<?= favor_base_path() ?>login.php?next='+encodeURIComponent('<?= favor_base_path() ?>bancadigital/');
   return false;
 }
 
 /* ================= server API ================= */
 async function apiRequest(action, payload=null, method='GET'){
   const options={method,headers:{'Accept':'application/json'}};
-  let url='/favordejack/bancadigital/api.php?action='+encodeURIComponent(action);
+  let url='<?= favor_base_path() ?>bancadigital/api.php?action='+encodeURIComponent(action);
   if(method!=='GET'){
     options.headers['Content-Type']='application/json';
     options.headers['X-CSRF-Token']=state.csrf||'';
@@ -1194,7 +1195,7 @@ async function apiRequest(action, payload=null, method='GET'){
     const type=response.headers.get('content-type')||'sin Content-Type';
     throw new Error(`Respuesta inválida del servidor (HTTP ${response.status}, ${type}).`);
   }
-  if(response.status===401){ location.href='/favordejack/bancadigital/'; throw new Error('SESSION'); }
+  if(response.status===401){ location.href='<?= favor_base_path() ?>bancadigital/'; throw new Error('SESSION'); }
   if(!response.ok || !data.ok) throw new Error(data.error||'No se pudo completar la operación');
   return data;
 }
@@ -1256,13 +1257,13 @@ function resolveAssetSrc(src){
   // URLs externas y data URLs se respetan tal cual.
   if(/^(https?:|data:)/i.test(value)) return value;
 
-  // Compatibilidad con rutas absolutas antiguas que apuntaban a /favordejack/media/.
-  // Las imágenes reales de Banca viven dentro de /favordejack/bancadigital/.
-  if(value.startsWith('/favordejack/media/icons/')){
-    return '/favordejack/bancadigital/icons/'+value.slice('/favordejack/media/icons/'.length);
+  // Compatibilidad con rutas absolutas antiguas que apuntaban a <?= favor_base_path() ?>media/.
+  // Las imágenes reales de Banca viven dentro de <?= favor_base_path() ?>bancadigital/.
+  if(value.startsWith('<?= favor_base_path() ?>media/icons/')){
+    return '<?= favor_base_path() ?>bancadigital/icons/'+value.slice('<?= favor_base_path() ?>media/icons/'.length);
   }
-  if(value.startsWith('/favordejack/media/characters/')){
-    return '/favordejack/bancadigital/characters/'+value.slice('/favordejack/media/characters/'.length);
+  if(value.startsWith('<?= favor_base_path() ?>media/characters/')){
+    return '<?= favor_base_path() ?>bancadigital/characters/'+value.slice('<?= favor_base_path() ?>media/characters/'.length);
   }
 
   // Las rutas absolutas correctas se dejan intactas.
@@ -1270,17 +1271,17 @@ function resolveAssetSrc(src){
 
   // La BD puede seguir guardando "media/..." para no requerir ninguna migración.
   if(value.startsWith('media/icons/')){
-    return '/favordejack/bancadigital/icons/'+value.slice('media/icons/'.length);
+    return '<?= favor_base_path() ?>bancadigital/icons/'+value.slice('media/icons/'.length);
   }
   if(value.startsWith('media/characters/')){
-    return '/favordejack/bancadigital/characters/'+value.slice('media/characters/'.length);
+    return '<?= favor_base_path() ?>bancadigital/characters/'+value.slice('media/characters/'.length);
   }
 
   // Compatibilidad con variantes históricas de ruta.
-  if(value.startsWith('icons/')) return '/favordejack/bancadigital/icons/'+value.slice('icons/'.length);
-  if(value.startsWith('characters/')) return '/favordejack/bancadigital/characters/'+value.slice('characters/'.length);
-  if(value.startsWith('bancadigital/icons/')) return '/favordejack/bancadigital/icons/'+value.slice('bancadigital/icons/'.length);
-  if(value.startsWith('bancadigital/characters/')) return '/favordejack/bancadigital/characters/'+value.slice('bancadigital/characters/'.length);
+  if(value.startsWith('icons/')) return '<?= favor_base_path() ?>bancadigital/icons/'+value.slice('icons/'.length);
+  if(value.startsWith('characters/')) return '<?= favor_base_path() ?>bancadigital/characters/'+value.slice('characters/'.length);
+  if(value.startsWith('bancadigital/icons/')) return '<?= favor_base_path() ?>bancadigital/icons/'+value.slice('bancadigital/icons/'.length);
+  if(value.startsWith('bancadigital/characters/')) return '<?= favor_base_path() ?>bancadigital/characters/'+value.slice('bancadigital/characters/'.length);
 
   return value;
 }
@@ -1293,7 +1294,7 @@ function characterImagePath(character, folder){
   const characterFile = characterFileName(character);
   if(!playerFolder || !characterFile) return PLACEHOLDER_PORTRAIT;
 
-  return `/favordejack/bancadigital/${folder}/${encodeURIComponent(playerFolder)}/${encodeURIComponent(characterFile)}.webp`;
+  return `<?= favor_base_path() ?>bancadigital/${folder}/${encodeURIComponent(playerFolder)}/${encodeURIComponent(characterFile)}.webp`;
 }
 
 function characterIconImgAttrs(character, eager=false){
@@ -2092,7 +2093,7 @@ function showPlayerHandleModal(playerId){
 function showEditPlayerModal(playerId){
   const p = state.players.find(x=>x.id===playerId);
   if(!p) return;
-  const adminImageField=isAdminUser()?`<label class="text-input">URL del icono <input type="text" id="player-icon-url" maxlength="300" value="${escapeHtml(p.iconUrl||'')}" placeholder="media/icons/... o https://..."><small>Solo administrador · acepta media/icons/... y lo resuelve dentro de /favordejack/bancadigital/.</small></label>`:'';
+  const adminImageField=isAdminUser()?`<label class="text-input">URL del icono <input type="text" id="player-icon-url" maxlength="300" value="${escapeHtml(p.iconUrl||'')}" placeholder="media/icons/... o https://..."><small>Solo administrador · acepta media/icons/... y lo resuelve dentro de <?= favor_base_path() ?>bancadigital/.</small></label>`:'';
   openModal(`
     <h2 class="modal-title">Editar jugador</h2>
     <label class="text-input">Nombre del jugador<input type="text" id="name-input" maxlength="60" value="${escapeHtml(p.name)}" autofocus></label>

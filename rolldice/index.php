@@ -48,7 +48,7 @@ function asset(string $path): string
 <h1>El Favor de <span>Jack</span></h1>
 <p class="jack-subtitle">Lanza. Mira cómo gira el destino. Acepta el resultado.</p>
 </div>
-<a class="jack-back-button" href="/favordejack/" aria-label="Volver a El Favor de Jack">
+<a class="jack-back-button" href="<?= favor_base_path() ?>" aria-label="Volver a El Favor de Jack">
 <span aria-hidden="true">←</span> Volver
 </a>
 </header>

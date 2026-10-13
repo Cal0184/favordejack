@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+require_once __DIR__ . '/paths.php';
+
 /**
  * Favor de Jack · rutas de recursos compartidos.
  * Las imágenes de jugadores/personajes viven fuera de Banca para que cualquier
@@ -16,7 +18,7 @@ function favor_asset_db_path(?string $value): string
     if (preg_match('#^(?:https?://|data:)#i', $value)) return $value;
 
     // Convierte URLs absolutas del propio sitio a una ruta canónica de BD.
-    $prefix = '/favordejack/';
+    $prefix = favor_base_path();
     if (str_starts_with($value, $prefix)) $value = substr($value, strlen($prefix));
     $value = ltrim($value, '/');
 
@@ -39,7 +41,7 @@ function favor_asset_url(?string $value): string
     $value = favor_asset_db_path($value);
     if ($value === '') return '';
     if (preg_match('#^(?:https?://|data:)#i', $value)) return $value;
-    return '/favordejack/' . ltrim($value, '/');
+    return favor_base_path() . ltrim($value, '/');
 }
 
 function favor_safe_asset_input(?string $value): string

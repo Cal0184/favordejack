@@ -15,7 +15,7 @@ header('X-Robots-Tag: noindex, nofollow');
 header('Cache-Control: private, no-store');
 
 if (!$user) {
-    header('Location: /favordejack/login.php?next=' . rawurlencode('/favordejack/timetoplay/'), true, 303);
+    header('Location: ' . favor_base_path() . 'login.php?next=' . rawurlencode(favor_base_path() . 'timetoplay/'), true, 303);
     exit;
 }
 if (($user['role'] ?? '') !== 'admin') {
@@ -23,7 +23,7 @@ if (($user['role'] ?? '') !== 'admin') {
     header('Content-Type: text/html; charset=UTF-8');
     echo '<!doctype html><html lang="es"><meta charset="utf-8"><meta name="robots" content="noindex">'
         . '<title>Acceso restringido</title><p>Esta sección es solo para el DM.</p>'
-        . '<p><a href="/favordejack/">Volver a Favor de Jack</a></p></html>';
+        . '<p><a href="' . favor_base_path() . '">Volver a Favor de Jack</a></p></html>';
     exit;
 }
 

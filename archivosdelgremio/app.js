@@ -1,6 +1,7 @@
 (() => {
     'use strict';
 
+    const FAVOR_BASE = new URL('../', document.currentScript.src).pathname; // raíz de la web, sea cual sea la carpeta
     const S = window.GUILD_STATE || {};
     const characters = Array.isArray(S.characters) ? S.characters : [];
     const players = Array.isArray(S.players) ? S.players : [];
@@ -62,31 +63,31 @@
         if (!value) return '';
         if (/^(https?:|data:)/i.test(value)) return value;
 
-        if (value.startsWith('/favordejack/media/icons/')) {
-            return '/favordejack/bancadigital/icons/' + value.slice('/favordejack/media/icons/'.length);
+        if (value.startsWith(FAVOR_BASE + 'media/icons/')) {
+            return FAVOR_BASE + 'bancadigital/icons/' + value.slice((FAVOR_BASE + 'media/icons/').length);
         }
-        if (value.startsWith('/favordejack/media/characters/')) {
-            return '/favordejack/bancadigital/characters/' + value.slice('/favordejack/media/characters/'.length);
+        if (value.startsWith(FAVOR_BASE + 'media/characters/')) {
+            return FAVOR_BASE + 'bancadigital/characters/' + value.slice((FAVOR_BASE + 'media/characters/').length);
         }
         if (value.startsWith('/')) return value;
 
         if (value.startsWith('media/icons/')) {
-            return '/favordejack/bancadigital/icons/' + value.slice('media/icons/'.length);
+            return FAVOR_BASE + 'bancadigital/icons/' + value.slice('media/icons/'.length);
         }
         if (value.startsWith('media/characters/')) {
-            return '/favordejack/bancadigital/characters/' + value.slice('media/characters/'.length);
+            return FAVOR_BASE + 'bancadigital/characters/' + value.slice('media/characters/'.length);
         }
         if (value.startsWith('icons/')) {
-            return '/favordejack/bancadigital/icons/' + value.slice('icons/'.length);
+            return FAVOR_BASE + 'bancadigital/icons/' + value.slice('icons/'.length);
         }
         if (value.startsWith('characters/')) {
-            return '/favordejack/bancadigital/characters/' + value.slice('characters/'.length);
+            return FAVOR_BASE + 'bancadigital/characters/' + value.slice('characters/'.length);
         }
         if (value.startsWith('bancadigital/icons/')) {
-            return '/favordejack/bancadigital/icons/' + value.slice('bancadigital/icons/'.length);
+            return FAVOR_BASE + 'bancadigital/icons/' + value.slice('bancadigital/icons/'.length);
         }
         if (value.startsWith('bancadigital/characters/')) {
-            return '/favordejack/bancadigital/characters/' + value.slice('bancadigital/characters/'.length);
+            return FAVOR_BASE + 'bancadigital/characters/' + value.slice('bancadigital/characters/'.length);
         }
         return value;
     }
@@ -300,8 +301,8 @@
                     </div>
                     ${text ? `<h3 class="section-title">Notas del expediente</h3><div class="folio-text">${esc(text)}</div>` : ''}
                     <div class="folio-actions">
-                        <a class="folio-action primary" href="/favordejack/bancadigital/?character=${encodeURIComponent(c.id)}">◈ Ir a su Banca</a>
-                        <a class="folio-action" href="/favordejack/inventario/?character=${encodeURIComponent(c.id)}">▣ Inventario</a>
+                        <a class="folio-action primary" href="${FAVOR_BASE}bancadigital/?character=${encodeURIComponent(c.id)}">◈ Ir a su Banca</a>
+                        <a class="folio-action" href="${FAVOR_BASE}inventario/?character=${encodeURIComponent(c.id)}">▣ Inventario</a>
                         <a class="folio-action" href="relaciones.php?character=${encodeURIComponent(c.id)}">⌁ Relaciones</a>
                         ${c.hasSheet ? `<a class="folio-action" href="hoja.php?id=${encodeURIComponent(c.id)}">📜 Hoja</a>` : ''}
                     </div>
@@ -610,14 +611,14 @@
             return;
         }
         if (isLogged) {
-            window.location.href = '/favordejack/cuenta.php';
+            window.location.href = FAVOR_BASE + 'cuenta.php';
             return;
         }
-        window.location.href = '/favordejack/login.php?next=' + encodeURIComponent('/favordejack/archivosdelgremio/');
+        window.location.href = FAVOR_BASE + 'login.php?next=' + encodeURIComponent(FAVOR_BASE + 'archivosdelgremio/');
     });
 
     $('#adminLogout')?.addEventListener('click', () => {
-        window.location.href = '/favordejack/logout.php?next=' + encodeURIComponent('/favordejack/archivosdelgremio/');
+        window.location.href = FAVOR_BASE + 'logout.php?next=' + encodeURIComponent(FAVOR_BASE + 'archivosdelgremio/');
     });
 
     // ------------------------------------------------------------

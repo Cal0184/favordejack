@@ -34,6 +34,12 @@ function h(string $value): string {
     return htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
 
+/** Las rutas de tiendas.json son relativas a la raíz de la web («tiendas/emporio/»). */
+function shopUrl(string $value): string {
+    if ($value === '' || preg_match('#^(?:[a-z][a-z0-9+.-]*:|//)#i', $value)) return $value;
+    return favor_url($value);
+}
+
 function firstChar(string $value): string {
     if ($value === '') return '?';
     return function_exists('mb_substr') ? mb_substr($value, 0, 1, 'UTF-8') : substr($value, 0, 1);
@@ -62,7 +68,7 @@ function markerClass(array $shop): string {
 <body>
 <?php favor_auth_widget(); ?>
 <header class="map-header">
-    <a class="home-link" href="/favordejack/"><span aria-hidden="true">←</span><span>Favor de Jack</span></a>
+    <a class="home-link" href="<?= favor_base_path() ?>"><span aria-hidden="true">←</span><span>Favor de Jack</span></a>
 
     <div class="map-title">
         <span class="title-ornament">✦</span>
@@ -150,7 +156,7 @@ function markerClass(array $shop): string {
                     <?php $sellers = is_array($shop['sellers'] ?? null) ? $shop['sellers'] : []; ?>
                     <a
                         class="<?= h(markerClass($shop)) ?>"
-                        href="<?= h((string)$shop['url']) ?>"
+                        href="<?= h(shopUrl((string)$shop['url'])) ?>"
                         data-shop-id="<?= h((string)$shop['id']) ?>"
                         data-shop-x="<?= h((string)$shop['x']) ?>"
                         data-shop-y="<?= h((string)$shop['y']) ?>"

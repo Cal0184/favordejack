@@ -1,3 +1,4 @@
+const FAVOR_BASE = new URL('../../', document.currentScript.src).pathname; // raíz de la web, sea cual sea la carpeta
 const S=window.APP_STATE,app=document.querySelector('#app'),nav=document.querySelector('#nav');
 let selected=[],filter='all';
 const esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
@@ -26,5 +27,5 @@ function manageRequests(){document.querySelector('#admin').innerHTML=S.requests.
 async function statusReq(id,status){try{await post('request_status',{id,status});location.reload()}catch(e){alert(e.message)}}
 function modal(html,closable=true){const d=document.createElement('div');d.className='modal';d.id='modal';d.onclick=e=>{if(closable&&e.target===d)closeModal()};d.innerHTML='<div class="panel modal-sheet">'+(closable?'<button class="close" onclick="closeModal()" aria-label="Cerrar">×</button>':'')+html+'</div>';document.body.append(d)}
 function closeModal(){document.querySelector('#modal')?.remove()}
-function goHome(){window.location.href='/favordejack/'}
+function goHome(){window.location.href=FAVOR_BASE}
 document.querySelector('#discord').onclick=e=>{e.preventDefault();alert('Edita este enlace cuando tengas tu URL definitiva de Discord.')};shell();

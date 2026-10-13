@@ -7,15 +7,10 @@ declare(strict_types=1);
  * variables del archivo que hace require de db.php (por ejemplo, las del login).
  */
 return (static function (): mysqli {
-    $configPath = __DIR__ . '/config.php';
-
-    if (!is_file($configPath)) {
-        throw new RuntimeException('Falta config.php.');
-    }
-
-    $dbConfig = require $configPath;
-    if (!is_array($dbConfig)) {
-        throw new RuntimeException('config.php no devolvió una configuración válida.');
+    require_once dirname(__DIR__) . '/includes/config.php';
+    $dbConfig = favor_config()['db'];
+    if (!$dbConfig) {
+        throw new RuntimeException('Falta la configuración de la base de datos (config.local.php).');
     }
 
     $dbHost = trim((string)($dbConfig['host'] ?? 'localhost'));
@@ -30,7 +25,7 @@ return (static function (): mysqli {
         str_starts_with($dbUsername, 'REEMPLAZAR_') ||
         str_starts_with($dbPassword, 'REEMPLAZAR_')
     ) {
-        throw new RuntimeException('Completa las credenciales MySQL en config.php.');
+        throw new RuntimeException('Completa las credenciales MySQL en config.local.php.');
     }
 
     mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);

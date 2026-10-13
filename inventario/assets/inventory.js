@@ -1,6 +1,7 @@
 'use strict';
 
 (() => {
+    const FAVOR_BASE = new URL('../../', document.currentScript.src).pathname; // raíz de la web, sea cual sea la carpeta
     const configNode = document.getElementById('inventoryConfig');
     if (!configNode) return;
 
@@ -378,7 +379,7 @@
         dom.archiveLink.href = `${config.links?.archive || '#'}${encodeURIComponent(character.id)}`;
         dom.addItemBtn.hidden = !payload.canEdit;
         if (dom.importSheetLink) {
-            dom.importSheetLink.href = `/favordejack/archivosdelgremio/importar-ficha.php?character=${encodeURIComponent(character.id)}`;
+            dom.importSheetLink.href = `${FAVOR_BASE}archivosdelgremio/importar-ficha.php?character=${encodeURIComponent(character.id)}`;
             dom.importSheetLink.hidden = !payload.canEdit;
         }
     }

@@ -24,7 +24,7 @@ $shopData = [
         'name' => 'La Varita Económica',
         'sellerA' => 'El Señor Blanco',
         'sellerB' => 'Pinkman',
-        'backUrl' => '/favordejack/mapa/',
+        'backUrl' => favor_base_path() . 'mapa/',
     ],
 ];
 ?>
@@ -43,7 +43,7 @@ $shopData = [
 <div class="noise" aria-hidden="true"></div>
 
 <header class="topbar">
-    <a class="back-link" href="/favordejack/mapa/">← Waterdeep</a>
+    <a class="back-link" href="<?= favor_base_path() ?>mapa/">← Waterdeep</a>
     <a class="brand" href="#inicio">
         <span class="brand-symbol">Vₑ</span>
         <span><strong>La Varita Económica</strong><small>Sin factura · Sin preguntas</small></span>
@@ -242,7 +242,7 @@ $shopData = [
 
 <footer class="footer">
     <span>La Varita Económica · Si preguntan, nunca estuvimos aquí.</span>
-    <a href="/favordejack/mapa/">← Volver al mapa</a>
+    <a href="<?= favor_base_path() ?>mapa/">← Volver al mapa</a>
 </footer>
 
 <div class="modal" id="productModal" aria-hidden="true">

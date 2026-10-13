@@ -59,7 +59,7 @@ $mod = static fn(?int $v): string => $v === null ? '' : (($m = intdiv($v - 10 + 
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#2b1a10">
     <title><?= h($row ? $row['Nombre'] . ' · Hoja' : 'Hoja no encontrada') ?> · Archivos del Gremio</title>
-    <link rel="icon" href="/favordejack/favicon.ico">
+    <link rel="icon" href="<?= favor_base_path() ?>favicon.ico">
     <style>
         :root { --ink:#2b1a10; --paper:#f3e6c8; --paper2:#e9d6ac; --muted:#6b5338; --line:#c9ad78; }
         * { box-sizing:border-box; }
@@ -91,7 +91,7 @@ $mod = static fn(?int $v): string => $v === null ? '' : (($m = intdiv($v - 10 + 
 <body>
 <div class="wrap">
 <?php if (!$row): ?>
-    <div class="top"><h1>Hoja no encontrada</h1><a href="/favordejack/archivosdelgremio/">← Archivos del Gremio</a></div>
+    <div class="top"><h1>Hoja no encontrada</h1><a href="<?= favor_base_path() ?>archivosdelgremio/">← Archivos del Gremio</a></div>
     <div class="card">Este personaje todavía no tiene una ficha importada.</div>
 <?php else: ?>
     <div class="top">
@@ -102,7 +102,7 @@ $mod = static fn(?int $v): string => $v === null ? '' : (($m = intdiv($v - 10 + 
         <div>
             <?php if ($canEdit): ?><a class="btn" href="?id=<?= h(rawurlencode($id)) ?>&amp;pdf=1" target="_blank" rel="noopener">PDF original</a>
             <a class="btn" href="importar-ficha.php?character=<?= h(rawurlencode($id)) ?>">Reimportar</a><?php endif; ?>
-            <a href="/favordejack/archivosdelgremio/?character=<?= h(rawurlencode($id)) ?>">← Volver al Archivo</a>
+            <a href="<?= favor_base_path() ?>archivosdelgremio/?character=<?= h(rawurlencode($id)) ?>">← Volver al Archivo</a>
         </div>
     </div>
 

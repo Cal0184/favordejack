@@ -37,7 +37,7 @@ $shopData = [
     'shop' => [
         'name' => 'Balas y Sangre',
         'seller' => 'Madeline Ironslinger',
-        'backUrl' => '/favordejack/',
+        'backUrl' => favor_base_path(),
     ],
 ];
 ?>
@@ -55,7 +55,7 @@ $shopData = [
 <body>
 <?php favor_auth_widget(); ?>
 <header class="topbar" id="topbar">
-    <a class="back-link" href="/favordejack/" aria-label="Volver a Favor de Jack">
+    <a class="back-link" href="<?= favor_base_path() ?>" aria-label="Volver a Favor de Jack">
         <span aria-hidden="true">←</span> Favor de Jack
     </a>
 
@@ -263,7 +263,7 @@ $shopData = [
 <footer class="footer">
     <span><b>Balas y Sangre</b> · Catálogo digital del Favor de Jack</span>
     <span class="footer-mark" aria-hidden="true">◆</span>
-    <a href="/favordejack/">Volver a Favor de Jack</a>
+    <a href="<?= favor_base_path() ?>">Volver a Favor de Jack</a>
 </footer>
 
 <div class="modal" id="productModal" aria-hidden="true">

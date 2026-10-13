@@ -41,8 +41,8 @@ $config = [
     ] : null,
     'visualAssets' => $visualAssets,
     'links' => [
-        'bank' => '/favordejack/bancadigital/?character=',
-        'archive' => '/favordejack/archivosdelgremio/?character=',
+        'bank' => favor_base_path() . 'bancadigital/?character=',
+        'archive' => favor_base_path() . 'archivosdelgremio/?character=',
     ],
 ];
 ?>
@@ -79,7 +79,7 @@ $config = [
 
     <div class="topbar__end">
         <span class="topbar__motto">Buenas historias<br>siempre encuentran su camino.</span>
-        <a class="hub-button" href="/favordejack/" aria-label="Salir del Inventario y volver al Hub">
+        <a class="hub-button" href="<?= favor_base_path() ?>" aria-label="Salir del Inventario y volver al Hub">
             <span aria-hidden="true">←</span> Volver al Hub
         </a>
     </div>

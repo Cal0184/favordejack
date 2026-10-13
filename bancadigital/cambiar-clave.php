@@ -1,4 +1,5 @@
 <?php
 declare(strict_types=1);
-header('Location: /favordejack/cuenta.php', true, 303);
+require_once dirname(__DIR__) . '/includes/paths.php';
+header('Location: ' . favor_base_path() . 'cuenta.php', true, 303);
 exit;
