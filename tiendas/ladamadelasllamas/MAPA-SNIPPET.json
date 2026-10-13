@@ -1,0 +1,12 @@
+{
+  "id": "dama-llamas",
+  "name": "La Dama de las Llamas",
+  "seller": "Gaston · Axe Rein",
+  "category": "Herrería · Forja · Mejoras arcanas",
+  "description": "Herrería de oficio con compraventa de armas y armaduras y un banco separado para mejoras mágicas.",
+  "url": "/favordejack/tiendas/dama-de-las-llamas/",
+  "sellerImage": "assets/vendedores/gaston.png",
+  "x": 31.0,
+  "y": 48.0,
+  "enabled": false
+}

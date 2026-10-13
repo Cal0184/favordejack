@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 760">
+<defs><linearGradient id="c" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#bf7597"/><stop offset="1" stop-color="#5b315f"/></linearGradient><linearGradient id="m"><stop stop-color="#7f2439"/><stop offset="1" stop-color="#21182f"/></linearGradient></defs>
+<g stroke="#2a1728" stroke-width="8" stroke-linejoin="round">
+<path d="M150 120 82 38l34 118M291 120l69-82-35 119" fill="#4e2a51"/>
+<ellipse cx="220" cy="155" rx="88" ry="105" fill="url(#c)"/><path d="M132 124c35-69 141-77 180-2-56-34-117-31-180 2Z" fill="#231529"/>
+<path d="M115 254c-55 95-72 217-48 389l109 53 45-159 45 159 108-53c24-171 7-294-48-389-66 43-144 43-211 0Z" fill="url(#m)"/>
+<path d="M126 267c42 69 146 75 191 1l-19 171-77-48-75 49Z" fill="#171423"/>
+<path d="M167 698 145 748M274 698l25 50" stroke="#1a151b" stroke-width="28"/>
+<path d="M186 335 159 570M254 335l29 235" stroke="#d2ac68" stroke-width="7"/><path d="M164 560h113" stroke="#d2ac68" stroke-width="12"/>
+<circle cx="190" cy="158" r="9" fill="#d84d62" stroke="none"/><circle cx="250" cy="158" r="9" fill="#d84d62" stroke="none"/>
+<path d="M191 210q29 15 57 0" fill="none" stroke="#542038" stroke-width="6"/>
+<path d="M96 432q-72 81 3 159M347 424q78 87 6 166" fill="none" stroke="#69374e" stroke-width="18"/>
+</g><text x="220" y="735" text-anchor="middle" fill="#dfc78d" font-family="Georgia,serif" font-size="28">ECIX'S</text>
+</svg>

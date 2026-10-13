@@ -1,0 +1,1296 @@
+[
+  {
+    "id": "lve-pergaminos-pergamino-de-bendicion",
+    "name": "Pergamino de bendición",
+    "category": "Pergaminos",
+    "subcategory": "Disponibles",
+    "price": "50 Oro",
+    "description": "Pergamino disponible actualmente en el inventario de La Varita Económica.",
+    "sellerNote": "White jura que no puede bajarlos más. Pinkman te guiña un ojo.",
+    "image": "assets/productos/pergamino-de-bendicion.webp",
+    "fallback": "assets/placeholders/pergaminos.svg"
+  },
+  {
+    "id": "lve-pergaminos-pergamino-de-luces-danzantes",
+    "name": "Pergamino de Luces danzantes",
+    "category": "Pergaminos",
+    "subcategory": "Disponibles",
+    "price": "50 Oro",
+    "description": "Pergamino disponible actualmente en el inventario de La Varita Económica.",
+    "sellerNote": "White jura que no puede bajarlos más. Pinkman te guiña un ojo.",
+    "image": "assets/productos/pergamino-de-luces-danzantes.webp",
+    "fallback": "assets/placeholders/pergaminos.svg"
+  },
+  {
+    "id": "lve-pergaminos-pergamino-de-caida-de-pluma-dano",
+    "name": "Pergamino de Caída de Pluma daño",
+    "category": "Pergaminos",
+    "subcategory": "Disponibles",
+    "price": "50 Oro",
+    "description": "Pergamino disponible actualmente en el inventario de La Varita Económica.",
+    "sellerNote": "White jura que no puede bajarlos más. Pinkman te guiña un ojo.",
+    "image": "assets/productos/pergamino-de-caida-de-pluma-dano.webp",
+    "fallback": "assets/placeholders/pergaminos.svg"
+  },
+  {
+    "id": "lve-pergaminos-pergamino-de-muro-cuchillas",
+    "name": "Pergamino de Muro Cuchillas",
+    "category": "Pergaminos",
+    "subcategory": "Disponibles",
+    "price": "50 Oro",
+    "description": "Pergamino disponible actualmente en el inventario de La Varita Económica.",
+    "sellerNote": "White jura que no puede bajarlos más. Pinkman te guiña un ojo.",
+    "image": "assets/productos/pergamino-de-muro-cuchillas.webp",
+    "fallback": "assets/placeholders/pergaminos.svg"
+  },
+  {
+    "id": "lve-pergaminos-pergamino-de-comprender-idiomas",
+    "name": "Pergamino de Comprender idiomas",
+    "category": "Pergaminos",
+    "subcategory": "Disponibles",
+    "price": "100",
+    "description": "Pergamino disponible actualmente en el inventario de La Varita Económica.",
+    "sellerNote": "White jura que no puede bajarlos más. Pinkman te guiña un ojo.",
+    "image": "assets/productos/pergamino-de-comprender-idiomas.webp",
+    "fallback": "assets/placeholders/pergaminos.svg"
+  },
+  {
+    "id": "lve-pergaminos-pergamino-de-detectar-magia",
+    "name": "Pergamino de Detectar magia",
+    "category": "Pergaminos",
+    "subcategory": "Disponibles",
+    "price": "100 Oro",
+    "description": "Pergamino disponible actualmente en el inventario de La Varita Económica.",
+    "sellerNote": "White jura que no puede bajarlos más. Pinkman te guiña un ojo.",
+    "image": "assets/productos/pergamino-de-detectar-magia.webp",
+    "fallback": "assets/placeholders/pergaminos.svg"
+  },
+  {
+    "id": "lve-pergaminos-pergamino-de-proteccion-contra-el-bien-y-el-mal",
+    "name": "Pergamino de Protección contra el bien y el mal",
+    "category": "Pergaminos",
+    "subcategory": "Disponibles",
+    "price": "100 Oro",
+    "description": "Pergamino disponible actualmente en el inventario de La Varita Económica.",
+    "sellerNote": "White jura que no puede bajarlos más. Pinkman te guiña un ojo.",
+    "image": "assets/productos/pergamino-de-proteccion-contra-el-bien-y-el-mal.webp",
+    "fallback": "assets/placeholders/pergaminos.svg"
+  },
+  {
+    "id": "lve-pergaminos-pergamino-de-santuario",
+    "name": "Pergamino de Santuario",
+    "category": "Pergaminos",
+    "subcategory": "Disponibles",
+    "price": "100 Oro",
+    "description": "Pergamino disponible actualmente en el inventario de La Varita Económica.",
+    "sellerNote": "White jura que no puede bajarlos más. Pinkman te guiña un ojo.",
+    "image": "assets/productos/pergamino-de-santuario.webp",
+    "fallback": "assets/placeholders/pergaminos.svg"
+  },
+  {
+    "id": "lve-pergaminos-pergamino-de-telekinesis",
+    "name": "Pergamino de Telekinesis",
+    "category": "Pergaminos",
+    "subcategory": "Disponibles",
+    "price": "100 Oro",
+    "description": "Pergamino disponible actualmente en el inventario de La Varita Económica.",
+    "sellerNote": "White jura que no puede bajarlos más. Pinkman te guiña un ojo.",
+    "image": "assets/productos/pergamino-de-telekinesis.webp",
+    "fallback": "assets/placeholders/pergaminos.svg"
+  },
+  {
+    "id": "lve-pergaminos-pergamino-de-toque-vampirico",
+    "name": "Pergamino de Toque vampírico",
+    "category": "Pergaminos",
+    "subcategory": "Disponibles",
+    "price": "150 Oro",
+    "description": "Pergamino disponible actualmente en el inventario de La Varita Económica.",
+    "sellerNote": "White jura que no puede bajarlos más. Pinkman te guiña un ojo.",
+    "image": "assets/productos/pergamino-de-toque-vampirico.webp",
+    "fallback": "assets/placeholders/pergaminos.svg"
+  },
+  {
+    "id": "lve-pergaminos-pergamino-de-rayo-de-debilitamiento",
+    "name": "Pergamino de Rayo de debilitamiento",
+    "category": "Pergaminos",
+    "subcategory": "Disponibles",
+    "price": "150 Oro",
+    "description": "Pergamino disponible actualmente en el inventario de La Varita Económica.",
+    "sellerNote": "White jura que no puede bajarlos más. Pinkman te guiña un ojo.",
+    "image": "assets/productos/pergamino-de-rayo-de-debilitamiento.webp",
+    "fallback": "assets/placeholders/pergaminos.svg"
+  },
+  {
+    "id": "lve-pergaminos-pergamino-de-romper",
+    "name": "Pergamino de Romper",
+    "category": "Pergaminos",
+    "subcategory": "Disponibles",
+    "price": "150 Oro",
+    "description": "Pergamino disponible actualmente en el inventario de La Varita Económica.",
+    "sellerNote": "White jura que no puede bajarlos más. Pinkman te guiña un ojo.",
+    "image": "assets/productos/pergamino-de-romper.webp",
+    "fallback": "assets/placeholders/pergaminos.svg"
+  },
+  {
+    "id": "lve-pergaminos-pergamino-de-muro-de-fuerza",
+    "name": "Pergamino de Muro de fuerza",
+    "category": "Pergaminos",
+    "subcategory": "Disponibles",
+    "price": "200 Oro",
+    "description": "Pergamino disponible actualmente en el inventario de La Varita Económica.",
+    "sellerNote": "White jura que no puede bajarlos más. Pinkman te guiña un ojo.",
+    "image": "assets/productos/pergamino-de-muro-de-fuerza.webp",
+    "fallback": "assets/placeholders/pergaminos.svg"
+  },
+  {
+    "id": "lve-pergaminos-pergamino-de-patron-hipnotico",
+    "name": "Pergamino de Patrón hipnótico",
+    "category": "Pergaminos",
+    "subcategory": "Disponibles",
+    "price": "200 Oro",
+    "description": "Pergamino disponible actualmente en el inventario de La Varita Económica.",
+    "sellerNote": "White jura que no puede bajarlos más. Pinkman te guiña un ojo.",
+    "image": "assets/productos/pergamino-de-patron-hipnotico.webp",
+    "fallback": "assets/placeholders/pergaminos.svg"
+  },
+  {
+    "id": "lve-pergaminos-pergamino-de-imagen-mayor",
+    "name": "Pergamino de Imagen Mayor",
+    "category": "Pergaminos",
+    "subcategory": "Disponibles",
+    "price": "200 Oro",
+    "description": "Pergamino disponible actualmente en el inventario de La Varita Económica.",
+    "sellerNote": "White jura que no puede bajarlos más. Pinkman te guiña un ojo.",
+    "image": "assets/productos/pergamino-de-imagen-mayor.webp",
+    "fallback": "assets/placeholders/pergaminos.svg"
+  },
+  {
+    "id": "lve-pergaminos-pergamino-de-faro-de-la-esperanza",
+    "name": "Pergamino de Faro de la esperanza",
+    "category": "Pergaminos",
+    "subcategory": "Disponibles",
+    "price": "200 Oro",
+    "description": "Pergamino disponible actualmente en el inventario de La Varita Económica.",
+    "sellerNote": "White jura que no puede bajarlos más. Pinkman te guiña un ojo.",
+    "image": "assets/productos/pergamino-de-faro-de-la-esperanza.webp",
+    "fallback": "assets/placeholders/pergaminos.svg"
+  },
+  {
+    "id": "lve-tatuajes-tatuaje-magico-cantrip",
+    "name": "Tatuaje Mágico — Cantrip",
+    "category": "Tatuajes",
+    "subcategory": "Permanente",
+    "price": "100 Po",
+    "description": "Tatuaje mágico permanente aplicado mediante una aguja encantada que se transforma en tinta viviente. El tatuaje se fusiona mágicamente con el cuerpo y permite lanzar el hechizo inscrito sin componentes materiales una vez por descanso largo. El tatuaje no desaparece después del uso.",
+    "stats": [
+      [
+        "Nivel",
+        "Cantrip"
+      ],
+      [
+        "Modificador mágico",
+        "+3"
+      ],
+      [
+        "CD Salvación",
+        "13"
+      ],
+      [
+        "Bonus Ataque",
+        "+5"
+      ]
+    ],
+    "tags": [
+      "Requiere vinculación",
+      "1/descanso largo"
+    ],
+    "image": "assets/productos/tatuaje-magico-cantrip.webp",
+    "fallback": "assets/placeholders/tatuajes.svg"
+  },
+  {
+    "id": "lve-tatuajes-tatuaje-magico-1",
+    "name": "Tatuaje Mágico — 1º",
+    "category": "Tatuajes",
+    "subcategory": "Permanente",
+    "price": "200 Po",
+    "description": "Tatuaje mágico permanente aplicado mediante una aguja encantada que se transforma en tinta viviente. El tatuaje se fusiona mágicamente con el cuerpo y permite lanzar el hechizo inscrito sin componentes materiales una vez por descanso largo. El tatuaje no desaparece después del uso.",
+    "stats": [
+      [
+        "Nivel",
+        "1º"
+      ],
+      [
+        "Modificador mágico",
+        "+3"
+      ],
+      [
+        "CD Salvación",
+        "13"
+      ],
+      [
+        "Bonus Ataque",
+        "+5"
+      ]
+    ],
+    "tags": [
+      "Requiere vinculación",
+      "1/descanso largo"
+    ],
+    "image": "assets/productos/tatuaje-magico-1.webp",
+    "fallback": "assets/placeholders/tatuajes.svg"
+  },
+  {
+    "id": "lve-tatuajes-tatuaje-magico-2",
+    "name": "Tatuaje Mágico — 2º",
+    "category": "Tatuajes",
+    "subcategory": "Permanente",
+    "price": "300 Po",
+    "description": "Tatuaje mágico permanente aplicado mediante una aguja encantada que se transforma en tinta viviente. El tatuaje se fusiona mágicamente con el cuerpo y permite lanzar el hechizo inscrito sin componentes materiales una vez por descanso largo. El tatuaje no desaparece después del uso.",
+    "stats": [
+      [
+        "Nivel",
+        "2º"
+      ],
+      [
+        "Modificador mágico",
+        "+3"
+      ],
+      [
+        "CD Salvación",
+        "13"
+      ],
+      [
+        "Bonus Ataque",
+        "+5"
+      ]
+    ],
+    "tags": [
+      "Requiere vinculación",
+      "1/descanso largo"
+    ],
+    "image": "assets/productos/tatuaje-magico-2.webp",
+    "fallback": "assets/placeholders/tatuajes.svg"
+  },
+  {
+    "id": "lve-brebajes-el-revividor",
+    "name": "El Revividor",
+    "category": "Brebajes",
+    "subcategory": "Hecho en casa",
+    "price": "1 de oro",
+    "description": "Un líquido de color amarillo con un olor ácido.",
+    "effect": "Recupera [1d4 + 2] puntos de vida.",
+    "sideEffect": "Dolor estomacal. Desventaja en tiradas de salvación de Constitución y Fuerza durante 1 minuto.",
+    "tags": [
+      "Efecto secundario"
+    ],
+    "image": "assets/productos/el-revividor.webp",
+    "fallback": "assets/placeholders/brebajes.svg"
+  },
+  {
+    "id": "lve-brebajes-segundo-round",
+    "name": "Segundo Round",
+    "category": "Brebajes",
+    "subcategory": "Hecho en casa",
+    "price": "2 de oro",
+    "description": "Un líquido de color marrón con un olor dulce.",
+    "effect": "Recupera [1d6 + 4] puntos de vida.",
+    "sideEffect": "Dolor de cabeza. Desventaja en todas las tiradas de habilidad después de 1 minuto de ser ingerido.",
+    "tags": [
+      "Efecto secundario"
+    ],
+    "image": "assets/productos/segundo-round.webp",
+    "fallback": "assets/placeholders/brebajes.svg"
+  },
+  {
+    "id": "lve-brebajes-no-mas-de-3",
+    "name": "No Más de 3",
+    "category": "Brebajes",
+    "subcategory": "Hecho en casa",
+    "price": "1 de oro",
+    "description": "Un líquido de color azul con un olor a alcohol.",
+    "effect": "Recupera [3d6 - 4] puntos de vida.",
+    "sideEffect": "Al tercer uso de este brebaje, vomitas involuntariamente y pierdes toda la vida recuperada por este brebaje de tu estado actual.",
+    "tags": [
+      "Efecto secundario"
+    ],
+    "image": "assets/productos/no-mas-de-3.webp",
+    "fallback": "assets/placeholders/brebajes.svg"
+  },
+  {
+    "id": "lve-brebajes-fuerza-del-oso",
+    "name": "Fuerza del Oso",
+    "category": "Brebajes",
+    "subcategory": "Hecho en casa",
+    "price": "3 de oro",
+    "description": "Un líquido de color rojo intenso con un aroma a frutas silvestres.",
+    "effect": "Recupera [2d8] puntos de vida.",
+    "sideEffect": "Pesadez muscular. Desventaja en tiradas de ataque durante 1 minuto.",
+    "tags": [
+      "Efecto secundario"
+    ],
+    "image": "assets/productos/fuerza-del-oso.webp",
+    "fallback": "assets/placeholders/brebajes.svg"
+  },
+  {
+    "id": "lve-brebajes-claridad-efimera",
+    "name": "Claridad Efímera",
+    "category": "Brebajes",
+    "subcategory": "Hecho en casa",
+    "price": "2 de oro",
+    "description": "Un líquido de color verde claro con un olor fresco a menta.",
+    "effect": "Recupera [1d8 + 2] puntos de vida.",
+    "sideEffect": "Confusión momentánea. Desventaja en tiradas de Percepción e Investigación durante 1 minuto.",
+    "tags": [
+      "Efecto secundario"
+    ],
+    "image": "assets/productos/claridad-efimera.webp",
+    "fallback": "assets/placeholders/brebajes.svg"
+  },
+  {
+    "id": "lve-mezclas-especiales-ira-del-barbaro",
+    "name": "Ira del Bárbaro",
+    "category": "Mezclas especiales",
+    "subcategory": "Inyector · Uncommon",
+    "price": "25 Oro",
+    "description": "Un inyector usa sangre de bárbaro cuando su furia está activada.",
+    "effect": "+2 en Fuerza.",
+    "sideEffect": "−2 Inteligencia y Sabiduría. Dura dos rondas.",
+    "tags": [
+      "Carta original del catálogo"
+    ],
+    "image": "assets/cartas/ira-del-barbaro.png",
+    "fallback": "assets/placeholders/brebajes.svg",
+    "featured": true
+  },
+  {
+    "id": "lve-mezclas-especiales-acelerador",
+    "name": "Acelerador",
+    "category": "Mezclas especiales",
+    "subcategory": "Consumible · Uncommon",
+    "price": "25 Oro",
+    "description": "Una bebida hecha con un grano concentrado de cafeína, diez cucharas de azúcar y tres hechizos de velocidad.",
+    "effect": "+2 Percepción y Destreza durante una ronda.",
+    "sideEffect": "Después queda un debufo de cansancio que disminuye Acrobacias y Destreza durante una ronda. Debufo total: dos rondas.",
+    "tags": [
+      "Carta original del catálogo"
+    ],
+    "image": "assets/cartas/acelerador.png",
+    "fallback": "assets/placeholders/brebajes.svg",
+    "featured": true
+  },
+  {
+    "id": "lve-mezclas-especiales-mentas-del-bardo",
+    "name": "Mentas del Bardo",
+    "category": "Mezclas especiales",
+    "subcategory": "Consumible · Uncommon",
+    "price": "25 Oro",
+    "description": "Dulces hechos de hojas especiales que dejan buen aliento al hablar.",
+    "effect": "+2 Carisma durante 10 minutos. Uso solo en diálogos.",
+    "sideEffect": "−3 Destreza y Fuerza.",
+    "tags": [
+      "Carta original del catálogo"
+    ],
+    "image": "assets/cartas/mentas-del-bardo.png",
+    "fallback": "assets/placeholders/brebajes.svg",
+    "featured": true
+  },
+  {
+    "id": "lve-sustancias-arena-azul",
+    "name": "Arena Azul",
+    "category": "Sustancias",
+    "subcategory": "Mercado negro",
+    "price": "50 gp X Gramo",
+    "description": "Arena fina azul, inhalada.",
+    "effect": "+2 Percepción, +2 Atletismo, +2 Acrobacia por 1 hora. Ventaja en Percepción para rastreo.",
+    "addiction": "CD 13 CON/SAB por uso. Automática al 3–5 uso según tu modificador.",
+    "sideEffect": "4 semanas: 1 nivel de agotamiento cada 3 días sin consumir. 6 semanas: –2 a todas las características; desventaja en todas las habilidades. 8 semanas: muerte.",
+    "tags": [
+      "Adicción",
+      "Mercancía restringida"
+    ],
+    "image": "assets/productos/arena-azul.webp",
+    "fallback": "assets/placeholders/sustancias.svg",
+    "risk": "alto"
+  },
+  {
+    "id": "lve-sustancias-diluvio",
+    "name": "Diluvio",
+    "category": "Sustancias",
+    "subcategory": "Mercado negro",
+    "price": "20 gp X Frasco",
+    "description": "Líquido azul etéreo, ingerido.",
+    "effect": "Puedes lanzar conjuros de nivel 1 sin coste. 20% de chance de permitir nivel 2. Duración 1 Minuto.",
+    "addiction": "CD 14 CON por cada uso. Automática tras 4 usos/semana.",
+    "sideEffect": "Desventaja en Inteligencia/Carisma/Sabiduría",
+    "tags": [
+      "Adicción",
+      "Mercancía restringida"
+    ],
+    "image": "assets/productos/diluvio.webp",
+    "fallback": "assets/placeholders/sustancias.svg",
+    "risk": "alto"
+  },
+  {
+    "id": "lve-sustancias-sannish",
+    "name": "Sannish",
+    "category": "Sustancias",
+    "subcategory": "Mercado negro",
+    "price": "10 gp X Frasco",
+    "description": "Líquido azul destilado, ingerido.",
+    "effect": "Euforia. Ventaja en todas las salvaciones de CON por 1 hora.",
+    "addiction": "CD 12 CON por uso; automática a los 3 usos.",
+    "sideEffect": "Labios azulados permanentes; sin consumir cada 24h → desventaja en todas las tiradas de CON.",
+    "tags": [
+      "Adicción",
+      "Mercancía restringida"
+    ],
+    "image": "assets/productos/sannish.webp",
+    "fallback": "assets/placeholders/sustancias.svg",
+    "risk": "alto"
+  },
+  {
+    "id": "lve-sustancias-polvo-de-hadas",
+    "name": "Polvo de Hadas",
+    "category": "Sustancias",
+    "subcategory": "Mercado negro",
+    "price": "5 gp X Gramo",
+    "description": "Polvo blanco brillante, inhalado.",
+    "effect": "+5 a Arcana, Investigación, Historia y cualquier tirada de INT por 1 hora.",
+    "addiction": "CD 10 SAB por uso; automática tras 8–10 usos.",
+    "sideEffect": "Sin consumir → desventaja en tiradas de INT",
+    "tags": [
+      "Adicción",
+      "Mercancía restringida"
+    ],
+    "image": "assets/productos/polvo-de-hadas.webp",
+    "fallback": "assets/placeholders/sustancias.svg",
+    "risk": "alto"
+  },
+  {
+    "id": "lve-sustancias-lagrimas-de-fenix",
+    "name": "Lágrimas de Fénix",
+    "category": "Sustancias",
+    "subcategory": "Mercado negro",
+    "price": "100 gp X Frasco",
+    "description": "Líquido dorado aromático, ingerido.",
+    "effect": "Cura 5d6+5 PV y elimina enfermedades y venenos",
+    "addiction": "Solo si consumes 2+ en un día → CD 15 CON. Automática tras 3 usos/semana.",
+    "sideEffect": "Cada 3 usos → -1 CON permanente. Fuerte dependencia emocional.",
+    "tags": [
+      "Adicción",
+      "Mercancía restringida"
+    ],
+    "image": "assets/productos/lagrimas-de-fenix.webp",
+    "fallback": "assets/placeholders/sustancias.svg",
+    "risk": "alto"
+  },
+  {
+    "id": "lve-sustancias-nectar-de-sombras",
+    "name": "Néctar de Sombras",
+    "category": "Sustancias",
+    "subcategory": "Mercado negro",
+    "price": "30 gp X Frascso",
+    "description": "Líquido negro viscoso, ingerido.",
+    "effect": "Invisibilidad por 1d4 minutos.",
+    "addiction": "CD 14 SAB por uso; automática tras 6 usos/mes.",
+    "sideEffect": "Al terminar invisibilidad → desventaja en ataques y habilidades por 1 hora; sin consumir → paranoia.",
+    "tags": [
+      "Adicción",
+      "Mercancía restringida"
+    ],
+    "image": "assets/productos/nectar-de-sombras.webp",
+    "fallback": "assets/placeholders/sustancias.svg",
+    "risk": "alto"
+  },
+  {
+    "id": "lve-sustancias-extremiss",
+    "name": "Extremiss",
+    "category": "Sustancias",
+    "subcategory": "Mercado negro",
+    "price": "75 gp X Frasco",
+    "description": "Adrenalina líquida mágica en un vial rojo intenso. Se inyecta o bebe.",
+    "effect": " +2 a Fuerza y Destreza por 5 rondas; ventaja en iniciativa; una acción adicional solo para Atacar, Correr o Esquivar; inmune a miedo durante la duración.",
+    "addiction": "CD 15 CON por uso; automática tras 2–4 usos según modificador.",
+    "sideEffect": "Al terminar recibes 1 nivel de agotamiento automático. Adicción: CD 15 CON por uso; automática tras 2–4 usos según modificador.\n Efectos de Adicción: Sin consumir cada 48h → –2 Fuerza, temblores y desventaja en Atletismo Tras abuso prolongado: –1 CON permanente cada 6 usos.",
+    "tags": [
+      "Adicción",
+      "Mercancía restringida"
+    ],
+    "image": "assets/productos/extremiss.webp",
+    "fallback": "assets/placeholders/sustancias.svg",
+    "risk": "alto"
+  },
+  {
+    "id": "lve-objetos-magicos-el-ojo-que-todo-lo-que-ve",
+    "name": "El ojo que todo lo que ve",
+    "category": "Objetos mágicos?",
+    "subcategory": "Mercadería rara",
+    "price": "40 Po",
+    "description": "Esta pequeña esfera de vidrio ve que todo existe, en todos los planos y durante todo el tiempo. Sin embargo, el ojo es casi imposible de concentrarse correctamente, y generalmente solo mostrará a los usuarios un flujo continuo de destellos de realidad aleatorios.",
+    "tags": [],
+    "image": "assets/productos/el-ojo-que-todo-lo-que-ve.webp",
+    "fallback": "assets/placeholders/objetos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-objetos-magicos-el-amuleto-de-no-retorno",
+    "name": "El amuleto de no retorno",
+    "category": "Objetos mágicos?",
+    "subcategory": "Mercadería rara",
+    "price": "50 Po",
+    "description": "Cuando se coloca en un cadáver, este amuleto de plata empañado evita que el objetivo se vuelva muerto viviente. Curiosamente, si lo usa un cuerpo vivo, el usuario no puede moverse hacia atrás o ser trasladado hacia atrá",
+    "tags": [
+      "Sintonización"
+    ],
+    "image": "assets/productos/el-amuleto-de-no-retorno.webp",
+    "fallback": "assets/placeholders/objetos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-objetos-magicos-la-banda-de-manejo-de-animales",
+    "name": "La banda de manejo de animales",
+    "category": "Objetos mágicos?",
+    "subcategory": "Mercadería rara",
+    "price": "60 Po",
+    "description": "Esta banda es una pequeña corona de hojas de roble. Se puede usar una vez al día para convocar instantáneamente a un animal aleatorio con una calificación de desafío de 0 en sus manos. No te ayuda a lidiar con el animal resultante.",
+    "tags": [],
+    "image": "assets/productos/la-banda-de-manejo-de-animales.webp",
+    "fallback": "assets/placeholders/objetos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-objetos-magicos-perdicion-de-la-hadas",
+    "name": "Perdicion de la Hadas",
+    "category": "Objetos mágicos?",
+    "subcategory": "Mercadería rara",
+    "price": "75 Po",
+    "description": "un par de gafas con montura de alambre. Al sintonizar estas gafas, una vez al día, durante una hora, los elfos no pueden mentirle. Los medios elfos tienen un tiro de 50-50.",
+    "tags": [
+      "Sintonización"
+    ],
+    "image": "assets/productos/perdicion-de-la-hadas.webp",
+    "fallback": "assets/placeholders/objetos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-objetos-magicos-el-asistente-del-herrero",
+    "name": "El asistente del herrero",
+    "category": "Objetos mágicos?",
+    "subcategory": "Mercadería rara",
+    "price": "100 Po",
+    "description": "Un poco de autómata de bronce en forma de cangrejo, de cinco pulgadas de ancho. Se puede usar para buscar cosas muy pequeñas como tornillos, pernos, monedas, etc.",
+    "tags": [
+      "Sintonización"
+    ],
+    "image": "assets/productos/el-asistente-del-herrero.webp",
+    "fallback": "assets/placeholders/objetos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-objetos-magicos-las-botas-de-descenso-rapido",
+    "name": "Las botas de descenso rápido",
+    "category": "Objetos mágicos?",
+    "subcategory": "Mercadería rara",
+    "price": "50 Po",
+    "description": "Un par de botas de cuero lisas que duplica la velocidad de cualquier movimiento en caida",
+    "tags": [
+      "Sintonización"
+    ],
+    "image": "assets/productos/las-botas-de-descenso-rapido.webp",
+    "fallback": "assets/placeholders/objetos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-objetos-magicos-una-botella-de-barro",
+    "name": "Una botella de barro",
+    "category": "Objetos mágicos?",
+    "subcategory": "Mercadería rara",
+    "price": "10 Po",
+    "description": "un pequeño frasco de vidrio lleno de barro. Emite un aura mágica muy débil y muy extraña.",
+    "tags": [],
+    "image": "assets/productos/una-botella-de-barro.webp",
+    "fallback": "assets/placeholders/objetos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-objetos-magicos-maravilla-del-nino",
+    "name": "Maravilla del niño",
+    "category": "Objetos mágicos?",
+    "subcategory": "Mercadería rara",
+    "price": "80 Po",
+    "description": "Este artículo es una pequeña aeronave de madera, intrincadamente tallada y totalmente capaz de vuelo durante una hora por día a una velocidad de vuelo máxima de 120 pies. Sin embargo, solo puede adaptarse a criaturas de la categoría de tamaño \"pequeña\" y más pequeñas. Deja una nube de brillo del arco iris en su rastro.",
+    "tags": [],
+    "image": "assets/productos/maravilla-del-nino.webp",
+    "fallback": "assets/placeholders/objetos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-objetos-magicos-la-capa-de-resistencia-al-agua",
+    "name": "La capa de resistencia al agua",
+    "category": "Objetos mágicos?",
+    "subcategory": "Mercadería rara",
+    "price": "80 Po",
+    "description": "Al ponerse esta capa azul brillante, el usuario gana la capacidad de repeler toda el agua. Los ataques a base de agua (ondas de marea, esferas acuosas, etc.) simplemente se separan de ellos, y pueden caminar sobre el agua a la mitad de su velocidad regular. Sin embargo, también experimentarán hidrofobia paralizante y lucharán para acercarse voluntariamente a los lagos, océanos, ríos, estanques, etc.",
+    "tags": [
+      "Sintonización"
+    ],
+    "image": "assets/productos/la-capa-de-resistencia-al-agua.webp",
+    "fallback": "assets/placeholders/objetos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-objetos-magicos-botas-de-huellas-falsas",
+    "name": "Botas de huellas falsas",
+    "category": "Objetos mágicos?",
+    "subcategory": "Mercadería rara",
+    "price": "150 Po",
+    "description": "Sólo los humanoides pueden usar estas botas. Mientras usas las botas, puedes optar por que dejen huellas como las de otro tipo de humanoide de tu tamaño.",
+    "tags": [],
+    "image": "assets/productos/botas-de-huellas-falsas.webp",
+    "fallback": "assets/placeholders/objetos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-objetos-magicos-vela-de-las-profundidades",
+    "name": "Vela de las profundidades",
+    "category": "Objetos mágicos?",
+    "subcategory": "Mercadería rara",
+    "price": "50 Po",
+    "description": "La llama de esta vela no se apaga al sumergirla en agua. Desprende luz y calor como una vela normal.",
+    "tags": [],
+    "image": "assets/productos/vela-de-las-profundidades.webp",
+    "fallback": "assets/placeholders/objetos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-objetos-magicos-el-dado-del-charlatan",
+    "name": "El dado del charlatán",
+    "category": "Objetos mágicos?",
+    "subcategory": "Mercadería rara",
+    "price": "100 Po",
+    "description": "Cada vez que lanzas este dado de seis caras, puedes controlar qué número arroja.",
+    "tags": [],
+    "image": "assets/productos/el-dado-del-charlatan.webp",
+    "fallback": "assets/placeholders/objetos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-objetos-magicos-piedra-limpiadora",
+    "name": "Piedra limpiadora",
+    "category": "Objetos mágicos?",
+    "subcategory": "Mercadería rara",
+    "price": "80 Po",
+    "description": "Una piedra limpiadora es una esfera de 1 pie de diámetro, grabada con sigilos místicos. Al tocar la piedra, puedes utilizar una acción para activarla y eliminar la suciedad y la mugre de tus prendas y de tu persona.",
+    "tags": [],
+    "image": "assets/productos/piedra-limpiadora.webp",
+    "fallback": "assets/placeholders/objetos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-objetos-magicos-amuleto-de-relojeria",
+    "name": "Amuleto de relojería",
+    "category": "Objetos mágicos?",
+    "subcategory": "Mercadería rara",
+    "price": "250 Po",
+    "description": "Cuando haces una tirada de ataque mientras llevas el amuleto, puedes renunciar a tirar el d20 para obtener un 10 en el dado. Una vez utilizada, esta propiedad no podrá volver a utilizarse hasta el siguiente amanecer.",
+    "tags": [],
+    "image": "assets/productos/amuleto-de-relojeria.webp",
+    "fallback": "assets/placeholders/objetos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-objetos-magicos-pendiente-de-mensaje",
+    "name": "Pendiente de mensaje",
+    "category": "Objetos mágicos?",
+    "subcategory": "Mercadería rara",
+    "price": "300 Po",
+    "description": "El cristal azul de este pendiente está envuelto con un delicado alambre de cobre. El pendiente tiene 5 cargas. Mientras lo usas, puedes usar una acción para gastar 1 carga y lanzar el hechizo Mensaje. El pendiente recupera 1d4 + 1 cargas gastadas diariamente al amanecer.",
+    "tags": [],
+    "image": "assets/productos/pendiente-de-mensaje.webp",
+    "fallback": "assets/placeholders/objetos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-objetos-magicos-libro-de-hechizos-duradero",
+    "name": "Libro de hechizos duradero",
+    "category": "Objetos mágicos?",
+    "subcategory": "Mercadería rara",
+    "price": "500 Po",
+    "description": "Este libro de hechizos, junto con todo lo escrito en sus páginas, no puede dañarse mediante fuego ni inmersión en agua. Además, el libro de hechizos no se deteriora con la edad.",
+    "tags": [],
+    "image": "assets/productos/libro-de-hechizos-duradero.webp",
+    "fallback": "assets/placeholders/objetos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-objetos-magicos-ojo-sustituto",
+    "name": "Ojo sustituto",
+    "category": "Objetos mágicos?",
+    "subcategory": "Mercadería rara",
+    "price": "120 Po",
+    "description": "Este ojo artificial reemplaza a uno real que se perdió o se extrajo. Si bien el ojo sustituto está incrustado en la cuenca del ojo, nadie más que usted puede quitarlo y puede ver a través del pequeño orbe como si fuera un ojo normal.",
+    "tags": [],
+    "image": "assets/productos/ojo-sustituto.webp",
+    "fallback": "assets/placeholders/objetos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-objetos-magicos-linterna-siempre-brillante",
+    "name": "Linterna siempre brillante",
+    "category": "Objetos mágicos?",
+    "subcategory": "Mercadería rara",
+    "price": "300 Po",
+    "description": "Esta linterna de diana contiene un fragmento de dragón de Eberron que arroja una luz comparable a la producida por un hechizo de Llama Continua. Una linterna siempre brillante arroja luz en un cono de 120 pies; los 60 pies más cercanos son luz brillante y los 60 pies más lejanos son luz tenue.",
+    "tags": [],
+    "image": "assets/productos/linterna-siempre-brillante.webp",
+    "fallback": "assets/placeholders/objetos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-objetos-magicos-ficha-de-pluma",
+    "name": "Ficha de pluma",
+    "category": "Objetos mágicos?",
+    "subcategory": "Mercadería rara",
+    "price": "50 Po",
+    "description": "Este pequeño disco de metal tiene grabada la imagen de una pluma. Cuando caes al menos 20 pies mientras la ficha está sobre tu persona, desciendes 60 pies por ronda y no sufres daño por la caída. La magia de la ficha se gasta después de aterrizar, tras lo cual el disco deja de ser mágico.",
+    "tags": [],
+    "image": "assets/productos/ficha-de-pluma.webp",
+    "fallback": "assets/placeholders/objetos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-objetos-magicos-tejido-glamuroso",
+    "name": "Tejido glamuroso",
+    "category": "Objetos mágicos?",
+    "subcategory": "Mercadería rara",
+    "price": "180 Po",
+    "description": "Glamerweave es ropa imbuida de magia ilusoria inofensiva. Mientras usas la versión común de esta ropa, puedes usar una acción adicional para crear un patrón ilusorio en movimiento dentro de la tela. Un tejido de glamour poco común puede hacer que el patrón se eleve de la tela. Por ejemplo, un vestido de tejido glamuroso podría estar envuelto en llamas ilusorias e inofensivas, mientras que un sombrero de tejido glamuroso podría tener mariposas ilusorias revoloteando a su alrededor. Cuando realizas una prueba de Carisma (Interpretacion) o Carisma (Persuasión) mientras usas la versión poco común de Glamerweave, puedes tirar un d4 y agregar el número obtenido a la prueba. Una vez que uses esta propiedad, no podrás volver a usarla hasta el siguiente amanecer.",
+    "tags": [],
+    "image": "assets/productos/tejido-glamuroso.webp",
+    "fallback": "assets/placeholders/objetos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-objetos-magicos-practica-bolsa-de-especias-de-heward",
+    "name": "Práctica bolsa de especias de Heward",
+    "category": "Objetos mágicos?",
+    "subcategory": "Mercadería rara",
+    "price": "200 Po",
+    "description": "Esta bolsa para cinturón parece vacía y tiene 10 cargas. Mientras sostienes la bolsa, puedes usar una acción para gastar 1 de sus cargas, decir el nombre de cualquier condimento alimentario no mágico (como sal, pimienta, azafrán o cilantro) y quitar una pizca del condimento deseado de la bolsa. Una pizca es suficiente para condimentar una sola comida. La bolsa recupera 1d6 + 4 cargas gastadas diariamente al amanecer.",
+    "tags": [],
+    "image": "assets/productos/practica-bolsa-de-especias-de-heward.webp",
+    "fallback": "assets/placeholders/objetos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-objetos-magicos-cuerno-de-alarma-silenciosa",
+    "name": "Cuerno de alarma silenciosa",
+    "category": "Objetos mágicos?",
+    "subcategory": "Mercadería rara",
+    "price": "150 Po",
+    "description": "Esta bocina tiene 4 cargas. Cuando usas una acción para tocarlo, una criatura de tu elección puede oír el sonido del cuerno, siempre que la criatura esté a 600 pies del cuerno y no esté ensordecida. Ninguna otra criatura escucha el sonido proveniente del cuerno. El cuerno recupera 1d4 cargas gastadas diariamente al amanecer.",
+    "tags": [],
+    "image": "assets/productos/cuerno-de-alarma-silenciosa.webp",
+    "fallback": "assets/placeholders/objetos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-objetos-magicos-tatuaje-del-iluminador",
+    "name": "Tatuaje del iluminador",
+    "category": "Objetos mágicos?",
+    "subcategory": "Mercadería rara",
+    "price": "300 Po",
+    "description": "Sintonía con el tatuaje. Para sintonizarse con este elemento, coloque la aguja en la piel donde desea que aparezca el tatuaje y presione la aguja allí durante todo el proceso de sintonización. Cuando se completa la sintonía, la aguja se convierte en la tinta que se convierte en el tatuaje, que aparece en la piel. Si tu sintonía con el tatuaje termina, el tatuaje desaparece y la aguja reaparece en tu espacio. Escritura mágica. Mientras este tatuaje esté en tu piel, podrás escribir con la yema del dedo como si fuera un bolígrafo de tinta que nunca se queda sin tinta. Como acción, puedes tocar un escrito de hasta una página de longitud y pronunciar el nombre de una criatura. La escritura se vuelve invisible para todos excepto para ti y la criatura nombrada durante las próximas 24 horas. Cualquiera de ustedes puede descartar la invisibilidad tocando el guión (no se requiere ninguna acción). Una vez utilizada, esta acción no se puede volver a utilizar hasta el siguiente amanecer.",
+    "tags": [
+      "Sintonización"
+    ],
+    "image": "assets/productos/tatuaje-del-iluminador.webp",
+    "fallback": "assets/placeholders/objetos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-objetos-magicos-instrumento-de-ilusiones",
+    "name": "Instrumento de ilusiones",
+    "category": "Objetos mágicos?",
+    "subcategory": "Mercadería rara",
+    "price": "250 Po",
+    "description": "Mientras tocas este instrumento musical, puedes crear efectos visuales ilusorios e inofensivos dentro de una esfera de 5 pies de radio centrada en el instrumento. Si eres bardo, el radio aumenta a 15 pies. Los efectos visuales de muestra incluyen notas musicales luminosas, una bailarina espectral, mariposas y nieve que cae suavemente. Los efectos mágicos no tienen sustancia ni sonido y son obviamente ilusorios. Los efectos terminan cuando dejas de jugar.",
+    "tags": [],
+    "image": "assets/productos/instrumento-de-ilusiones.webp",
+    "fallback": "assets/placeholders/objetos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-objetos-magicos-tatuaje-de-mascarada",
+    "name": "Tatuaje De Mascarada",
+    "category": "Objetos mágicos?",
+    "subcategory": "Mercadería rara",
+    "price": "350 Po",
+    "description": "Sintonía con el tatuaje. Para sintonizarse con este elemento, coloque la aguja en la piel donde desea que aparezca el tatuaje y presione la aguja allí durante todo el proceso de sintonización. Cuando se completa la sintonía, la aguja se convierte en la tinta que se convierte en el tatuaje, que aparece en la piel. Si tu sintonía con el tatuaje termina, el tatuaje desaparece y la aguja reaparece en tu espacio. Tinta fluida. Como acción adicional, puedes darle al tatuaje cualquier color o patrón y moverlo a cualquier área de tu piel. Cualquiera que sea la forma que adopte, siempre es obviamente un tatuaje. Puede variar en tamaño desde no más pequeño que una pieza de cobre hasta una intrincada obra de arte que cubre toda tu piel. Disfrazarse. Como acción, puedes usar el tatuaje para lanzar el hechizo Disfrazarse (CD 13 para discernir el disfraz). Una vez que el hechizo se lanza desde el tatuaje, no se puede volver a lanzar desde el tatuaje hasta el siguiente amanecer.",
+    "tags": [
+      "Sintonización"
+    ],
+    "image": "assets/productos/tatuaje-de-mascarada.webp",
+    "fallback": "assets/placeholders/objetos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-objetos-magicos-llave-misteriosa",
+    "name": "Llave misteriosa",
+    "category": "Objetos mágicos?",
+    "subcategory": "Mercadería rara",
+    "price": "200 Po",
+    "description": "En la cabecera de esta clave hay un signo de interrogación. La llave tiene un 5 por ciento de posibilidades de desbloquear cualquier cerradura en la que esté insertada. Una vez que desbloquea algo, la clave desaparece.",
+    "tags": [],
+    "image": "assets/productos/llave-misteriosa.webp",
+    "fallback": "assets/placeholders/objetos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-objetos-magicos-orbe-de-direccion",
+    "name": "Orbe de dirección",
+    "category": "Objetos mágicos?",
+    "subcategory": "Mercadería rara",
+    "price": "75 Po",
+    "description": "Mientras sostienes este orbe, puedes usar una acción para determinar en qué dirección está el norte. Esta propiedad funciona sólo en el plano material.",
+    "tags": [],
+    "image": "assets/productos/orbe-de-direccion.webp",
+    "fallback": "assets/placeholders/objetos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-objetos-magicos-orbe-del-tiempo",
+    "name": "Orbe del tiempo",
+    "category": "Objetos mágicos?",
+    "subcategory": "Mercadería rara",
+    "price": "75 Po",
+    "description": "Mientras sostienes este orbe, puedes usar una acción para determinar si afuera es de mañana, tarde, tarde o noche. Esta propiedad funciona sólo en el plano material.",
+    "tags": [],
+    "image": "assets/productos/orbe-del-tiempo.webp",
+    "fallback": "assets/placeholders/objetos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-objetos-magicos-perfume-de-hechiceria",
+    "name": "Perfume de hechicería",
+    "category": "Objetos mágicos?",
+    "subcategory": "Mercadería rara",
+    "price": "120 Po",
+    "description": "Este pequeño frasco contiene un perfume mágico, suficiente para un solo uso. Puedes utilizar una acción para aplicarte el perfume y su efecto dura 1 hora. Mientras dure, tienes ventaja en todas las pruebas de Carisma dirigidas a humanoides con un nivel de desafío de 1 o inferior. Quienes se someten al efecto del perfume no son conscientes de que han sido influenciados por la magia.",
+    "tags": [],
+    "image": "assets/productos/perfume-de-hechiceria.webp",
+    "fallback": "assets/placeholders/objetos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-objetos-magicos-pipa-del-recuerdo",
+    "name": "Pipa del Recuerdo",
+    "category": "Objetos mágicos?",
+    "subcategory": "Mercadería rara",
+    "price": "250 Po",
+    "description": "Esta pipa de madera larga y delicada cuenta con una cazoleta hecha de piedra de río lisa. Cuando la pipa está encendida. El humo exhalado no se disipa, sino que permanece alrededor del portador. Después de 10 minutos, el humo forma formas móviles que recrean los logros más impresionantes y heroicos del portador durante 5 minutos. Cuando se completa esta actuación realista, el humo se disipa. La pipa no se podrá volver a utilizar de esta manera hasta el próximo amanecer.",
+    "tags": [],
+    "image": "assets/productos/pipa-del-recuerdo.webp",
+    "fallback": "assets/placeholders/objetos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-objetos-magicos-pipa-de-monstruos-de-humo",
+    "name": "Pipa de monstruos de humo",
+    "category": "Objetos mágicos?",
+    "subcategory": "Mercadería rara",
+    "price": "80 Po",
+    "description": "Mientras fumas esta pipa, puedes usar una acción para exhalar una bocanada de humo que toma la forma de una sola criatura, como un dragón, un flumph o una rana. La forma debe ser lo suficientemente pequeña como para caber en un cubo de 1 pie y pierde su forma después de unos segundos, convirtiéndose en una nube de humo común y corriente.",
+    "tags": [],
+    "image": "assets/productos/pipa-de-monstruos-de-humo.webp",
+    "fallback": "assets/placeholders/objetos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-objetos-magicos-polo-de-colapso",
+    "name": "Polo de colapso",
+    "category": "Objetos mágicos?",
+    "subcategory": "Mercadería rara",
+    "price": "100 Po",
+    "description": "Mientras sostienes este poste de 10 pies, puedes usar una acción para pronunciar una palabra de comando y hacer que colapse en una varilla de 1 pie de largo, para facilitar su almacenamiento. El peso del poste no cambia. Puedes usar una acción para pronunciar una palabra de comando diferente y hacer que la varilla vuelva a convertirse en un poste; sin embargo, la varilla se alargará sólo hasta donde lo permita el espacio circundante.",
+    "tags": [],
+    "image": "assets/productos/polo-de-colapso.webp",
+    "fallback": "assets/placeholders/objetos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-objetos-magicos-olla-del-despertar",
+    "name": "Olla del despertar",
+    "category": "Objetos mágicos?",
+    "subcategory": "Mercadería rara",
+    "price": "500 Oro",
+    "description": "Si plantas un arbusto común y corriente en esta maceta de barro de 10 libras y lo dejas crecer durante 30 días, el arbusto se transforma mágicamente en un arbusto despierto (consulta el Manual de monstruos para conocer las estadísticas) al final de ese tiempo. Cuando el arbusto despierta, sus raíces rompen la maceta destruyéndola. El arbusto despierto es amigable contigo. Sin órdenes tuyas, no hace nada.",
+    "tags": [],
+    "image": "assets/productos/olla-del-despertar.webp",
+    "fallback": "assets/placeholders/objetos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-objetos-magicos-pocion-de-escalada",
+    "name": "Poción de escalada",
+    "category": "Objetos mágicos?",
+    "subcategory": "Mercadería rara",
+    "price": "150 Po",
+    "description": "Cuando bebes esta poción, obtienes una velocidad de ascenso igual a tu velocidad al caminar durante 1 hora. Durante este tiempo, tienes ventaja en las pruebas de Fuerza (Atletismo) que realizas para escalar. La poción se separa en capas marrones, plateadas y grises que se asemejan a bandas de piedra. Agitar la botella no logra mezclar los colores.",
+    "tags": [],
+    "image": "assets/productos/pocion-de-escalada.webp",
+    "fallback": "assets/placeholders/objetos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-objetos-magicos-pocion-de-descanso-vigilante",
+    "name": "Poción de descanso vigilante",
+    "category": "Objetos mágicos?",
+    "subcategory": "Mercadería rara",
+    "price": "250 Po",
+    "description": "Cuando bebes esta poción, obtienes los siguientes beneficios durante las siguientes 8 horas: la magia no puede hacerte dormir y puedes permanecer despierto durante un descanso prolongado y aun así obtener sus beneficios. Esta dulce bebida de color ámbar no tiene ningún efecto sobre las criaturas que no necesitan dormir, como los elfos.",
+    "tags": [],
+    "image": "assets/productos/pocion-de-descanso-vigilante.webp",
+    "fallback": "assets/placeholders/objetos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-objetos-magicos-capsula-de-presion",
+    "name": "Cápsula de presión",
+    "category": "Objetos mágicos?",
+    "subcategory": "Mercadería rara",
+    "price": "120 Po",
+    "description": "Esta pequeña cápsula está hecha de cera de abejas mezclada con arena y una variedad de plantas acuáticas encantadas. Una criatura que consume una cápsula de presión ignora los efectos de nadar a profundidades superiores a 100 pies (ver 'Ambientes inusuales' en el capítulo 5 de la Guía del Dungeon Master).",
+    "tags": [],
+    "image": "assets/productos/capsula-de-presion.webp",
+    "fallback": "assets/placeholders/objetos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-objetos-magicos-cuerda-de-reparacion",
+    "name": "Cuerda de reparación",
+    "category": "Objetos mágicos?",
+    "subcategory": "Mercadería rara",
+    "price": "75 Po",
+    "description": "Puedes cortar este rollo de cuerda de cáñamo de 50 pies en cualquier cantidad de pedazos más pequeños y luego usar una acción para pronunciar una palabra de comando y hacer que los pedazos se vuelvan a unir. Las piezas deben estar en contacto entre sí y no en uso. Una cuerda de reparación se acorta para siempre si una sección de ella se pierde o se destruye.",
+    "tags": [],
+    "image": "assets/productos/cuerda-de-reparacion.webp",
+    "fallback": "assets/placeholders/objetos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-objetos-magicos-pluma-de-escriba",
+    "name": "Pluma de escriba",
+    "category": "Objetos mágicos?",
+    "subcategory": "Mercadería rara",
+    "price": "200 Po",
+    "description": "Puedes utilizar este bolígrafo para escribir sobre cualquier superficie. Tú decides si la escritura es visible o invisible, pero la escritura siempre será visible para una persona con la Marca de Escriba. Cualquier criatura con la Marca de Escritura puede usar una acción para tocar la escritura invisible, haciéndola visible para todos. Si usas el bolígrafo para escribir sobre una criatura que no es una construcción, la escritura se desvanece después de 7 días.",
+    "tags": [],
+    "image": "assets/productos/pluma-de-escriba.webp",
+    "fallback": "assets/placeholders/objetos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-objetos-magicos-tejido-cambiante",
+    "name": "Tejido cambiante",
+    "category": "Objetos mágicos?",
+    "subcategory": "Mercadería rara",
+    "price": "350 Po",
+    "description": "Cuando se crea un traje de tejido cambiante, se pueden incrustar en la tela hasta cinco conjuntos diferentes. Mientras usas la ropa, puedes pronunciar su palabra de comando como acción adicional para transformar tu atuendo en uno de los otros diseños que contiene. Independientemente de su apariencia, el atuendo no puede ser otra cosa que ropa. Aunque puede duplicar el aspecto de otras prendas mágicas, no adquiere sus propiedades mágicas.",
+    "tags": [],
+    "image": "assets/productos/tejido-cambiante.webp",
+    "fallback": "assets/placeholders/objetos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-objetos-magicos-baston-de-cantos-de-pajaros",
+    "name": "Bastón de cantos de pájaros",
+    "category": "Objetos mágicos?",
+    "subcategory": "Mercadería rara",
+    "price": "200 Po",
+    "description": "El bastón de madera está decorado con tallas de pájaros. Tiene 10 cargas. Mientras lo sostienes, puedes usar una acción para gastar 1 carga del bastón y hacer que cree uno de los siguientes sonidos en un rango de 60 pies: el chirrido de un pinzón, el graznido de un cuervo, el graznido de un pato, el cloqueo de una gallina, el graznido de un ganso, el canto de un somorgujo, el engullido de un pavo, el grito de una gaviota, el ulular de un búho o el chillido de un águila. El bastón recupera 1d6 + 4 cargas gastadas diariamente al amanecer. Si gastas la última carga, tira un d20. Con un 1, el bastón explota en una inofensiva nube de plumas de pájaro y se pierde para siempre.",
+    "tags": [],
+    "image": "assets/productos/baston-de-cantos-de-pajaros.webp",
+    "fallback": "assets/placeholders/objetos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-objetos-magicos-baston-de-flores",
+    "name": "Bastón de flores",
+    "category": "Objetos mágicos?",
+    "subcategory": "Mercadería rara",
+    "price": "150 Po",
+    "description": "Este bastón de madera tiene 10 cargas. Mientras lo sostienes, puedes usar una acción para gastar 1 carga del bastón y hacer que una flor brote de un trozo de tierra o suelo a 5 pies de ti, o del propio bastón. A menos que elijas un tipo específico de flor, el personal crea una margarita con un aroma suave. La flor es inofensiva y no mágica, y crece o se marchita como lo haría una flor normal. El bastón recupera 1d6 + 4 cargas gastadas diariamente al amanecer. Si gastas la última carga, tira un d20. Con un 1, el bastón se convierte en pétalos de flores y se pierde para siempre.",
+    "tags": [],
+    "image": "assets/productos/baston-de-flores.webp",
+    "fallback": "assets/placeholders/objetos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-objetos-magicos-muneca-parlante",
+    "name": "Muñeca parlante",
+    "category": "Objetos mágicos?",
+    "subcategory": "Mercadería rara",
+    "price": "100 Po",
+    "description": "Mientras este muñeco de peluche esté a 5 pies de ti, puedes descansar un poco diciéndole que diga hasta seis frases, ninguna de las cuales puede tener más de seis palabras, y establecer una condición bajo la cual el muñeco diga cada frase. También puedes reemplazar frases antiguas por otras nuevas. Cualquiera que sea la condición, debe ocurrir a menos de 5 pies del muñeco para que pueda hablar.",
+    "tags": [],
+    "image": "assets/productos/muneca-parlante.webp",
+    "fallback": "assets/placeholders/objetos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-objetos-magicos-jarra-de-abundancia",
+    "name": "Jarra de abundancia",
+    "category": "Objetos mágicos?",
+    "subcategory": "Mercadería rara",
+    "price": "250 Po",
+    "description": "Si pronuncias la palabra de comando (“Illefarn”) mientras se agarra el asa, la jarra se llena de tres pintas de rica cerveza enana. La jarra tiene 3 cargas. Usar los gastos de propiedad de la jarra 1 carga y la jarra recupera todo lo gastado al amanecer.",
+    "tags": [],
+    "image": "assets/productos/jarra-de-abundancia.webp",
+    "fallback": "assets/placeholders/objetos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-objetos-magicos-jarra-de-sobriedad",
+    "name": "Jarra de sobriedad",
+    "category": "Objetos mágicos?",
+    "subcategory": "Mercadería rara",
+    "price": "150 Po",
+    "description": "Esta jarra tiene una cara severa esculpida en un lado. Puedes beber cerveza, vino o cualquier otra bebida alcohólica no mágica sin emborracharte. La jarra no tiene ningún efecto sobre líquidos mágicos o sustancias nocivas como el veneno.",
+    "tags": [],
+    "image": "assets/productos/jarra-de-sobriedad.webp",
+    "fallback": "assets/placeholders/objetos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-objetos-magicos-varita-de-direccion",
+    "name": "Varita de dirección",
+    "category": "Objetos mágicos?",
+    "subcategory": "Mercadería rara",
+    "price": "100 Po",
+    "description": "Esta varita tiene 3 cargas. Mientras lo sostienes, puedes usar una acción para gastar 1 de sus cargas y crear música orquestal agitándolo. La música se puede escuchar a una distancia de 60 pies y termina cuando dejas de agitar la varita. La varita recupera todas las cargas gastadas diariamente al amanecer. Si gastas la última carga de la varita, tira un d20. Con un 1, suena un triste sonido de tuba mientras la varita se convierte en polvo y se destruye.",
+    "tags": [],
+    "image": "assets/productos/varita-de-direccion.webp",
+    "fallback": "assets/placeholders/objetos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-objetos-magicos-varita-de-pirotecnia",
+    "name": "Varita de pirotecnia",
+    "category": "Objetos mágicos?",
+    "subcategory": "Mercadería rara",
+    "price": "150 Po",
+    "description": "Esta varita tiene 7 cargas. Mientras lo sostienes, puedes usar una acción para gastar 1 de sus cargas y crear una explosión inofensiva de luz multicolor en un punto que puedas ver hasta a 60 pies de distancia. El estallido de luz va acompañado de un crujido que se puede escuchar hasta a 300 pies de distancia. La luz es tan brillante como la llama de una antorcha pero dura sólo un segundo. La varita recupera 1d6 + 1 cargas gastadas diariamente al amanecer. Si gastas la última carga de la varita, tira un d20. Con un 1, la varita estalla en un espectáculo pirotécnico inofensivo y es destruida.",
+    "tags": [],
+    "image": "assets/productos/varita-de-pirotecnia.webp",
+    "fallback": "assets/placeholders/objetos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-objetos-magicos-varita-de-cenos-fruncidos",
+    "name": "Varita de ceños fruncidos",
+    "category": "Objetos mágicos?",
+    "subcategory": "Mercadería rara",
+    "price": "200 Po",
+    "description": "Esta varita tiene 3 cargas. Mientras lo sostienes, puedes usar una acción para gastar 1 de sus cargas y apuntar a un humanoide que puedas ver a 30 pies de ti. El objetivo debe superar una tirada de salvación de Carisma CD 10 o verse obligado a fruncir el ceño durante 1 minuto. La varita recupera todas las cargas gastadas diariamente al amanecer. Si gastas la última carga de la varita, tira un d20. Con un 1, la varita se transforma en una Varita de Sonrisas.",
+    "tags": [],
+    "image": "assets/productos/varita-de-cenos-fruncidos.webp",
+    "fallback": "assets/placeholders/objetos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-objetos-magicos-varita-de-sonrisas",
+    "name": "Varita de sonrisas",
+    "category": "Objetos mágicos?",
+    "subcategory": "Mercadería rara",
+    "price": "200 Po",
+    "description": "Esta varita tiene 3 cargas. Mientras lo sostienes, puedes usar una acción para gastar 1 de sus cargas y apuntar a un humanoide que puedas ver a 30 pies de ti. El objetivo debe superar una tirada de salvación de Carisma CD 10 o verse obligado a sonreír durante 1 minuto. La varita recupera todas las cargas gastadas diariamente al amanecer. Si gastas la última carga de la varita, tira un d20. Con un 1, la varita se transforma en una Varita de ceños fruncidos.",
+    "tags": [],
+    "image": "assets/productos/varita-de-sonrisas.webp",
+    "fallback": "assets/placeholders/objetos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-objetos-magicos-vaina-de-varita",
+    "name": "Vaina de varita",
+    "category": "Objetos mágicos?",
+    "subcategory": "Mercadería rara",
+    "price": "250 Po",
+    "description": "Una funda de varita se sujeta a su brazo e imparte los siguientes beneficios: La funda de la varita no se te puede quitar mientras estés en sintonía con ella. Puedes insertar una varita en la funda como acción. La funda sólo puede contener una varita a la vez. Puedes retraer o extender una varita desde la funda como acción adicional. Mientras la varita está extendida, puedes usarla como si la estuvieras sosteniendo, pero tu mano permanece libre. Si una varita enfundada requiere sintonización, debes sintonizarte con la varita antes de poder usarla. Sin embargo, la funda de la varita y la varita adjunta cuentan como un solo objeto mágico con respecto a la cantidad de objetos mágicos con los que puedes sintonizarte. Si sacas la varita de la funda, tu sintonía con el extremo de la varita",
+    "tags": [
+      "Sintonización"
+    ],
+    "image": "assets/productos/vaina-de-varita.webp",
+    "fallback": "assets/placeholders/objetos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-defectuosos-reloj-realmente-roto",
+    "name": "Reloj realmente roto",
+    "category": "Defectuosos",
+    "subcategory": "Lote dudoso",
+    "price": "100 po",
+    "description": "A pesar de que sus manecillas y engranajes no funcionan en absoluto, este reloj siempre falla, sin importar la hora del día que sea.",
+    "tags": [
+      "Defecto incluido"
+    ],
+    "image": "assets/productos/reloj-realmente-roto.webp",
+    "fallback": "assets/placeholders/defectuosos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-defectuosos-sombrero-al-reves",
+    "name": "Sombrero al revés",
+    "category": "Defectuosos",
+    "subcategory": "Lote dudoso",
+    "price": "50 po",
+    "description": "No importa lo que hagas, cómo te lo pongas o lo ajustes, tan pronto como lo sueltes, este sombrero está al revés cuando lo usas.",
+    "tags": [
+      "Defecto incluido"
+    ],
+    "image": "assets/productos/sombrero-al-reves.webp",
+    "fallback": "assets/placeholders/defectuosos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-defectuosos-carcaj-krakenesco",
+    "name": "Carcaj krakenesco",
+    "category": "Defectuosos",
+    "subcategory": "Lote dudoso",
+    "price": "40 po",
+    "description": "Este carcaj tiene diseños intrincados de un kraken. Cualquier munición en él parece ser un tentáculo retorciéndose. Tan pronto como se retira, vuelve a su forma normal.",
+    "tags": [
+      "Defecto incluido"
+    ],
+    "image": "assets/productos/carcaj-krakenesco.webp",
+    "fallback": "assets/placeholders/defectuosos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-defectuosos-baraja-de-cartas-justa",
+    "name": "Baraja de cartas justa",
+    "category": "Defectuosos",
+    "subcategory": "Lote dudoso",
+    "price": "200 po",
+    "description": "Una baraja de cartas que, cuando se usa para jugar al blackjack, siempre dará como resultado que cada jugador obtenga 19 con tres cartas.",
+    "tags": [
+      "Defecto incluido"
+    ],
+    "image": "assets/productos/baraja-de-cartas-justa.webp",
+    "fallback": "assets/placeholders/defectuosos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-defectuosos-saco-de-tenencia-inverso",
+    "name": "Saco de tenencia inverso",
+    "category": "Defectuosos",
+    "subcategory": "Lote dudoso",
+    "price": "300 po",
+    "description": "Un saco enorme que solo tiene la capacidad suficiente para contener una bellota.",
+    "tags": [
+      "Defecto incluido"
+    ],
+    "image": "assets/productos/saco-de-tenencia-inverso.webp",
+    "fallback": "assets/placeholders/defectuosos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-defectuosos-guantes-ajustados",
+    "name": "Guantes ajustados",
+    "category": "Defectuosos",
+    "subcategory": "Lote dudoso",
+    "price": "60 po",
+    "description": "Elegantes guantes de seda que se ajustan automáticamente a cualquier criatura que los use, pero siempre tendrán un dedo extra.",
+    "tags": [
+      "Defecto incluido"
+    ],
+    "image": "assets/productos/guantes-ajustados.webp",
+    "fallback": "assets/placeholders/defectuosos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-defectuosos-venda-de-verdadera-vision",
+    "name": "Venda de verdadera visión",
+    "category": "Defectuosos",
+    "subcategory": "Lote dudoso",
+    "price": "200 po",
+    "description": "Venda de cuero grueso que le da al usuario la capacidad de ver a través de disfraces (si puede ver).",
+    "tags": [
+      "Defecto incluido"
+    ],
+    "image": "assets/productos/venda-de-verdadera-vision.webp",
+    "fallback": "assets/placeholders/defectuosos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-defectuosos-taza-de-juerguista",
+    "name": "Taza de juerguista",
+    "category": "Defectuosos",
+    "subcategory": "Lote dudoso",
+    "price": "50 po",
+    "description": "Una taza que no se puede voltear. Si uno intenta hacerlo, la taza cambia de forma en sus manos para que no se derrame.",
+    "tags": [
+      "Defecto incluido"
+    ],
+    "image": "assets/productos/taza-de-juerguista.webp",
+    "fallback": "assets/placeholders/defectuosos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-defectuosos-espada-de-consuelo",
+    "name": "Espada de consuelo",
+    "category": "Defectuosos",
+    "subcategory": "Lote dudoso",
+    "price": "100 po",
+    "description": "parece ser una gran espada sin empuñadura. Dondequiera que uno la agarra, aparece la empuñadura y la espada se balancea a su alrededor. La empuñadura desaparece cuando se suelta. Por ejemplo, si agarras el medio, terminarás con una espada corta de dos lados. Cuando uno ataca a alguien con ella, aparece una empuñadura donde la espada los contacta, lo que resulta en una herida contundente.",
+    "tags": [
+      "Defecto incluido"
+    ],
+    "image": "assets/productos/espada-de-consuelo.webp",
+    "fallback": "assets/placeholders/defectuosos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-defectuosos-botas-de-acrobata",
+    "name": "Botas de acróbata",
+    "category": "Defectuosos",
+    "subcategory": "Lote dudoso",
+    "price": "200 po",
+    "description": "permiten equilibrarse perfectamente en cualquier superficie de menos de dos pulgadas de ancho, como una cornisa o una cuerda floja. Caminar sobre suelo plano hará que el usuario se caiga de bruces.",
+    "tags": [
+      "Defecto incluido"
+    ],
+    "image": "assets/productos/botas-de-acrobata.webp",
+    "fallback": "assets/placeholders/defectuosos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-defectuosos-frasco-de-estus",
+    "name": "Frasco de estus",
+    "category": "Defectuosos",
+    "subcategory": "Lote dudoso",
+    "price": "2000 po",
+    "description": "Este frasco de vidrio verde contiene el fluido dorado brillante llamado Estus; un placer popular entre los no-muertos, ya que no solo funcionan para ellos muy pocos métodos de curación confiables, sino que su sabor distintivo se puede sentir incluso si el bebedor normalmente no tiene ese sentido. Intentar verter cualquier otra sustancia en el matraz no funciona, ya que simplemente se desliza hacia afuera. El matraz Estus puede contener hasta doce cargas. Mientras estás sintonizado con él, puedes gastar una carga y tomar un trago como una acción, recuperando puntos de golpe igual a 7 más tu modificador de Constitución. Solo la persona sintonizada con el frasco puede obtener algún beneficio, ya que el Estus dentro se desvanece en el aire rápidamente después de dejar el frasco. Todavía te beneficias de este efecto si eres un no-muerto. Cuando se gasta la última carga, todo lo que puedes hacer es contemplar el significado de la existencia mientras miras tristemente tu botella vacía, al menos hasta que se vuelva a llenar. recargando El frasco de Estus normalmente no recupera las cargas por sí solo. Sin embargo, existen varios métodos conocidos para hacer que se rellene solo: Calentarlo durante 10 minutos sobre un fuego abierto hace que recupere 1 carga. Siempre que tengas éxito en una tirada de salvación contra muerte, el frasco recupera 1 carga. Si mueres, el matraz absorbe un poco de la energía vital que escapas para sí mismo y recupera todas sus cargas.",
+    "tags": [
+      "Defecto incluido"
+    ],
+    "image": "assets/productos/frasco-de-estus.webp",
+    "fallback": "assets/placeholders/defectuosos.svg",
+    "risk": "variable"
+  },
+  {
+    "id": "lve-defectuosos-mordedor-de-dientes",
+    "name": "Mordedor de dientes",
+    "category": "Defectuosos",
+    "subcategory": "Lote dudoso",
+    "price": "700 gp",
+    "description": "Espada corta +1 Maldición: Temperamental si sacas un 1 o 2 en un tirada de ataque, el arma golpeara la cara de su portado generando un 1d4 de daño y rompiendo uno de tus dientes",
+    "tags": [
+      "Defecto incluido",
+      "Maldición"
+    ],
+    "image": "assets/productos/mordedor-de-dientes.webp",
+    "fallback": "assets/placeholders/defectuosos.svg",
+    "risk": "variable"
+  }
+]

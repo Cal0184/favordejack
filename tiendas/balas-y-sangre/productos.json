@@ -1,0 +1,663 @@
+[
+  {
+    "id": "bys-pistola-palma",
+    "name": "Pistola de palma",
+    "category": "Armas de fuego",
+    "price": "50 Oro",
+    "ammo_price": "2 Oro (20 Balas)",
+    "ammunition": "1 Bala",
+    "damage": "1d8",
+    "range": "40/120",
+    "properties": [
+      "Ligera",
+      "Recarga 1",
+      "Fallo 1"
+    ],
+    "image": "assets/productos/armas/pistola-palma.webp",
+    "fallback": "assets/placeholders/arma.svg",
+    "available": true
+  },
+  {
+    "id": "bys-revolver",
+    "name": "Revólver",
+    "category": "Armas de fuego",
+    "price": "250 Oro",
+    "ammo_price": "4 Oro (20 Balas)",
+    "ammunition": "6 Balas",
+    "damage": "1d10",
+    "range": "80/320",
+    "properties": [
+      "Recarga 6",
+      "Fallo 2"
+    ],
+    "image": "assets/productos/armas/revolver.webp",
+    "fallback": "assets/placeholders/arma.svg",
+    "available": true
+  },
+  {
+    "id": "bys-mosquete",
+    "name": "Mosquete",
+    "category": "Armas de fuego",
+    "price": "300 Oro",
+    "ammo_price": "5 Oro (20 Balas)",
+    "ammunition": "1 Bala",
+    "damage": "1d12",
+    "range": "120/480",
+    "properties": [
+      "A dos manos",
+      "Recarga 1",
+      "Fallo 2"
+    ],
+    "image": "assets/productos/armas/mosquete.webp",
+    "fallback": "assets/placeholders/arma.svg",
+    "available": true
+  },
+  {
+    "id": "bys-trabuco",
+    "name": "Trabuco",
+    "category": "Armas de fuego",
+    "price": "300 Oro",
+    "ammo_price": "5 Oro (5 Balas)",
+    "ammunition": "1 Bala",
+    "damage": "2d8",
+    "range": "15/60",
+    "properties": [
+      "A dos manos",
+      "Recarga 1",
+      "Fallo 2"
+    ],
+    "image": "assets/productos/armas/trabuco.webp",
+    "fallback": "assets/placeholders/arma.svg",
+    "available": true
+  },
+  {
+    "id": "bys-escopeta-doble-canon",
+    "name": "Escopeta doble cañón",
+    "category": "Armas de fuego",
+    "price": "600 Oro",
+    "ammo_price": "5 Oro (10 Balas)",
+    "ammunition": "2 Balas",
+    "damage": "2d8",
+    "range": "40/80",
+    "properties": [
+      "Pesado",
+      "Recarga 2",
+      "A dos manos",
+      "Fallo 2"
+    ],
+    "image": "assets/productos/armas/escopeta-doble-canon.webp",
+    "fallback": "assets/placeholders/arma.svg",
+    "available": true
+  },
+  {
+    "id": "bys-rifle-caza",
+    "name": "Rifle de caza",
+    "category": "Armas de fuego",
+    "price": "600 Oro",
+    "ammo_price": "10 Oro (20 Balas)",
+    "ammunition": "4 Balas",
+    "damage": "2d10",
+    "range": "90/420",
+    "properties": [
+      "A dos manos",
+      "Recarga 4",
+      "Lento",
+      "Fallo 2"
+    ],
+    "description": "Lento. Si golpeas a una criatura con esta arma y le causas daño, puedes reducir su velocidad en 10 pies hasta el comienzo de tu siguiente turno. Si la criatura es golpeada más de una vez por armas que tienen esta propiedad, la reducción de Velocidad no excede los 10 pies.",
+    "image": "assets/productos/armas/rifle-caza.webp",
+    "fallback": "assets/placeholders/arma.svg",
+    "available": true
+  },
+  {
+    "id": "bys-escopeta-cuadruple",
+    "name": "Escopeta cuádruple",
+    "category": "Armas de fuego",
+    "price": "700 Oro",
+    "ammo_price": "10 Oro (20 Balas)",
+    "ammunition": "4 Balas",
+    "damage": "4d8",
+    "range": "30/60",
+    "properties": [
+      "Pesado",
+      "Recarga 2",
+      "A dos manos",
+      "Fallo 3"
+    ],
+    "image": "assets/productos/armas/escopeta-cuadruple.webp",
+    "fallback": "assets/placeholders/arma.svg",
+    "available": true
+  },
+  {
+    "id": "bys-pistola-espada",
+    "name": "Pistola Espada",
+    "category": "Armas de fuego",
+    "price": "275 Oro",
+    "ammo_price": "2 Oro (10 Balas)",
+    "ammunition": "1 Bala",
+    "damage": "1d6 / 1d10",
+    "range": "30/90",
+    "properties": [
+      "Sutil",
+      "Ligera",
+      "Recarga 1",
+      "Especial",
+      "Fallo 1"
+    ],
+    "description": "Disparo de seguimiento: cuando golpeas a una criatura con la espada, puedes usar una acción adicional para realizar un ataque con la pistola de chispa cargada contra el mismo objetivo. Esto se considera un ataque cuerpo a cuerpo.",
+    "image": "assets/productos/armas/pistola-espada.webp",
+    "fallback": "assets/placeholders/arma.svg",
+    "available": true
+  },
+  {
+    "id": "bys-hacha-pistola",
+    "name": "Hacha Pistola",
+    "category": "Armas de fuego",
+    "price": "90 Oro",
+    "ammo_price": "2 Oro (10 Balas)",
+    "ammunition": "1 Bala",
+    "damage": "1d10 / 1d6",
+    "range": "30/90",
+    "properties": [
+      "A dos manos",
+      "Recarga 1",
+      "Fallo 1",
+      "Especial"
+    ],
+    "description": "Un hacha doble con una pistola en el mango. Cuando golpeas a una criatura con la cabeza del arma, puedes usar una acción adicional para realizar un ataque con la pistola de chispa cargada contra el mismo objetivo. Esto se considera un ataque cuerpo a cuerpo.",
+    "image": "assets/productos/armas/hacha-pistola.webp",
+    "fallback": "assets/placeholders/arma.svg",
+    "available": true
+  },
+  {
+    "id": "bys-colt-1851",
+    "name": "Colt 1851",
+    "category": "Armas de fuego",
+    "price": "750 Oro",
+    "ammo_price": "2 Oro (12 Balas)",
+    "ammunition": "6 Balas",
+    "damage": "1d8 / 1d10 / 1d12",
+    "range": "60/100",
+    "properties": [
+      "Recarga 6",
+      "Especial",
+      "Fallo 2"
+    ],
+    "description": "Un revólver de pólvora negra calibre .36 de seis tiros con un cilindro extraíble. Cargar el revólver requiere un casquillo de percusión, una carga de pólvora negra y una bola de plomo del tamaño adecuado para cada una de las recámaras del cilindro.\n\nCargar completamente un cilindro vacío toma 1 minuto si el usuario domina las armas de fuego o 5 minutos si no lo es. Para recargar más rápidamente en combate, el cilindro completo se puede cambiar por un cilindro de reemplazo en lugar de uno de los ataques que realizarías como parte de la acción de Ataque. El peso del cilindro es de 0,5 libras y los cilindros de repuesto cuestan 50 GP cada uno.\n\nEl revólver se puede cargar con tres cargas de pólvora negra de diferentes tamaños. Una carga ligera utiliza 15 granos de pólvora y causa 1d8 de daño perforante; una carga estándar utiliza 20 granos y causa 1d10; una carga pesada utiliza 25 granos y causa 1d12. El disparo es audible a mayor distancia cuanto mayor sea la carga.\n\nUna carga de menos de 15 granos puede atascar la bola en el cañón y una carga superior a 25 granos corre el riesgo de destruir el revólver. Si el revólver explota, el daño depende de las recámaras cargadas y puede escucharse desde una distancia de hasta 1500 pies.",
+    "image": "assets/productos/armas/colt-1851.webp",
+    "fallback": "assets/placeholders/arma.svg",
+    "available": true
+  },
+  {
+    "id": "bys-lemat",
+    "name": "Revólver Lemat",
+    "category": "Armas de fuego",
+    "price": "635 Oro",
+    "ammo_price": "2 Oro (18 Balas)",
+    "ammunition": "9 Balas",
+    "damage": "2d6 / 2d8",
+    "range": "40/120 · 20/60",
+    "properties": [
+      "Recarga 6",
+      "Especial",
+      "Fallo 3"
+    ],
+    "description": "Al recargar el revólver Lemat, debes usar una acción para recargar cada disparo individual. Además, cuando realizas un ataque con el Lemat Revolver, puedes usar cualquiera de sus perfiles y cada uno requiere su propia recarga. El revólver requiere balas de pistola de alto calibre y la escopeta requiere proyectiles.",
+    "image": "assets/productos/armas/lemat.webp",
+    "fallback": "assets/placeholders/arma.svg",
+    "available": true
+  },
+  {
+    "id": "bys-gatling",
+    "name": "Gatling Gun",
+    "category": "Armas de fuego",
+    "price": "500 Oro",
+    "ammo_price": "50 Oro (100 Balas)",
+    "ammunition": "100 Balas",
+    "damage": "5d6",
+    "range": "40/90",
+    "properties": [
+      "A dos manos",
+      "Pesada",
+      "Recarga 50",
+      "Fallo 4",
+      "Especial"
+    ],
+    "description": "Cada ataque individual con esta arma consta de 10 disparos y por tanto consume 10 de munición cada ataque. Cada disparo consecutivo desencadena un -5 acumulativo.",
+    "image": "assets/productos/armas/gatling.webp",
+    "fallback": "assets/placeholders/arma.svg",
+    "available": true
+  },
+  {
+    "id": "bys-springfield-1861",
+    "name": "Springfield 1861",
+    "category": "Armas de fuego",
+    "price": "475 Oro",
+    "ammo_price": "2 Oro (18 Balas)",
+    "ammunition": "4 Balas",
+    "damage": "3d4",
+    "range": "200/400",
+    "properties": [
+      "Pesada",
+      "A dos manos",
+      "Recarga 1",
+      "Fallo 1"
+    ],
+    "image": "assets/productos/armas/springfield-1861.webp",
+    "fallback": "assets/placeholders/arma.svg",
+    "available": true
+  },
+  {
+    "id": "bys-winchester-1873",
+    "name": "Winchester 1873",
+    "category": "Armas de fuego",
+    "price": "450 Oro",
+    "ammo_price": "30 Oro (50 Balas)",
+    "ammunition": "25 Balas",
+    "damage": "2d6",
+    "range": "80/240",
+    "properties": [
+      "Recarga 12",
+      "Fallo 2",
+      "A dos manos"
+    ],
+    "image": "assets/productos/armas/winchester-1873.webp",
+    "fallback": "assets/placeholders/arma.svg",
+    "available": true
+  },
+  {
+    "id": "bys-magnum",
+    "name": "Magnum Revolver",
+    "category": "Armas de fuego",
+    "price": "550 Oro",
+    "ammo_price": "60 Oro (30 Balas)",
+    "ammunition": "6 Balas",
+    "damage": "2d10",
+    "range": "60/180",
+    "properties": [
+      "Recarga 8",
+      "Pesada",
+      "Costosa",
+      "Fallo 3"
+    ],
+    "image": "assets/productos/armas/magnum.webp",
+    "fallback": "assets/placeholders/arma.svg",
+    "available": true
+  },
+  {
+    "id": "bys-balas-acero",
+    "name": "Balas de acero",
+    "category": "Munición",
+    "price": "5 Oro",
+    "quantity": "10",
+    "description": "Munición de acero. Se vende en paquetes de 10.",
+    "image": "assets/productos/municion/balas-acero.webp",
+    "fallback": "assets/placeholders/municion.svg",
+    "available": true
+  },
+  {
+    "id": "bys-balas-alquimia",
+    "name": "Balas de alquimia",
+    "category": "Munición",
+    "price": "30 Oro",
+    "quantity": "10",
+    "description": "Habilidad Especial: al impactar, esta bala libera una sustancia alquímica que inflige 1d6 de daño adicional de ácido al objetivo.",
+    "image": "assets/productos/municion/balas-alquimia.webp",
+    "fallback": "assets/placeholders/municion.svg",
+    "available": true
+  },
+  {
+    "id": "bys-tranquilizador",
+    "name": "Tranquilizador",
+    "category": "Munición",
+    "price": "5 Oro",
+    "quantity": "1",
+    "description": "Habilidad Especial: esta bala contiene un sedante que, al impactar, requiere que el objetivo haga una tirada de salvación de Constitución (DC 12) o quede inconsciente durante 1 minuto. El objetivo puede repetir la tirada de salvación al final de cada uno de sus turnos.",
+    "image": "assets/productos/municion/tranquilizador.webp",
+    "fallback": "assets/placeholders/municion.svg",
+    "available": true
+  },
+  {
+    "id": "bys-balas-flash",
+    "name": "Balas Flash",
+    "category": "Munición",
+    "price": "25 Oro",
+    "quantity": "1",
+    "description": "Habilidad Especial: al impactar, esta bala emite un destello cegador. El objetivo debe hacer una tirada de salvación de Constitución (DC 12) o quedar cegado durante 1d4 rondas. Las criaturas que no estén mirando directamente el destello tienen ventaja en la tirada de salvación.",
+    "image": "assets/productos/municion/balas-flash.webp",
+    "fallback": "assets/placeholders/municion.svg",
+    "available": true
+  },
+  {
+    "id": "bys-balas-mas-1",
+    "name": "Balas +1",
+    "category": "Munición",
+    "price": "400 Oro",
+    "quantity": "Mejora",
+    "description": "Mejora de munición +1. El documento de la tienda la presenta como una mejora con valor de 400 Oro.",
+    "image": "assets/productos/municion/balas-mas-1.webp",
+    "fallback": "assets/placeholders/municion.svg",
+    "available": true
+  },
+  {
+    "id": "bys-balas-explosivas",
+    "name": "Balas Explosivas",
+    "category": "Munición",
+    "price": "50 Oro",
+    "quantity": "1",
+    "description": "Habilidad Especial: al impactar, esta bala explota en un radio de 10 pies, infligiendo 2d6 de daño de fuego a todas las criaturas en el área. Las criaturas afectadas pueden hacer una tirada de salvación de Destreza (DC 13) para reducir el daño a la mitad.",
+    "image": "assets/productos/municion/balas-explosivas.webp",
+    "fallback": "assets/placeholders/municion.svg",
+    "available": true
+  },
+  {
+    "id": "bys-libra-polvora",
+    "name": "Libra de pólvora",
+    "category": "Pólvora",
+    "price": "25 Oro",
+    "description": "Prender fuego a un contenedor lleno de pólvora puede hacer que explote, causando daño por fuego a las criaturas dentro de un radio de 10 pies (1d6 para un cuerno de pólvora, 2d6 para un barril). Una tirada de salvación de Destreza CD 12 exitosa reduce a la mitad el daño. Prender fuego a una onza de pólvora hace que se encienda durante 1 ronda, arrojando luz brillante en un radio de 30 pies y luz tenue durante 30 pies adicionales.",
+    "image": "assets/productos/consumibles/libra-polvora.webp",
+    "fallback": "assets/placeholders/polvora.svg",
+    "available": true
+  },
+  {
+    "id": "bys-herramientas-de-artificiero",
+    "name": "Herramientas de artificiero",
+    "category": "Herramientas",
+    "price": "100 Oro",
+    "description": "Este kit contiene todas las herramientas, como llaves, pernos y cristales de contención, necesarias para crear autómatas y mecanismos de relojería. No incluye chatarra ni otras materias primas, que puedes comprar por 10 po la libra. Estas herramientas permiten trabajar en inventos más complejos, como ballestas automáticas o autómatas.",
+    "image": "assets/productos/herramientas/herramientas-de-artificiero.webp",
+    "fallback": "assets/placeholders/herramientas.svg",
+    "available": true
+  },
+  {
+    "id": "bys-herramientas-de-alquimista",
+    "name": "Herramientas de alquimista",
+    "category": "Herramientas",
+    "price": "50 Oro",
+    "description": "Los suministros del alquimista incluyen dos vasos de vidrio, un marco de metal para sostener un vaso en su lugar sobre una llama abierta, una varilla de vidrio para agitar, un mortero pequeño y una bolsa de ingredientes alquímicos comunes, que incluyen sal, hierro en polvo y agua purificada.",
+    "image": "assets/productos/herramientas/herramientas-de-alquimista.webp",
+    "fallback": "assets/placeholders/herramientas.svg",
+    "available": true
+  },
+  {
+    "id": "bys-herramientas-de-barbero",
+    "name": "Herramientas de barbero",
+    "category": "Herramientas",
+    "price": "3 Oro",
+    "description": "Un barbero es un profesional capacitado en el mantenimiento, higiene y estética del cuidado del cabello humano. Las herramientas incluyen un par de tijeras, una navaja de afeitar y una correa, un cuenco y una pastilla de jabón.",
+    "image": "assets/productos/herramientas/herramientas-de-barbero.webp",
+    "fallback": "assets/placeholders/herramientas.svg",
+    "available": true
+  },
+  {
+    "id": "bys-suministros-de-cerveceria",
+    "name": "Suministros de cervecería",
+    "category": "Herramientas",
+    "price": "80 Oro",
+    "description": "Contiene una botella de vino grande que se puede rellenar con cualquier líquido, siempre que no se derrita. También incluye varios lúpulos, un sifón y 3 pies de tubería. El documento incluye beneficios adicionales para criaturas fatigadas y para quienes dominan este kit.",
+    "image": "assets/productos/herramientas/suministros-de-cerveceria.webp",
+    "fallback": "assets/placeholders/herramientas.svg",
+    "available": true
+  },
+  {
+    "id": "bys-suministros-de-caligrafo",
+    "name": "Suministros de calígrafo",
+    "category": "Herramientas",
+    "price": "10 Oro",
+    "description": "La caligrafía trata la escritura como un arte delicado y hermoso. Los suministros permiten examinar guiones y determinar si son legítimos. Incluyen tinta, una docena de hojas de pergamino y tres plumas.",
+    "image": "assets/productos/herramientas/suministros-de-caligrafo.webp",
+    "fallback": "assets/placeholders/herramientas.svg",
+    "available": true
+  },
+  {
+    "id": "bys-herramientas-de-carpintero",
+    "name": "Herramientas de carpintero",
+    "category": "Herramientas",
+    "price": "8 Oro",
+    "description": "Incluyen una sierra, un martillo, clavos, un hacha, una escuadra, una regla, una azuela, un cepillo y un cincel. El dominio permite agregar la bonificación de competencia a pruebas relacionadas con el oficio.",
+    "image": "assets/productos/herramientas/herramientas-de-carpintero.webp",
+    "fallback": "assets/placeholders/herramientas.svg",
+    "available": true
+  },
+  {
+    "id": "bys-herramientas-del-cartografo",
+    "name": "Herramientas del cartógrafo",
+    "category": "Herramientas",
+    "price": "15 Oro",
+    "description": "Consisten en una pluma, tinta, pergamino, un compás, un calibrador y una regla. El dominio permite agregar la bonificación de competencia a pruebas relacionadas con el oficio.",
+    "image": "assets/productos/herramientas/herramientas-del-cartografo.webp",
+    "fallback": "assets/placeholders/herramientas.svg",
+    "available": true
+  },
+  {
+    "id": "bys-herramientas-de-zapatero",
+    "name": "Herramientas de zapatero",
+    "category": "Herramientas",
+    "price": "5 Oro",
+    "description": "Consisten en un martillo, un punzón, un cuchillo, un zapatero, un cúter, cuero de repuesto e hilo. Un buen par de botas puede ser decisivo al atravesar tierras escarpadas y mazmorras.",
+    "image": "assets/productos/herramientas/herramientas-de-zapatero.webp",
+    "fallback": "assets/placeholders/herramientas.svg",
+    "available": true
+  },
+  {
+    "id": "bys-utensilios-de-cocina",
+    "name": "Utensilios de cocina",
+    "category": "Herramientas",
+    "price": "1 Oro",
+    "description": "Incluyen una olla de metal, cuchillos, tenedores, una cuchara para revolver y un cucharón. Están pensados para mejorar las comidas durante viajes y aventuras.",
+    "image": "assets/productos/herramientas/utensilios-de-cocina.webp",
+    "fallback": "assets/placeholders/herramientas.svg",
+    "available": true
+  },
+  {
+    "id": "bys-kit-de-disfraz",
+    "name": "Kit de disfraz",
+    "category": "Herramientas",
+    "price": "25 Oro",
+    "description": "Incluye cosméticos, tinte para el cabello, pequeños accesorios y algunas prendas de vestir. Permite a su propietario adoptar una identidad falsa.",
+    "image": "assets/productos/herramientas/kit-de-disfraz.webp",
+    "fallback": "assets/placeholders/herramientas.svg",
+    "available": true
+  },
+  {
+    "id": "bys-kit-de-falsificacion",
+    "name": "Kit de falsificación",
+    "category": "Herramientas",
+    "price": "15 Oro",
+    "description": "Incluye varios tipos de tinta, una variedad de pergaminos y papeles, plumas, sellos y lacre, hojas de oro y plata y pequeñas herramientas para esculpir cera derretida e imitar un sello.",
+    "image": "assets/productos/herramientas/kit-de-falsificacion.webp",
+    "fallback": "assets/placeholders/herramientas.svg",
+    "available": true
+  },
+  {
+    "id": "bys-equipo-de-juego",
+    "name": "Equipo de juego",
+    "category": "Herramientas",
+    "price": "6 Plata / 2 Oro",
+    "description": "Abarca una amplia gama de piezas de juego, incluidos dados y barajas de cartas. Cada tipo de conjunto de juego requiere una competencia distinta.",
+    "image": "assets/productos/herramientas/equipo-de-juego.webp",
+    "fallback": "assets/placeholders/herramientas.svg",
+    "available": true
+  },
+  {
+    "id": "bys-herramientas-de-soplador-de-vidrio",
+    "name": "Herramientas de soplador de vidrio",
+    "category": "Herramientas",
+    "price": "30 po",
+    "description": "Incluyen una cerbatana, un pequeño marver, bloques y pinzas. Se necesita una fuente de calor para trabajar el vidrio.",
+    "image": "assets/productos/herramientas/herramientas-de-soplador-de-vidrio.webp",
+    "fallback": "assets/placeholders/herramientas.svg",
+    "available": true
+  },
+  {
+    "id": "bys-herramientas-de-joyero",
+    "name": "Herramientas de joyero",
+    "category": "Herramientas",
+    "price": "25 po",
+    "description": "La formación incluye técnicas básicas para embellecer gemas y experiencia en la identificación de piedras preciosas. Consta de una pequeña sierra y un martillo, limas, alicates y pinzas.",
+    "image": "assets/productos/herramientas/herramientas-de-joyero.webp",
+    "fallback": "assets/placeholders/herramientas.svg",
+    "available": true
+  },
+  {
+    "id": "bys-herramientas-de-peletero",
+    "name": "Herramientas de peletero",
+    "category": "Herramientas",
+    "price": "5 po",
+    "description": "Incluyen un cuchillo, un mazo pequeño, una bordeadora, una perforadora, hilo y restos de cuero. El conocimiento del oficio se extiende a las pieles de animales, armaduras de cuero y artículos similares.",
+    "image": "assets/productos/herramientas/herramientas-de-peletero.webp",
+    "fallback": "assets/placeholders/herramientas.svg",
+    "available": true
+  },
+  {
+    "id": "bys-herramientas-de-albanil",
+    "name": "Herramientas de albañil",
+    "category": "Herramientas",
+    "price": "10 po",
+    "description": "Permiten crear estructuras de piedra, incluidas paredes y edificios de ladrillo. Consisten en una paleta, un martillo, un cincel, cepillos y una escuadra.",
+    "image": "assets/productos/herramientas/herramientas-de-albanil.webp",
+    "fallback": "assets/placeholders/herramientas.svg",
+    "available": true
+  },
+  {
+    "id": "bys-suministros-de-pintor",
+    "name": "Suministros de pintor",
+    "category": "Herramientas",
+    "price": "10 po",
+    "description": "Incluyen un caballete, lienzo, pinturas, pinceles, carboncillos y una paleta. El dominio representa la capacidad para pintar y dibujar y aporta conocimientos de historia del arte.",
+    "image": "assets/productos/herramientas/suministros-de-pintor.webp",
+    "fallback": "assets/placeholders/herramientas.svg",
+    "available": true
+  },
+  {
+    "id": "bys-herramientas-de-alfarero",
+    "name": "Herramientas de alfarero",
+    "category": "Herramientas",
+    "price": "10 po",
+    "description": "Se utilizan para crear una variedad de objetos de cerámica. Incluyen agujas de alfarero, costillas, raspadores, un cuchillo y calibradores.",
+    "image": "assets/productos/herramientas/herramientas-de-alfarero.webp",
+    "fallback": "assets/placeholders/herramientas.svg",
+    "available": true
+  },
+  {
+    "id": "bys-herramientas-de-herreria",
+    "name": "Herramientas de Herrería",
+    "category": "Herramientas",
+    "price": "20 po",
+    "description": "Permiten trabajar metal, alterar su forma, reparar daños o convertir lingotes en artículos útiles. Incluyen martillos, tenazas, carbón, trapos y una piedra de afilar.",
+    "image": "assets/productos/herramientas/herramientas-de-herreria.webp",
+    "fallback": "assets/placeholders/herramientas.svg",
+    "available": true
+  },
+  {
+    "id": "bys-herramientas-de-trabajo",
+    "name": "Herramientas de Trabajo",
+    "category": "Herramientas",
+    "price": "50 po",
+    "description": "Un conjunto de herramientas de bricolaje diseñado para reparar muchos objetos mundanos. Incluye herramientas manuales, hilo, agujas, una piedra de afilar, trozos de tela y cuero y un pequeño bote de pegamento.",
+    "image": "assets/productos/herramientas/herramientas-de-trabajo.webp",
+    "fallback": "assets/placeholders/herramientas.svg",
+    "available": true
+  },
+  {
+    "id": "bys-herramientas-de-tejedor",
+    "name": "Herramientas de tejedor",
+    "category": "Herramientas",
+    "price": "1 po",
+    "description": "Permiten crear telas y confeccionarlas en prendas de vestir. Incluyen hilo, agujas y trozos de tela. Quien las domina sabe manejar un telar, aunque ese equipo es demasiado grande para transportarlo.",
+    "image": "assets/productos/herramientas/herramientas-de-tejedor.webp",
+    "fallback": "assets/placeholders/herramientas.svg",
+    "available": true
+  },
+  {
+    "id": "bys-herramientas-de-tallador-de-madera",
+    "name": "Herramientas de tallador de madera",
+    "category": "Herramientas",
+    "price": "1 po",
+    "description": "Permiten crear objetos complejos de madera, como fichas o flechas. Consisten en un cuchillo, una gubia y una sierra pequeña.",
+    "image": "assets/productos/herramientas/herramientas-de-tallador-de-madera.webp",
+    "fallback": "assets/placeholders/herramientas.svg",
+    "available": true
+  },
+  {
+    "id": "bys-herramientas-de-doctor",
+    "name": "Herramientas de Doctor",
+    "category": "Herramientas",
+    "price": "50 po",
+    "description": "Vienen en una bolsa de cuero negro o marrón con herramientas de acero pulidas y de precisión. La competencia permite agregar la bonificación de competencia a pruebas de Sabiduría (Medicina) al estabilizar una criatura moribunda o diagnosticar y curar una enfermedad; si ya se domina Medicina, la bonificación se duplica.",
+    "image": "assets/productos/herramientas/herramientas-de-doctor.webp",
+    "fallback": "assets/placeholders/herramientas.svg",
+    "available": true
+  },
+  {
+    "id": "bys-herramientas-de-topografo",
+    "name": "Herramientas de Topógrafo",
+    "category": "Herramientas",
+    "price": "350 Oro",
+    "description": "Permiten marcar esquinas y parcelas de tierra, trazar coordenadas y mapas con precisión. El kit incluye una cadena Gunter de 100 eslabones, una brújula de topógrafo y un teodolito.",
+    "image": "assets/productos/herramientas/herramientas-de-topografo.webp",
+    "fallback": "assets/placeholders/herramientas.svg",
+    "available": true
+  },
+  {
+    "id": "bys-herramientas-del-metalurgista",
+    "name": "Herramientas del metalurgista",
+    "category": "Herramientas",
+    "price": "100 po",
+    "description": "Incluyen afeitadoras de metal, una fundición de tamaño pequeño y crisoles de tamaño pequeño, necesarios para obtener virutas de metal y crear aleaciones. Por cada 4 onzas de metal puestas en una aleación, se obtienen 3 onzas de aleación y 1 de escoria.",
+    "image": "assets/productos/herramientas/herramientas-del-metalurgista.webp",
+    "fallback": "assets/placeholders/herramientas.svg",
+    "available": true
+  },
+  {
+    "id": "bys-herramientas-de-tallar-huesos",
+    "name": "Herramientas de Tallar huesos",
+    "category": "Herramientas",
+    "price": "1 po",
+    "description": "Kit para el arte de tallar en hueso, guardado en un estuche de cuero enrollable. Incluye lupa, cinco cuchillos progresivamente más finos, una aguja o púa, bolígrafo de tinta y un soporte sujeto con cuerda.",
+    "image": "assets/productos/herramientas/herramientas-de-tallar-huesos.webp",
+    "fallback": "assets/placeholders/herramientas.svg",
+    "available": true
+  },
+  {
+    "id": "bys-herramientas-de-costura",
+    "name": "Herramientas de Costura",
+    "category": "Herramientas",
+    "price": "5 gp",
+    "description": "Paquete compacto para unir materiales con aguja e hilo. Incluye agujas, carretes de hilo, cinta métrica, dedales, alfileres y cojín, una caja de ganchos y botones y tijeras para cortar hilos.",
+    "image": "assets/productos/herramientas/herramientas-de-costura.webp",
+    "fallback": "assets/placeholders/herramientas.svg",
+    "available": true
+  },
+  {
+    "id": "bys-herramientas-de-ladron",
+    "name": "Herramientas de ladrón",
+    "category": "Herramientas",
+    "price": "25 po",
+    "description": "Diseñadas para forzar cerraduras y frustrar trampas. Incluyen una lima pequeña, un juego de ganzúas, un pequeño espejo montado en un mango de metal, tijeras de hoja estrecha y alicates.",
+    "image": "assets/productos/herramientas/herramientas-de-ladron.webp",
+    "fallback": "assets/placeholders/herramientas.svg",
+    "available": true
+  },
+  {
+    "id": "bys-kit-de-herboristeria",
+    "name": "Kit de herboristería",
+    "category": "Herramientas",
+    "price": "5 Po",
+    "description": "Incluye bolsas para guardar hierbas, tijeras y guantes de cuero para recolectar plantas, un mortero y varios frascos de vidrio.",
+    "image": "assets/productos/herramientas/kit-de-herboristeria.webp",
+    "fallback": "assets/placeholders/herramientas.svg",
+    "available": true
+  },
+  {
+    "id": "bys-kit-de-envenenador",
+    "name": "Kit de envenenador",
+    "category": "Herramientas",
+    "price": "50 po",
+    "description": "Incluye viales de vidrio, un mortero, productos químicos y una varilla de vidrio para agitar.",
+    "image": "assets/productos/herramientas/kit-de-envenenador.webp",
+    "fallback": "assets/placeholders/herramientas.svg",
+    "available": true
+  }
+]

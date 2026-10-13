@@ -1,0 +1,14 @@
+[
+  {
+    "id": "identificar-objeto-magico",
+    "name": "Identificar objeto mágico",
+    "price": "100 po",
+    "description": "Ecix’s usa el conjuro Identificar sobre un objeto mágico."
+  },
+  {
+    "id": "sangre-y-magia",
+    "name": "Un poco de mi sangre y magia",
+    "price": "3.000 po",
+    "description": "Ecix’s transforma un arma en un arma +2."
+  }
+]

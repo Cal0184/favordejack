@@ -1,0 +1,234 @@
+{
+  "version": 1,
+  "updated": "2026-09-14",
+  "tabs": [
+    {
+      "id": "regla",
+      "label": "Reglas"
+    },
+    {
+      "id": "buff",
+      "label": "Buffs"
+    },
+    {
+      "id": "nerf",
+      "label": "Nerfs"
+    },
+    {
+      "id": "ban",
+      "label": "Baneos"
+    }
+  ],
+  "rules": [
+    {
+      "id": "agarre-presa",
+      "title": "Presa / Agarre",
+      "category": "Acciones",
+      "type": "regla",
+      "html": "<p>Puedes usar la acción Atacar para realizar un ataque cuerpo a cuerpo especial, un agarre. Si eres capaz de realizar múltiples ataques con la acción Atacar, este ataque reemplaza a uno de ellos.</p>\n<p>El objetivo de tu agarre debe estar dentro de tu alcance y tener un tamaño que esté, como mucho, una categoría por encima de la tuya.</p>\n<p>Utilizando al menos una mano libre, intentas sujetar al objetivo mediante una prueba de agarrar en lugar de una tirada de ataque: haz una prueba de Fuerza (Atletismo) enfrentada a una prueba de Fuerza (Atletismo) o Destreza (Acrobacia) del objetivo, según elija este último.</p>\n<p>Si tienes éxito, sometes al objetivo al estado Agarrado.</p>\n<p>Mover una Criatura Agarrada: Cuando te mueves, puedes arrastrar o llevar a la criatura agarrada contigo, pero tu velocidad se reduce a la mitad, a menos que la criatura sea dos o más tamaños más pequeña que tú.</p>"
+    },
+    {
+      "id": "desarmar",
+      "title": "Desarmar",
+      "category": "Acciones",
+      "type": "regla",
+      "html": "<p>Una criatura puede usar un ataque de arma para golpear un arma u otro objeto desde las garras de un objetivo. El atacante hace un lanzamiento de ataque disputado por la comprobación de Atletismo o la comprobación de Acrobáticas del objetivo. Si el atacante gana el concurso, el ataque no causa ningún daño u otro efecto mal, pero el defensor deja caer el objeto.</p>\n<p>El atacante tiene una desventaja en su tirada de ataque si el objetivo sostiene el objeto con dos o más manos. El objetivo tiene ventaja en su control de habilidad si es más grande que la criatura atacante, o desventaja si es más pequeño.</p>"
+    },
+    {
+      "id": "esquivar",
+      "title": "Esquivar",
+      "category": "Acciones",
+      "type": "regla",
+      "html": "<ul>\n<li>Te enfocas por completo en evitar ataques.</li>\n<li>Hasta el comienzo de tu siguiente turno, cualquier tirada de ataque hecha contra ti tiene una desventaja si puedes ver al atacante, y haces lanzamientos de salvación de Destreza con ventaja.</li>\n<li>Pierdes este beneficio si estás incapacitado o si tu velocidad cae a 0.</li>\n</ul>"
+    },
+    {
+      "id": "destrabarse",
+      "title": "Destrabarse",
+      "category": "Acciones",
+      "type": "regla",
+      "html": "<p>Tu movimiento no provoca ataques de oportunidad durante el resto del turno.</p>"
+    },
+    {
+      "id": "preparar-accion",
+      "title": "Preparar una acción",
+      "category": "Acciones",
+      "type": "regla",
+      "html": "<p>Elige una circunstancia y una acción de respuesta.</p>\n<p>Primero, decide qué circunstancia (que puedas percibir) activará tu reacción.</p>\n<p>Luego, elige la acción que realizarás en respuesta a dicha activación. Como alternativa, en vez de una acción puedes decidir moverte hasta tu velocidad.</p>\n<p>Cuando ocurra la circunstancia de activación, podrás elegir entre usar tu reacción al terminar esta o ignorarla.</p>\n<p>Cuando te preparas para lanzar un conjuro, lo lanzas con normalidad pero retienes su energía, que liberarás usando tu reacción cuando se produzca la circunstancia activadora.</p>\n<p>Sólo los conjuros cuyo tiempo de lanzamiento sea de 1 acción pueden formar parte de una acción preparada.</p>\n<p>Además, el esfuerzo que implica contener las energías mágicas hasta el momento de liberarlas exige concentración.</p>"
+    },
+    {
+      "id": "estabilizar",
+      "title": "Estabilizar a una criatura",
+      "category": "Acciones",
+      "type": "regla",
+      "html": "<ul>\n<li>Evita que una criatura moribunda tenga que realizar tiradas de salvacion contra muerte.</li>\n<li>Realiza un prueba de Sabiduría (Medicina) CD 10.</li>\n<li>Con éxito, la criatura está estable y ya no necesita realizar tiradas de salvación contra muerte.</li>\n<li>Una criatura estable recupera 1 punto de vida después de 1d4 horas.</li>\n</ul>"
+    },
+    {
+      "id": "empujar",
+      "title": "Empujar (Shove)",
+      "category": "Acciones",
+      "type": "regla",
+      "html": "<p>Empuja a una criatura, ya sea para derribarla o para alejarla de ti.</p>\n<p>Utilizando la acción de Atacar, puedes realizar un ataque cuerpo a cuerpo especial para empujar a un criatura. Si eres capaz de realizar múltiples ataques con la acción Atacar, este ataque reemplaza a uno de ellos.</p>\n<p>El objetivo de tu empuje no debe ser más de un tamaño más grande que tú, y debe estar a tu alcance.</p>\n<p>Realiza una prueba de Fuerza (Atletismo) enfrentada por la Fuerza (Atletismo) o Destreza (Acrobacia) del objetivo (el objetivo elige la habilidad a usar).</p>\n<p>Si tienes éxito, ya sea que derribes al objetivo o lo empujes 5 pies lejos de ti.</p>"
+    },
+    {
+      "id": "interponerse",
+      "title": "Interponerse",
+      "category": "Acciones",
+      "type": "regla",
+      "html": "<p>Como accion, cuando una criatura a 5 pies de ti sea objetivo de un ataque, puedes usar tu reacción para interponerte y redirigir el ataque hacia ti.</p>\n<ul>\n<li>El atacante realiza la misma tirada de ataque, pero ahora contra tu Clase de Armadura (CA) en lugar de la del aliado.</li>\n<li>No puedes usar esta acción si estás incapacitado, reducido a 0 de velocidad o sorprendido.</li>\n</ul>"
+    },
+    {
+      "id": "correr",
+      "title": "Correr",
+      "category": "Acciones",
+      "type": "regla",
+      "html": "<p>Obtienes movimiento adicional para el turno en curso.</p>\n<p>El incremento es igual a tu velocidad, después de aplicarle cualquier modificador. (No se duplica)</p>"
+    },
+    {
+      "id": "cobertura",
+      "title": "Reglas de Cobertura",
+      "category": "Combate",
+      "type": "regla",
+      "html": "<p>Un objetivo con cobertura media tiene un bonificador de +2 a la CA y a las tiradas de salvación de Destreza. Un objetivo tiene cobertura media si un obstáculo bloquea al menos la mitad de su cuerpo. El obstáculo puede ser un muro bajo, un mueble grande, un tronco de árbol delgado, o una criatura, ya sea enemiga o amiga.</p>\n<p>Un objetivo con cobertura de tres cuartos tiene un bonificador de +5 a la CA y a las tiradas de salvación de Destreza. Una criatura tiene una cobertura de tres cuartos si aproximadamente tres cuartos de ella está cubierta por un obstáculo. El obstáculo puede ser un rastrillo, una aspillera, o un tronco de árbol grueso.</p>\n<p>Un objetivo con cobertura total no puede ser el objetivo directo de un ataque o conjuro, aunque algunos conjuros pueden alcanzar dicho objetivo siendo incluido en un área de efecto. Una criatura tiene cobertura total si está completamente oculta por un obstáculo.</p>"
+    },
+    {
+      "id": "ataque-oportunidad",
+      "title": "Ataque de oportunidad",
+      "category": "Combate",
+      "type": "regla",
+      "html": "<p>Rara vez puedes moverte despreocupadamente junto a tus enemigos sin ponerte en peligro.</p>\n<p><em>Circunstancia de activación: la criatura enemiga que puedas ver sale de tu alcance.</em></p>\n<ul>\n<li>Realiza un ataque cuerpo a cuerpo contra la criatura provocadora.</li>\n<li>El ataque interrumpe el movimiento de la criatura provocadora, ocurriendo justo antes de que la criatura deje tu alcance.</li>\n<li>Las criaturas no provocan ataques de oportunidad cuando se teletransportan o cuando alguien o algo las mueve sin usar su movimiento, acción o reacción.</li>\n</ul>"
+    },
+    {
+      "id": "reacciones",
+      "title": "Reacciones",
+      "category": "Combate",
+      "type": "regla",
+      "html": "<p>Ciertas habilidades, hechizos y situaciones especiales te permiten realizar una acción especial llamada reacción.</p>\n<p>Una reacción es una respuesta instantánea a un desencadenante de algún tipo, que puede ocurrir en tu turno o en el de otra persona.</p>\n<p>El ataque de oportunidad es el tipo de reacción más común.</p>\n<p>Cuando realizas una reacción, no puedes realizar otra hasta el comienzo de tu siguiente turno.</p>\n<p>Si la reacción interrumpe el turno de otra criatura, esta puede continuar su turno inmediatamente después de la reacción.</p>"
+    },
+    {
+      "id": "acciones-legendarias",
+      "title": "Acciones legendarias",
+      "category": "Combate",
+      "type": "regla",
+      "html": "<p>Una criatura legendaria puede realizar un cierto número de acciones especiales fuera de sus turnos.</p>\n<p>Solo una opción de acción legendaria puede ser utilizada cada vez y solo al final del turno de otra criatura.</p>\n<p>Al inicio de su turno, la criatura legendaria recupera las acciones legendarias gastadas.</p>\n<p>Puede abstenerse de usarlas, y no puede utilizarlas si se encuentra incapacitada o, de cualquier otro modo, incapaz de realizar acciones.</p>\n<p>Si se le sorprende, no puede utilizarlas hasta pasado su primer turno de combate.</p>"
+    },
+    {
+      "id": "tomar-pocion",
+      "title": "Tomar una Poción",
+      "category": "Combate",
+      "type": "regla",
+      "html": "<p>Las pociones de curación pueden usarse de dos formas:</p>\n<ul>\n<li>Acción: Recuperas la cantidad máxima de HP posible.</li>\n<li>Acción Bonus: Lanzas los dados para determinar la curación.</li>\n<li>Darla a un aliado: Requiere una acción.</li>\n</ul>\n<p><strong>Cualquier otra poción que no sea de curación solo puede usarse como acción completa.</strong></p>"
+    },
+    {
+      "id": "estado-agarrado",
+      "title": "Estado Agarrado",
+      "category": "Estados",
+      "type": "regla",
+      "html": "<p>La velocidad de una criatura agarrada es 0 y no puede aumentar por encima de ese valor.</p>\n<p>Este estado termina si quien agarra queda incapacitado.</p>\n<p>Este estado también termina si algún efecto aleja a la criatura de quien (o lo que) la tiene agarrada, como cuando el conjuro ola atronadora hace salir despedida a una criatura.</p>"
+    },
+    {
+      "id": "salir-agarre",
+      "title": "Salir de Agarre",
+      "category": "Estados",
+      "type": "regla",
+      "html": "<p>Acción para Escapar: Puedes gastar tu acción para hacer un chequeo de Atletismo (Fuerza) o Acrobacias (Destreza) (tu elección) contra la CD del agarre (que es el resultado de la tirada de Atletismo del que te agarró). Si superas la CD, te liberas.</p>\n<p>Forzar al enemigo a soltarte.</p>\n<p>Empujar al enemigo: Si alguien empuja al que te agarra más de 5 pies, te suelta automáticamente.</p>\n<p>Derribar al enemigo: Si el que te agarra queda inconsciente o derribado, te suelta.</p>"
+    },
+    {
+      "id": "inconsciente",
+      "title": "Inconsciente",
+      "category": "Estados",
+      "type": "regla",
+      "html": "<p>Estás inconsciente.</p>\n<p>Un criatura inconsciente está incapacitada, no puede moverse o hablar y no es consciente de su entorno.</p>\n<p>La criatura deja caer cualquier cosa que esté sujetando y cae derribada.</p>\n<p>La criatura falla automáticamente las tiradas de salvación de Fuerza y Destreza.</p>\n<p>Las tiradas de ataque contra la criatura tienen ventaja.</p>\n<p>Todos los ataques que impacten a la criatura son críticos si el atacante está a 5 pies o menos de ella.</p>"
+    },
+    {
+      "id": "concentracion",
+      "title": "Salvar Concentración",
+      "category": "Magia",
+      "type": "regla",
+      "html": "<p>Cada vez que sufras daño mientras te concentras en un conjuro tendrás que hacer una tirada de salvación de Constitución para mantener la concentración. La CD será de 10 o la mitad del daño sufrido, lo que sea mayor.</p>\n<p>Si recibes daño de varios orígenes, como una flecha y el aliento de un dragón, deberás hacer una tirada de salvación por separado para cada fuente de daño.</p>"
+    },
+    {
+      "id": "silvery-barbs",
+      "title": "Silbery Barbs",
+      "category": "Magia",
+      "type": "regla",
+      "html": "<p>&quot;Mágicamente distraes a la criatura desencadenante y conviertes su incertidumbre momentánea en aliento para otra criatura. La criatura desencadenante debe volver a tirar el d20 y <strong>utilizar la tirada inferior.</strong>&quot;</p>\n<p>La criatura elegida tiene ventaja <strong>en la siguiente</strong> tirada de ataque, prueba de habilidad o tirada de salvación que realice dentro de 1 minuto. Una criatura sólo puede ser potenciada mediante el uso de este hechizo a la vez.</p>"
+    },
+    {
+      "id": "vision-verdadera",
+      "title": "Visión verdadera",
+      "category": "Magia",
+      "type": "regla",
+      "html": "<p>Una criatura con visión verdadera puede, hasta un cierto alcance, ver en la oscuridad normal y mágica, ver criaturas y objetos invisibles, detectar automáticamente ilusiones visuales y superar tiradas de salvación contra ellas, y percibir la forma original de un cambiaformas o de una criatura transformada por magia.</p>\n<p>Además, puede ver en el Plano Etéreo.</p>"
+    },
+    {
+      "id": "aumento-magico",
+      "title": "Aumento Magico",
+      "category": "Magia",
+      "type": "regla",
+      "html": "<p><a href=\"https://media.discordapp.net/attachments/1249507347395772486/1336823004449083494/Captura_de_pantalla_2025-02-05_191636.png?ex=6aa91b31&amp;is=6aa7c9b1&amp;hm=6e48dbf96d94cb3a3b96b98e6df4eee5a309a2533d067e6539e1208d858af224&amp;=&amp;format=webp&amp;quality=lossless&amp;width=346&amp;height=384\" target=\"_blank\" rel=\"noopener noreferrer\">Imagen</a></p>"
+    },
+    {
+      "id": "distancia",
+      "title": "Distancia",
+      "category": "Armas y herramientas",
+      "type": "regla",
+      "html": "<p>Un arma que puede ser usada para realizar un ataque a distancia tiene una distancia indicada entre paréntesis después de las propiedades Munición o Arrojadiza.</p>\n<p>La distancia indica dos números: el primero es la distancia normal del arma en pies, y el segundo indica la distancia larga del arma.</p>\n<p>Cuando ataques a un objetivo más allá de la distancia normal, tiene desventaja en la tirada de ataque. No puedes atacar a un objetivo más allá de la distancia larga del arma.</p>"
+    },
+    {
+      "id": "cerraduras",
+      "title": "Cómo abrir una cerradura",
+      "category": "Armas y herramientas",
+      "type": "regla",
+      "html": "<p>Tienes herramientas de ladrón y las dominas. Puedes intentar forzar la cerradura y agregar tu bonificación de competencia a la prueba (Dex).</p>\n<p>Tienes las herramientas de los ladrones y tienes experiencia con las herramientas de los ladrones. Puedes intentar forzar la cerradura y agregar el doble de tu bonificación de competencia a la prueba (Dex).</p>\n<p>Tienes herramientas de ladrón pero no eres competente con ellas. Aún puedes intentar forzar la cerradura, pero no podrás agregar tu bonificación de competencia.</p>\n<p>No tienes herramientas de ladrón, así que improvisas algunas (con la aprobación de tu DM), pero no dominas las herramientas de ladrón. Aún puedes intentar forzar la cerradura, pero con desventajas.</p>\n<p>Tienes herramientas improvisadas y dominas las herramientas de los ladrones. Tienes desventaja al abrir la cerradura, pero puedes agregar tu bonificación de competencia.</p>\n<p>Sin herramientas de ladrones ni herramientas improvisadas. Haz una prueba de fuerza para lanzar al miembro del grupo más cercano a través de la puerta o accionar la cerradura con una palanca. Básicamente, busca otra forma de superarlo porque no puedes elegirlo.</p>"
+    },
+    {
+      "id": "recarga",
+      "title": "Recarga",
+      "category": "Armas y herramientas",
+      "type": "regla",
+      "html": "<p>Debido al tiempo requerido para cargar esta arma, Sólo se puede disparar una sola pieza de munición cuando se utiliza una acción, una acción bonificada o reacción al disparar, sin importar el número de ataques que puedas hacer normalmente.</p>"
+    },
+    {
+      "id": "municion",
+      "title": "Municion",
+      "category": "Armas y herramientas",
+      "type": "regla",
+      "html": "<p>Puedes utilizar un arma que tiene la propiedad de munición para hacer un ataque a distancia sólo si tienes munición para disparar desde el arma.</p>\n<p>Cada vez que atacas con el arma, gastas una pieza de munición. Coger la munición de un carcaj, caja u otro recipiente es parte del ataque.</p>\n<p>Al final de la batalla, se puede recuperar la mitad de tu munición gastada tomando un minuto para buscar en el campo de batalla.</p>\n<p>Si utilizas un arma que tiene la propiedad de munición para hacer un ataque cuerpo a cuerpo, tratas el arma como arma improvisada.</p>"
+    },
+    {
+      "id": "miss-fire",
+      "title": "Miss Fire",
+      "category": "Armas y herramientas",
+      "type": "regla",
+      "html": "<p>Cada vez que hagas una tirada de ataque con un arma de fuego, si el resultado del dado es igual o inferior a la puntuación de fallo de disparo del arma, esta falla.</p>\n<p>El ataque falla automáticamente y el arma no se puede volver a usar hasta que gastes una acción para intentar repararla.</p>\n<p>Para reparar tu arma de fuego, debes hacer una prueba exitosa con las herramientas de inventor (Tinker’s Tools), con una CD igual a 8 + la puntuación de fallo de disparo.</p>\n<p>Si fallas la tirada, el arma se rompe y debe ser reparada fuera de combate, a un costo equivalente a una cuarta parte del valor del arma.</p>\n<p>Las criaturas que usan un arma de fuego sin tener competencia con ella aumentan en 1 la puntuación de fallo de disparo del arma.</p>"
+    },
+    {
+      "id": "asesinar",
+      "title": "Asesinar",
+      "category": "Clases y rasgos",
+      "type": "regla",
+      "html": "<p>(Se desbloquea a Nivel 3 Rogue)</p>\n<p>Durante el primer turno de combate, tienes ventaja en las tiradas de ataque contra cualquier criatura que aún no haya actuado.</p>\n<p>Si atacas a una criatura sorprendida, cualquier golpe que asestes será un golpe crítico automático.</p>"
+    },
+    {
+      "id": "monje",
+      "title": "Monje",
+      "category": "Clases y rasgos",
+      "type": "regla",
+      "html": "<p>(Se desboquea a Nivel 2 Monje)</p>\n<p>Los Monjes podrán realizar ataque desarmado como acción adicional sin necesidad de usar la acción ataque.</p>"
+    },
+    {
+      "id": "percepcion-expertise",
+      "title": "Percepción Pasiva y Experiencia (Expertise)",
+      "category": "Clases y rasgos",
+      "type": "regla",
+      "html": "<p>La Expertise afecta a las tiradas de Percepción pasiva.</p>\n<p>Para calcular el total de una prueba pasiva, la fórmula es: 10 + todos los modificadores que se apliquen normalmente a la prueba.</p>\n<p>Ejemplo con Experiencia: Si tienes un modificador de Sabiduría de +3 y una bonificación por competencia de +4 (con competencia en Percepción), tu puntuación de Percepción pasiva es 10 + 7, es decir, 17.</p>\n<p>Si tienes Experiencia en Percepción, la competencia de +4 se duplica, por lo que tu Percepción pasiva será 21.</p>"
+    },
+    {
+      "id": "iniciativa-jack",
+      "title": "Iniciativa y (Jack of All Trades)",
+      "category": "Clases y rasgos",
+      "type": "regla",
+      "html": "<p>El rasgo Pericia afeta también se aplica a las tiradas de Iniciativa.</p>"
+    }
+  ]
+}

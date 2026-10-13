@@ -1,0 +1,28 @@
+# --- Secretos y configuración de cada servidor (nunca en Git) ---
+bancadigital/config.php
+config.local.php
+emporio/admin.json
+emporio/data/users.json
+emporio/data/users-backup.json
+
+# --- Datos que escribe la web (van en el paquete de exportación, no en Git) ---
+bancadigital/data/
+emporio/data/requests.json
+emporio/data/favorites.json
+emporio/data/audit.json
+archivosdelgremio/fichas/*
+!archivosdelgremio/fichas/.htaccess
+media/characters/
+media/icons/
+media/profiles/
+
+# --- Copias duplicadas que se limpian en la fase 2 ---
+emporio/Cartas/
+bancadigital/icons/
+bancadigital/characters/
+
+# --- Restos ---
+*.bak
+*.lock
+.DS_Store
+Thumbs.db

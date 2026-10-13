@@ -1,0 +1,12 @@
+{
+  "id": "varita-economica",
+  "name": "La Varita Económica",
+  "seller": "El Señor Blanco · Pinkman",
+  "category": "Mercado negro · Magia dudosa · Contrabando",
+  "description": "Pergaminos, mezclas experimentales, mercancía restringida y objetos mágicos con defectos incluidos.",
+  "url": "/favordejack/tiendas/varita-economica/",
+  "sellerImage": "assets/vendedores/blanco.png",
+  "x": 45.0,
+  "y": 70.0,
+  "enabled": false
+}

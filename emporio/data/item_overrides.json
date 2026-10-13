@@ -1,0 +1,135 @@
+{
+    "anillo-catapulta": {
+        "name": "Anillo Catapulta",
+        "category": "Objetos mágicos",
+        "price": "600 po",
+        "stock": 1,
+        "description": "3 veces por día puedes usar el conjuro Catapulta en un objeto que estés sosteniendo en la misma mano que el anillo."
+    },
+    "anillo-de-catapulta": {
+        "name": "Anillo Catapulta",
+        "category": "Objetos mágicos",
+        "price": "600 po",
+        "stock": 1,
+        "description": "3 veces por día puedes usar el conjuro Catapulta en un objeto que estés sosteniendo en la misma mano que el anillo."
+    },
+    "Cuerda-de-escalada": {
+        "name": "Cuerda de Escalada",
+        "category": "Supervivencia y entorno",
+        "price": "1.200 po",
+        "stock": 1,
+        "description": "Se ancla automáticamente al comando verbal, tensándose con fuerza mágica.\n\nFacilita trepar sin riesgo de deslizamiento y soporta hasta 1000 libras."
+    },
+    "cuerda-escalada": {
+        "name": "Cuerda de Escalada",
+        "category": "Supervivencia y entorno",
+        "price": "1.200 po",
+        "stock": 1,
+        "description": "Se ancla automáticamente al comando verbal, tensándose con fuerza mágica.\n\nFacilita trepar sin riesgo de deslizamiento y soporta hasta 1000 libras."
+    },
+    "arco-runico": {
+        "name": "Arco Rúnico",
+        "category": "Armas y ofensiva",
+        "price": "1.100 po",
+        "stock": 1,
+        "description": "Arco corto +1. Requiere vinculación. Como acción gratuita, puedes cambiar el tipo de daño del arma entre: punzante, contundente, cortante, fuego, hielo, eléctrico o radiante."
+    },
+    "botas-anti-grasa": {
+        "name": "Botas Anti Grasa",
+        "category": "Movimiento y viaje",
+        "price": "300 po",
+        "stock": 2,
+        "description": "Requiere vinculación. Mientras las llevas puestas, eres inmune al conjuro Grease. Una vez al día puedes lanzar Grease centrado en ti mismo."
+    },
+    "bronntanas": {
+        "name": "Bronntanas Blade",
+        "category": "Armas y ofensiva",
+        "price": "1.100 po",
+        "stock": 1,
+        "description": "Espada larga +1, sutil. Requiere vinculación. Mientras esté vinculada, tienes competencia con esta arma, puedes utilizarla como arma sutil y no sufres penalizaciones por utilizarla bajo el agua.\n\n3/día, como acción bonus, puedes activar Hoja de Agua durante 4 rondas: el daño cambia a hielo, el alcance aumenta a 10 pies y puede ser arrojada hasta 30 pies, regresando a su portador mientras este no se haya movido y tenga una mano libre."
+    },
+    "bronntanas-blade": {
+        "name": "Bronntanas Blade",
+        "category": "Armas y ofensiva",
+        "price": "1.100 po",
+        "stock": 1,
+        "description": "Espada larga +1, sutil. Requiere vinculación. Mientras esté vinculada, tienes competencia con esta arma, puedes utilizarla como arma sutil y no sufres penalizaciones por utilizarla bajo el agua.\n\n3/día, como acción bonus, puedes activar Hoja de Agua durante 4 rondas: el daño cambia a hielo, el alcance aumenta a 10 pies y puede ser arrojada hasta 30 pies, regresando a su portador mientras este no se haya movido y tenga una mano libre."
+    },
+    "cinturon-de-fuerza-de-gigante": {
+        "name": "Cinturón de Fuerza de Gigante (Fuerza 21)",
+        "category": "Armas y ofensiva",
+        "price": "1.800 po",
+        "stock": 1,
+        "description": "Requiere vinculación. Mientras lleves este cinturón, tu puntuación de Fuerza se convierte en 21."
+    },
+    "cinturon-de-fuerza-de-gigante-fuerza-21": {
+        "name": "Cinturón de Fuerza de Gigante (Fuerza 21)",
+        "category": "Armas y ofensiva",
+        "price": "1.800 po",
+        "stock": 1,
+        "description": "Requiere vinculación. Mientras lleves este cinturón, tu puntuación de Fuerza se convierte en 21."
+    },
+    "mochila-compartida": {
+        "name": "Mochila Compartida",
+        "category": "Herramientas, almacenamiento y utilidad",
+        "price": "1.000 po",
+        "stock": 1,
+        "description": "Bolsa de tenencia compartida. Cualquier criatura vinculada con la mochila que se encuentre a 60 pies o menos puede invocar como acción adicional cualquier objeto de 5 lb o menos que esté almacenado dentro de ella."
+    },
+    "orbe-de-las-plagas": {
+        "name": "Orbe de las Plagas",
+        "category": "Objetos mágicos",
+        "price": "2.800 po",
+        "stock": 1,
+        "description": "Requiere vinculación. El orbe tiene 10 cargas y recupera 1d6+3 cargas cada día. Si no le quedan cargas, tira 1d20; con un 1, el orbe se vuelve polvo.\n\nPermite utilizar: Detectar venenos y enfermedades (1 carga), Rayo de enfermedad (1), Rayo de debilitamiento (2), Nube apestosa (3), Marchitar (4) y Contagio (5).\n\nComo acción, puedes arrojar el orbe al suelo para liberar una nube de plagas en una esfera de 35 pies; las criaturas dentro del área son afectadas por Contagio."
+    },
+    "ojos-de-aguila": {
+        "name": "Ojos de Águila",
+        "category": "Percepción y sentidos",
+        "price": "450 po",
+        "stock": 2,
+        "description": "Requiere vinculación. Mientras los llevas puestos, tienes ventaja en las pruebas de Sabiduría (Percepción) que dependan de la vista."
+    },
+    "papel-transmutador": {
+        "name": "Papel Transmutador",
+        "category": "Herramientas, almacenamiento y utilidad",
+        "price": "300 po",
+        "stock": 2,
+        "description": "Rollo de seda de 1 pie de ancho que puede desenredarse para formar una hoja de 5 pies × 20 pies. Al doblarse, se vuelve tan fuerte como el acero."
+    },
+    "piedra-de-una-tonelada": {
+        "name": "Piedra de una Tonelada",
+        "category": "Herramientas, almacenamiento y utilidad",
+        "price": "300 po",
+        "stock": 2,
+        "description": "La piedra no puede utilizarse como arma arrojadiza. Mediante una palabra de comando, puedes cambiar su peso a 1 tonelada y devolverlo posteriormente a su peso normal."
+    },
+    "guijarro-de-1-tonelada": {
+        "name": "Piedra de una Tonelada",
+        "category": "Herramientas, almacenamiento y utilidad",
+        "price": "300 po",
+        "stock": 2,
+        "description": "La piedra no puede utilizarse como arma arrojadiza. Mediante una palabra de comando, puedes cambiar su peso a 1 tonelada y devolverlo posteriormente a su peso normal."
+    },
+    "tunica-del-horador": {
+        "name": "Túnica del Orador",
+        "category": "Defensa y protección",
+        "price": "1.100 po",
+        "stock": 1,
+        "description": "Armadura de cuero +1. Requiere vinculación. 3/día puedes obtener ventaja en una prueba de habilidad basada en Carisma. 1/día puedes lanzar Comando."
+    },
+    "tunica-del-orador": {
+        "name": "Túnica del Orador",
+        "category": "Defensa y protección",
+        "price": "1.100 po",
+        "stock": 1,
+        "description": "Armadura de cuero +1. Requiere vinculación. 3/día puedes obtener ventaja en una prueba de habilidad basada en Carisma. 1/día puedes lanzar Comando."
+    },
+    "varita-de-bolas-de-fuego": {
+        "name": "Varita de Bolas de Fuego",
+        "category": "Varitas, bastones y focos",
+        "price": "2.600 po",
+        "stock": 1,
+        "description": "Requiere vinculación. La varita tiene 7 cargas. Mientras la sostienes, puedes usar una acción y gastar 1 o más cargas para lanzar Bola de Fuego (CD 15). Con 1 carga se lanza a nivel 3; por cada carga adicional aumenta en un nivel.\n\nRecupera 1d6+1 cargas al amanecer. Al gastar la última carga, tira 1d20; con un 1, la varita se convierte en cenizas y es destruida."
+    }
+}

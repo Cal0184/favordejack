@@ -1,0 +1,190 @@
+{
+  "note": "Importado desde 'Descuento Hecho.xlsx'. La hoja no indica porcentaje, regla ni significado explícito de X; por eso esta información NO modifica precios.",
+  "entries": [
+    {
+      "name": "Bel",
+      "marked": true,
+      "sourceMark": "X"
+    },
+    {
+      "name": "Connor",
+      "marked": true,
+      "sourceMark": "x"
+    },
+    {
+      "name": "Sekar Castamere",
+      "marked": false,
+      "sourceMark": null
+    },
+    {
+      "name": "Agni Vaelthorne",
+      "marked": true,
+      "sourceMark": "x"
+    },
+    {
+      "name": "Amelia",
+      "marked": false,
+      "sourceMark": null
+    },
+    {
+      "name": "Margoth",
+      "marked": false,
+      "sourceMark": null
+    },
+    {
+      "name": "Ogolat",
+      "marked": false,
+      "sourceMark": null
+    },
+    {
+      "name": "Rody",
+      "marked": false,
+      "sourceMark": null
+    },
+    {
+      "name": "Dhay",
+      "marked": false,
+      "sourceMark": null
+    },
+    {
+      "name": "Brighde",
+      "marked": false,
+      "sourceMark": null
+    },
+    {
+      "name": "Baphy",
+      "marked": false,
+      "sourceMark": null
+    },
+    {
+      "name": "Viajero",
+      "marked": true,
+      "sourceMark": "X"
+    },
+    {
+      "name": "Bullseye",
+      "marked": false,
+      "sourceMark": null
+    },
+    {
+      "name": "Thunddar",
+      "marked": false,
+      "sourceMark": null
+    },
+    {
+      "name": "Pahnaetiel",
+      "marked": false,
+      "sourceMark": null
+    },
+    {
+      "name": "Cuarzo",
+      "marked": false,
+      "sourceMark": null
+    },
+    {
+      "name": "Samantha Masoch",
+      "marked": true,
+      "sourceMark": "x"
+    },
+    {
+      "name": "Ghalin",
+      "marked": false,
+      "sourceMark": null
+    },
+    {
+      "name": "Aeolus",
+      "marked": false,
+      "sourceMark": null
+    },
+    {
+      "name": "Mannor",
+      "marked": false,
+      "sourceMark": null
+    },
+    {
+      "name": "Bjormen",
+      "marked": false,
+      "sourceMark": null
+    },
+    {
+      "name": "Redentora",
+      "marked": true,
+      "sourceMark": "x"
+    },
+    {
+      "name": "Althares",
+      "marked": false,
+      "sourceMark": null
+    },
+    {
+      "name": "Joshua",
+      "marked": true,
+      "sourceMark": "x"
+    },
+    {
+      "name": "Lawrence",
+      "marked": true,
+      "sourceMark": "x"
+    },
+    {
+      "name": "Erk",
+      "marked": false,
+      "sourceMark": null
+    },
+    {
+      "name": "Aliche de Fleur",
+      "marked": false,
+      "sourceMark": null
+    },
+    {
+      "name": "Xebac",
+      "marked": false,
+      "sourceMark": null
+    },
+    {
+      "name": "Tao",
+      "marked": false,
+      "sourceMark": null
+    },
+    {
+      "name": "Alejandro",
+      "marked": false,
+      "sourceMark": null
+    },
+    {
+      "name": "Sagiri",
+      "marked": false,
+      "sourceMark": null
+    },
+    {
+      "name": "Fang",
+      "marked": false,
+      "sourceMark": null
+    },
+    {
+      "name": "Iván Greco",
+      "marked": false,
+      "sourceMark": null
+    },
+    {
+      "name": "Neorian",
+      "marked": false,
+      "sourceMark": null
+    },
+    {
+      "name": "Ulreak",
+      "marked": false,
+      "sourceMark": null
+    },
+    {
+      "name": "Mike",
+      "marked": false,
+      "sourceMark": null
+    },
+    {
+      "name": "Wrecker",
+      "marked": false,
+      "sourceMark": null
+    }
+  ]
+}

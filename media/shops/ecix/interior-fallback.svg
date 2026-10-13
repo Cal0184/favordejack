@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 800">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#472a2f"/><stop offset=".55" stop-color="#201620"/><stop offset="1" stop-color="#0c090d"/></linearGradient><radialGradient id="glow"><stop stop-color="#e4bd74" stop-opacity=".65"/><stop offset="1" stop-color="#e4bd74" stop-opacity="0"/></radialGradient></defs>
+<rect width="1600" height="800" fill="url(#bg)"/><ellipse cx="800" cy="180" rx="620" ry="260" fill="url(#glow)"/>
+<g fill="#281923" stroke="#6d4937" stroke-width="8"><rect x="70" y="140" width="360" height="500"/><rect x="1170" y="140" width="360" height="500"/><path d="M520 650V210q280-210 560 0v440Z"/></g>
+<g fill="#8c5a3d"><rect x="95" y="220" width="310" height="18"/><rect x="95" y="340" width="310" height="18"/><rect x="95" y="460" width="310" height="18"/><rect x="1195" y="220" width="310" height="18"/><rect x="1195" y="340" width="310" height="18"/><rect x="1195" y="460" width="310" height="18"/></g>
+<g fill="#a36bc4"><circle cx="145" cy="205" r="23"/><circle cx="260" cy="315" r="20"/><circle cx="360" cy="435" r="25"/><circle cx="1260" cy="205" r="21"/><circle cx="1390" cy="315" r="24"/><circle cx="1470" cy="435" r="19"/></g>
+<path d="M680 800 760 430h80l80 370Z" fill="#55346e" opacity=".85"/><rect x="600" y="500" width="400" height="95" rx="18" fill="#593a2a" stroke="#ae7b4b" stroke-width="7"/><text x="800" y="566" text-anchor="middle" fill="#edd59c" font-family="Georgia,serif" font-size="42">EL EMPORIO DE ECIX'S</text>
+</svg>

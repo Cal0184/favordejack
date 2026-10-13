@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520">
+<rect width="800" height="520" fill="#100b08"/>
+<path d="M205 175h390v172H205z" fill="#2c1b11" stroke="#a87734" stroke-width="8"/>
+<path d="M274 260h252M400 175v172" stroke="#5a3c21" stroke-width="6"/>
+<path d="m320 337 80-152 80 152" fill="none" stroke="#d49e45" stroke-width="8"/>
+<circle cx="400" cy="203" r="18" fill="#68d6d0"/>
+<text x="400" y="443" text-anchor="middle" fill="#d9bd87" font-size="30" font-family="Georgia">HERRERÍA · TASACIÓN</text>
+</svg>

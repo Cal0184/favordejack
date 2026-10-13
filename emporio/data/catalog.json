@@ -1,0 +1,1010 @@
+[
+  {
+    "id": "arco-del-cazador",
+    "name": "Arco del cazador",
+    "category": "Armas y ofensiva",
+    "price": "400 po",
+    "description": "En un ataque a distancia exitoso lanza 'Hunter's Mark' como acción adicional. (2 días)"
+  },
+  {
+    "id": "bronntanas-blade",
+    "name": "Bronntanas Blade",
+    "category": "Armas y ofensiva",
+    "price": "1100 po",
+    "description": "Requiere vinculacion / espada larga +1 / Sutil\n\nMientras vinculada tienes competencia con esta arma\n\nse puede utilizar como arma sutil\n\nno penalizaciones por usarla bajo el agua\n\n3/dia hoja de agua: Como accion bonus, puedes hacer una hoja de liquida extendiendo el alcance del arma por 4 rondas y gana los siguientes beneficios\n\nEl daño cambia a Hielo\n\nEl alcance del arma son 10ft\n\nPuede ser arrojada 30ft. y esta volvera a su porador, mientras este no se halla movido o no tenga manos libres"
+  },
+  {
+    "id": "bumerang-druidico",
+    "name": "Bumerang Druidico",
+    "category": "Armas y ofensiva",
+    "price": "500 po",
+    "description": "Arma (garrote), rara (requiere armonización por parte de un druida, guardabosques, clérigo de la naturaleza o juramento de los antiguos paladines)\n\n1d8+Sabiduria\n\nEste palo mágico de madera tiene la propiedad arrojada (20/60). Mientras estás sintonizado, conoces el truco de shillelagh, o puedes elegir otro truco de druida si ya lo conoces. Si está encantado con el cantrip shillelagh, los efectos del hechizo se mantienen incluso cuando se lanza el arma. Si fallas un ataque de arma a distancia con el garrote, puedes hacer inmediatamente otra tirada de ataque a distancia contra una criatura diferente dentro de los 5 pies del objetivo original. Acertar o fallar, el palo regresa mágicamente a ti después del ataque."
+  },
+  {
+    "id": "bumeran-de-tormenta",
+    "name": "Bumerán de Tormenta",
+    "category": "Armas y ofensiva",
+    "price": "1500 po",
+    "description": "Arma de madera oscura que, al lanzarse, genera truenos retumbantes. Impacta por 1d6 daño contundente + 2d6 relámpago. Vuelve a la mano al final del turno. Se desaconseja en interiores o funerales."
+  },
+  {
+    "id": "cinturon-de-fuerza-de-gigante-fuerza-21",
+    "name": "Cinturón de Fuerza de Gigante (Fuerza 21)",
+    "category": "Armas y ofensiva",
+    "price": "1200 po",
+    "description": "Un cinturón grueso con hebilla grabada en runas gigantes.\n\nTu Fuerza pasa a 19 mientras lo usas.\n\nIdeal para cargadores de cajas o para aplastar cabezas."
+  },
+  {
+    "id": "cinturon-de-fuerza-de-gigante-de-colinas",
+    "name": "Cinturón de Fuerza de Gigante de Colinas",
+    "category": "Armas y ofensiva",
+    "price": "1800 po",
+    "description": "Mientras llevas el cinturón, tu puntuación de Fuerza se vuelve igual a 21\n\nCada cinturón está hecho con elementos del tipo de gigante correspondiente.\n\nEl cinturón no solo cambia tu fuerza… cambia tu vida. Pero no olvides: con gran fuerza, vienen pantalones que se te caen si lo pierdes."
+  },
+  {
+    "id": "cuchilla-de-cristal-oscuro",
+    "name": "Cuchilla de Cristal oscuro",
+    "category": "Armas y ofensiva",
+    "price": "2000 po",
+    "description": "En un golpe con esta arma, el objetivo recibe un 1d4 extra de daño necrotico.\n\nEsta daga puede ser utilizada para restringir a una criatura atraves de su sombra.\n\nSi atacas de manera cercana o lejana con esta arma a la sombra de un objetivo, este debe hacer una salvacion DC (8+Competencia+Destreza o Fuerza) y si falla la criatura esta restringida, hasta que la daga sea retirada de su sombra\n\nSolo afecta a criaturas Grandes / Medianas / Pequeñas"
+  },
+  {
+    "id": "cuchillo-de-cocina",
+    "name": "Cuchillo de cocina",
+    "category": "Armas y ofensiva",
+    "price": "450 po",
+    "description": "Cuchillo mágico que siempre está caliente\n\n+2 daño de fuego cuando se usa cuerpo a cuerpo\n\nPuede preparar comida cocinada sin fuego"
+  },
+  {
+    "id": "daga-de-veneno",
+    "name": "Daga de Veneno",
+    "category": "Armas y ofensiva",
+    "price": "1300 po",
+    "description": "Daga +1 de aspecto siniestro.\n\n1/día, puedes recubrirla de un veneno mágico:\n\nEl próximo golpe obliga a una salvación de Constitución CD 15 o el objetivo sufre 2d10 de daño venenoso y queda envenenado por 1 minuto.\n\nDespués de eso… solo es una daga elegante."
+  },
+  {
+    "id": "dardo-buscador",
+    "name": "Dardo Buscador",
+    "category": "Armas y ofensiva",
+    "price": "350 po",
+    "description": "Dardo mágico de un solo uso. Al susurrar \"seek\" y lanzarlo, busca un objetivo que hayas visto antes dentro de 120 ft, incluso sin línea de visión. Puede girar esquinas y atravesar huecos de 1 pulgada. El blanco debe hacer una salvación de Destreza CD 16 o sufre 1d4 perforante + 3d4 relámpago. Luego se vuelve un dardo normal Ideal para cobrar deudas desde la sombra."
+  },
+  {
+    "id": "el-filo-de-onix",
+    "name": "El filo de Onix",
+    "category": "Armas y ofensiva",
+    "price": "4500 po",
+    "description": "Daga +2\n\nVuelta de la oscuridad: Después de lanzarla, puedes decir una palabra de comando y esta aparecerá en tu mano\n\nTransformación de Onix: Cuando eres el objetivo de un ataque / Hechizo o una habilidad, puedes usar un reacción para empezar a generar arena oscura, en este estado tienes 50 puntos de vida extra, esta vida no se puede recuperar. este estado dura hasta el inicio de tu siguiente turno"
+  },
+  {
+    "id": "garras-del-explorador",
+    "name": "Garras del Explorador",
+    "category": "Armas y ofensiva",
+    "price": "700 po",
+    "description": "Guantes mágicos con garras retráctiles. Te dan trepada igual a tu velocidad, ventaja para escalar y puedes hacer 1d4 de daño cortante como ataque desarmado. Básicamente, uñas con licencia mágica."
+  },
+  {
+    "id": "hoja-kraken",
+    "name": "Hoja Kraken",
+    "category": "Armas y ofensiva",
+    "price": "1200 po",
+    "description": "Requiere vinculacion / Espadon +1\n\nMientras estes a 15 ft. de una fuente de agua, esta arma posee un aura de colores verdes y azules y mientras la tengas equipada, tienes velocidad de nado igual a tu velocidad de movimiento adicionalmente, una vez por dia puedes castear Muro de agua."
+  },
+  {
+    "id": "jabalina-de-rayo",
+    "name": "Jabalina de Rayo",
+    "category": "Armas y ofensiva",
+    "price": "700 po",
+    "description": "Una jabalina de hierro con relámpagos grabados, aún caliente al tacto. Puedes usarla normalmente como arma mágica. Pero una vez por día, al lanzarla y decir su palabra de comando, se convierte en un rayo que atraviesa enemigos en línea recta."
+  },
+  {
+    "id": "levantarse-contra-la-oscuridad",
+    "name": "Levantarse contra la oscuridad",
+    "category": "Armas y ofensiva",
+    "price": "1300 po",
+    "description": "Espada larga bendita +1d6 radiante\n\nSi esta enlazada, como accion bonus al golpear puedes emitir una luz de un rango de 20 ft. si golpeas a alguien en ese estado añades un 1d6 de daño radiante"
+  },
+  {
+    "id": "latigo-de-vibora",
+    "name": "Látigo de víbora",
+    "category": "Armas y ofensiva",
+    "price": "1400 po",
+    "description": "Latigo +1 +1d6 daño de veneno\n\n(1/dia) Al golpear, puedes hacer que la cabela de la serpiente muerda al contrincante y por las siguientes 12 horas, sabes la ubicación del objetivo mientras se mantenga a 1000 metros, sin importar que este vivo o muerto"
+  },
+  {
+    "id": "piedra-runicas",
+    "name": "Piedra Runicas",
+    "category": "Armas y ofensiva",
+    "price": "350 po",
+    "description": "Una bolsa que contiene un numero desconocido de piedra con diferentes grabados, al lanzarla y golpear un objeto, haces un ataque de arma a distancia [Destreza] y debes tirar un d6 para determinar el tipo de daño\n\nFuego\n\nHielo\n\nElectrico\n\nContundente\n\nFuerza\n\nRandiante\n\nAl golpear la roca, esta se desvanece."
+  },
+  {
+    "id": "saludos-del-redentor",
+    "name": "Saludos del Redentor",
+    "category": "Armas y ofensiva",
+    "price": "1200 po",
+    "description": "Arma (arco largo), rara (requiere armonización por parte de un paladín)\n\nUn arco diseñado para guerreros sagrados que prefieren mantener el mal a distancia. Cualquier ataque a distancia que realices con esta arma se considera un ataque de arma cuerpo a cuerpo a efectos de usar tu habilidad Castigo divino y cumplir los requisitos de cualquier hechizo de paladín que lances con 'castigar' en su nombre.\n\nAdemás, cuando gastas un espacio de conjuro de nivel 1 para usar tu rasgo Castigo divino en un ataque realizado con este arco, puedes optar por no gastar el espacio de conjuro en su lugar. Esta propiedad no se puede volver a utilizar hasta el próximo amanecer."
+  },
+  {
+    "id": "seax-del-sindicato-everwinter",
+    "name": "Seax del sindicato Everwinter",
+    "category": "Armas y ofensiva",
+    "price": "1900 po",
+    "description": "Daga +1\n\nToque de invierno: acción bonus, palabra de comando esta arma empieza a soltar un frio asesino, esta golpear 2d6 de daño de frio, el efecto durara hasta que que el portador repita la palabra de comando o esta arma toque el suelo"
+  },
+  {
+    "id": "tatuaje-de-garra-sobrenatural",
+    "name": "Tatuaje de Garra Sobrenatural",
+    "category": "Armas y ofensiva",
+    "price": "1000 po",
+    "description": "Este tatuaje mágico te permite, como acción bonus, hacer un ataque desarmado con garras por 1d6 de daño cortante."
+  },
+  {
+    "id": "zumbador-punzante",
+    "name": "Zumbador Punzante",
+    "category": "Armas y ofensiva",
+    "price": "500 po",
+    "description": "Esta flecha esta rodeada de abejas, cuando esta flecha golpea una superficie, no importa si golpea o no, el enjambre de abejas emerge por un minuto, el enjambre rellena un cubo de 5 ft en el lugar de impacto, Cualquier criatura que entre en esa area o inicie su turno dentro de ella, debe salvar Constitucion DC 15 o recibir 1d12 de daño venenoso"
+  },
+  {
+    "id": "anillo-de-proteccion",
+    "name": "Anillo de Protección",
+    "category": "Armaduras, escudos y defensa",
+    "price": "1000 po",
+    "description": "Anillo de plata con una diminuta runa de escudo.\n\nMientras lo lleves, ganas +1 a la CA y +1 a todas las salvaciones.\n\nPequeño pero confiable."
+  },
+  {
+    "id": "armadura-de-adamantina",
+    "name": "Armadura de Adamantina",
+    "category": "Armaduras, escudos y defensa",
+    "price": "+600 po sobre la armadura base",
+    "description": "La armadura perfecta para los que “no quiero morir hoy”.\n\nConvierte cualquier golpe crítico en golpe normal mientras la llevas.\n\nSolo para armaduras metálicas no ligeras.\n\nSí, incluso si el bicho saca 20 natural... sigue siendo solo un golpecito."
+  },
+  {
+    "id": "armadura-humeante",
+    "name": "Armadura humeante",
+    "category": "Armaduras, escudos y defensa",
+    "price": "900 po",
+    "description": "+1 de CA\n\nSe dice que esta armadura de obra maestra protege a su portador de la mirada de un basilisco."
+  },
+  {
+    "id": "broche-de-proteccion",
+    "name": "Broche de Protección",
+    "category": "Armaduras, escudos y defensa",
+    "price": "500 po",
+    "description": "Broche de plata con gema oculta.\n\nMientras lo lleves, eres inmune al daño de fuerza causado por planos extraplanares (vórtices, pull of the void).\n\nPerfecto contra criaturas de otros planos."
+  },
+  {
+    "id": "capa-de-proteccion",
+    "name": "Capa de Protección",
+    "category": "Armaduras, escudos y defensa",
+    "price": "1000 po",
+    "description": "Capa de tela suave con un broche en forma de escudo.\n\nGanas +1 a la CA y +1 a todas las tiradas de salvación mientras la lleves puesta. Ligera y discreta."
+  },
+  {
+    "id": "escudo-atrapaflechas",
+    "name": "Escudo Atrapaflechas",
+    "category": "Armaduras, escudos y defensa",
+    "price": "800 po",
+    "description": "Una vez por ronda, puedes usar tu reacción para atrapar un proyectil dirigido a ti (CD 15 Destreza). No funciona contra conjuros."
+  },
+  {
+    "id": "escudo-bumeran",
+    "name": "Escudo Bumerán",
+    "category": "Armaduras, escudos y defensa",
+    "price": "600 po",
+    "description": "Escudo redondo encantado. Puedes lanzarlo como arma (Arrojadiza, rango 20/60, daño 1d6 mágico), y al final del turno regresa automáticamente a tu mano. Solo falla si alguien lo agarra al vuelo, y nadie debería hacer eso."
+  },
+  {
+    "id": "escudo-centinela",
+    "name": "Escudo Centinela",
+    "category": "Armaduras, escudos y defensa",
+    "price": "700 po",
+    "description": "Escudo de acero espejo con runa de alerta.\n\nTe otorga +2 a la CA, ventaja en Iniciativa y Percepción pasiva +2.\n\nBrilla ligeramente cuando detecta criaturas invisibles o escondidas."
+  },
+  {
+    "id": "escudo-de-la-tortuga",
+    "name": "Escudo de la Tortuga",
+    "category": "Armaduras, escudos y defensa",
+    "price": "350 po",
+    "description": "Escudo que, una vez por descanso largo, puede darte media cobertura (CA +2 extra) al agacharte y no moverte en tu turno. Un excelente accesorio para quien prefiere esconderse con dignidad."
+  },
+  {
+    "id": "escudo-de-roble-hoja-de-hierro",
+    "name": "Escudo de roble hoja de hierro",
+    "category": "Armaduras, escudos y defensa",
+    "price": "1000 po",
+    "description": "Armadura (escudo), poco común (requiere armonización por parte de un druida)\n\nEste escudo de madera reforzado está cubierto con enredaderas de hoja de hierro que te otorgan protección adicional. Obtienes una bonificación de +1 a tu CA mientras empuñas este escudo además de la bonificación normal del escudo a la CA. Además, el escudo de madera se reforma para adaptarse a ti cada vez que usas tu característica de clase de forma salvaje para transformarte en una bestia. Cuando lo haces, las enredaderas de hoja de hierro y el escudo de madera se adhieren a tu forma bestial, otorgándote una bonificación de +1 a tu CA mientras te transformas de esta manera."
+  },
+  {
+    "id": "escudo-iman",
+    "name": "Escudo Imán",
+    "category": "Armaduras, escudos y defensa",
+    "price": "1400 po",
+    "description": "Retorno: Como acción bonus, puedes llamar al escudo para que vuelva a tu brazo mientras ente una distancia menor a 30 pies.\n\n(3/dia) Campo magnético: Como acción puedes violentamente atraer o repeler un objeto de metal que este dentro de una esfera a 30 pies de ti. Atraer el objeto se detendrá antes de golpear el escudo y este caerá de manera inofensiva, los objetos atraídos no pueden superar las 300 libras\n\nPuedes elegir en ves de enfocarte en un objeto de metal en específico, como una armadura o arma que este a 30 pies de ti, el retenedor de esta tiene que superar una tirada de fuerza DC 10 + competencia. en un fallo son desarmados o atraídos/empujados 20 ft."
+  },
+  {
+    "id": "mejora-de-advertencia",
+    "name": "Mejora de Advertencia",
+    "category": "Armaduras, escudos y defensa",
+    "price": "1200 po",
+    "description": "Puede aplicarse a un arma o escudo. Mientras lo lleves, no puedes ser sorprendido y tú y tus aliados cercanos tienen ventaja en iniciativa."
+  },
+  {
+    "id": "peto-de-equilibrio",
+    "name": "Peto de Equilibrio",
+    "category": "Armaduras, escudos y defensa",
+    "price": "600 po",
+    "description": "Esta armadura mágica te da ventaja en tiradas contra ser derribado o empujado, y reduce en 5 pies cualquier empujón o deslizamiento mágico. Favorecido por monjes, luchadores y gente con pies grandes."
+  },
+  {
+    "id": "piedra-de-la-suerte",
+    "name": "Piedra de la Suerte",
+    "category": "Armaduras, escudos y defensa",
+    "price": "900 po",
+    "description": "Una piedra pulida que vibra levemente en tu mano.\n\nMientras la tengas vinculada, obtienes +1 a todas las tiradas de salvación y de habilidad. No da suerte en el amor, pero sí contra trampas."
+  },
+  {
+    "id": "revit",
+    "name": "Revit",
+    "category": "Armaduras, escudos y defensa",
+    "price": "1200 po",
+    "description": "Mientras lo llevas, puedes usar una acción para curarte 1d8 + tu nivel (1/día). Si mueres con él puesto, se destruye para devolverte a 1 HP."
+  },
+  {
+    "id": "tatuaje-de-barrera",
+    "name": "Tatuaje de Barrera",
+    "category": "Armaduras, escudos y defensa",
+    "price": "500–1600 po",
+    "description": "Versión común (CA 12 + DEX): 500 po\n\nVersión poco común (CA 15 + DEX máx +2): 900 po\n\nVersión rara (CA fija 18): 1600 po\n\nUn tatuaje que brilla apenas bajo la piel.\n\nMientras no uses armadura ni escudo, tu CA mejora según el nivel del tatuaje.\n\nEs mágico, resistente y no se cae con el sudor. (No se puede combinar con armadura pero si puedes obtener los beneficios de un escudo)"
+  },
+  {
+    "id": "amuleto-del-devoto",
+    "name": "Amuleto del Devoto",
+    "category": "Magia y lanzamiento de conjuros",
+    "price": "1200 po",
+    "description": "Requiere vínculo con tu patrón divino.\n\nAmuleto de bronce con símbolo sagrado.\n\nGanas +1 al DC de tus conjuros de clérigo o paladín y +1 a las tiradas de golpe con ellos."
+  },
+  {
+    "id": "anillo-de-lanzamiento",
+    "name": "Anillo de lanzamiento",
+    "category": "Magia y lanzamiento de conjuros",
+    "price": "500 po",
+    "description": "3/día Catapulta (usando objeto sostenido)"
+  },
+  {
+    "id": "anillo-de-oscurecimiento",
+    "name": "Anillo de Oscurecimiento",
+    "category": "Magia y lanzamiento de conjuros",
+    "price": "900 po",
+    "description": "1/día puedes lanzar Darkness. Mientras esté vinculado, te da visión en oscuridad mágica (solo tuya). Muy usado por gente que no quiere que lo vean hacer cosas… cuestionables."
+  },
+  {
+    "id": "baston-cegador-del-cielo",
+    "name": "Bastón Cegador del Cielo",
+    "category": "Magia y lanzamiento de conjuros",
+    "price": "800 po",
+    "description": "Este bastón te permite lanzar Faerie Fire y Blindness/Deafness 1 vez al día cada uno. Al hacerlo, emite un destello como relámpago celestial. Advertencia: no mires directamente si estás de resaca."
+  },
+  {
+    "id": "baston-pacifista",
+    "name": "Bastón pacifista",
+    "category": "Magia y lanzamiento de conjuros",
+    "price": "1400 po",
+    "description": "1-4 cargas: Encantar persona\n\n1-3 cargas: curar heridas\n\n1 carga: Santuario\n\nSi nunca hiciste daño el día anterior, recupera 1d8+3 cargas\n\nSi hiciste daño el día anterior, pierde 1d4 cargas."
+  },
+  {
+    "id": "collar-del-guerrero",
+    "name": "Collar del guerrero",
+    "category": "Magia y lanzamiento de conjuros",
+    "price": "400 po",
+    "description": "Mientras estés Enlazado con este collar, puedes lanzar True Strike como acción bonus 2 veces por día."
+  },
+  {
+    "id": "cristal-mental",
+    "name": "Cristal Mental",
+    "category": "Magia y lanzamiento de conjuros",
+    "price": "250–900 po",
+    "description": "Objeto maravilloso, consumo único\n\nCristales tallados que contienen magia pura. Al lanzar un conjuro de 1 acción mientras sostienes uno, puedes modificarlo con un efecto especial. Solo uno por conjuro, no acumulable con Metamagia.\n\nTras usarse, se convierte en una gema sin magia (vale 50 gp)."
+  },
+  {
+    "id": "diadema-de-explosion",
+    "name": "Diadema de Explosión",
+    "category": "Magia y lanzamiento de conjuros",
+    "price": "600 po",
+    "description": "Te permite lanzar Rayo Abrasador (Scorching Ray) como acción, +5 al ataque. Solo una vez al día. Para cuando la diplomacia falla… y explota."
+  },
+  {
+    "id": "flautas-del-terror",
+    "name": "Flautas del Terror",
+    "category": "Magia y lanzamiento de conjuros",
+    "price": "800 po",
+    "description": "Tienen 3 cargas. Con una acción puedes reproducir una melodía que aterroriza en un radio de 30 ft: tirada de Sabiduría CD 13 o huyen asustados. Úsalas en calabozos, fiestas o cuando el jefe crea que lo estás celebrando."
+  },
+  {
+    "id": "foco-tocado-por-dragon",
+    "name": "Foco Tocado por Dragón",
+    "category": "Magia y lanzamiento de conjuros",
+    "price": "1800–5000 po",
+    "description": "Este foco mágico puede tomar la forma de un orbe, cetro, cristal, etc., con detalles de alas o escamas de dragón. Evoluciona según el tesoro dracónico donde fue hallado.\n\nVentaja en iniciativa. Sirve como foco para todos tus conjuros.\n\nCromático: +1d6 al daño de conjuros de ácido, frío, fuego, relámpago o veneno.\n\nGema: Teletransportación de 15 pies al lanzar un conjuro.\n\nMetálico: Puedes usar tu reacción para dar ventaja en una salvación a una criatura a 30 pies.\n\nWakened (Muy Raro): Ganas lo anterior y puedes lanzar dos conjuros específicos según la afinidad dracónica (1/día cada uno). (3500 po)\n\nAscendant (Legendario): Además de todo lo anterior, puedes lanzar un conjuro como si fuese de nivel 9 (1/día). (5000 po)\n\nSutil protección con sabor dracónico para magos arriesgados."
+  },
+  {
+    "id": "gema-de-brillo",
+    "name": "Gema de Brillo",
+    "category": "Magia y lanzamiento de conjuros",
+    "price": "1100 po",
+    "description": "Una gema prismática con 50 cargas.\n\nCon una palabra de comando, emite luz brillante en 30 pies y tenue en 30 más (sin gastar carga).\n\nSegunda palabra: 1 carga, lanza un rayo de luz a 60 pies. El objetivo debe hacer una salvación de Constitución CD 15 o queda cegado por 1 minuto (repite salvación al final de cada turno).\n\nTercera palabra: 5 cargas, emite una explosión de luz cegadora en un cono de 30 pies (misma salvación).\n\nCuando se agotan todas las cargas, se vuelve una gema no mágica (50 gp)."
+  },
+  {
+    "id": "guantes-de-portador-de-la-antorcha",
+    "name": "Guantes de portador de la antorcha",
+    "category": "Magia y lanzamiento de conjuros",
+    "price": "300 po",
+    "description": "+10 radio de luz a la antorcha sostenida\n\n1/día Pirotecnia"
+  },
+  {
+    "id": "guantes-termales",
+    "name": "Guantes Termales",
+    "category": "Magia y lanzamiento de conjuros",
+    "price": "1400 po",
+    "description": "+2 daño fuego / +2 daño frio\n\nGuante azul: como acción al tocar una superficie de agua puedes congelar hasta 10 pies de esta en área, este efecto dura una hora.\n\nGuante rojo: como acción al tocar un objeto inflamable este se quemara\n\nAmbos: Estela de vapor: Puedes golpear tus palmas, para lanzar una esfera de 20 pies de vapor, cualquiera criatura dentro de la esfera recibe 2 de daño de fuego y debe realizar una tirada de salvación de fuerza CD14 o caer al suelo, esta esfera dura 10 minutos aunque un viento fuerte la puede dicipar."
+  },
+  {
+    "id": "manual-de-lorehold",
+    "name": "Manual de Lorehold",
+    "category": "Magia y lanzamiento de conjuros",
+    "price": "450 po",
+    "description": "Libro mágico que otorga ventaja en tiradas de Historia mientras esté abierto. También puedes usarlo como foco arcano. Requiere vinculación. Usado por eruditos, arqueólogos y bardos dramáticos."
+  },
+  {
+    "id": "manual-de-quandrix",
+    "name": "Manual de Quandrix",
+    "category": "Magia y lanzamiento de conjuros",
+    "price": "450 po",
+    "description": "Libro arcano enfocado en patrones, matemagia y naturaleza. Otorga ventaja en tiradas de Inteligencia (Arcana o Naturaleza) mientras se consulta."
+  },
+  {
+    "id": "orbe-de-gong",
+    "name": "Orbe de Gong",
+    "category": "Magia y lanzamiento de conjuros",
+    "price": "500 po",
+    "description": "Al golpearlo (acción), emite un gong sónico que rompe silencio mágico y dispersa ilusiones menores en 30 pies. Tiene 3 cargas y se recarga al amanecer. A veces también despierta a los muertos… de forma literal."
+  },
+  {
+    "id": "perla-de-poder",
+    "name": "Perla de Poder",
+    "category": "Magia y lanzamiento de conjuros",
+    "price": "1200 po",
+    "description": "Perla del tamaño de un guisante, color marfil.\n\n1/día como acción puedes recuperar uno de tus espacios de conjuro gastados (hasta nivel 3). Ideal para lanzar un hechizo de último minuto."
+  },
+  {
+    "id": "piedra-de-ioun",
+    "name": "Piedra de Ioun",
+    "category": "Magia y lanzamiento de conjuros",
+    "price": "350–4000 po",
+    "description": "Pequeñas piedras flotantes que giran alrededor de tu cabeza. Hay múltiples versiones:\n\nLas Piedras de Ioun son gemas encantadas que orbitan alrededor de tu cabeza cuando las activas con una acción. Se requiere sintonización.\n\nSon difíciles de remover (AC 24, prueba de Destreza CD 24).\n\nCada tipo de piedra tiene un efecto diferente:\n\nEfectos comunes (raras o muy raras):\n\nProtección: +1 AC. (900 po)\n\nSustento: No necesitas comer ni beber. (350 po)\n\nConciencia: No puedes ser sorprendido. (600 po)\n\nReserva: Almacena hasta 3 niveles de conjuros. (1400 po)\n\nAbsorción: Anula conjuros dirigidos a ti hasta nivel 4. (2000 po)\nGran Absorción: Anula conjuros dirigidos a ti hasta nivel 8. (3500 po)\n\nRegeneración: Recuperas 15 HP por hora. (2400 po)\n\nDominio: +1 bono de competencia. (4000 po)\n\nAtributos (Fuerza, Destreza, Constitución, Inteligencia, Sabiduría, Carisma): +2 al puntaje (máx. 20). (1800 po)\n\nCada piedra posee su propia rareza, coste y forma/color. Algunas se destruyen al usarlas por completo."
+  },
+  {
+    "id": "pipa-de-la-paz",
+    "name": "Pipa de la paz",
+    "category": "Magia y lanzamiento de conjuros",
+    "price": "650 po",
+    "description": "Puedes castear Calmar emociones una vez por descanso corto"
+  },
+  {
+    "id": "sombrero-de-hechiceria",
+    "name": "Sombrero de Hechicería",
+    "category": "Magia y lanzamiento de conjuros",
+    "price": "400 po",
+    "description": "Mientras lo llevas, puedes cambiar el daño de un hechizo que lances a otro tipo elemental (fuego, rayo, frío, ácido, trueno). Solo funciona 1/día. Amado por magos con estilo y poco autocontrol."
+  },
+  {
+    "id": "tunica-de-las-serpientes",
+    "name": "Túnica de las Serpientes",
+    "category": "Magia y lanzamiento de conjuros",
+    "price": "300 po",
+    "description": "Una vez por día, puedes lanzar Animal Friendship contra serpientes o convertir la túnica en un enjambre ilusorio que intimida (CD 13). Muy de moda en templos, menos útil en tabernas."
+  },
+  {
+    "id": "varita-de-enredar",
+    "name": "Varita de Enredar",
+    "category": "Magia y lanzamiento de conjuros",
+    "price": "1000 po",
+    "description": "Tiene 7 cargas. Puedes gastar 1 para lanzar Enredar (CD 13). Recupera 1d6+1 cargas al amanecer. Útil para detener enemigos, o simplemente molestar a tus amigos en medio de una charla."
+  },
+  {
+    "id": "varita-magica-hechizos-nivel-3",
+    "name": "Varita mágica (Hechizos nivel 3)",
+    "category": "Magia y lanzamiento de conjuros",
+    "price": "1300 po",
+    "description": "Te permite lanzar un hechizo nivel 3 / 2 nivel 2 / 3 nivel 1, pero sola una de estas opciones"
+  },
+  {
+    "id": "zapatillas-resbaladizas",
+    "name": "Zapatillas resbaladizas",
+    "category": "Magia y lanzamiento de conjuros",
+    "price": "300 po",
+    "description": "Inmune al hechizo 'Grease'\n\n1/día emitido 'Grease' centrado en uno mismo"
+  },
+  {
+    "id": "abrigo-de-vestido-de-cucaracha",
+    "name": "Abrigo de vestido de cucaracha",
+    "category": "Movimiento y transporte",
+    "price": "900 po",
+    "description": "Mientras usado, puedes arrastrarte igual a tu velocidad de movimiento, puedes moverte en las superficies en cualquier dirección, y consigues una velocidad de escalado igual a tu velocidad."
+  },
+  {
+    "id": "anillo-de-caminata-sobre-el-agua",
+    "name": "Anillo de Caminata Sobre el Agua",
+    "category": "Movimiento y transporte",
+    "price": "550 po",
+    "description": "Mientras lo lleves, puedes caminar sobre superficies líquidas como si fueran sólidas. Solo falla si estás inconsciente. Apto para profetas, ilusionistas… o tipos con complejo de mesías."
+  },
+  {
+    "id": "anillo-nervioso",
+    "name": "Anillo nervioso",
+    "category": "Movimiento y transporte",
+    "price": "500 po",
+    "description": "Siempre que esté a menos de 5 pies de una superficie estable que pueda soportar su peso, levitará."
+  },
+  {
+    "id": "botas-aladas",
+    "name": "Botas Aladas",
+    "category": "Movimiento y transporte",
+    "price": "1900 po",
+    "description": "Botas de cuero ligero con alas plegables.\n\nPermiten volar a 60 pies por turno mientras las usas (acción adicional para desplegar/plegar)."
+  },
+  {
+    "id": "botas-de-zancada-y-salto",
+    "name": "Botas de Zancada y Salto",
+    "category": "Movimiento y transporte",
+    "price": "500 po",
+    "description": "Tu velocidad de caminar se convierte en 30 ft, sin penalización por carga o armadura, y triplican tu alcance de salto. Ideal para corredores, saltadores… o para huir de quien cocine mal."
+  },
+  {
+    "id": "cuerda-de-escalada",
+    "name": "Cuerda de Escalada",
+    "category": "Movimiento y transporte",
+    "price": "350 po",
+    "description": "Cuerda de seda encantada de 60 pies.\n\nSe ancla automáticamente al comando verbal, tensándose con fuerza mágica.\n\nFacilita trepar sin riesgo de deslizamiento y soporta hasta 1000 libras."
+  },
+  {
+    "id": "escoba-voladora",
+    "name": "Escoba Voladora",
+    "category": "Movimiento y transporte",
+    "price": "2500 po",
+    "description": "Una escoba mágica que vuela a 80 pies por turno o 40 pies si llevas carga.\n\nObedece comandos simples, se puede montar o invocar a la mano.\n\nUsualmente viene con cabello de unicornio... o pelo de gato, si es versión barata."
+  },
+  {
+    "id": "gancho-de-rogue",
+    "name": "Gancho de rogue",
+    "category": "Movimiento y transporte",
+    "price": "1000 po",
+    "description": "Requiere vinculacion\n\nCuando apuntas con este guante, se lanzara una cuerda de 100 ft de largo y esta se agarra de dicha superficie.\n\nMientras enganchado, esta cuerda lanzara al usuario contra la superficie agarrada, el usuario debera salvar Destreza o Acrobacias, para evitar la colisión contra la obstáculos, el agarra se soltara de la superficie cuando el usuario aterrice en la superficie."
+  },
+  {
+    "id": "mochila-globo",
+    "name": "Mochila Globo",
+    "category": "Movimiento y transporte",
+    "price": "600 po",
+    "description": "Una mochila con globo inflable mágico. Al activarla (acción), se hincha y te eleva hasta 60 pies, descendiendo lentamente. Ideal para escapar, explorar o quedar colgado como idiota con estilo."
+  },
+  {
+    "id": "ropa-alada",
+    "name": "Ropa Alada",
+    "category": "Movimiento y transporte",
+    "price": "350 po",
+    "description": "Traje ligero con plumas cosidas mágicamente.\n\nPermite planear desde alturas y reduce el daño por caída en 2d6.\n\nNo otorga vuelo sostenido, pero suaviza cualquier tropiezo desde el aire."
+  },
+  {
+    "id": "amuleto-del-borracho",
+    "name": "Amuleto del Borracho",
+    "category": "Supervivencia y entorno",
+    "price": "250 po",
+    "description": "Mientras lo llevas, tienes ventaja contra veneno por alcohol, y recuperas 1d4 HP al terminar un descanso corto si bebiste en la última hora. Poco recomendable para personajes responsables."
+  },
+  {
+    "id": "antorcha-de-la-profundidad",
+    "name": "Antorcha de la profundidad",
+    "category": "Supervivencia y entorno",
+    "price": "200 po",
+    "description": "Esta antorcha, se activa con una palabra de comando, y no se apagara hasta volver a decir. Este fuego no se puede propagar y no genera calor"
+  },
+  {
+    "id": "bufanda-de-anguila-gigante",
+    "name": "Bufanda de anguila gigante",
+    "category": "Supervivencia y entorno",
+    "price": "850 po",
+    "description": "Mientras estas enlazado con esta bufanda, puedes respirar bajo el agua y consigues una velocidad de nado de 40 pies.\n\nAdicionalmente, tienes ventaja en contra ser restringido o agarrado, y en tu turno puedes usar la mitad de tu movimiento para escapar de esas condiciones"
+  },
+  {
+    "id": "capa-de-la-mantarraya",
+    "name": "Capa de la Mantarraya",
+    "category": "Supervivencia y entorno",
+    "price": "700 po",
+    "description": "Con la capucha puesta, respiras bajo el agua y tienes velocidad de nado de 60 ft. Para los marineros que no confían en chopitos de plástico"
+  },
+  {
+    "id": "collar-de-adaptacion",
+    "name": "Collar de Adaptación",
+    "category": "Supervivencia y entorno",
+    "price": "900 po",
+    "description": "Un collar de plata grabado con runas de respiración.\n\nMientras lo lleves, eres inmune a gases nocivos y puedes respirar en entornos extremos (bajo el agua, en atmósferas viciadas o a gran altitud).\n\nPerfecto para exploradores de cavernas y viajes submarinos."
+  },
+  {
+    "id": "cuenta-de-nutricion",
+    "name": "Cuenta de Nutrición",
+    "category": "Supervivencia y entorno",
+    "price": "150 po",
+    "description": "Disuelta en agua, produce un líquido espeso que nutre como una comida completa. No tiene sabor, pero llena el estómago y mantiene a los exploradores vivos cuando no queda ni pan duro."
+  },
+  {
+    "id": "cuenta-de-refresco",
+    "name": "Cuenta de Refresco",
+    "category": "Supervivencia y entorno",
+    "price": "150 po",
+    "description": "Piedra pequeña que, al sumergirse en agua, la vuelve fresca, limpia y fría. No cura, pero refresca. A menudo vendida por 3 veces su valor en festivales."
+  },
+  {
+    "id": "globo-de-deriva",
+    "name": "Globo de Deriva",
+    "category": "Supervivencia y entorno",
+    "price": "300 po",
+    "description": "Una esfera luminosa flotante. Al activarla, emite luz (60 ft brillante/120 ft tenue). Puede moverse contigo con comando y flota a tu lado. Un farol mágico que no se rompe… ni se moja."
+  },
+  {
+    "id": "globo-de-deriva-rajado",
+    "name": "Globo de Deriva Rajado",
+    "category": "Supervivencia y entorno",
+    "price": "150 po",
+    "description": "Versión defectuosa del Driftglobe. Ilumina como una antorcha mágica pero se apaga aleatoriamente durante la noche (20% de probabilidad por hora). Algunos lo usan por estética, otros por masoquismo."
+  },
+  {
+    "id": "gorro-de-respiracion-acuatica",
+    "name": "Gorro de Respiración Acuática",
+    "category": "Supervivencia y entorno",
+    "price": "400 po",
+    "description": "Un gorro encantado que te permite respirar bajo el agua indefinidamente mientras lo lleves puesto. Se ajusta mágicamente a cualquier cabeza, salvo la de los peces, irónicamente."
+  },
+  {
+    "id": "medalla-del-horizonte",
+    "name": "Medalla del Horizonte",
+    "category": "Supervivencia y entorno",
+    "price": "600 po",
+    "description": "Un colgante que, 1/día, te permite ignorar efectos de terreno difícil y no necesitas raciones ni agua por 24 horas. Creado por exploradores que no querían cargar nada, ni pensar."
+  },
+  {
+    "id": "medalla-del-pastel-de-carne",
+    "name": "Medalla del Pastel de Carne",
+    "category": "Supervivencia y entorno",
+    "price": "200 po",
+    "description": "Mientras la lleves, puedes comer cualquier comida sin enfermarte y te da ventaja contra veneno ingerido."
+  },
+  {
+    "id": "perla-profunda",
+    "name": "Perla Profunda",
+    "category": "Supervivencia y entorno",
+    "price": "200 po",
+    "description": "Al consumirla te permite respirar bajo el agua por 24 horas"
+  },
+  {
+    "id": "tridente-comunicador-de-peces",
+    "name": "Tridente comunicador de peces",
+    "category": "Supervivencia y entorno",
+    "price": "300 po",
+    "description": "Se al usar te permite comunicarte con toda criatura marina"
+  },
+  {
+    "id": "tunica-de-la-cascada",
+    "name": "Túnica de la cascada",
+    "category": "Supervivencia y entorno",
+    "price": "1200 po",
+    "description": "Cuero +1\n\nTunica que al usarse te da ventaja en las tiradas de atletismo cuando nadas o escalas superficies mojadas.\n\nCaer por una cascada no genera daño de caida\n\n1/dia puedes castear muro de agua"
+  },
+  {
+    "id": "botas-de-los-elfos",
+    "name": "Botas de los Elfos",
+    "category": "Sigilo y engaño",
+    "price": "700 po",
+    "description": "Ligeras y de cuero fino, apenas hacen ruido.\n\nTienes ventaja en tiradas de Sigilo y no haces sonido al caminar, incluso sobre piedra, hojas secas o huesos.\n\nNi tu madre te escucharía llegar."
+  },
+  {
+    "id": "broche-de-esencia-viva",
+    "name": "Broche de Esencia Viva",
+    "category": "Sigilo y engaño",
+    "price": "400 po",
+    "description": "Mientras usa este broche sin dueño, los hechizos y cualquier otra cosa que detectaría o revele su tipo de criatura que lo trate como humanoide, y aquellos que revelen su alineación lo tratan como neutral."
+  },
+  {
+    "id": "capa-de-los-elfos",
+    "name": "Capa de los Elfos",
+    "category": "Sigilo y engaño",
+    "price": "1100 po",
+    "description": "Una capa que cambia sutilmente de color según el entorno.\n\nMientras tengas la capucha puesta, ganas ventaja en Sigilo y los demás tienen desventaja para verte con Percepción.\n\nIdeal para cazadores, espías y gente con deudas."
+  },
+  {
+    "id": "collar-anti-deteccion",
+    "name": "Collar anti detección",
+    "category": "Sigilo y engaño",
+    "price": "800 po",
+    "description": "Se puede utilizar para no ser detectado con habilidades mágica"
+  },
+  {
+    "id": "inviso-crema",
+    "name": "Inviso-Crema",
+    "category": "Sigilo y engaño",
+    "price": "500 po",
+    "description": "Tarda 1 minuto en aplicarse\n\nda 1 hora de invisibilidad\n\nsolo funciona en la carne (debes estar desnudo)"
+  },
+  {
+    "id": "manto-del-picaro",
+    "name": "Manto del Pícaro",
+    "category": "Sigilo y engaño",
+    "price": "800 po",
+    "description": "Mientras lo llevas, obtienes ventaja en Sigilo y puedes lanzar Disguise Self 1/día. Al moverte, el borde del manto parece fundirse con sombras. El favorito de los que entran sin invitación."
+  },
+  {
+    "id": "sombrero-de-disfraz",
+    "name": "Sombrero de Disfraz",
+    "category": "Sigilo y engaño",
+    "price": "400 po",
+    "description": "Sombrero ancho con interiores bordados.\n\n1/día, como acción puedes lanzar Disfrazarse (sin usar ranura de conjuro).\n\nEl efecto dura 1 hora o hasta que lo quites."
+  },
+  {
+    "id": "cristal-psi",
+    "name": "Cristal Psi",
+    "category": "Percepción e información",
+    "price": "600 po",
+    "description": "Cristal que brilla con energía mental. Mientras esté vinculado, puedes usarlo 1/día para lanzar Detect Thoughts o Telepathy (limitada). Usado por telépatas, espías y gente que odia hablar."
+  },
+  {
+    "id": "escudo-de-vision-lejana",
+    "name": "Escudo de Visión Lejana",
+    "category": "Percepción e información",
+    "price": "350 po",
+    "description": "Mientras lo sostienes, puedes usar una acción para ver hasta 1 milla como si usaras un catalejo. No atraviesa paredes, pero revela amenazas lejanas con claridad incómoda."
+  },
+  {
+    "id": "gafas-de-lectura-de-objetos",
+    "name": "Gafas de Lectura de Objetos",
+    "category": "Percepción e información",
+    "price": "500 po",
+    "description": "Mientras las usas, puedes lanzar Identificar una vez al día sin componentes. Además, leerás automáticamente cualquier idioma grabado en objetos. Útiles, aunque definitivamente poco discretas."
+  },
+  {
+    "id": "gafas-del-buscador",
+    "name": "Gafas del Buscador",
+    "category": "Percepción e información",
+    "price": "600 po",
+    "description": "Estas gafas mágicas permiten detectar puertas ocultas, compartimentos secretos y trampas simples. Mientras las usas, puedes lanzar Detectar Trampas una vez al día. Nunca más perderás un pasadizo secreto por culpa de un 4 en Percepción."
+  },
+  {
+    "id": "gafas-despedazadas",
+    "name": "Gafas Despedazadas",
+    "category": "Percepción e información",
+    "price": "400 po",
+    "description": "Cuando las usas, puedes ver la estructura de objetos o criaturas por 10 minutos (1/día), revelando puntos débiles o mecánica interna."
+  },
+  {
+    "id": "gafas-nocturnas",
+    "name": "Gafas Nocturnas",
+    "category": "Percepción e información",
+    "price": "500 po",
+    "description": "Estas gafas otorgan visión en la oscuridad hasta 60 ft, o extienden tu visión oscura existente en 60 ft más. Perfectas para exploraciones nocturnas o evitar pisar a tus amigos en la cama."
+  },
+  {
+    "id": "guantes-de-asaltador-de-mentes",
+    "name": "Guantes de asaltador de mentes",
+    "category": "Percepción e información",
+    "price": "900 po",
+    "description": "Ventaja en tiradas de juego de manos mientra vinculados\n\n3/dia Lapsus de memoria, Como accion bonus, puedes tocar a un objetivo y este debe superar una salvacion de sabiduria o recibir 10+½ de tu nivel o olvidar los últimos 16 segundos"
+  },
+  {
+    "id": "linterna-fantasma",
+    "name": "Linterna Fantasma",
+    "category": "Percepción e información",
+    "price": "500 po",
+    "description": "Luz mágica que revela invisibles y espíritus cercanos mientras esté encendida. Funciona 4 horas por carga y su llama nunca arde lo físico."
+  },
+  {
+    "id": "linterna-reveladora",
+    "name": "Linterna Reveladora",
+    "category": "Percepción e información",
+    "price": "600 po",
+    "description": "Linterna de bronce con cristal grabado.\n\nSu luz de corte mágico revela criaturas invisibles, objetos ocultos y runas mágicas en su radio de 30 pies.\n\nFunciona 8 horas antes de necesitar recarga con aceite especial."
+  },
+  {
+    "id": "medallon-de-pensamientos",
+    "name": "Medallón de Pensamientos",
+    "category": "Percepción e información",
+    "price": "900 po",
+    "description": "Mientras lo llevas, puedes lanzar Detectar Pensamientos (CD 13) hasta 3 veces al día. Un favorito entre diplomáticos, interrogadores y tramposos con estilo."
+  },
+  {
+    "id": "parasito-auditivo",
+    "name": "Parásito Auditivo",
+    "category": "Percepción e información",
+    "price": "300 po",
+    "description": "Un pequeño gusano encantado que entra por el oído y te da ventaja en Percepción auditiva, pero también repite frases escuchadas al azar. Útil, inquietante y molesto, como todo buen compañero."
+  },
+  {
+    "id": "piedra-sensorial",
+    "name": "Piedra Sensorial",
+    "category": "Percepción e información",
+    "price": "700 po",
+    "description": "Mientras esté en tu posesión, puedes usar una acción para ver o escuchar a través de ella como si estuvieras allí, hasta 500 pies. Ideal para espiar, vigilar o hacer trampa en los dados."
+  },
+  {
+    "id": "silbato-de-aguila",
+    "name": "Silbato de Águila",
+    "category": "Percepción e información",
+    "price": "300 po",
+    "description": "Una vez por día, al soplarlo, invocas un águila espectral que te guía o señala un punto visible a 1 milla. No ataca ni transporta, pero puede ser la diferencia entre una salida épica y un TPK."
+  },
+  {
+    "id": "anillo-de-comunicacion",
+    "name": "Anillo de comunicación",
+    "category": "Comunicación y social",
+    "price": "300 po",
+    "description": "Te permite lanzar Mensaje a voluntad"
+  },
+  {
+    "id": "atuendo-de-comerciantes",
+    "name": "Atuendo de comerciantes",
+    "category": "Comunicación y social",
+    "price": "1200 po",
+    "description": "Armadura de cuero +1 (11+destreza) puede ser utilizado por cualquier clase\n\n+2 tiradas de persuasión\n\nventaja en tiradas de carisma para regatear comerciantes"
+  },
+  {
+    "id": "diadema-de-perfeccion-humana",
+    "name": "Diadema de Perfección Humana",
+    "category": "Comunicación y social",
+    "price": "600 po",
+    "description": "Mientras la usas, tu apariencia se ajusta a estándares ideales de belleza humana. Te da ventaja en tiradas de Carisma para causar buena impresión y, 1/día, puedes lanzar Friends. Nunca corrige tu personalidad."
+  },
+  {
+    "id": "gema-del-fabulista",
+    "name": "Gema del Fabulista",
+    "category": "Comunicación y social",
+    "price": "300 po",
+    "description": "Mientras la sostienes, puedes imitar voces o sonidos que hayas oído en las últimas 24 horas. También puedes narrar con resonancia dramática cualquier escena que vivas."
+  },
+  {
+    "id": "pajaro-de-papel",
+    "name": "Pájaro de Papel",
+    "category": "Comunicación y social",
+    "price": "150 po",
+    "description": "Este pequeño origami puede llevar un mensaje escrito a cualquier persona que hayas visto. Al soltarlo, vuela sin descanso hasta su destino. No puede atravesar planos, pero puede atravesar corazones con su romanticismo barato."
+  },
+  {
+    "id": "pipa-de-burbujas-de-galder",
+    "name": "Pipa de Burbujas de Galder",
+    "category": "Comunicación y social",
+    "price": "150 po",
+    "description": "Al usarla, puedes crear burbujas mágicas que muestran imágenes vagas de recuerdos recientes o emociones. No tiene efecto mecánico, pero revela más de lo que los aventureros quisieran."
+  },
+  {
+    "id": "pluma-esmeralda",
+    "name": "Pluma Esmeralda",
+    "category": "Comunicación y social",
+    "price": "150 po",
+    "description": "Permite escribir hasta 1000 palabras en cualquier superficie, aunque esté mojada, rugosa o vertical. La tinta brilla levemente, desaparece a voluntad y se puede leer incluso en oscuridad mágica. Requiere estilo para usarla, claro"
+  },
+  {
+    "id": "tunicas-del-orador-persuasivo",
+    "name": "Túnicas del orador persuasivo",
+    "category": "Comunicación y social",
+    "price": "500 po",
+    "description": "3/día: Ventaja en la verificación de habilidad basada en Carisma\n\n1/día: Comando"
+  },
+  {
+    "id": "anillo-de-cristal-cortante",
+    "name": "Anillo de cristal cortante",
+    "category": "Herramientas, almacenamiento y utilidad",
+    "price": "350 po",
+    "description": "Mientras lleves este anillo puedes como accion para cortar cristal, coloca el anillo contra la superficie y has una linea a donde quieres cortar, esto no genera ruido, aun que no prevee que el cristal al caerse se rompa y haga ruido.\n\nAlternativamente como accion bonus puedes golpear una superficie de vidrio y romperla de manera automatica.\n\nel anillo tiene 3 cargas. cuando cortas o rompes un cristal se gasta una carga, el anillo recarga todas sus cargas al amanecer"
+  },
+  {
+    "id": "banda-de-lealtad",
+    "name": "Banda de Lealtad",
+    "category": "Herramientas, almacenamiento y utilidad",
+    "price": "200 po",
+    "description": "Brazalete encantado. Si quien lo lleva muere, el objeto que portaba más cercano al corazón (arma, diario, anillo) regresa mágicamente al propietario original del brazalete. Un seguro de herencia rápida para aventureros con testamento."
+  },
+  {
+    "id": "baraja-miscelanea",
+    "name": "Baraja Miscelánea",
+    "category": "Herramientas, almacenamiento y utilidad",
+    "price": "150 po",
+    "description": "Una baraja mágica que, al robar una carta (1/día), genera un efecto menor aleatorio: un pastel, una lluvia leve, un silbido mágico o una moneda caliente."
+  },
+  {
+    "id": "bolsa-de-contencion",
+    "name": "Bolsa de Contención",
+    "category": "Herramientas, almacenamiento y utilidad",
+    "price": "700 po",
+    "description": "Una bolsa de cuero con runas bordadas que nunca parece llena.\n\nSu interior es un espacio extradimensional capaz de cargar hasta 500 libras en\n\n64 pies cúbicos.\n\nPesa solo 15 libras sin importar su contenido.\n\nPuedes sacar objetos como acción. No metas otra bolsa mágica o… boom."
+  },
+  {
+    "id": "carcaj-de-ehlonna",
+    "name": "Carcaj de Ehlonna",
+    "category": "Herramientas, almacenamiento y utilidad",
+    "price": "650 po",
+    "description": "Un carcaj extradimensional con tres compartimientos mágicos.\n\nCabe desde una jabalina hasta una varita y nunca se mezcla nada.\n\nSacar un arma es siempre acción gratuita.\n\nUna bendición para arqueros, exploradores y acumuladores."
+  },
+  {
+    "id": "el-inventario-del-partido",
+    "name": "El inventario del partido",
+    "category": "Herramientas, almacenamiento y utilidad",
+    "price": "1000 po",
+    "description": "bolsa de tenencia cualquiera que esté sintonizado dentro de los 60 pies puede invocar cualquier objeto de 5 lb de la bolsa como acción adicional"
+  },
+  {
+    "id": "fragmento-del-feywild",
+    "name": "Fragmento del Feywild",
+    "category": "Herramientas, almacenamiento y utilidad",
+    "price": "600 po",
+    "description": "Un trozo de cristal encantado con esencia feérica. Mientras lo llevas, puedes lanzar 1/día Misty Step o hacer crecer una flor al tocar tierra fértil. Ligero, bello y absolutamente impráctico en ciudades."
+  },
+  {
+    "id": "guantes-de-regalo",
+    "name": "Guantes de regalo",
+    "category": "Herramientas, almacenamiento y utilidad",
+    "price": "800 po",
+    "description": "Viene en juegos de 1 a 5, destinados a ser sostenidos por diferentes personas.\n\nacción adicional: elemento de transporte sostenido en la mano del aliado que usa uno de los guantes"
+  },
+  {
+    "id": "guijarro-de-1-tonelada",
+    "name": "Guijarro de 1 tonelada",
+    "category": "Herramientas, almacenamiento y utilidad",
+    "price": "300 po",
+    "description": "no se puede tirar\n\npalabra de comando cambia el peso a 1 tonelada y viceversa"
+  },
+  {
+    "id": "lira-de-construccion",
+    "name": "Lira de Construcción",
+    "category": "Herramientas, almacenamiento y utilidad",
+    "price": "900 po",
+    "description": "Una vez al día, puedes tocar esta lira mágica para animar materiales en un radio de 30 pies a construir estructuras simples (puentes, muros, cobertizos)."
+  },
+  {
+    "id": "llavero-amuleto",
+    "name": "Llavero Amuleto",
+    "category": "Herramientas, almacenamiento y utilidad",
+    "price": "250 po",
+    "description": "Este llavero mágico puede almacenar hasta 3 llaves vinculadas. Puedes hacer que cambie de forma para imitar una de ellas como acción. Muy útil para guardias corruptos o ladrones meticulosos."
+  },
+  {
+    "id": "piedras-de-afilar",
+    "name": "Piedras de afilar",
+    "category": "Herramientas, almacenamiento y utilidad",
+    "price": "400 po",
+    "description": "puedes usar una acción para afilar tu arma está conseguirá un +1 (Max +3) por cada turno que lo utilices pero solo durara 3 turnos"
+  },
+  {
+    "id": "pintura-de-marca-de-estado-de-animo",
+    "name": "Pintura de Marca de Estado de Ánimo",
+    "category": "Herramientas, almacenamiento y utilidad",
+    "price": "150 po",
+    "description": "Este frasco contiene tinta viva. Al aplicarse a la piel, cambia de color según tu humor (rojo: ira, azul: tristeza, verde: calma, etc). Algunos bardos la usan como maquillaje emocional, otros para no tener que explicar cómo se sienten."
+  },
+  {
+    "id": "seda-de-transmutacion",
+    "name": "Seda de transmutación",
+    "category": "Herramientas, almacenamiento y utilidad",
+    "price": "300 po",
+    "description": "rollo de seda de 1 pie de ancho\n\nSe desenreda para formar una hoja de 5 pies x 20 pies\n\ntan fuerte como el acero"
+  },
+  {
+    "id": "silla-del-caballero",
+    "name": "Silla del Caballero",
+    "category": "Herramientas, almacenamiento y utilidad",
+    "price": "250 po",
+    "description": "Una silla plegable encantada. Como acción, la puedes invocar y aparece lista para sentarte, incluso en superficies imposibles. Puede flotar hasta 5 pies. Útil para batallas largas, o egos aún más largos."
+  },
+  {
+    "id": "tunica-de-objetos-utiles",
+    "name": "Túnica de Objetos Útiles",
+    "category": "Herramientas, almacenamiento y utilidad",
+    "price": "500 po",
+    "description": "Túnica con parches decorativos. Una vez al día puedes desprender un parche para obtener objetos como 10 ft de cuerda, cola de pez, bote pequeño, escalera, etc Tu kit de supervivencia portátil."
+  },
+  {
+    "id": "vara-inamovible",
+    "name": "Vara inamovible",
+    "category": "Herramientas, almacenamiento y utilidad",
+    "price": "500 po",
+    "description": "Esta vara de cedro fue tomada del tesoro del dragón Sisudi."
+  },
+  {
+    "id": "abrojos-astrales",
+    "name": "Abrojos astrales",
+    "category": "Consumibles, alquimia y trampas",
+    "price": "700 po",
+    "description": "Como acción, puedes esparcir estos abrojos mágicos sobre un área cuadrada de 5 pies de lado. Cualquier criatura que entre en el área debe superar una tirada de salvación de Destreza CD 15 o dejar de moverse este turno y recibir 1 daño perforante. Cuando esto sucede, los abrojos explotan en un estallido de energía extraplanar, destruyendo los abrojos e infligiendo 6d6 de daño por fuerza a la criatura y haciendo que se eleve verticalmente hasta 20 pies, como si fuera por el conjuro de levitación. La criatura permanece suspendida de esta manera durante 1d4 asaltos, tiempo durante el cual su velocidad se convierte en 0. El efecto finaliza antes de tiempo si la criatura sufre algún daño.\n\nCuando los abrojos se esparcen en el suelo, se vuelven casi invisibles y flotan hasta 1 pulgada del suelo. Una criatura nota los abrojos con una prueba exitosa de Sabiduría (Percepción) CD 20. Puedes recuperar los abrojos invisibles para usarlos más adelante con 1 minuto de cuidadosa búsqueda y recolección. Los abrojos dejan de flotar y se vuelven visibles una vez que se recuperan de esta manera."
+  },
+  {
+    "id": "aceite-de-resbaladicidad",
+    "name": "Aceite de Resbaladicidad",
+    "category": "Consumibles, alquimia y trampas",
+    "price": "250 po",
+    "description": "Este frasco cubre un objeto o superficie (5 ft²) durante 10 min, haciéndolo imposible de agarrar o caminar sin caer (CD 15). Algunos lo usan para escapar, otros para arruinar banquetes."
+  },
+  {
+    "id": "antidoto-de-sangre-de-licantropo",
+    "name": "Antídoto de Sangre de Licántropo",
+    "category": "Consumibles, alquimia y trampas",
+    "price": "300 po",
+    "description": "Poción mágica poco común que cura la licantropía si ésta fue causada por mordedura o saliva. Un elixir milagroso para quienes se arrepienten del cambio lunar."
+  },
+  {
+    "id": "perdicion-del-ejecutor",
+    "name": "Perdición del ejecutor",
+    "category": "Consumibles, alquimia y trampas",
+    "price": "300 po",
+    "description": "Despues de tomar esta pocion, tienes que sobrevivir por 3 horas.\n\nTu cabeza se separa de tu cuerpo, pero esta aun puede controlar el cuerpo en caso de la cabeza ser destruida el cuerpo muere.\n\nLa cabeza y el cuerpo son diferentes objetivos.\n\nLa cabeza falla todas las salvaciones de destreza y fuerza de manera automatica\n\nEl cuerpo falla todas las salvaciones de inteligencia y carisma de manera automatica.\n\nEl cuerpo puede ser manipulado mientras la cabeza esta lejos, un este siendo sordo y ciego, este no puede hablar, comer, beber o respirar, todo lo que toque el cuerpo la cabeza lo siente.\n\nLa cabeza mantiene sus sentidos funcionales, pero se encuentra restringida y no puedes moverte ni atacar por ti mismo, puedes usar componentes verbales y lanzarte hechizos a ti mismo. Los efectos de pociones o borrachera solo afectan a la cabeza.\n\nLa cabeza puede volver a colocar en el cuerpo, y el cuerpo se recupera de cualquier herida y termina cualquier efecto que este posea. si la cabeza no es vuelta a poner en el cuerpo en 3 horas. Mueres."
+  },
+  {
+    "id": "polvos-de-sabrosidad",
+    "name": "Polvos de sabrosidad",
+    "category": "Consumibles, alquimia y trampas",
+    "price": "150 po",
+    "description": "Una bolsa con polvos los cuales dan un excelente sabor a la comida, con la contra de dar desventaja a las salvaciones de sabiduría"
+  },
+  {
+    "id": "polvora-de-humo",
+    "name": "Pólvora de Humo",
+    "category": "Consumibles, alquimia y trampas",
+    "price": "250 po",
+    "description": "Frasco que, al romperse, llena un área de 20 pies con humo denso por 1 minuto. No requiere concentración. Usada por ladrones, magos teatrales y personas que no quieren explicar por qué huyeron."
+  },
+  {
+    "id": "baston-de-la-vibora",
+    "name": "Bastón de la Víbora",
+    "category": "Invocación y criaturas",
+    "price": "900 po",
+    "description": "Como acción, el bastón se convierte en una culebra constrictor gigante (iniciativa propia). Bonus acción para volver a bastón. Tu mascota leal… en versión peligrosa."
+  },
+  {
+    "id": "figurilla-de-poder-cuervo-de-plata",
+    "name": "Figurilla de Poder: Cuervo de Plata",
+    "category": "Invocación y criaturas",
+    "price": "500 po",
+    "description": "Pequeña estatua de un cuervo plateado.\n\nComo acción, se transforma en un cuervo vivo que te obedece y puede reconocer, espiar o entregar mensajes.\n\nVuelve a su forma de figurilla tras 24 horas o si pierdes el hilo conductor."
+  },
+  {
+    "id": "gema-elemental",
+    "name": "Gema Elemental",
+    "category": "Invocación y criaturas",
+    "price": "900 po",
+    "description": "Viene en variantes (fuego, aire, tierra, agua). Una vez por uso, puedes invocar un elemental del tipo correspondiente (como el conjuro Conjure Elemental). Luego la gema se agrieta y queda inerte."
+  },
+  {
+    "id": "sombrero-de-alimanas",
+    "name": "Sombrero de Alimañas",
+    "category": "Invocación y criaturas",
+    "price": "250 po",
+    "description": "Un sombrero de donde puedes sacar ratas, murciélagos o sapos (1/día cada uno). Criaturas obedecen por unos minutos antes de desaparecer. Perfecto para magos de teatro o druidas excéntricos."
+  },
+  {
+    "id": "caja-infernal-de-rompecabezas",
+    "name": "Caja Infernal de Rompecabezas",
+    "category": "Objetos malditos y peligrosos",
+    "price": "700 po",
+    "description": "Caja oscura con mecanismos imposibles. Puede resolverse con tiradas de Inteligencia (CD 30), reduciendo la dificultad en 1 cada día que se estudia. Si fuerzas la caja o fallas, recibes 2d10 de daño de fuego.\n\nSi la resuelves, obtienes una respuesta verdadera sobre una entidad extraplanar o secreto oculto.\n\nEl conocimiento tiene un precio… y la caja siempre cobra."
+  },
+  {
+    "id": "envolturas-de-los-inquietos",
+    "name": "Envolturas de los inquietos",
+    "category": "Objetos malditos y peligrosos",
+    "price": "1800 po",
+    "description": "Estos envoltorios rescatados de los brazos de un señor de las momias cuelgan sueltos de tus brazos pero nunca parecen deslizarse. Mientras usa las envolturas, tiene resistencia al daño necrótico.\n\nAdemás, cuando realizas la acción de Atacar mientras llevas las vendas, puedes usar una acción adicional inmediatamente antes o después de uno de tus ataques para hacer que una parte de la venda lance a un objetivo a 10 pies de ti. Haz un ataque de hechizo cuerpo a cuerpo para envolver, usando una bonificación de ataque de +7. Con un impacto, el objetivo sufre 1d8 de daño necrótico.\n\nLas envolturas tienen 3 cargas y recuperan 1d3 cargas gastadas diariamente al amanecer. Como acción, puedes extender la mano y gastar 1 o más de las cargas de las envolturas para liberar una ráfaga de arena en un cono de 15 pies. Cada criatura en el área debe hacer una tirada de salvación de Constitución CD 15. Si falla, la criatura queda cegada hasta el comienzo de tu siguiente turno y, por cada carga que gastes, recibe 1d6 de daño contundente más 2d8 de daño necrótico. Con una salvación exitosa, una criatura sufre la mitad de daño y no queda cegada.\n\nMaldición. Una vez que te pones estas envolturas malditas, no puedes quitártelas a menos que seas el objetivo del hechizo de eliminación de maldición o magia similar. Mientras llevas las envolturas, tienes desventaja en las tiradas de ataque contra muertos vivientes y en las tiradas de salvación contra sus hechizos y habilidades especiales. Además, mientras estás maldito, no te recuperas tanto del descanso. Cuando lances Dados de Golpe para recuperar puntos de golpe, tira cada uno de los dados dos veces y usa el resultado más bajo.\n\nAsumen que el desierto olvida e impone el olvido; que la impermanencia de las dunas muestra alguna ruptura en su memoria.\n\nEl desierto no olvida. El desierto se pudre, drenando toda bondad, toda gracia del alma. El desierto toma, y toma, y toma, y cuando se toma la vida misma...\n\nEl desierto recuerda.\n\nY el desierto guardará los huesos."
+  },
+  {
+    "id": "espada-de-venganza",
+    "name": "Espada de Venganza",
+    "category": "Objetos malditos y peligrosos",
+    "price": "500 po",
+    "description": "Espada +1 maldita. Te obliga a portarla y te da desventaja con otras armas.\n\nSi recibes daño, debes hacer una salvación de Sabiduría CD 15 o atacar al agresor hasta que uno de los dos caiga.\n\nSolo puede liberarse con Remove Curse o Banishment.\n\nNo se recomienda a personas emocionalmente estables.\n\n“Barata. Letal. Pegajosa. Como una ex con filo.”"
+  }
+]

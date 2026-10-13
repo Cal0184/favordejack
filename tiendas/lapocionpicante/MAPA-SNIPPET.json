@@ -1,0 +1,12 @@
+{
+  "id": "pocion-picante",
+  "name": "La Poción Picante",
+  "seller": "Yamo-Yamo",
+  "category": "Botica · Elixires · Alquimia",
+  "description": "Curación, remedios, blindajes alquímicos, esencias, conjuros embotellados y néctares draconianos.",
+  "url": "/favordejack/tiendas/pocion-picante/",
+  "sellerImage": "assets/vendedores/yamo-yamo.png",
+  "x": 60.0,
+  "y": 58.0,
+  "enabled": false
+}

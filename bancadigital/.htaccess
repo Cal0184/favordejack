@@ -1,0 +1,20 @@
+Options -Indexes -MultiViews
+DirectoryIndex index.php
+
+<FilesMatch "^(config|config\.example|db|session|login|app)\.php$">
+  Require all denied
+</FilesMatch>
+
+<FilesMatch "\.(sql|bak|log|ini)$">
+  Require all denied
+</FilesMatch>
+
+<FilesMatch "^(CREDENCIALES|LEEME|README|NOMBRES_DE_IMAGENES).*">
+  Require all denied
+</FilesMatch>
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule ^data(?:/|$) - [F,L]
+  RewriteRule ^(?:panel-v3|entrada-v3|salir-v3|cambiar-clave-v3)\.php$ /favordejack/bancadigital/ [R=302,L]
+</IfModule>

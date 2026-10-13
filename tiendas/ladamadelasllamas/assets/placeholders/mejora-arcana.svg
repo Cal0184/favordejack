@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520">
+<defs><radialGradient id="r"><stop stop-color="#173338"/><stop offset=".45" stop-color="#101615"/><stop offset="1" stop-color="#090706"/></radialGradient></defs>
+<rect width="800" height="520" fill="url(#r)"/>
+<path d="M240 374 398 122l162 252z" fill="none" stroke="#65d7d3" stroke-width="8"/>
+<circle cx="400" cy="286" r="72" fill="none" stroke="#c99b4e" stroke-width="7"/>
+<path d="M400 214v144M328 286h144M350 236l100 100M450 236 350 336" stroke="#74e1dd" stroke-width="5" opacity=".85"/>
+<text x="400" y="458" text-anchor="middle" fill="#bad8d1" font-size="28" font-family="Georgia">MEJORA ARCANA</text>
+</svg>

@@ -1,0 +1,173 @@
+[
+  {
+    "id": "ddl-extremidad-protesica",
+    "name": "Extremidad protésica",
+    "category": "Objetos mágicos",
+    "price": "100 Oro",
+    "description": "Este artículo reemplaza una extremidad perdida, una mano, un brazo, un pie, una pierna o una parte similar del cuerpo. Mientras la prótesis está colocada, funciona de manera idéntica a la pieza que reemplaza. Puedes separarla o volverla a unir como una acción, y no se puede eliminar en contra de tu voluntad. Se desprende si mueres.",
+    "image": "assets/productos/extremidad-protesica.webp",
+    "fallback": "assets/placeholders/objeto-magico.svg"
+  },
+  {
+    "id": "ddl-cubo-termico",
+    "name": "Cubo Térmico",
+    "category": "Objetos mágicos",
+    "price": "50 Oro",
+    "description": "Este cubo de azufre sólido de 3 pulgadas genera suficiente calor seco para mantener la temperatura a 95 grados Fahrenheit (35 grados Celsius) a 15 pies de él.",
+    "image": "assets/productos/cubo-termico.webp",
+    "fallback": "assets/placeholders/objeto-magico.svg"
+  },
+  {
+    "id": "ddl-flecha-irrompible",
+    "name": "Flecha irrompible",
+    "category": "Objetos mágicos",
+    "price": "10 Oro",
+    "description": "Esta flecha no se puede romper, excepto cuando está dentro de un Campo Antimagia.",
+    "image": "assets/productos/flecha-irrompible.webp",
+    "fallback": "assets/placeholders/objeto-magico.svg"
+  },
+  {
+    "id": "ddl-anillo-blindaje",
+    "name": "Anillo de blindaje",
+    "category": "Objetos mágicos",
+    "price": "300 Oro",
+    "variants": [
+      "Fuego",
+      "Hielo",
+      "Electricidad",
+      "Ácido",
+      "Veneno",
+      "Trueno"
+    ],
+    "description": "Un anillo de protección es un trozo pulido de cristal o piedra alineado con uno de los planos de existencia. Si eres un lanzador de hechizos, puedes usar este anillo como foco de lanzamiento de hechizos. Si estás sintonizado cuando recibes daño del tipo asociado con el material del anillo, puedes usar tu reacción para reducir el daño en 1d4 (hasta un mínimo de 0).",
+    "image": "assets/productos/anillo-blindaje.webp",
+    "fallback": "assets/placeholders/objeto-magico.svg"
+  },
+  {
+    "id": "ddl-hoja-brazo",
+    "name": "Hoja de Brazo",
+    "category": "Objetos mágicos",
+    "price": "250 Oro",
+    "properties": [
+      "Sintonización",
+      "Arma integrada"
+    ],
+    "description": "Un arma mágica que se adhiere a tu brazo y se vuelve inseparable de ti siempre que estés en sintonía con ella. Para sintonizar con este objeto, debes sostenerlo contra tu antebrazo durante todo el período de sintonización. Como acción adicional, puedes retraer el arma hacia tu antebrazo o extenderla desde allí. Mientras está extendida, puedes usar el arma como si la estuvieras sosteniendo y no puedes usar esa mano para otros fines.",
+    "image": "assets/productos/hoja-brazo.webp",
+    "fallback": "assets/placeholders/objeto-magico.svg"
+  },
+  {
+    "id": "ddl-candado-engano",
+    "name": "Candado de engaño",
+    "category": "Objetos mágicos",
+    "price": "75 Oro",
+    "description": "Este candado parece normal y viene con una sola llave. Los fiadores de esta cerradura se ajustan mágicamente para frustrar a los ladrones. Las pruebas de Destreza realizadas para forzar la cerradura tienen desventaja.",
+    "image": "assets/productos/candado-engano.webp",
+    "fallback": "assets/placeholders/objeto-magico.svg"
+  },
+  {
+    "id": "ddl-espada-luna",
+    "name": "Espada tocada por la luna",
+    "category": "Mejoras mágicas",
+    "price": "200 Oro",
+    "description": "En la oscuridad, la hoja desenvainada de esta espada arroja luz de luna, creando una luz brillante en un radio de 15 pies y una luz tenue en 15 pies adicionales.",
+    "image": "assets/productos/espada-tocada-luna.webp",
+    "fallback": "assets/placeholders/mejora-arcana.svg"
+  },
+  {
+    "id": "ddl-rubi-mago-guerra",
+    "name": "Rubí del mago de guerra",
+    "category": "Mejoras mágicas",
+    "price": "500 Oro",
+    "properties": [
+      "Sintonización",
+      "Foco arcano"
+    ],
+    "description": "Grabado con runas sobrenaturales, este rubí de 1 pulgada de diámetro te permite usar un arma simple o marcial como foco de lanzamiento de hechizos. Para que esta propiedad funcione, debes unir el rubí al arma presionándolo contra ella durante al menos 10 minutos. El rubí permanece unido hasta que lo separes como una acción, el arma sea destruida o termine tu sintonía.",
+    "image": "assets/productos/rubi-mago-guerra.webp",
+    "fallback": "assets/placeholders/mejora-arcana.svg"
+  },
+  {
+    "id": "ddl-escudo-expresion",
+    "name": "Escudo de expresión",
+    "category": "Mejoras mágicas",
+    "price": "75 Oro",
+    "description": "El frente de este escudo tiene la forma de una cara. Mientras llevas el escudo, puedes usar una acción adicional para alterar la expresión de la cara.",
+    "image": "assets/productos/escudo-expresion.webp",
+    "fallback": "assets/placeholders/mejora-arcana.svg"
+  },
+  {
+    "id": "ddl-armadura-humeante",
+    "name": "Armadura humeante",
+    "category": "Mejoras mágicas",
+    "price": "150 Oro",
+    "description": "Mientras se lleva puesta, de esta armadura se elevan volutas de humo inofensivo e inodoro.",
+    "image": "assets/productos/armadura-humeante.webp",
+    "fallback": "assets/placeholders/mejora-arcana.svg"
+  },
+  {
+    "id": "ddl-yelmo-aterrador",
+    "name": "Yelmo aterrador",
+    "category": "Mejoras mágicas",
+    "price": "100 Oro",
+    "description": "Este temible yelmo de acero hace que tus ojos brillen de color rojo mientras lo usas.",
+    "image": "assets/productos/yelmo-aterrador.webp",
+    "fallback": "assets/placeholders/mejora-arcana.svg"
+  },
+  {
+    "id": "ddl-armadura-reluciente",
+    "name": "Armadura reluciente",
+    "category": "Mejoras mágicas",
+    "price": "200 Oro",
+    "description": "Esta armadura nunca se ensucia.",
+    "image": "assets/productos/armadura-reluciente.webp",
+    "fallback": "assets/placeholders/mejora-arcana.svg"
+  },
+  {
+    "id": "ddl-baston-veterano",
+    "name": "Bastón de veterano",
+    "category": "Mejoras mágicas",
+    "price": "200 Oro",
+    "description": "Cuando agarras este bastón y usas una acción adicional para pronunciar la palabra de comando, se transforma en una espada larga ordinaria y deja de ser mágica.",
+    "image": "assets/productos/baston-veterano.webp",
+    "fallback": "assets/placeholders/mejora-arcana.svg"
+  },
+  {
+    "id": "ddl-armadura-desechada",
+    "name": "Armadura desechada",
+    "category": "Mejoras mágicas",
+    "price": "100 Oro",
+    "description": "Puedes quitarte esta armadura como acción.",
+    "image": "assets/productos/armadura-desechada.webp",
+    "fallback": "assets/placeholders/mejora-arcana.svg"
+  },
+  {
+    "id": "ddl-mejora-ignifuga",
+    "name": "Mejora ignífuga",
+    "category": "Mejoras mágicas",
+    "price": "100 Oro",
+    "description": "El objeto entregado será ignífugo.",
+    "image": "assets/productos/mejora-ignifuga.webp",
+    "fallback": "assets/placeholders/mejora-arcana.svg"
+  },
+  {
+    "id": "ddl-mejora-1",
+    "name": "Mejora +1",
+    "category": "Mejoras mágicas",
+    "price": "800 Oro",
+    "appliesTo": "Armas y armaduras",
+    "description": "Mejora mágica aplicable a armas y armaduras.",
+    "image": "assets/productos/mejora-1.webp",
+    "fallback": "assets/placeholders/mejora-arcana.svg"
+  },
+  {
+    "id": "ddl-mejora-2",
+    "name": "Mejora +2",
+    "category": "Mejoras mágicas",
+    "price": "3000 Oro",
+    "appliesTo": "Armas y armaduras",
+    "description": "Mejora mágica de alto nivel aplicable a armas y armaduras.",
+    "image": "assets/productos/mejora-2.webp",
+    "fallback": "assets/placeholders/mejora-arcana.svg"
+  }
+]

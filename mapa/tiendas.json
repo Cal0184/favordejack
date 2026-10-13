@@ -1,0 +1,127 @@
+[
+  {
+    "id": "balas-y-sangre",
+    "name": "Balas y Sangre",
+    "category": "Armería · Munición · Herramientas",
+    "description": "Armas de fuego, pólvora y equipo práctico.",
+    "url": "/favordejack/tiendas/balas-y-sangre/",
+    "x": 67.1,
+    "y": 42.2,
+    "enabled": true,
+    "marker": "B",
+    "theme": "blood",
+    "sellers": [
+      {
+        "name": "Madeline Ironslinger",
+        "image": "assets/vendedores/madeline-ironslinger.png"
+      }
+    ]
+  },
+  {
+    "id": "nuevo-emporio",
+    "name": "El Nuevo Emporio",
+    "category": "Objetos mágicos · Curiosidades",
+    "description": "Objetos mágicos, servicios y mercancía extraordinaria.",
+    "url": "/favordejack/tiendas/emporio/",
+    "x": 55.0,
+    "y": 31.0,
+    "enabled": true,
+    "marker": "E",
+    "theme": "emporium",
+    "sellers": [
+      {
+        "name": "Ecix's",
+        "image": "/favordejack/media/shops/ecix/ecix.png",
+        "fallback": "/favordejack/media/shops/ecix/ecix-fallback.svg"
+      }
+    ]
+  },
+  {
+    "id": "dama-de-las-llamas",
+    "name": "La Dama de las Llamas",
+    "category": "Herrería · Forja · Mejoras arcanas",
+    "description": "Forja de oficio, compraventa y un banco separado para mejoras mágicas.",
+    "url": "/favordejack/tiendas/ladamadelasllamas/",
+    "x": 31.0,
+    "y": 48.0,
+    "enabled": true,
+    "marker": "⚒",
+    "theme": "forge",
+    "sellers": [
+      {
+        "name": "Gaston",
+        "image": "assets/vendedores/gaston.png"
+      },
+      {
+        "name": "Axe Rein",
+        "image": "assets/vendedores/axe-rein.png"
+      }
+    ]
+  },
+  {
+    "id": "pocion-picante",
+    "name": "La Poción Picante",
+    "category": "Botica · Elixires · Alquimia",
+    "description": "Curación, remedios, blindajes, esencias, conjuros embotellados y néctares.",
+    "url": "/favordejack/tiendas/lapocionpicante/",
+    "x": 60.0,
+    "y": 58.0,
+    "enabled": true,
+    "marker": "✚",
+    "theme": "potion",
+    "sellers": [
+      {
+        "name": "Yamo-Yamo",
+        "image": "assets/vendedores/yamo-yamo.png"
+      }
+    ]
+  },
+  {
+    "id": "varita-economica",
+    "name": "La Varita Económica",
+    "category": "Mercado negro · Magia dudosa",
+    "description": "Pergaminos, mezclas experimentales, contrabando y objetos con defectos incluidos.",
+    "url": "/favordejack/tiendas/lavaritaeconomica/",
+    "x": 45.0,
+    "y": 70.0,
+    "enabled": true,
+    "marker": "?",
+    "theme": "blackmarket",
+    "sellers": [
+      {
+        "name": "El Señor Blanco",
+        "image": "assets/vendedores/blanco.png"
+      },
+      {
+        "name": "Pinkman",
+        "image": "assets/vendedores/pinkman.png"
+      }
+    ]
+  },
+  {
+    "id": "coruvs-carozus",
+    "name": "Coruvs Carozus",
+    "category": "Medicina y magia",
+    "description": "",
+    "url": "",
+    "x": 42.0,
+    "y": 22.0,
+    "enabled": false,
+    "marker": "C",
+    "theme": "default",
+    "sellers": []
+  },
+  {
+    "id": "tienda-del-gremio",
+    "name": "Tienda del Gremio",
+    "category": "Suministros del gremio",
+    "description": "",
+    "url": "",
+    "x": 35.0,
+    "y": 63.0,
+    "enabled": false,
+    "marker": "G",
+    "theme": "default",
+    "sellers": []
+  }
+]

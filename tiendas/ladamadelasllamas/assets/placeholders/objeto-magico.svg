@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520">
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#1a120e"/><stop offset="1" stop-color="#090807"/></linearGradient></defs>
+<rect width="800" height="520" fill="url(#g)"/>
+<path d="M155 352 352 155l70 70-197 197z" fill="#4f4034" stroke="#c79143" stroke-width="8"/>
+<circle cx="496" cy="238" r="82" fill="#111b1d" stroke="#61c8c8" stroke-width="8"/>
+<path d="m496 173 18 44 47 4-36 30 11 46-40-25-40 25 11-46-36-30 47-4z" fill="none" stroke="#77e2db" stroke-width="8"/>
+<text x="400" y="458" text-anchor="middle" fill="#bfa680" font-size="28" font-family="Georgia">PIEZA EN CATALOGACIÓN</text>
+</svg>

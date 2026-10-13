@@ -1,0 +1,10 @@
+{
+    "0d8f52e0d16f21903edc": {
+        "name": "Abrojos astrales",
+        "category": "Consumibles, alquimia y trampas",
+        "price": "700 po",
+        "description": "Como acción, puedes esparcir estos abrojos mágicos sobre un área cuadrada de 5 pies de lado. Cualquier criatura que entre en el área debe superar una tirada de salvación de Destreza CD 15 o dejar de moverse este turno y recibir 1 daño perforante. Cuando esto sucede, los abrojos explotan en un estallido de energía extraplanar, destruyendo los abrojos e infligiendo 6d6 de daño por fuerza a la criatura y haciendo que se eleve verticalmente hasta 20 pies, como si fuera por el conjuro de levitación. La criatura permanece suspendida de esta manera durante 1d4 asaltos, tiempo durante el cual su velocidad se convierte en 0. El efecto finaliza antes de tiempo si la criatura sufre algún daño.\n\nCuando los abrojos se esparcen en el suelo, se vuelven casi invisibles y flotan hasta 1 pulgada del suelo. Una criatura nota los abrojos con una prueba exitosa de Sabiduría (Percepción) CD 20. Puedes recuperar los abrojos invisibles para usarlos más adelante con 1 minuto de cuidadosa búsqueda y recolección. Los abrojos dejan de flotar y se vuelven visibles una vez que se recuperan de esta manera.",
+        "stock": 1,
+        "available": true
+    }
+}

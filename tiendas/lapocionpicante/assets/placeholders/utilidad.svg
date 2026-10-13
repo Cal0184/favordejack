@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520">
+<defs><radialGradient id="r"><stop stop-color="#d48ac5" stop-opacity=".24"/><stop offset=".55" stop-color="#372034"/><stop offset="1" stop-color="#090807"/></radialGradient></defs>
+<rect width="800" height="520" fill="url(#r)"/>
+<path d="M350 88h100v65l-22 24v39c66 17 111 77 111 146 0 34-11 65-29 91H290c-18-26-29-57-29-91 0-69 45-129 111-146v-39l-22-24z" fill="#101312" stroke="#d48ac5" stroke-width="7"/>
+<path d="M294 350c41-31 84-15 117-29 39-17 72-55 112-29 8 22 10 44 4 68H276c-3-4-5-7-7-10 7-2 15-1 25 0z" fill="#d48ac5" opacity=".65"/>
+<circle cx="400" cy="270" r="64" fill="none" stroke="#d48ac5" stroke-width="5" opacity=".75"/>
+<text x="400" y="290" text-anchor="middle" fill="#d48ac5" font-size="62" font-family="Georgia">◇</text>
+<text x="400" y="473" text-anchor="middle" fill="#d48ac5" font-size="27" font-family="Georgia" letter-spacing="3">UTILIDAD</text>
+</svg>

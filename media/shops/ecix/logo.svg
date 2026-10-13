@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 230" role="img" aria-labelledby="t d">
+<title id="t">El Emporio de Ecix's</title><desc id="d">Sello arcano dorado y violeta del Emporio de Ecix's.</desc>
+<defs>
+ <linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f1d79c"/><stop offset=".48" stop-color="#c79a52"/><stop offset="1" stop-color="#765027"/></linearGradient>
+ <radialGradient id="r"><stop stop-color="#6e426f"/><stop offset="1" stop-color="#17101d"/></radialGradient>
+ <filter id="s"><feDropShadow dx="0" dy="5" stdDeviation="5" flood-opacity=".7"/></filter>
+</defs>
+<g filter="url(#s)">
+ <path d="M105 24 154 50 182 98 177 153 141 196 86 207 38 181 10 133 15 78 51 35Z" fill="url(#r)" stroke="url(#g)" stroke-width="6"/>
+ <path d="M96 49 124 82 155 73 140 107 162 137 124 132 102 165 94 126 56 114 90 96Z" fill="none" stroke="url(#g)" stroke-width="5" stroke-linejoin="round"/>
+ <path d="M65 67c13-24 52-28 68-4M60 158c20 24 56 28 80 3" fill="none" stroke="#8e6a36" stroke-width="3"/>
+ <text x="97" y="126" text-anchor="middle" font-family="Georgia,serif" font-size="62" font-weight="700" fill="url(#g)">E</text>
+</g>
+<g fill="url(#g)" font-family="Georgia,serif" filter="url(#s)">
+ <text x="213" y="100" font-size="74" font-weight="700" letter-spacing="3">ECIX'S</text>
+ <text x="218" y="151" font-size="30" letter-spacing="8">EL NUEVO EMPORIO</text>
+</g>
+<path d="M218 174h472" stroke="url(#g)" stroke-width="2"/><circle cx="204" cy="174" r="5" fill="#c79a52"/><circle cx="704" cy="174" r="5" fill="#c79a52"/>
+<text x="460" y="207" text-anchor="middle" font-family="Georgia,serif" font-size="19" font-style="italic" fill="#aa95ad">objetos arcanos · curiosidades · servicios</text>
+</svg>
