@@ -209,7 +209,7 @@ $categories = array_values($categories);
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#130d09">
 <title>El Emporio de Ecix's</title>
-<style>
+<style>[hidden]{display:none!important}
 :root{
     --bg:#0d0907;--paper:#e7d2a7;--paper2:#f4e4bf;--ink:#352317;
     --gold:#c0934d;--gold2:#f0cd85;--muted:#a6967f;--line:#5d4228;
@@ -388,7 +388,7 @@ footer{padding:35px 20px 50px;border-top:1px solid #2f2117;color:#6f6456;text-al
 (() => {
 'use strict';
 
-const DATA = <?= json_encode(array_column($cards, null, 'id'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
+const DATA = <?= json_encode(array_column($cards, null, 'id'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP) ?>;
 const cards = [...document.querySelectorAll('.card')];
 const search = document.querySelector('#search');
 const searchClear = document.querySelector('#searchClear');

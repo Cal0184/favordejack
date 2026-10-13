@@ -4,6 +4,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/assets.php';
 require_once __DIR__ . '/includes/auth-widget.php';
+require_once __DIR__ . '/includes/emojis.php';
 
 favor_session_start();
 
@@ -25,33 +26,7 @@ function hp(string $v): string
     return htmlspecialchars($v, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
 
-/*
- * Lista cerrada de emojis permitidos.
- * Se valida tanto en la interfaz como en el servidor para impedir
- * que se guarde cualquier valor escrito/manipulado manualmente.
- */
-$allowedEmojis = [
-    '🛡️' => 'Escudo',
-    '⚔️' => 'Espadas',
-    '🗡️' => 'Daga',
-    '🏹' => 'Arco',
-    '🪄' => 'Varita',
-    '🔮' => 'Orbe mágico',
-    '🧙' => 'Mago',
-    '🧝' => 'Elfo',
-    '🧚' => 'Hada',
-    '🧛' => 'Vampiro',
-    '🐉' => 'Dragón',
-    '🐲' => 'Dragón oriental',
-    '🐺' => 'Lobo',
-    '🦇' => 'Murciélago',
-    '🦅' => 'Águila',
-    '💀' => 'Calavera',
-    '👑' => 'Corona',
-    '🏰' => 'Castillo',
-    '🧿' => 'Talismán',
-    '📜' => 'Pergamino',
-];
+$allowedEmojis = favor_allowed_emojis();
 
 if ($user) {
     $db = favor_db();

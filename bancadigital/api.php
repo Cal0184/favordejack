@@ -4,6 +4,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/session.php';
 require_once dirname(__DIR__) . '/includes/assets.php';
 require_once dirname(__DIR__) . '/includes/migrations.php';
+require_once dirname(__DIR__) . '/includes/emojis.php';
 
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
@@ -122,7 +123,7 @@ function player_from_row(array $row): array {
         'id' => (string)$row['ID'],
         'name' => (string)$row['Nombre'],
         'handle' => (string)$row['Handle'],
-        'emoji' => (string)$row['Emoji'],
+        'emoji' => array_key_exists((string)$row['Emoji'], favor_allowed_emojis()) ? (string)$row['Emoji'] : '🛡️',
         'iconBg' => (string)($row['IconBg'] ?? '#22402F'),
         'iconUrl' => (string)$row['IconUrl'],
         'order' => (int)$row['Orden'],
@@ -325,8 +326,13 @@ try {
             $name = clean_text($candidate['name'] ?? '', 60);
             if ($name === '') throw new DomainException('Escribe un nombre para el jugador.');
             $handle = clean_text($candidate['handle'] ?? '', 40);
-            $emoji = clean_text($candidate['emoji'] ?? ($oldRow['Emoji'] ?? '🛡️'), 16);
-            if ($emoji === '') $emoji = '🛡️';
+            // Solo emojis de la lista cerrada (igual que perfil.php): impide inyectar código.
+            $allowedEmojis = favor_allowed_emojis();
+            $emoji = trim((string)($candidate['emoji'] ?? ($oldRow['Emoji'] ?? '🛡️')));
+            if (!array_key_exists($emoji, $allowedEmojis)) {
+                $oldEmoji = (string)($oldRow['Emoji'] ?? '');
+                $emoji = array_key_exists($oldEmoji, $allowedEmojis) ? $oldEmoji : '🛡️';
+            }
             $iconBg = clean_text($candidate['iconBg'] ?? ($oldRow['IconBg'] ?? '#22402F'), 20);
             if (!preg_match('/^#[0-9A-Fa-f]{6}$/', $iconBg)) $iconBg = '#22402F';
             $icon = $oldRow ? (string)($oldRow['IconUrl'] ?? '') : '';
@@ -590,8 +596,12 @@ try {
                 $name = clean_text($candidate['name'] ?? '', 60);
                 if ($name === '') continue;
                 $handle = clean_text($candidate['handle'] ?? '', 40);
-                $emoji = clean_text($candidate['emoji'] ?? ($oldRow['Emoji'] ?? '🛡️'), 16);
-                if ($emoji === '') $emoji = '🛡️';
+                $allowedEmojis = favor_allowed_emojis();
+                $emoji = trim((string)($candidate['emoji'] ?? ($oldRow['Emoji'] ?? '🛡️')));
+                if (!array_key_exists($emoji, $allowedEmojis)) {
+                    $oldEmoji = (string)($oldRow['Emoji'] ?? '');
+                    $emoji = array_key_exists($oldEmoji, $allowedEmojis) ? $oldEmoji : '🛡️';
+                }
                 $iconBg = clean_text($candidate['iconBg'] ?? ($oldRow['IconBg'] ?? '#22402F'), 20);
                 if (!preg_match('/^#[0-9A-Fa-f]{6}$/', $iconBg)) $iconBg = '#22402F';
                 $icon = $oldRow ? (string)($oldRow['IconUrl'] ?? '') : '';

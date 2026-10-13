@@ -5,6 +5,12 @@ Options -Indexes
   Require all denied
 </FilesMatch>
 
+# Datos internos (JSON), notas (README) y bloqueos: la web los lee desde PHP,
+# el navegador nunca los necesita.
+<FilesMatch "^(?!robots\.txt$).*\.(?:json|txt|md|lock)$">
+  Require all denied
+</FilesMatch>
+
 <IfModule mod_deflate.c>
   AddOutputFilterByType DEFLATE text/html text/plain text/css text/javascript application/javascript application/json image/svg+xml
 </IfModule>

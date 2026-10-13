@@ -1325,7 +1325,9 @@ function playerIconDataUrl(player){
             font-size="54" font-family="Apple Color Emoji,Segoe UI Emoji,Noto Color Emoji,sans-serif">${emoji}</text>
     </svg>
   `;
-  return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+  // encodeURIComponent no codifica comillas simples; se codifican aparte
+  // porque esta URL se usa dentro de atributos.
+  return `data:image/svg+xml,${encodeURIComponent(svg).replace(/'/g,'%27')}`;
 }
 function playerIconBg(player){
   return /^#[0-9a-f]{6}$/i.test(String(player?.iconBg||'')) ? player.iconBg : '#22402F';

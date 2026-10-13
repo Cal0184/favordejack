@@ -241,13 +241,13 @@ function rollDiceFastMode(){
             </div>
         </div>` + document.getElementById("roll_history_element_container").innerHTML;
 
-    rollIndex > 1 && (document.getElementById(`history_element_${rollIndex - 1}`).style.display = "block");
+    // Tras una fórmula el elemento anterior puede no existir: comprobar antes de usarlo.
+    const previousElement = document.getElementById(`history_element_${rollIndex - 1}`);
+    if (rollIndex > 1 && previousElement) previousElement.style.display = "block";
 
-    rollIndex == 2 && (document.getElementById("history_element_0").remove());
-    
-    if((rollIndex > maxHistorySize) || document.getElementById(`history_element_${rollIndex - maxHistorySize}`)){
-        document.getElementById(`history_element_${rollIndex - maxHistorySize}`).remove();
-    }
+    if (rollIndex == 2) document.getElementById("history_element_0")?.remove();
+
+    document.getElementById(`history_element_${rollIndex - maxHistorySize}`)?.remove();
 
     triggerMainElementAnimation("history");
 
