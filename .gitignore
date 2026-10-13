@@ -26,3 +26,7 @@ bancadigital/characters/
 *.lock
 .DS_Store
 Thumbs.db
+
+# --- Paquetes de respaldo (contienen datos) ---
+respaldos/*
+!respaldos/.htaccess
