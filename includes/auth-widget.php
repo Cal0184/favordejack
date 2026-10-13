@@ -19,11 +19,11 @@ function favor_auth_widget(): void
     <div class="favor-auth-widget" aria-label="Sesión de Favor de Jack">
         <?php if ($user): ?>
             <span><?= htmlspecialchars((string)$user['displayName'], ENT_QUOTES, 'UTF-8') ?><?= ($user['role'] ?? '') === 'admin' ? ' · Admin' : '' ?></span>
-            <a href="/favordejack/cuenta.php">Mi cuenta</a>
-            <a class="favor-auth-exit" href="/favordejack/logout.php">Salir</a>
+            <a href="<?= favor_base_path() ?>cuenta.php">Mi cuenta</a>
+            <a class="favor-auth-exit" href="<?= favor_base_path() ?>logout.php">Salir</a>
         <?php else: ?>
             <span>Modo lectura</span>
-            <a href="/favordejack/login.php">Iniciar sesión</a>
+            <a href="<?= favor_base_path() ?>login.php">Iniciar sesión</a>
         <?php endif; ?>
     </div>
     <?php

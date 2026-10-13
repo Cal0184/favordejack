@@ -11,6 +11,11 @@ Options -Indexes
   Require all denied
 </FilesMatch>
 
+# Configuración del servidor: contiene la contraseña de la base de datos.
+<FilesMatch "^config\.(?:local|example)\.php$">
+  Require all denied
+</FilesMatch>
+
 <IfModule mod_deflate.c>
   AddOutputFilterByType DEFLATE text/html text/plain text/css text/javascript application/javascript application/json image/svg+xml
 </IfModule>

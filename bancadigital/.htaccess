@@ -16,5 +16,7 @@ DirectoryIndex index.php
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteRule ^data(?:/|$) - [F,L]
-  RewriteRule ^(?:panel-v3|entrada-v3|salir-v3|cambiar-clave-v3)\.php$ /favordejack/bancadigital/ [R=302,L]
+  # Enlaces antiguos: vuelven a la Banca en la carpeta donde esté la web.
+  RewriteCond %{REQUEST_URI} ^(.*/)[^/]+$
+  RewriteRule ^(?:panel-v3|entrada-v3|salir-v3|cambiar-clave-v3)\.php$ %1 [R=302,L]
 </IfModule>

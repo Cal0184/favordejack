@@ -10,15 +10,15 @@ function hr(string $v):string{return htmlspecialchars($v,ENT_QUOTES|ENT_SUBSTITU
 function relation_asset_url(?string $url):string{
  $value=trim(str_replace('\\','/',(string)$url));if($value==='')return '';
  if(preg_match('~^(https?:|data:)~i',$value))return $value;
- if(str_starts_with($value,'/favordejack/media/icons/'))return '/favordejack/bancadigital/icons/'.substr($value,strlen('/favordejack/media/icons/'));
- if(str_starts_with($value,'/favordejack/media/characters/'))return '/favordejack/bancadigital/characters/'.substr($value,strlen('/favordejack/media/characters/'));
+ if(str_starts_with($value,favor_base_path() . 'media/icons/'))return favor_base_path() . 'bancadigital/icons/'.substr($value,strlen(favor_base_path() . 'media/icons/'));
+ if(str_starts_with($value,favor_base_path() . 'media/characters/'))return favor_base_path() . 'bancadigital/characters/'.substr($value,strlen(favor_base_path() . 'media/characters/'));
  if(str_starts_with($value,'/'))return $value;
- if(str_starts_with($value,'media/icons/'))return '/favordejack/bancadigital/icons/'.substr($value,strlen('media/icons/'));
- if(str_starts_with($value,'media/characters/'))return '/favordejack/bancadigital/characters/'.substr($value,strlen('media/characters/'));
- if(str_starts_with($value,'icons/'))return '/favordejack/bancadigital/icons/'.substr($value,strlen('icons/'));
- if(str_starts_with($value,'characters/'))return '/favordejack/bancadigital/characters/'.substr($value,strlen('characters/'));
- if(str_starts_with($value,'bancadigital/icons/'))return '/favordejack/bancadigital/icons/'.substr($value,strlen('bancadigital/icons/'));
- if(str_starts_with($value,'bancadigital/characters/'))return '/favordejack/bancadigital/characters/'.substr($value,strlen('bancadigital/characters/'));
+ if(str_starts_with($value,'media/icons/'))return favor_base_path() . 'bancadigital/icons/'.substr($value,strlen('media/icons/'));
+ if(str_starts_with($value,'media/characters/'))return favor_base_path() . 'bancadigital/characters/'.substr($value,strlen('media/characters/'));
+ if(str_starts_with($value,'icons/'))return favor_base_path() . 'bancadigital/icons/'.substr($value,strlen('icons/'));
+ if(str_starts_with($value,'characters/'))return favor_base_path() . 'bancadigital/characters/'.substr($value,strlen('characters/'));
+ if(str_starts_with($value,'bancadigital/icons/'))return favor_base_path() . 'bancadigital/icons/'.substr($value,strlen('bancadigital/icons/'));
+ if(str_starts_with($value,'bancadigital/characters/'))return favor_base_path() . 'bancadigital/characters/'.substr($value,strlen('bancadigital/characters/'));
  return favor_asset_url($value);
 }
 function rel_can_edit(?array $u,array $c):bool{return $u && (($u['role']??'')==='admin'||(string)($u['playerId']??'')===(string)$c['Jugador']);}
@@ -135,9 +135,9 @@ a{color:inherit;text-decoration:none}button,input,select,textarea{font:inherit}
 <body>
 <?php favor_auth_widget();?>
 <header class="topbar">
- <a class="navlink" href="/favordejack/archivosdelgremio/">← Archivos</a>
+ <a class="navlink" href="<?= favor_base_path() ?>archivosdelgremio/">← Archivos</a>
  <div class="brand"><strong>Relaciones</strong><span>Archivo de vínculos del gremio · versión 2.3</span></div>
- <a class="navlink" href="/favordejack/">Favor de Jack</a>
+ <a class="navlink" href="<?= favor_base_path() ?>">Favor de Jack</a>
 </header>
 
 <main class="page">

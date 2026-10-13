@@ -58,7 +58,7 @@ $categories = array_keys($categories);
 </head>
 <body>
 <header class="topbar">
-    <a class="back-link" href="/favordejack/" aria-label="Volver al Hub">← Volver al Hub</a>
+    <a class="back-link" href="<?= favor_base_path() ?>" aria-label="Volver al Hub">← Volver al Hub</a>
     <div class="identity">
         <?php if ($user): ?>
             <span><?= rg_h((string)($user['displayName'] ?? $user['username'] ?? 'Aventurero')) ?></span>

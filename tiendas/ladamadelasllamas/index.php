@@ -29,7 +29,7 @@ $shopData = [
     'products' => $products,
     'shop' => [
         'name' => 'La Dama de las Llamas',
-        'backUrl' => '/favordejack/mapa/',
+        'backUrl' => favor_base_path() . 'mapa/',
         'seller' => 'Gaston',
         'arcaneSeller' => 'Axe Rein',
     ],
@@ -48,7 +48,7 @@ $shopData = [
 <body>
 <?php favor_auth_widget(); ?>
 <header class="topbar">
-    <a class="back-link" href="/favordejack/mapa/">← Mapa de Waterdeep</a>
+    <a class="back-link" href="<?= favor_base_path() ?>mapa/">← Mapa de Waterdeep</a>
 
     <a class="brand" href="#inicio">
         <span class="brand-emblem" aria-hidden="true">⚒</span>
@@ -257,7 +257,7 @@ $shopData = [
 
 <footer class="footer">
     <span>La Dama de las Llamas · Herrería del Favor de Jack</span>
-    <a href="/favordejack/mapa/">Volver al mapa de Waterdeep</a>
+    <a href="<?= favor_base_path() ?>mapa/">Volver al mapa de Waterdeep</a>
 </footer>
 
 <div class="modal" id="productModal" aria-hidden="true">

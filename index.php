@@ -9,13 +9,13 @@ $sessionUser = favor_current_user();
 favor_session_close();
 
 $routes = [
-    'bank'        => '/favordejack/bancadigital/',
-    'profile'     => '/favordejack/perfil.php',
-    'inventory'   => '/favordejack/inventario/',
-    'dice'        => '/favordejack/rolldice/',
-    'files'       => '/favordejack/archivosdelgremio/',
-    'map'         => '/favordejack/mapa/',
-    'regulations' => '/favordejack/regulaciones/',
+    'bank'        => favor_base_path() . 'bancadigital/',
+    'profile'     => favor_base_path() . 'perfil.php',
+    'inventory'   => favor_base_path() . 'inventario/',
+    'dice'        => favor_base_path() . 'rolldice/',
+    'files'       => favor_base_path() . 'archivosdelgremio/',
+    'map'         => favor_base_path() . 'mapa/',
+    'regulations' => favor_base_path() . 'regulaciones/',
 ];
 
 function route(string $key, array $routes): string
@@ -474,9 +474,9 @@ button,summary{font:inherit}
                     <strong><?= h((string)$sessionUser['displayName']) ?></strong>
                     <small><?= ($sessionUser['role'] ?? '') === 'admin' ? 'Administrador' : 'Aventurero' ?></small>
                 </div>
-                <a href="/favordejack/cuenta.php">Mi cuenta</a>
-                <a href="/favordejack/perfil.php">Mi perfil</a>
-                <a class="danger" href="/favordejack/logout.php">Cerrar sesión</a>
+                <a href="<?= favor_base_path() ?>cuenta.php">Mi cuenta</a>
+                <a href="<?= favor_base_path() ?>perfil.php">Mi perfil</a>
+                <a class="danger" href="<?= favor_base_path() ?>logout.php">Cerrar sesión</a>
             </div>
         </details>
         <?php else: ?>
@@ -488,8 +488,8 @@ button,summary{font:inherit}
             </summary>
             <div class="user-popover">
                 <div class="user-popover-head"><strong>Modo lectura</strong><small>Inicia sesión para modificar datos</small></div>
-                <a href="/favordejack/login.php">Iniciar sesión</a>
-                <a href="/favordejack/olvide-clave.php">Olvidé mi contraseña</a>
+                <a href="<?= favor_base_path() ?>login.php">Iniciar sesión</a>
+                <a href="<?= favor_base_path() ?>olvide-clave.php">Olvidé mi contraseña</a>
             </div>
         </details>
         <?php endif; ?>

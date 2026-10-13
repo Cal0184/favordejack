@@ -50,7 +50,7 @@ if ($user) {
             $icon = favor_safe_asset_input((string)($_POST['iconUrl'] ?? ''));
             if (trim((string)($_POST['iconUrl'] ?? '')) !== '' && $icon === '') {
                 throw new RuntimeException(
-                    'La URL del icono no es válida. Usa https:// o una ruta dentro de /favordejack/media/.'
+                    'La URL del icono no es válida. Usa https:// o una ruta dentro de ' . favor_base_path() . 'media/.'
                 );
             }
 
@@ -407,8 +407,8 @@ if (!array_key_exists($emoji, $allowedEmojis)) {
 <?php favor_auth_widget(); ?>
 
 <div class="top">
-    <a href="/favordejack/">← Favor de Jack</a>
-    <a href="/favordejack/cuenta.php">Seguridad de la cuenta</a>
+    <a href="<?= favor_base_path() ?>">← Favor de Jack</a>
+    <a href="<?= favor_base_path() ?>cuenta.php">Seguridad de la cuenta</a>
 </div>
 
 <?php if (!$user || !$player): ?>
@@ -416,7 +416,7 @@ if (!array_key_exists($emoji, $allowedEmojis)) {
         <section class="card login">
             <h1>Mi perfil</h1>
             <p>Inicia sesión para personalizar tu perfil del gremio.</p>
-            <a href="/favordejack/login.php?next=%2Ffavordejack%2Fperfil.php">
+            <a href="<?= favor_base_path() ?>login.php?next=<?= rawurlencode(favor_base_path()) ?>perfil.php">
                 Iniciar sesión
             </a>
         </section>
@@ -522,7 +522,7 @@ if (!array_key_exists($emoji, $allowedEmojis)) {
                     El emoji ahora se elige únicamente desde la lista disponible.
                     Si dejas la URL vacía, se usa el emoji seleccionado sobre el color elegido.
                     Las imágenes compartidas del proyecto viven bajo
-                    <strong>/favordejack/media/</strong>.
+                    <strong><?= favor_base_path() ?>media/</strong>.
                 </div>
 
                 <div class="actions">

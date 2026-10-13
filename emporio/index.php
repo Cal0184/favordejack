@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+require_once dirname(__DIR__) . '/includes/paths.php';
 
 /*
  * El Emporio de Ecix's
@@ -21,7 +22,7 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
         'httponly' => true,
         'samesite' => 'Lax',
         'secure' => (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'),
-        'path' => '/favordejack/emporio/',
+        'path' => favor_base_path() . 'emporio/',
     ]);
     session_start();
 }
@@ -33,8 +34,8 @@ const DATA_DIR = __DIR__ . '/data';
 const CARDS_DIR = __DIR__ . '/Cartas';
 const ADMIN_FILE = __DIR__ . '/admin.json';
 const FAVORITES_COOKIE = 'ecixs_favorites';
-const HOME_URL = '/favordejack/';
-const BANK_URL = '/favordejack/bancadigital/';
+define('HOME_URL', favor_base_path());
+define('BANK_URL', favor_base_path() . 'bancadigital/');
 
 function json_file(string $name): string {
     return DATA_DIR . '/' . $name . '.json';
@@ -113,7 +114,7 @@ function favorites_cookie_write(array $favorites): bool {
     $value = implode('.', $favorites);
     return setcookie(FAVORITES_COOKIE, $value, [
         'expires' => time() + 60 * 60 * 24 * 365 * 2,
-        'path' => '/favordejack/emporio/',
+        'path' => favor_base_path() . 'emporio/',
         'secure' => (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'),
         'httponly' => false,
         'samesite' => 'Lax',
