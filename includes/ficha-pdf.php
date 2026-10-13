@@ -451,35 +451,121 @@ function ficha_height_m(string $value): ?float
     return $meters > 0 && $meters < 100 ? round($meters, 2) : null;
 }
 
-/** Convierte el texto libre de "Equipo" en una lista de objetos. */
+/** Nombres de conjuros frecuentes (inglés SRD y español) para no confundirlos con objetos. */
+function ficha_known_spells(): array
+{
+    static $set = null;
+    if ($set !== null) return $set;
+    $names = 'acid splash|aid|alarm|animal friendship|animate dead|antimagic field|arcane lock|armor of agathys|arms of hadar|bane|banishment|barkskin|beacon of hope|bestow curse|blade ward|bless|blight|blindness/deafness|blink|blur|branding smite|burning hands|call lightning|calm emotions|chain lightning|charm person|chill touch|chromatic orb|circle of death|clairvoyance|cloudkill|color spray|command|commune|cone of cold|confusion|conjure animals|counterspell|create food and water|create or destroy water|cure wounds|dancing lights|darkness|darkvision|daylight|death ward|detect evil and good|detect magic|detect poison and disease|detect thoughts|dimension door|disguise self|disintegrate|dispel evil and good|dispel magic|divination|divine favor|divine word|dominate person|dragon\'s breath|druidcraft|earth tremor|eldritch blast|enhance ability|enlarge/reduce|ensnaring strike|entangle|expeditious retreat|faerie fire|false life|fear|feather fall|find familiar|find steed|fire bolt|fire shield|fireball|fire ball|flame blade|flame strike|flaming sphere|fly|fog cloud|freedom of movement|friends|gaseous form|geas|gentle repose|giant insect|glyph of warding|goodberry|grease|greater invisibility|greater restoration|guardian of faith|guidance|guiding bolt|gust of wind|hail of thorns|haste|heal|healing word|heat metal|hellish rebuke|heroism|hex|hold monster|hold person|holy aura|hunter\'s mark|hypnotic pattern|ice knife|ice storm|identify|inflict wounds|insect plague|invisibility|jump|knock|lesser restoration|levitate|light|lightning bolt|locate object|longstrider|mage armor|mage hand|magic missile|magic weapon|mass cure wounds|mass healing word|melf\'s acid arrow|mending|message|minor illusion|mirror image|misty step|moonbeam|nondetection|pass without trace|phantasmal force|plane shift|poison spray|polymorph|power word kill|prayer of healing|prestidigitation|produce flame|protection from energy|protection from evil and good|protection from poison|raise dead|ray of frost|ray of sickness|remove curse|resistance|resurrection|revivify|sacred flame|sanctuary|scorching ray|scrying|searing smite|see invisibility|shatter|shield|shield of faith|shillelagh|shocking grasp|silence|silent image|sleep|sleet storm|slow|spare the dying|speak with animals|speak with dead|spider climb|spike growth|spirit guardians|spiritual weapon|stinking cloud|stone shape|stoneskin|suggestion|thaumaturgy|thorn whip|thunderwave|thunderous smite|toll the dead|true strike|vicious mockery|wall of fire|wall of force|wall of stone|warding bond|water breathing|water walk|web|wind wall|word of radiance|wrathful smite|zone of truth|'
+        . 'agarre electrizante|alarma|ayuda|bendecir|bendicion|bola de fuego|curar heridas|palabra curativa|palabra de curacion|arma espiritual|guardianes espirituales|restablecimiento menor|restauracion menor|restablecimiento mayor|silencio|disipar magia|levantar maldicion|quitar maldicion|luz del dia|manos ardientes|rayo abrasador|esfera flamigera|muro de fuego|escudo de fuego|escudo|escudo de fe|proyectil magico|misil magico|armadura de mago|mano de mago|luz|llama sagrada|taumaturgia|orientacion|guia|resistencia|perdonar a los moribundos|toque gelido|rayo de escarcha|descarga sobrenatural|rafaga sobrenatural|saeta de fuego|rayo de fuego|dormir|hechizar persona|hechizar a persona|detectar magia|invisibilidad|paso brumoso|telarana|sugestion|contrahechizo|volar|celeridad|relampago|rayo|revivir|retirada expeditiva|caida de pluma|disfrazarse|identificar|santuario|orden imperiosa|perdicion|infligir heridas|saeta guia|rayo guia|crear o destruir agua|purificar comida y bebida|cancion de descanso|burla cruel|mensaje|prestidigitacion|ilusion menor|reparar|amistad|fuego feerico|fuego feérico|bayas buenas|enmaranar|ola atronadora|onda atronadora|marca del cazador|maleficio|reprension infernal|armadura de agathys|brazos de hadar|nube de oscurecimiento|oscuridad|vision en la oscuridad|imagen multiple|reflejos|desplazamiento|arma magica|calor metalico|piel robliza|sosegar emociones|calmar emociones|zona de verdad|aumentar habilidad|potenciar caracteristica|plegaria de curacion|curar heridas en masa|palabra curativa en masa|revivificar|resurreccion|faro de esperanza|proteccion contra el bien y el mal|proteccion contra la energia|proteccion contra veneno|guardian de la fe|custodia contra la muerte|libertad de movimiento|destierro|piel petrea|tormenta de hielo|cono de frio|golpe flamigero|columna flamigera|comunion|curar|sanar|temblor de tierra|meteoritos pequenos|esfera de fuego';
+    $set = array_flip(explode('|', $names));
+    return $set;
+}
+
+function ficha_spell_heading(string $heading): bool
+{
+    return (bool)preg_match('~(conjur|hechiz|spell|diario|siempre\s+listo|preparad|truco|cantrip|ritual|dominio|always\s+prepared|nivel\s*\d|lvl\s*\d|^\d+\s*(º|°|er|do|ro|to|vo|no)?\s*nivel|magia|plegaria|oracion)~u', ficha_fold($heading));
+}
+
+/** Pronunciación tipo "(KRIP-aa BUR-saa-oh)": típica de las listas de conjuros de Cal. */
+function ficha_has_pronunciation(string $text): bool
+{
+    return (bool)preg_match('~\((?=[^)]*[A-Z]{2,})[A-Za-z\'\- ]+\)~u', $text);
+}
+
+function ficha_looks_like_spell(string $name): bool
+{
+    if (ficha_has_pronunciation($name)) return true;
+    $base = ficha_fold(preg_replace('~\(.*?\)~u', '', $name) ?? $name);
+    $base = trim($base, " .:;!-");
+    return $base !== '' && isset(ficha_known_spells()[$base]);
+}
+
+function ficha_clean_entry(string $part): string
+{
+    // Quita viñetas y emojis del principio (💖, ●, -, *…).
+    $part = preg_replace('~^[\s\p{So}\p{Sk}\p{Cs}\x{FE0F}\x{200D}•●○■◆◇▪►\-–—*·>]+~u', '', $part) ?? $part;
+    return trim($part, " \t.-_");
+}
+
+/**
+ * Convierte el texto libre de "Equipo" o "Tesoro" en entradas.
+ * Cada entrada lleva 'kind': item (objeto), spell (conjuro) o money (dinero),
+ * así la vista previa solo propone añadir al inventario lo que parece un objeto.
+ */
 function ficha_split_items(string $text): array
 {
-    $text = trim(str_replace(["\n", ';', '•', '●'], ',', $text));
+    $text = str_replace(["\r\n", "\r"], "\n", trim($text));
     if ($text === '') return [];
-    $parts = preg_split('~\s*,\s*|\s+y\s+(?=(?:un|una|unos|unas|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|\d+)\b)~iu', $text) ?: [];
     $numbers = ['un' => 1, 'una' => 1, 'uno' => 1, 'dos' => 2, 'tres' => 3, 'cuatro' => 4, 'cinco' => 5,
         'seis' => 6, 'siete' => 7, 'ocho' => 8, 'nueve' => 9, 'diez' => 10, 'unos' => 1, 'unas' => 1, 'a' => 1, 'an' => 1];
-    $items = [];
-    foreach ($parts as $part) {
-        $part = trim($part, " \t.-_");
-        if ($part === '' || mb_strlen($part) < 2) continue;
-        $qty = 1;
-        if (preg_match('~^(\d+)\s*(?:x\s*)?(.+)$~iu', $part, $m)) {
-            $qty = max(1, min(9999, (int)$m[1]));
-            $part = $m[2];
-        } elseif (preg_match('~^(\pL+)\s+(.+)$~u', $part, $m) && isset($numbers[ficha_fold($m[1])])) {
-            $qty = $numbers[ficha_fold($m[1])];
-            $part = $m[2];
-        } elseif (preg_match('~^(.+?)\s*\(?x\s*(\d+)\)?$~iu', $part, $m)) {
-            $qty = max(1, min(9999, (int)$m[2]));
-            $part = $m[1];
+    $units = 'pies|pie|ft|feet|metros|metro|m|libras|libra|lb|lbs|kg|kilos|gramos|g|litros|litro|onzas|varas|yardas|pulgadas';
+    $coin = 'po|pp|pl|pc|pe|ppt|gp|sp|cp|ep|pt|mo|monedas?\s+de\s+(?:oro|plata|cobre|platino|electro)';
+    $entries = [];
+    $group = 0;
+    $groupSpell = false;
+    foreach (explode("\n", $text) as $line) {
+        $line = ficha_clean_entry($line);
+        if ($line === '') continue;
+        // "Diario:" o "Siempre Listos:" son títulos de una lista, no objetos.
+        if (preg_match('~^(.{1,40}):$~u', $line, $hm)) {
+            $group++;
+            $groupSpell = ficha_spell_heading($hm[1]);
+            continue;
         }
-        $part = trim($part);
-        if ($part === '') continue;
-        $name = mb_strtoupper(mb_substr($part, 0, 1, 'UTF-8'), 'UTF-8') . mb_substr($part, 1, null, 'UTF-8');
-        $items[] = ['name' => mb_substr($name, 0, 160, 'UTF-8'), 'quantity' => $qty];
+        // "Conjuros: bless, cure wounds" en una sola línea.
+        $lineSpell = $groupSpell;
+        if (preg_match('~^([^:,]{1,30}):\s*(.+)$~u', $line, $hm) && ficha_spell_heading($hm[1])) {
+            $lineSpell = true;
+            $line = $hm[2];
+        }
+        $parts = preg_split('~\s*[,;]\s*|\s+y\s+(?=(?:un|una|unos|unas|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|\d+)\b)~iu', $line) ?: [];
+        foreach ($parts as $part) {
+            $part = ficha_clean_entry($part);
+            if ($part === '' || mb_strlen($part) < 2) continue;
+            $kind = 'item';
+            $qty = 1;
+            $ownSpell = ficha_looks_like_spell($part);
+            if ($ownSpell || ($lineSpell && ficha_item_category($part) === 'Utilidad')) {
+                // Dentro de una lista de conjuros, algo como "anillo de oro" sigue siendo un objeto.
+                $kind = 'spell';
+            } elseif (preg_match('~^\d[\d.,]*\s*(?:' . $coin . ')\.?$~iu', $part)) {
+                $kind = 'money';
+            } else {
+                // "bolsa con mi dinero 15 po" → "Bolsa con mi dinero" (el dinero se lleva en la Banca).
+                $part = trim(preg_replace('~\s*\d[\d.,]*\s*(?:' . $coin . ')\.?$|\s+(?:' . $coin . ')\.?$~iu', '', $part) ?? $part);
+                if (preg_match('~^(\d+)\s*(' . $units . ')\.?\s+(?:de\s+)?(.+)$~iu', $part, $m)) {
+                    // "50 pies de cuerda" es una cuerda de 50 pies, no 50 cuerdas.
+                    $part = $m[3] . ' (' . $m[1] . ' ' . $m[2] . ')';
+                } elseif (preg_match('~^(\d+)\s*(?:x\s*)?(.+)$~iu', $part, $m)) {
+                    $qty = max(1, min(9999, (int)$m[1]));
+                    $part = $m[2];
+                } elseif (preg_match('~^(\pL+)\s+(.+)$~u', $part, $m) && isset($numbers[ficha_fold($m[1])])) {
+                    $qty = $numbers[ficha_fold($m[1])];
+                    $part = $m[2];
+                } elseif (preg_match('~^(.+?)\s*\(?x\s*(\d+)\)?$~iu', $part, $m)) {
+                    $qty = max(1, min(9999, (int)$m[2]));
+                    $part = $m[1];
+                }
+            }
+            $part = trim($part, " \t.-_");
+            if ($part === '') continue;
+            $name = mb_strtoupper(mb_substr($part, 0, 1, 'UTF-8'), 'UTF-8') . mb_substr($part, 1, null, 'UTF-8');
+            $entries[] = ['name' => mb_substr($name, 0, 160, 'UTF-8'), 'quantity' => $qty, 'kind' => $kind, 'group' => $group];
+        }
     }
-    return $items;
+    // Si en un mismo bloque la mayoría parecen conjuros, el bloque entero es una lista de conjuros.
+    $byGroup = [];
+    foreach ($entries as $e) $byGroup[$e['group']][] = $e['kind'];
+    foreach ($entries as &$e) {
+        $kinds = $byGroup[$e['group']];
+        $spells = count(array_filter($kinds, static fn($k) => $k === 'spell'));
+        if ($e['group'] > 0 && $e['kind'] === 'item' && $spells >= 2 && $spells * 2 >= count($kinds)
+            && ficha_item_category($e['name']) === 'Utilidad') $e['kind'] = 'spell';
+        unset($e['group']);
+    }
+    unset($e);
+    return $entries;
 }
 
 function ficha_item_category(string $name): string
@@ -529,21 +615,25 @@ function ficha_interpret(array $f): array
             $g('AtkBonus' . $i) !== '' ? 'Ataque ' . $g('AtkBonus' . $i) : '',
             $g('Damage' . $i) !== '' ? 'Daño ' . $g('Damage' . $i) : '',
         ])));
-        $items[] = ['name' => $name, 'quantity' => 1, 'category' => 'Arma / Armadura', 'equipped' => true, 'description' => $desc, 'source' => 'Ataques'];
+        $items[] = ['name' => $name, 'quantity' => 1, 'category' => 'Arma / Armadura', 'equipped' => true, 'description' => $desc, 'source' => 'Ataques', 'kind' => 'item'];
     }
     $armor = $g('ArmorWorn');
     if ($armor !== '' && !preg_match('~^(sin armadura|ninguna|no|none|-+)$~iu', $armor)) {
         $items[] = ['name' => $armor, 'quantity' => 1, 'category' => 'Arma / Armadura', 'equipped' => true,
-            'description' => $g('ACworn') !== '' ? 'CA ' . $g('ACworn') : '', 'source' => 'Armadura'];
+            'description' => $g('ACworn') !== '' ? 'CA ' . $g('ACworn') : '', 'source' => 'Armadura', 'kind' => 'item'];
     }
     if ($g('shieldyes') !== '') {
-        $items[] = ['name' => 'Escudo', 'quantity' => 1, 'category' => 'Arma / Armadura', 'equipped' => true, 'description' => '', 'source' => 'Armadura'];
+        $items[] = ['name' => 'Escudo', 'quantity' => 1, 'category' => 'Arma / Armadura', 'equipped' => true, 'description' => '', 'source' => 'Armadura', 'kind' => 'item'];
     }
-    foreach (ficha_split_items($g('Equipment')) as $it) {
-        $items[] = $it + ['category' => ficha_item_category($it['name']), 'equipped' => false, 'description' => '', 'source' => 'Equipo'];
-    }
-    foreach (ficha_split_items(trim($g('Treasure') . ', ' . $g('Treasure 2'), ', ')) as $it) {
-        $items[] = $it + ['category' => ficha_item_category($it['name']) === 'Utilidad' ? 'Vanidad' : ficha_item_category($it['name']), 'equipped' => false, 'description' => '', 'source' => 'Tesoro'];
+    $detectedSpells = [];
+    foreach (['Equipo' => $g('Equipment'), 'Tesoro' => trim($g('Treasure') . "\n" . $g('Treasure 2'))] as $source => $text) {
+        foreach (ficha_split_items($text) as $it) {
+            if ($it['kind'] === 'spell') $detectedSpells[] = $it['name'];
+            $category = ficha_item_category($it['name']);
+            if ($it['kind'] === 'spell') $category = 'Objeto mágico';
+            elseif ($source === 'Tesoro' && $category === 'Utilidad') $category = 'Vanidad';
+            $items[] = $it + ['category' => $category, 'equipped' => false, 'description' => '', 'source' => $source];
+        }
     }
     // Quita duplicados por nombre dentro de la misma ficha (sumando cantidades).
     $unique = [];
@@ -626,7 +716,7 @@ function ficha_interpret(array $f): array
         'aliados' => trim($g('Allies') . ($g('FactionName') !== '' ? "\n" . $g('FactionName') : '')),
         'conjuros' => array_filter([
             'clase' => $g('SpellClass'), 'aptitud' => $g('SpellAbility'), 'cd' => $g('SpellSaveDC'), 'ataque' => $g('SAB'),
-            'lista' => $spells,
+            'lista' => array_values(array_unique(array_merge($spells, $detectedSpells))),
         ]),
     ], static fn($v) => $v !== '' && $v !== [] && $v !== null);
 
