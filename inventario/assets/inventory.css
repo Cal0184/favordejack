@@ -389,6 +389,10 @@ body::before{
 .is-settled .item-card{animation:none}
 .is-settled .is-fresh{animation:rowIn .34s cubic-bezier(.2,.75,.2,1) both}
 
+/* Mientras llega el inventario, «Añadir objeto» se ve en espera (como «Guardando…» en el editor);
+   un clic se recuerda y abre el editor en cuanto llegan los datos. */
+.hero-button.is-waiting,.hero-button.is-waiting:hover{opacity:.55;cursor:wait;transform:none}
+
 /* Revalidación en segundo plano: gira el icono en vez de insertar un aviso que mueve la lista. */
 .refresh-inventory span{display:inline-block}
 .refresh-inventory.is-busy span{animation:inventorySpin .9s linear infinite}
