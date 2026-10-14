@@ -2611,6 +2611,7 @@ async function showTransferModal(charId, prefill=null){
       showModalError('');
       if(!targetSelect.value) targetSelect.focus();
     });
+    targetSelect.addEventListener('change', ()=>showModalError(''));
 
     // Al volver desde la confirmación se conserva lo que ya se había elegido.
     const previousTarget = prefill && targets.find(t=>t.id===prefill.targetId);
