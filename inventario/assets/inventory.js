@@ -940,6 +940,11 @@
             if (background) toast('No se pudo actualizar; se muestran los datos guardados en esta pestaña.', 'warning');
             else {
                 state.pendingAdd = '';
+                // Sin datos no se puede editar: se quita la espera y se ocultan los botones,
+                // como antes. Pulsar de nuevo el personaje reintenta la carga.
+                setAddWaiting(false);
+                dom.addItemBtn.hidden = true;
+                if (dom.importSheetLink) dom.importSheetLink.hidden = true;
                 setInventoryState(error.message || 'No fue posible cargar el inventario.', 'error');
             }
         } finally {

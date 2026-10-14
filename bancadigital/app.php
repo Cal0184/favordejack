@@ -273,7 +273,7 @@ h1,h2,h3,.display{ font-family:'Cinzel', Georgia, serif; letter-spacing:.02em; }
   border:0 !important;
   /* Rellena siempre el marco cuadrado; las esquinas redondeadas ocultan el fondo negro del arte. */
   object-fit:cover;
-  object-position:50% 25%;
+  object-position:50% 0%;
   border-radius:8px;
   background:rgba(91,70,50,.12);
   transform:none !important;

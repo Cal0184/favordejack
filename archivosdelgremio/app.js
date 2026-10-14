@@ -323,7 +323,18 @@
         // Si el retrato aún no ha llegado, al cargar no debe agrandar el folio
         // (movía "Ir a su Banca" bajo el cursor y sacaba una barra de scroll).
         const portrait = $('.folio-art img', characterModalContent);
-        if (portrait && !portrait.naturalWidth) portrait.parentElement.classList.add('is-pending');
+        if (portrait && !portrait.naturalWidth) {
+            const art = portrait.parentElement;
+            art.classList.add('is-pending');
+            // Cuando llega se muestra entero, pero nunca bajo el cursor: si está sobre los
+            // botones, espera a que salga de ellos.
+            portrait.addEventListener('load', () => {
+                const actions = $('.folio-actions', characterModalContent);
+                const release = () => art.classList.remove('is-pending');
+                if (actions?.matches(':hover')) actions.addEventListener('pointerleave', release, { once: true });
+                else release();
+            }, { once: true });
+        }
         characterModal.classList.add('open');
         characterModal.setAttribute('aria-hidden', 'false');
         setModalOpen(true);

@@ -361,7 +361,8 @@ select:focus,input:focus,textarea:focus{border-color:#79531f;box-shadow:0 0 0 3p
 /* El folio no cambia de tamaño después de abrirse: su barra de scroll tiene el hueco
    guardado (del tono del borde de la página cuando no hace falta), y un retrato que aún
    no había llegado ocupa el alto que ya hay en vez de estirarlo. */
-.folio-modal{scrollbar-gutter:stable;background:#d1b886}
+/* En móvil el folio ocupa toda la pantalla: ahí no hace falta reservar el hueco. */
+@media(min-width:681px){.folio-modal{scrollbar-gutter:stable;background:#d1b886}}
 .folio-art.is-pending img{position:absolute;inset:0}
 .folio-content{position:relative;padding:42px 38px;background:linear-gradient(90deg,#d6bf8e,#f0e2be 7%,#eddfbb 95%,#d1b886);overflow:hidden}
 .folio-content::before{content:"";position:absolute;inset:0;opacity:.18;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.25'/%3E%3C/svg%3E")}
