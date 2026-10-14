@@ -8,6 +8,7 @@
     const config = JSON.parse(configNode.textContent || '{}');
     const CACHE_TTL = 30_000;
     const PAGE_SIZE = 20;
+    const ENTRANCE_MS = 700; // entrada de la lista: rowIn (.34s) + el mayor retraso escalonado (12 × 24 ms)
 
     const $ = (id) => document.getElementById(id);
     const dom = {
@@ -78,6 +79,9 @@
         inventoryCache: new Map(),
         charactersAbort: null,
         inventoryAbort: null,
+        navigation: 0,
+        pendingAdd: '',
+        enteredAt: 0,
         page: 1,
         view: 'list',
         booted: false,
@@ -263,6 +267,15 @@
         return null;
     }
 
+    // Marca el personaje activo sin reconstruir la lista (evita repetir su animación en cada clic).
+    function markActiveCharacter() {
+        dom.characterList.querySelectorAll('[data-character-id]').forEach((button) => {
+            const active = button.dataset.characterId === state.currentCharacterId;
+            button.classList.toggle('is-active', active);
+            button.setAttribute('aria-pressed', active ? 'true' : 'false');
+        });
+    }
+
     function renderCharacters() {
         const characters = currentCharacters();
         const query = (dom.characterSearch.value || '').trim().toLocaleLowerCase('es');
@@ -323,6 +336,8 @@
     function resetWorkspace() {
         state.currentCharacterId = '';
         state.currentInventory = null;
+        state.pendingAdd = '';
+        state.navigation += 1; // una apertura de personaje aún en curso ya no debe aplicarse
         state.page = 1;
         dom.characterWorkspace.hidden = true;
         dom.welcomeState.hidden = false;
@@ -334,7 +349,7 @@
         dom.inventoryState.textContent = '';
         dom.inventorySummary.hidden = true;
         dom.inventoryFilters.hidden = true;
-        renderCharacters();
+        markActiveCharacter();
     }
 
     function setInventoryState(message, kind = '') {
@@ -343,21 +358,35 @@
         dom.inventoryState.hidden = !message;
     }
 
-    function renderHero(payload) {
+    // Ficha provisional (el inventario aún no llega): «Añadir objeto» se ve en espera y, si se
+    // pulsa, el clic se recuerda y el editor se abre en cuanto llegan los datos.
+    function setAddWaiting(waiting) {
+        dom.addItemBtn.classList.toggle('is-waiting', waiting);
+        dom.addItemBtn.setAttribute('aria-disabled', waiting ? 'true' : 'false');
+    }
+
+    // reveal=false actualiza la ficha sin repetir su animación de entrada (datos que llegan
+    // después del clic, revalidaciones y cambios guardados).
+    function renderHero(payload, { reveal = true } = {}) {
         const character = payload.character;
         dom.welcomeState.hidden = true;
         dom.characterWorkspace.hidden = false;
         const characterSheet = dom.characterWorkspace.querySelector('.character-sheet');
-        if (characterSheet) {
+        if (characterSheet && reveal) {
             characterSheet.classList.remove('is-revealing');
             void characterSheet.offsetWidth;
             characterSheet.classList.add('is-revealing');
         }
-        dom.heroPortrait.replaceChildren(createImage(character.portraitUrl, character.name, {
-            wrapperClass: 'portrait__frame',
-            fallback: (character.name || '?').charAt(0).toLocaleUpperCase('es') || '?',
-            eager: true,
-        }));
+        // El retrato solo se vuelve a crear si cambia; así no parpadea al actualizar.
+        const portraitKey = `${character.id}|${character.portraitUrl || ''}`;
+        if (dom.heroPortrait.dataset.portraitKey !== portraitKey) {
+            dom.heroPortrait.dataset.portraitKey = portraitKey;
+            dom.heroPortrait.replaceChildren(createImage(character.portraitUrl, character.name, {
+                wrapperClass: 'portrait__frame',
+                fallback: (character.name || '?').charAt(0).toLocaleUpperCase('es') || '?',
+                eager: true,
+            }));
+        }
         dom.heroPlayer.textContent = character.playerName || 'Personaje';
         dom.heroName.textContent = character.name;
         if (dom.heroMeta) dom.heroMeta.textContent = `${character.playerName || 'Aventurero'} · Inventario del personaje`;
@@ -707,11 +736,26 @@
         renderItemsOnly();
     }
 
-    function renderItemsOnly() {
+    // quiet=true repinta en el sitio (sin animación de entrada) conservando los detalles
+    // abiertos y el scroll: se usa cuando cambian los datos, no cuando el usuario navega.
+    // Si la lista aún está entrando (clic reciente), las filas nuevas continúan esa misma
+    // animación desde donde iba en lugar de cortarla.
+    function renderItemsOnly({ quiet = false } = {}) {
         const payload = state.currentInventory;
         if (!payload) return;
         const sourceItems = payload.items || [];
         const filtered = filteredItems(sourceItems);
+        const expandedIds = quiet
+            ? [...document.querySelectorAll('#itemRows .is-expanded, #itemCards .is-expanded')].map((node) => node.dataset.itemId)
+            : [];
+        const scrollY = window.scrollY;
+        const now = performance.now();
+        const played = quiet ? Math.max(0, now - state.enteredAt) : 0;
+        const settled = quiet && played >= ENTRANCE_MS;
+        const offset = quiet && !settled ? played : 0;
+        if (!quiet) state.enteredAt = now;
+        dom.inventoryList.classList.toggle('is-settled', settled);
+        dom.inventoryCards?.classList.toggle('is-settled', settled);
         dom.itemRows.replaceChildren();
         dom.itemCards?.replaceChildren();
 
@@ -737,13 +781,13 @@
 
         if (state.view === 'cards') {
             const fragment = document.createDocumentFragment();
-            pageItems.forEach((item, index) => { const card = createItemCard(item, payload.canEdit); card.style.animationDelay = `${Math.min(index, 12) * 24}ms`; fragment.append(card); });
+            pageItems.forEach((item, index) => { const card = createItemCard(item, payload.canEdit); card.style.animationDelay = `${Math.min(index, 12) * 24 - offset}ms`; fragment.append(card); });
             dom.itemCards.append(fragment);
             dom.inventoryList.hidden = true;
             dom.inventoryCards.hidden = false;
         } else {
             const fragment = document.createDocumentFragment();
-            pageItems.forEach((item, index) => { const row = createItemRow(item, payload.canEdit); row.style.animationDelay = `${Math.min(index, 12) * 22}ms`; fragment.append(row); });
+            pageItems.forEach((item, index) => { const row = createItemRow(item, payload.canEdit); row.style.animationDelay = `${Math.min(index, 12) * 22 - offset}ms`; fragment.append(row); });
             dom.itemRows.append(fragment);
             dom.inventoryList.hidden = false;
             dom.inventoryCards.hidden = true;
@@ -758,23 +802,26 @@
             ? `Mostrando ${first}–${last} de ${filtered.length}`
             : `Mostrando ${first}–${last} de ${filtered.length} filtrados (${sourceItems.length} total)`;
         renderPager(filtered.length);
+
+        if (quiet) {
+            const container = state.view === 'cards' ? dom.itemCards : dom.itemRows;
+            expandedIds.forEach((id) => container?.querySelector(`[data-item-id="${CSS.escape(id)}"]:not([data-action])`)?.classList.add('is-expanded'));
+            if (window.scrollY !== scrollY) window.scrollTo(0, scrollY);
+        }
     }
 
-    function renderInventory(payload) {
+    function renderInventory(payload, { reveal = true, quiet = false } = {}) {
         state.currentInventory = payload;
-        renderHero(payload);
+        renderHero(payload, { reveal });
+        setAddWaiting(false);
         const items = payload.items || [];
         updateSummary(items);
         updateCategoryFilter(items);
         dom.inventoryFilters.hidden = items.length === 0;
-        renderItemsOnly();
+        renderItemsOnly({ quiet });
     }
 
-    function renderInventoryLoading(hasCachedData = false) {
-        if (hasCachedData) {
-            setInventoryState('Actualizando…', 'subtle');
-            return;
-        }
+    function renderInventoryLoading() {
         dom.inventorySummary.hidden = true;
         dom.inventoryFilters.hidden = true;
         dom.inventoryList.hidden = true;
@@ -830,65 +877,127 @@
 
     async function selectPlayer(playerId, { updateUrl = true, force = false } = {}) {
         if (!playerId) return;
-        state.inventoryAbort?.abort();
+        cancelInventoryRequest();
         state.currentPlayerId = playerId;
         resetWorkspace();
         if (updateUrl) syncUrl('', { replace: false });
         await loadCharacters(playerId, { force });
     }
 
-    async function loadInventory(characterId, { force = false, updateUrl = true, replaceUrl = false } = {}) {
-        if (!characterId) return;
-        clearGlobalMessage();
-        const characterChanged = state.currentCharacterId !== characterId;
-        state.currentCharacterId = characterId;
-        if (characterChanged) resetFilters();
-        renderCharacters();
+    // Firma de los datos para saber si una revalidación trae algo nuevo (el orden de llegada no importa).
+    function inventorySignature(data) {
+        const items = [...(data?.items || [])].sort((a, b) => a.id - b.id);
+        return JSON.stringify({ ...data, items });
+    }
 
-        const known = findCharacter(characterId);
-        if (known) renderHero({ character: known, canEdit: false, items: [] });
+    // Guarda en caché y devuelve true si los datos cambiaron respecto a la copia anterior.
+    function storeInventory(characterId, data) {
+        const signature = inventorySignature(data);
+        const previous = state.inventoryCache.get(characterId);
+        state.inventoryCache.set(characterId, { data, ts: Date.now(), signature });
+        return !previous || previous.signature !== signature;
+    }
 
-        const cached = state.inventoryCache.get(characterId);
-        const fresh = cached && Date.now() - cached.ts < CACHE_TTL;
-        if (cached) renderInventory(cached.data);
-        renderInventoryLoading(Boolean(cached));
+    function setRefreshing(isRefreshing) {
+        dom.refreshInventoryBtn.classList.toggle('is-busy', isRefreshing);
+        dom.refreshInventoryBtn.setAttribute('aria-busy', isRefreshing ? 'true' : 'false');
+    }
 
-        if (updateUrl) syncUrl(characterId, { replace: replaceUrl });
-        if (fresh && !force) {
-            renderInventory(cached.data);
-            return;
-        }
-
+    function cancelInventoryRequest() {
         state.inventoryAbort?.abort();
+        state.inventoryAbort = null;
+        setRefreshing(false);
+    }
+
+    // Permiso provisional para pintar la ficha mientras llega el inventario. Decide el servidor:
+    // el editor no se abre hasta tener sus datos y cada guardado se vuelve a comprobar.
+    function provisionalCanEdit(character) {
+        const user = config.currentUser;
+        return Boolean(user && (user.role === 'admin' || (user.playerId !== '' && user.playerId === character.playerId)));
+    }
+
+    // background=true revalida sin tocar la pantalla, salvo que los datos hayan cambiado.
+    async function fetchInventory(characterId, { background = false } = {}) {
+        cancelInventoryRequest();
         const controller = new AbortController();
         state.inventoryAbort = controller;
+        if (background) setRefreshing(true);
         try {
             const data = await apiGet('inventory', { characterId }, controller.signal);
-            state.inventoryCache.set(characterId, { data, ts: Date.now() });
-            if (state.currentCharacterId === characterId) {
-                renderInventory(data);
-                renderCharacters();
+            const changed = storeInventory(characterId, data);
+            if (state.currentCharacterId !== characterId) return;
+            if (background) {
+                if (changed) renderInventory(data, { reveal: false, quiet: true });
+                return;
+            }
+            renderInventory(data, { reveal: false });
+            if (state.pendingAdd === characterId) {
+                state.pendingAdd = '';
+                openEditor();
             }
         } catch (error) {
-            if (error.name === 'AbortError') return;
-            if (cached) {
-                renderInventory(cached.data);
-                toast('No se pudo actualizar; se muestran los datos guardados en esta pestaña.', 'warning');
-            } else if (state.currentCharacterId === characterId) {
+            if (error.name === 'AbortError' || state.currentCharacterId !== characterId) return;
+            if (background) toast('No se pudo actualizar; se muestran los datos guardados en esta pestaña.', 'warning');
+            else {
+                state.pendingAdd = '';
                 setInventoryState(error.message || 'No fue posible cargar el inventario.', 'error');
             }
         } finally {
-            if (state.inventoryAbort === controller) state.inventoryAbort = null;
+            if (state.inventoryAbort === controller) {
+                state.inventoryAbort = null;
+                setRefreshing(false);
+            }
         }
     }
 
+    // Un clic = una petición como mucho y un único pintado animado. Con caché se pinta al
+    // instante y, si está vieja, se revalida en segundo plano sin repintar si nada cambió.
+    async function loadInventory(characterId, { force = false, updateUrl = true, replaceUrl = false } = {}) {
+        if (!characterId) return;
+        clearGlobalMessage();
+        const cached = state.inventoryCache.get(characterId);
+        const fresh = cached && Date.now() - cached.ts < CACHE_TTL;
+
+        // Personaje ya abierto (o cargándose): no se vuelve a pintar.
+        if (state.currentCharacterId === characterId && (state.currentInventory || state.inventoryAbort)) {
+            if (state.currentInventory && !state.inventoryAbort && (force || !fresh)) {
+                await fetchInventory(characterId, { background: true });
+            }
+            return;
+        }
+
+        state.currentCharacterId = characterId;
+        state.currentInventory = null;
+        state.pendingAdd = '';
+        cancelInventoryRequest();
+        resetFilters();
+        markActiveCharacter();
+        if (updateUrl) syncUrl(characterId, { replace: replaceUrl });
+
+        if (cached) {
+            renderInventory(cached.data);
+            if (force || !fresh) await fetchInventory(characterId, { background: true });
+            return;
+        }
+
+        const known = findCharacter(characterId);
+        if (known) renderHero({ character: known, canEdit: provisionalCanEdit(known), items: [] });
+        setAddWaiting(true);
+        renderInventoryLoading();
+        await fetchInventory(characterId);
+    }
+
+    // Cada apertura recibe un turno: si mientras espera a la red se abre otro personaje o se
+    // vuelve a la portada (cambio de jugador, historial), deja de tener efecto.
     async function openCharacter(characterId, options = {}) {
+        const ticket = ++state.navigation;
         const known = findCharacter(characterId);
         if (known) {
             if (state.currentPlayerId !== known.playerId) {
                 state.currentPlayerId = known.playerId;
                 dom.playerSelect.value = known.playerId;
                 await loadCharacters(known.playerId);
+                if (ticket !== state.navigation) return;
             }
             await loadInventory(characterId, options);
             return;
@@ -896,12 +1005,15 @@
 
         try {
             const context = await apiGet('context', { characterId });
+            if (ticket !== state.navigation) return;
             const character = context.character;
             state.currentPlayerId = character.playerId;
             dom.playerSelect.value = character.playerId;
             await loadCharacters(character.playerId);
+            if (ticket !== state.navigation) return;
             await loadInventory(characterId, options);
         } catch (error) {
+            if (ticket !== state.navigation) return;
             showGlobalMessage(error.message);
             resetWorkspace();
         }
@@ -936,16 +1048,35 @@
         dom.formError.hidden = true;
     }
 
-    function cacheInventory(payload) {
-        state.currentInventory = payload;
-        state.inventoryCache.set(state.currentCharacterId, { data: payload, ts: Date.now() });
-        renderInventory(payload);
+    // Copia más reciente del inventario de un personaje: la de pantalla si sigue abierto y,
+    // si no, la de la caché. Sobre ella se aplica la respuesta de un guardado.
+    function latestInventory(characterId, fallback) {
+        if (state.currentCharacterId === characterId && state.currentInventory) return state.currentInventory;
+        return state.inventoryCache.get(characterId)?.data || fallback;
+    }
+
+    // Tras guardar, equipar o eliminar: se repinta en el sitio y solo el objeto tocado vuelve a entrar.
+    // Si mientras tanto se abrió otro personaje, el cambio solo se guarda en la caché del original:
+    // no se toca la pantalla ni la carga en curso del personaje nuevo.
+    function cacheInventory(characterId, payload, freshItemId = 0) {
+        if (state.currentCharacterId !== characterId) {
+            storeInventory(characterId, payload);
+            return;
+        }
+        cancelInventoryRequest(); // una revalidación lanzada antes del cambio traería datos viejos
+        storeInventory(characterId, payload);
+        renderInventory(payload, { reveal: false, quiet: true });
+        if (freshItemId) {
+            const container = state.view === 'cards' ? dom.itemCards : dom.itemRows;
+            container?.querySelector(`[data-item-id="${CSS.escape(String(freshItemId))}"]:not([data-action])`)?.classList.add('is-fresh');
+        }
     }
 
     async function saveItem(event) {
         event.preventDefault();
         const characterId = state.currentCharacterId;
-        if (!characterId || !state.currentInventory?.canEdit) return;
+        const payload = state.currentInventory;
+        if (!characterId || !payload?.canEdit) return;
 
         dom.saveItemBtn.disabled = true;
         dom.saveItemBtn.textContent = 'Guardando…';
@@ -966,11 +1097,12 @@
         try {
             const response = await apiPost(form);
             const saved = response.data.item;
-            const items = [...(state.currentInventory.items || [])];
+            const latest = latestInventory(characterId, payload);
+            const items = [...(latest.items || [])];
             const index = items.findIndex((item) => item.id === saved.id);
             if (index >= 0) items[index] = saved;
             else items.push(saved);
-            cacheInventory({ ...state.currentInventory, items });
+            cacheInventory(characterId, { ...latest, items }, saved.id);
             closeEditor();
             toast(response.message || 'Objeto guardado.');
         } catch (error) {
@@ -989,15 +1121,17 @@
         if (!item) return;
         if (!window.confirm(`¿Eliminar “${item.name}” del inventario?`)) return;
 
+        const characterId = state.currentCharacterId;
         const form = new FormData();
         form.set('action', 'delete');
-        form.set('characterId', state.currentCharacterId);
+        form.set('characterId', characterId);
         form.set('id', String(itemId));
 
         try {
             const response = await apiPost(form);
-            const items = payload.items.filter((candidate) => candidate.id !== itemId);
-            cacheInventory({ ...payload, items });
+            const latest = latestInventory(characterId, payload);
+            const items = (latest.items || []).filter((candidate) => candidate.id !== itemId);
+            cacheInventory(characterId, { ...latest, items });
             toast(response.message || 'Objeto eliminado.');
         } catch (error) {
             toast(error.message, 'error');
@@ -1010,17 +1144,19 @@
         const item = payload.items.find((candidate) => candidate.id === itemId);
         if (!item) return;
 
+        const characterId = state.currentCharacterId;
         const form = new FormData();
         form.set('action', 'equip');
-        form.set('characterId', state.currentCharacterId);
+        form.set('characterId', characterId);
         form.set('id', String(itemId));
         form.set('equipped', item.equipped ? '0' : '1');
 
         try {
             const response = await apiPost(form);
             const saved = response.data.item;
-            const items = payload.items.map((candidate) => candidate.id === saved.id ? saved : candidate);
-            cacheInventory({ ...payload, items });
+            const latest = latestInventory(characterId, payload);
+            const items = (latest.items || []).map((candidate) => candidate.id === saved.id ? saved : candidate);
+            cacheInventory(characterId, { ...latest, items }, saved.id);
             toast(saved.equipped ? 'Objeto equipado.' : 'Objeto guardado en el inventario.');
         } catch (error) {
             toast(error.message, 'error');
@@ -1054,9 +1190,9 @@
             if (data.inventory?.character) {
                 const characterId = data.inventory.character.id;
                 state.currentCharacterId = characterId;
-                state.inventoryCache.set(characterId, { data: data.inventory, ts: Date.now() });
+                storeInventory(characterId, data.inventory);
                 renderInventory(data.inventory);
-                renderCharacters();
+                markActiveCharacter();
                 syncUrl(characterId, { replace: true });
             } else {
                 resetWorkspace();
@@ -1085,7 +1221,10 @@
     dom.refreshInventoryBtn.addEventListener('click', () => {
         if (state.currentCharacterId) loadInventory(state.currentCharacterId, { force: true, updateUrl: false });
     });
-    dom.addItemBtn.addEventListener('click', () => openEditor());
+    dom.addItemBtn.addEventListener('click', () => {
+        if (state.currentInventory) openEditor();
+        else if (state.currentCharacterId) state.pendingAdd = state.currentCharacterId; // se abre al llegar los datos
+    });
 
     [dom.itemSearch, dom.categoryFilter, dom.equipmentFilter, dom.sortFilter].forEach((control) => {
         const eventName = control === dom.itemSearch ? 'input' : 'change';
@@ -1187,11 +1326,12 @@
         else resetWorkspace();
     });
 
+    // Al volver a la pestaña con datos viejos se revalida en segundo plano: solo se repinta si algo cambió.
     window.addEventListener('focus', () => {
-        if (!state.booted || !state.currentCharacterId || state.inventoryAbort) return;
+        if (!state.booted || !state.currentCharacterId || !state.currentInventory || state.inventoryAbort) return;
         const cached = state.inventoryCache.get(state.currentCharacterId);
         if (!cached || Date.now() - cached.ts >= CACHE_TTL) {
-            loadInventory(state.currentCharacterId, { force: true, updateUrl: false });
+            fetchInventory(state.currentCharacterId, { background: true });
         }
     });
 
