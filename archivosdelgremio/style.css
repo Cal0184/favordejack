@@ -766,6 +766,12 @@ body.modal-open{overflow:hidden}
     }
     .book-tab::before{display:none}
 }
+/* En móvil cada marcador conserva su ancho y la barra se desliza por dentro,
+   como pedía la regla de 680px (la de arriba los aplastaba y los nombres se montaban). */
+@media(max-width:680px){
+    .book-tabs{justify-content:flex-start}
+    .book-tab,.book-tab:hover,.book-tab.active{flex:0 0 auto}
+}
 
 /* Personajes no activos: el archivo sigue visible, pero queda claramente
    "apagado" sin necesidad de poner un cartel encima. */
@@ -1045,7 +1051,9 @@ body.modal-open{overflow:hidden}
     font-style:italic;
     font-size:.78rem;
 }
-.catalog-dots{display:flex;align-items:center;justify-content:center;gap:6px;min-height:14px}
+/* Con muchos expedientes los puntos bajan de línea: si no, en móvil la página
+   quedaba más ancha que la pantalla y el folio del personaje se cortaba a la derecha. */
+.catalog-dots{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px;min-width:0;min-height:14px}
 .catalog-dot{
     width:8px;height:8px;padding:0;
     border:1px solid #8d6a3b;
@@ -1242,9 +1250,11 @@ body.modal-open{overflow:hidden}
 /* V3.8 · Acciones entre módulos y Relaciones */
 .book-tab.relation-link{text-decoration:none}
 .folio-actions{position:relative;z-index:2;display:flex;gap:8px;flex-wrap:wrap;margin-top:20px;padding-top:15px;border-top:1px solid #ad9364}
-.folio-action{display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:8px 12px;border:1px solid #8b6737;border-radius:4px;background:#d8c08d;color:#4b321e;text-decoration:none;font-weight:700;font-size:.82rem}
+.folio-action{display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:8px 12px;border:1px solid #8b6737;border-radius:4px;background:#d8c08d;color:#4b321e;text-decoration:none;font-weight:700;font-size:.82rem;transition:transform .18s ease,box-shadow .18s ease,background-color .18s ease,border-color .18s ease,color .18s ease}
 .folio-action.primary{background:linear-gradient(#7e5b2d,#5b3d1f);color:#f7e7c1;border-color:#67451f}
-.folio-action:hover{filter:brightness(1.05);transform:translateY(-1px)}
+/* Hover sin filter ni cambios de tamaño: el botón se eleva y brilla, sin mover el folio. */
+.folio-action:hover{transform:translateY(-2px);background-color:#e5cf9f;border-color:#6f4b24;box-shadow:0 6px 12px #4328143d,inset 0 0 0 1px #f8ebc9aa}
+.folio-action.primary:hover{color:#fff4d8;border-color:#4f3317;box-shadow:0 6px 14px #2d180b59,inset 0 0 0 1px #d9b56d88}
 
 /* Categoría NPC */
 .admin-status-chip.npc{background:#4d3f67;color:#f2e8ff;border-color:#76649a}
