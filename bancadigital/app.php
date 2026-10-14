@@ -334,12 +334,14 @@ h1,h2,h3,.display{ font-family:'Cinzel', Georgia, serif; letter-spacing:.02em; }
 }
 .ledger-page{ padding:26px 24px; }
 .ledger-left{ border-right:none; }
-.ledger-right{ background:rgba(255,255,255,.12); max-height:560px; overflow-y:auto; }
+/* Sin alto fijo: el historial (3 movimientos por página) y su paginación caben siempre sin
+   barra de desplazamiento interna, aunque las cifras sean grandes o el motivo ocupe dos líneas. */
+.ledger-right{ background:rgba(255,255,255,.12); overflow-y:auto; }
 /* Con la barra de jugadores al lado, las dos páginas sólo caben a partir de ~1100px. */
 @media (max-width:1100px){
   .ledger{ grid-template-columns:1fr; }
   .ledger::before{ display:none; }
-  .ledger-right{ max-height:420px; border-top:2px dashed var(--parchment-shadow); }
+  .ledger-right{ border-top:2px dashed var(--parchment-shadow); }
 }
 @media (max-width:480px){
   .container{ padding-left:12px; padding-right:12px; }
@@ -1494,7 +1496,7 @@ function readCoinInputs(){
   return {ok:true, values};
 }
 function coinListText(values){
-  return COIN_KEYS.filter(k=>(values[k]||0)!==0).map(k=>`${Math.abs(values[k])} ${COIN_META[k].abbr}`).join(', ');
+  return COIN_KEYS.filter(k=>(values[k]||0)!==0).map(k=>`${fmtCoin(Math.abs(values[k]))} ${COIN_META[k].abbr}`).join(', ');
 }
 function coinsToCopper(coins){
   return COIN_KEYS.reduce((total,k)=>total + (Number(coins?.[k])||0) * RATE[k], 0);
@@ -2409,7 +2411,7 @@ function showAddMoneyModal(charId){
 }
 function showConfirmAddMoney(charId, delta, reason, author, isCorrection){
   const c = state.characters.find(c=>c.id===charId);
-  const summary = COIN_KEYS.filter(k=>delta[k]>0).map(k=>`${delta[k]} ${COIN_META[k].abbr}`).join(', ');
+  const summary = coinListText(delta);
   openModal(`
     <h2 class="modal-title">Confirmar</h2>
     <p class="modal-summary">Añadirás <strong>${summary}</strong> a ${escapeHtml(c.name)}.</p>
@@ -2467,7 +2469,7 @@ function showSpendMoneyModal(charId){
     const spend = spendDeltaWithAutomaticChange(c.coins, amounts);
     if(!spend.ok){
       const missing = spend.requestedTotal - spend.currentTotal;
-      showModalError(`No hay fondos suficientes. Te faltan ${missing} PC de valor total.`);
+      showModalError(`No hay fondos suficientes. Te faltan ${fmtCoin(missing)} PC de valor total.`);
       return;
     }
     const delta = spend.delta;
@@ -2653,7 +2655,7 @@ async function showTransferModal(charId, prefill=null){
 function showConfirmTransfer(sourceId,target,amounts,reason){
   const source = state.characters.find(x=>x.id===sourceId);
   if(!source || !target) return;
-  const summary = COIN_KEYS.filter(k=>amounts[k]>0).map(k=>`${fmtCoin(amounts[k])} ${COIN_META[k].abbr}`).join(', ');
+  const summary = coinListText(amounts);
 
   openModal(`
     <h2 class="modal-title">Confirmar transferencia</h2>
@@ -2745,7 +2747,7 @@ function showExchangeModal(charId){
     if(giveType===receiveType){ preview.textContent = 'Selecciona dos monedas diferentes.'; return; }
     const receiveAmt = exchangeCalc(giveType, amountRead.value, receiveType);
     if(receiveAmt===null){ preview.textContent = 'La conversión no es exacta; cambia la cantidad.'; return; }
-    preview.innerHTML = `Entregarás <strong>${amountRead.value} ${COIN_META[giveType].abbr}</strong> y recibirás <strong>${receiveAmt} ${COIN_META[receiveType].abbr}</strong>.`;
+    preview.innerHTML = `Entregarás <strong>${fmtCoin(amountRead.value)} ${COIN_META[giveType].abbr}</strong> y recibirás <strong>${fmtCoin(receiveAmt)} ${COIN_META[receiveType].abbr}</strong>.`;
   };
   ['give-coin','give-amount','receive-coin'].forEach(id=>{
     document.getElementById(id).addEventListener('input', updateExchangePreview);
@@ -2760,7 +2762,7 @@ function showExchangeModal(charId){
     if(!amountRead.ok){ showModalError(amountRead.message); return; }
     const giveAmt = amountRead.value;
     if(giveType===receiveType){ showModalError('Elige dos monedas diferentes.'); return; }
-    if(giveAmt > (c.coins[giveType]||0)){ showModalError(`No hay suficiente ${COIN_META[giveType].label} (${COIN_META[giveType].abbr}). Disponible: ${c.coins[giveType]||0}.`); return; }
+    if(giveAmt > (c.coins[giveType]||0)){ showModalError(`No hay suficiente ${COIN_META[giveType].label} (${COIN_META[giveType].abbr}). Disponible: ${fmtCoin(c.coins[giveType])}.`); return; }
     const receiveAmt = exchangeCalc(giveType, giveAmt, receiveType);
     if(receiveAmt===null){ showModalError('Esa cantidad no permite una conversión exacta. Prueba con otra cantidad.'); return; }
     const author = state.user ? state.user.displayName : ''; 
@@ -2771,7 +2773,7 @@ function showConfirmExchange(charId, giveType, giveAmt, receiveType, receiveAmt,
   const c = state.characters.find(c=>c.id===charId);
   openModal(`
     <h2 class="modal-title">Confirmar cambio</h2>
-    <p class="modal-summary">Entregarás <strong>${giveAmt} ${COIN_META[giveType].abbr}</strong> y recibirás <strong>${receiveAmt} ${COIN_META[receiveType].abbr}</strong>.</p>
+    <p class="modal-summary">Entregarás <strong>${fmtCoin(giveAmt)} ${COIN_META[giveType].abbr}</strong> y recibirás <strong>${fmtCoin(receiveAmt)} ${COIN_META[receiveType].abbr}</strong>.</p>
     ${author?`<p class="modal-detail">Registrado por: ${escapeHtml(author)}</p>`:''}
     <div class="modal-actions">
       <button class="btn btn-secondary" id="back-btn">Atrás</button>
