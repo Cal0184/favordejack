@@ -999,3 +999,87 @@ body::before{display:none!important}
   #jack_expression_roll{width:100%}
   .jack-right-column{padding:7px;border-radius:13px}
 }
+
+/* =========================================================
+   V5 — Botón «Volver» del encabezado y etiqueta «Editar»
+   del dado personalizado con el estilo de la mesa
+   ========================================================= */
+.jack-back-button{
+  flex:none;
+  align-self:center;
+  margin-left:auto;
+  display:inline-flex;
+  align-items:center;
+  gap:9px;
+  min-height:44px;
+  padding:0 17px 0 14px;
+  border:1px solid rgba(232,209,155,.42);
+  border-radius:10px;
+  background:
+    radial-gradient(circle at 0 0,rgba(199,154,59,.14),transparent 60%),
+    linear-gradient(145deg,#2b1e15,#0f0a07);
+  color:#ead39a;
+  font:700 .78rem/1 Cinzel,serif;
+  letter-spacing:.08em;
+  text-decoration:none;
+  white-space:nowrap;
+  box-shadow:0 4px 0 rgba(0,0,0,.38),inset 0 0 0 1px rgba(0,0,0,.3);
+  transition:color .18s ease,border-color .18s ease,transform .18s ease,box-shadow .18s ease,filter .18s ease;
+}
+.jack-back-button span{
+  font:600 1.05rem/1 Inter,system-ui,sans-serif;
+  color:var(--jack-gold-2);
+  transition:transform .18s ease;
+}
+.jack-back-button:hover{
+  color:#fff1c5;
+  border-color:var(--jack-gold-2);
+  filter:brightness(1.12);
+  transform:translateY(-1px);
+  box-shadow:0 5px 0 rgba(0,0,0,.38),0 0 16px rgba(240,207,117,.16),inset 0 0 0 1px rgba(0,0,0,.3);
+}
+.jack-back-button:hover span{transform:translateX(-3px)}
+.jack-back-button:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(0,0,0,.38),inset 0 0 0 1px rgba(0,0,0,.3)}
+.jack-back-button:focus-visible{
+  outline:2px solid var(--jack-gold-2);
+  outline-offset:3px;
+  color:#fff1c5;
+  border-color:var(--jack-gold-2);
+}
+
+/* «Editar» venía con el verde y la letra de la plantilla original */
+.dice_roll_button_custom_text_2_element{
+  width:max-content!important;
+  height:24px!important;
+  border:1px solid rgba(169,216,185,.32);
+  border-radius:6px!important;
+  background:linear-gradient(135deg,#264535,var(--jack-green))!important;
+  box-shadow:0 3px 0 rgba(0,0,0,.32);
+}
+.dice_roll_button_custom_text_2{
+  height:100%;
+  display:flex;
+  align-items:center;
+  padding:0 8px;
+  cursor:pointer;
+  color:#f3ead2;
+  font:700 .66rem/1 Cinzel,serif!important;
+  letter-spacing:.06em;
+}
+.dice_roll_button_custom_text_2_element:hover{filter:brightness(1.15)}
+.dice_roll_button_custom_input{
+  background-color:#100a07!important;
+  color:#f0e4c9!important;
+  font-family:Cinzel,serif!important;
+  outline:1px solid rgba(226,190,109,.3)!important;
+  transition:outline-color .18s ease,box-shadow .18s ease;
+}
+.dice_roll_button_custom_input:focus{
+  outline-color:#d2ad5d!important;
+  box-shadow:inset -8px 8px 0 0 rgba(0,0,0,.4),0 0 0 3px rgba(210,173,93,.14)!important;
+}
+
+@media(max-width:610px){
+  .jack-hero-v2{display:grid!important;grid-template-columns:58px minmax(0,1fr);align-items:center!important}
+  .jack-back-button{grid-column:1 / -1;grid-row:1;justify-self:start;margin:0}
+}

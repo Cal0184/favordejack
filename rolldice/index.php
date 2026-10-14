@@ -48,7 +48,7 @@ function asset(string $path): string
 <h1>El Favor de <span>Jack</span></h1>
 <p class="jack-subtitle">Lanza. Mira cómo gira el destino. Acepta el resultado.</p>
 </div>
-<a class="jack-back-button" href="<?= favor_base_path() ?>" aria-label="Volver a El Favor de Jack">
+<a class="jack-back-button" href="<?= favor_url_html() ?>" aria-label="Volver a El Favor de Jack">
 <span aria-hidden="true">←</span> Volver
 </a>
 </header>
@@ -155,10 +155,10 @@ function asset(string $path): string
 <div class="dice_roll_button_custom_container responsive">
 <div class="dice_roll_button_custom_text_2_container">
 <div class="dice_roll_button_custom_text_2_element">
-<p class="dice_roll_button_custom_text_2">Editar</p>
+<label class="dice_roll_button_custom_text_2" for="dice_roll_button_custom_input">Editar</label>
 </div>
 </div>
-<input class="dice_roll_button_custom_input" id="dice_roll_button_custom_input" onchange="setCustomRollDice()" value="16"/>
+<input aria-label="Caras del dado personalizado" class="dice_roll_button_custom_input" id="dice_roll_button_custom_input" onchange="setCustomRollDice()" value="16"/>
 </div>
 </div>
 </div>
