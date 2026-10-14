@@ -255,7 +255,8 @@ h1,h2,h3,.display{ font-family:'Cinzel', Georgia, serif; letter-spacing:.02em; }
   flex:0 0 125px;
   margin:0 auto 12px;
   padding:0;
-  overflow:hidden;
+  /* Sin recorte: el icono "respira" (translate) y su sombra deben verse completos. */
+  overflow:visible;
   border:0;
   border-radius:0;
   box-shadow:none;
@@ -270,8 +271,11 @@ h1,h2,h3,.display{ font-family:'Cinzel', Georgia, serif; letter-spacing:.02em; }
   margin:0 !important;
   padding:0 !important;
   border:0 !important;
-  object-fit:contain;
-  object-position:center;
+  /* Rellena siempre el marco cuadrado; las esquinas redondeadas ocultan el fondo negro del arte. */
+  object-fit:cover;
+  object-position:50% 25%;
+  border-radius:8px;
+  background:rgba(91,70,50,.12);
   transform:none !important;
   filter:drop-shadow(0 7px 8px rgba(40,23,12,.2));
   animation:portraitBreathe 4.2s ease-in-out infinite;
@@ -330,11 +334,14 @@ h1,h2,h3,.display{ font-family:'Cinzel', Georgia, serif; letter-spacing:.02em; }
 }
 .ledger-page{ padding:26px 24px; }
 .ledger-left{ border-right:none; }
-.ledger-right{ background:rgba(255,255,255,.12); max-height:560px; overflow-y:auto; }
-@media (max-width:760px){
+/* Sin alto fijo: el historial (3 movimientos por página) y su paginación caben siempre sin
+   barra de desplazamiento interna, aunque las cifras sean grandes o el motivo ocupe dos líneas. */
+.ledger-right{ background:rgba(255,255,255,.12); overflow-y:auto; }
+/* Con la barra de jugadores al lado, las dos páginas sólo caben a partir de ~1100px. */
+@media (max-width:1100px){
   .ledger{ grid-template-columns:1fr; }
   .ledger::before{ display:none; }
-  .ledger-right{ max-height:420px; border-top:2px dashed var(--parchment-shadow); }
+  .ledger-right{ border-top:2px dashed var(--parchment-shadow); }
 }
 @media (max-width:480px){
   .container{ padding-left:12px; padding-right:12px; }
@@ -356,21 +363,23 @@ h1,h2,h3,.display{ font-family:'Cinzel', Georgia, serif; letter-spacing:.02em; }
   align-self:stretch;
   display:flex; align-items:center; justify-content:center;
 }
+/* El retrato es una figura de cuerpo entero con fondo transparente: se ajusta al alto
+   real del marco (en móvil también) para no cortar cabeza ni pies. */
 .bank-character-art img{
-  position:static; width:100%; height:430px; max-width:100%; max-height:430px;
+  position:absolute; inset:0; width:100%; height:100%; max-width:100%; max-height:100%;
   object-fit:contain; object-position:center center; display:block;
 }
 .bank-details{ min-width:0; display:flex; flex-direction:column; justify-content:center; }
 .bank-main-text-only{ grid-template-columns:1fr; }
 .bank-header{ text-align:center; margin-bottom:12px; }
 .bank-name{ font-size:1.5rem; color:var(--burgundy-dark); }
-.bank-total{ font-size:1rem; color:var(--ink-soft); margin-top:2px; }
-.bank-total strong{ color:var(--gold-bright); background:var(--ink); padding:1px 8px; border-radius:6px; }
+.bank-total{ font-size:1.05rem; color:var(--ink-soft); margin-top:2px; }
+.bank-total strong{ display:inline-block; color:var(--gold-bright); background:var(--ink); padding:2px 10px; border-radius:6px; font-size:1.3rem; line-height:1.25; font-variant-numeric:lining-nums; overflow-wrap:anywhere; }
 
 .coin-pouch-row{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin:14px 0; }
 .coin-pouch{
   position:relative;overflow:hidden;background:rgba(255,255,255,.35); border:1px solid var(--parchment-shadow); border-radius:10px;
-  padding:12px 6px; text-align:center;
+  padding:12px 6px; text-align:center; container-type:inline-size;
 }
 .coin-pouch::after{content:"";position:absolute;top:-60%;left:-85%;width:55%;height:220%;transform:rotate(24deg);background:linear-gradient(90deg,transparent,#fff9,transparent);animation:coinShine 4.8s ease-in-out infinite}
 .coin-pouch:nth-child(2)::after{animation-delay:1.1s}.coin-pouch:nth-child(3)::after{animation-delay:2.2s}.coin-pouch:nth-child(4)::after{animation-delay:3.3s}
@@ -385,8 +394,11 @@ h1,h2,h3,.display{ font-family:'Cinzel', Georgia, serif; letter-spacing:.02em; }
 .coin-po circle{ fill:var(--po); stroke:var(--po-dark); } .coin-po .coin-mark{ fill:var(--po-dark); }
 .coin-pl circle{ fill:var(--pl); stroke:var(--pl-dark); } .coin-pl .coin-mark{ fill:var(--pl-dark); }
 .coin-pc circle{ fill:var(--pc); stroke:var(--pc-dark); } .coin-pc .coin-mark{ fill:var(--pc-dark); }
-.coin-pouch .coin-abbr{ font-family:'Cinzel', serif; font-size:.75rem; color:var(--ink-soft); letter-spacing:.05em; }
-.coin-pouch .coin-count{ font-size:1.25rem; font-weight:600; }
+.coin-pouch .coin-abbr{ font-family:'Cinzel', serif; font-size:.8rem; color:var(--ink-soft); letter-spacing:.05em; }
+.coin-pouch .coin-count{ font-size:1.9rem; font-size:min(1.9rem,33cqi); font-weight:600; line-height:1.15; color:var(--ink); font-variant-numeric:lining-nums tabular-nums; overflow-wrap:anywhere; }
+/* Cifras largas (p. ej. 1.000.000) se reducen según el ancho de la bolsa para no desbordar. */
+.coin-pouch .coin-count.is-long{ font-size:1.4rem; font-size:min(1.5rem,23cqi); }
+.coin-pouch .coin-count.is-xlong{ font-size:1.05rem; font-size:min(1.15rem,16cqi); }
 
 .action-row{ display:flex; gap:10px; flex-wrap:wrap; margin-top:6px; }
 .action-row .btn{ flex:1; min-width:140px; }
@@ -396,7 +408,7 @@ h1,h2,h3,.display{ font-family:'Cinzel', Georgia, serif; letter-spacing:.02em; }
 }
 @media (max-width:480px){
   .bank-main{ grid-template-columns:1fr; }
-  .bank-character-art{ height:300px; min-height:300px; align-self:auto; }
+  .bank-character-art{ height:340px; min-height:340px; align-self:auto; }
 }
 
 .ledger-title{ font-size:1.1rem; color:var(--burgundy-dark); margin:0 0 14px; text-align:center; }
@@ -414,8 +426,9 @@ h1,h2,h3,.display{ font-family:'Cinzel', Georgia, serif; letter-spacing:.02em; }
 .history-date{ font-size:.78rem; color:var(--ink-soft); white-space:nowrap; }
 .history-delta{ margin-top:3px; }
 .history-meta{ font-size:.82rem; color:var(--ink-soft); font-style:italic; margin-top:2px; }
-.history-result{ font-size:.78rem; color:var(--ink-soft); margin-top:4px; }
-.coin-tag{ display:inline-block; padding:0 4px; border-radius:4px; font-weight:600; }
+.history-result{ font-size:.9rem; color:var(--ink-soft); margin-top:4px; }
+.history-result strong{ color:var(--ink); font-weight:600; font-variant-numeric:lining-nums; }
+.coin-tag{ display:inline-block; padding:1px 7px; margin:2px 0; border-radius:5px; font-weight:600; font-size:1.1rem; font-variant-numeric:lining-nums; }
 
 /* ---------- modal ---------- */
 #modal-overlay{
@@ -444,6 +457,7 @@ h1,h2,h3,.display{ font-family:'Cinzel', Georgia, serif; letter-spacing:.02em; }
   font-family:'EB Garamond', serif; font-size:1rem; padding:9px 10px; border-radius:8px;
   border:1px solid var(--parchment-shadow); background:#fff8ea; box-sizing:border-box; width:100%; min-width:0;
 }
+.coin-input input{ font-size:1.15rem; font-variant-numeric:lining-nums; }
 .text-input, .select-input{ display:block; font-size:.85rem; color:var(--ink-soft); margin-bottom:12px; }
 .text-input input, .select-input select{ width:100%; margin-top:4px; }
 .checkbox-input{ font-size:.88rem; color:var(--ink-soft); display:flex; align-items:center; gap:8px; margin-bottom:12px; }
@@ -603,6 +617,10 @@ h1,h2,h3,.display{ font-family:'Cinzel', Georgia, serif; letter-spacing:.02em; }
 .history-pagination button:disabled{opacity:.45;cursor:default}
 .history-page-label{font-size:.82rem;color:var(--ink-soft)}
 .transfer-note{margin:-2px 0 12px;text-align:center;color:var(--ink-soft);font-size:.86rem;font-style:italic}
+.transfer-recipient{margin:4px 0 14px;padding:10px 10px 0;border:1px solid rgba(126,91,45,.22);border-radius:10px;background:rgba(255,248,234,.45)}
+.transfer-recipient .select-input{font-family:'Cinzel',serif;font-size:.8rem}
+.transfer-recipient select{font-size:1.05rem}
+.select-input select:disabled{opacity:.6;cursor:not-allowed}
 @media(max-width:680px){
   .container{margin:10px 8px 18px;padding:18px 12px 56px;border-radius:16px}
   .session-bar{
@@ -696,7 +714,8 @@ h1,h2,h3,.display{ font-family:'Cinzel', Georgia, serif; letter-spacing:.02em; }
 .workspace-heading{min-width:0;flex:1}
 .workspace-heading h2{margin:0;color:var(--burgundy-dark);font-size:clamp(1.2rem,2vw,1.65rem)}
 .workspace-handle{color:var(--gold);font-family:'Cinzel',serif;font-size:.75rem;margin-top:1px}
-.workspace-meta{color:var(--ink-soft);font-size:.82rem;margin-top:3px}
+.workspace-meta{color:var(--ink-soft);font-size:.9rem;margin-top:3px}
+.workspace-meta strong{color:var(--burgundy-dark);font-size:1.12em;font-weight:600;font-variant-numeric:lining-nums}
 .workspace-actions{display:flex;align-items:center;justify-content:flex-end;gap:7px;flex-wrap:wrap}
 .workspace-actions .btn{padding:8px 12px;font-size:.72rem}
 .limit-note{display:inline-flex;align-items:center;padding:7px 10px;border:1px solid rgba(110,31,44,.28);border-radius:8px;background:rgba(110,31,44,.06);color:#6e1f2c;font-size:.78rem;font-weight:600}
@@ -707,12 +726,19 @@ h1,h2,h3,.display{ font-family:'Cinzel', Georgia, serif; letter-spacing:.02em; }
 .character-card-main{display:grid;grid-template-columns:112px minmax(0,1fr);gap:13px;align-items:start}
 .characters-grid .character-card .portrait-frame{width:112px;height:112px;flex-basis:112px;margin:0}
 .characters-grid .character-card .portrait-frame .portrait-img{width:112px !important;height:112px !important}
-.character-card-copy{min-width:0}
+.character-card-copy{min-width:0;container-type:inline-size}
 .characters-grid .character-name{font-size:1rem;margin:0 0 2px;color:var(--burgundy-dark)}
-.characters-grid .character-wealth{font-size:.78rem;margin:0 0 7px}
-.characters-grid .mini-coins{margin:6px 0 7px;gap:4px}
-.characters-grid .mini-coin{font-size:.62rem;padding:3px 1px}
-.characters-grid .mini-coin strong{font-size:.77rem}
+.characters-grid .character-wealth{font-size:.92rem;margin:0 0 7px}
+.characters-grid .character-wealth strong{color:var(--ink);font-size:1.08em;font-weight:600;font-variant-numeric:lining-nums}
+/* Las monedas se reparten en 4 columnas sólo si caben cifras grandes; si no, 2×2. */
+.characters-grid .mini-coins{grid-template-columns:repeat(4,minmax(0,1fr));margin:7px 0 8px;gap:5px}
+.characters-grid .mini-coin{padding:5px 4px 4px;text-align:center;font-family:'Cinzel',serif;font-size:.68rem;letter-spacing:.04em;min-width:0;container-type:inline-size}
+.characters-grid .mini-coin strong{font-family:'EB Garamond',serif;font-size:1.35rem;font-size:min(1.35rem,33cqi);line-height:1.1;letter-spacing:0;font-variant-numeric:lining-nums tabular-nums;overflow-wrap:anywhere}
+.characters-grid .mini-coin strong.is-long{font-size:1rem;font-size:min(1.1rem,23cqi)}
+.characters-grid .mini-coin strong.is-xlong{font-size:.74rem;font-size:min(.9rem,16cqi)}
+@container (max-width:360px){
+  .characters-grid .mini-coins{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
 .characters-grid .character-description{min-height:0;margin:5px 0 0;font-size:.76rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .character-card-footer{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;padding-top:9px;border-top:1px solid rgba(91,70,50,.16)}
 .character-card-footer .btn{padding:7px 11px;font-size:.7rem}
@@ -759,7 +785,7 @@ h1,h2,h3,.display{ font-family:'Cinzel', Georgia, serif; letter-spacing:.02em; }
   .character-card-main{grid-template-columns:86px minmax(0,1fr);gap:10px}
   .characters-grid .character-card .portrait-frame{width:86px;height:86px}
   .characters-grid .character-card .portrait-frame .portrait-img{width:86px !important;height:86px !important}
-  .characters-grid .mini-coins{grid-template-columns:repeat(2,1fr)}
+  .characters-grid .mini-coins{grid-template-columns:repeat(2,minmax(0,1fr))}
   .character-card-footer{align-items:flex-start;flex-direction:column}
   .workspace-actions{padding-left:0}
 }
@@ -1439,6 +1465,14 @@ function totalGold(coins){
 function fmtGold(n){
   return n.toLocaleString('es-CL', {maximumFractionDigits:2});
 }
+function fmtCoin(n){
+  return (Number(n)||0).toLocaleString('es-CL', {maximumFractionDigits:0});
+}
+// Clase de tamaño para cifras largas: evita desbordes con saldos como 1.000.000.
+function coinFigureClass(text){
+  const length = String(text).length;
+  return length > 9 ? 'is-xlong' : length > 6 ? 'is-long' : '';
+}
 function exchangeCalc(giveType, giveAmt, receiveType){
   const copper = giveAmt * RATE[giveType];
   if(copper % RATE[receiveType] !== 0) return null;
@@ -1462,7 +1496,7 @@ function readCoinInputs(){
   return {ok:true, values};
 }
 function coinListText(values){
-  return COIN_KEYS.filter(k=>(values[k]||0)!==0).map(k=>`${Math.abs(values[k])} ${COIN_META[k].abbr}`).join(', ');
+  return COIN_KEYS.filter(k=>(values[k]||0)!==0).map(k=>`${fmtCoin(Math.abs(values[k]))} ${COIN_META[k].abbr}`).join(', ');
 }
 function coinsToCopper(coins){
   return COIN_KEYS.reduce((total,k)=>total + (Number(coins?.[k])||0) * RATE[k], 0);
@@ -1775,8 +1809,8 @@ function renderCharacters(){
   const limitReached=!special && chars.length>=5;
   const heading=special ? displayPlayerName(player) : `Personajes de ${escapeHtml(player.name)}`;
   const subtitle=special
-    ? (specialPlayerKey(player)==='muertos' ? 'Archivo de personajes fallecidos.' : ['personajes fuera','retirados'].includes(specialPlayerKey(player)) ? 'Personajes retirados o fuera de actividad.' : 'Personajes no jugadores de la campaña.')
-    : `${chars.length}/5 personajes activos · ${fmtGold(wealth)} PO en total`;
+    ? escapeHtml(specialPlayerKey(player)==='muertos' ? 'Archivo de personajes fallecidos.' : ['personajes fuera','retirados'].includes(specialPlayerKey(player)) ? 'Personajes retirados o fuera de actividad.' : 'Personajes no jugadores de la campaña.')
+    : `${chars.length}/5 personajes activos · <strong>${escapeHtml(fmtGold(wealth))}&nbsp;PO</strong> en total`;
 
   title.innerHTML=`
     <div class="workspace-hero">
@@ -1784,7 +1818,7 @@ function renderCharacters(){
       <div class="workspace-heading">
         <h2>${heading}</h2>
         ${!special && playerHandle(player) ? `<div class="workspace-handle">#${escapeHtml(playerHandle(player))}</div>` : ''}
-        <div class="workspace-meta">${escapeHtml(subtitle)}</div>
+        <div class="workspace-meta">${subtitle}</div>
         ${canEditPlayer(player.id) && !special ? `<div class="profile-tools">
           <button class="mini-btn" onclick="showPlayerEmojiModal('${player.id}')">Emblema</button>
           <button class="mini-btn" onclick="showPlayerHandleModal('${player.id}')">${playerHandle(player)?'#subnombre':'Definir #subnombre'}</button>
@@ -1824,8 +1858,11 @@ function renderCharacters(){
         <div class="character-card-copy">
           ${statusBadge}
           <div class="character-name">${escapeHtml(c.name)}</div>
-          <div class="character-wealth">Riqueza equivalente: ${fmtGold(total)} PO</div>
-          <div class="mini-coins">${COIN_KEYS.map(k=>`<div class="mini-coin mini-${k}"><strong>${c.coins[k]||0}</strong>${COIN_META[k].abbr}</div>`).join('')}</div>
+          <div class="character-wealth">Riqueza equivalente: <strong>${fmtGold(total)}&nbsp;PO</strong></div>
+          <div class="mini-coins">${COIN_KEYS.map(k=>{
+            const amount=fmtCoin(c.coins[k]);
+            return `<div class="mini-coin mini-${k}" title="${COIN_META[k].label}"><strong class="${coinFigureClass(amount)}">${amount}</strong>${COIN_META[k].abbr}</div>`;
+          }).join('')}</div>
           ${c.description?`<div class="character-description">${escapeHtml(c.description)}</div>`:''}
         </div>
       </div>
@@ -1855,13 +1892,16 @@ async function renderBank(){
   const total = totalGold(c.coins);
   const textOnly = isTextOnlyCharacter(c);
 
-  const pouches = COIN_KEYS.map(k=>`
+  const pouches = COIN_KEYS.map(k=>{
+    const amount = fmtCoin(c.coins[k]);
+    return `
     <div class="coin-pouch coin-${k}" title="${COIN_META[k].label}">
       ${coinIconSVG(k)}
       <div class="coin-abbr">${COIN_META[k].abbr}</div>
-      <div class="coin-count">${c.coins[k]||0}</div>
+      <div class="coin-count ${coinFigureClass(amount)}">${amount}</div>
       <div style="font-size:.72rem;color:var(--ink-soft);margin-top:2px;">${COIN_META[k].label}</div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 
   const newestFirst = movements.slice().reverse();
   const pageSize = 3;
@@ -1874,10 +1914,10 @@ async function renderBank(){
   const historyHtml = pageItems.map(mv=>{
     const deltaParts = COIN_KEYS.filter(k=>mv.delta[k]).map(k=>{
       const v = mv.delta[k];
-      const sign = v>0? '+':'';
-      return `<span class="coin-tag ${v>0?'positive':'negative'}">${sign}${v} ${COIN_META[k].abbr}</span>`;
+      const sign = v>0? '+':'-';
+      return `<span class="coin-tag ${v>0?'positive':'negative'}">${sign}${fmtCoin(Math.abs(v))} ${COIN_META[k].abbr}</span>`;
     }).join(' ');
-    const resultParts = COIN_KEYS.map(k=>`${mv.resultBalance[k]} ${COIN_META[k].abbr}`).join(' · ');
+    const resultParts = COIN_KEYS.map(k=>`<strong>${fmtCoin(mv.resultBalance[k])}</strong> ${COIN_META[k].abbr}`).join(' · ');
     return `<div class="history-item">
       <div class="history-top">
         <span class="history-type ${mv.type}">${TYPE_LABEL[mv.type]||mv.type}</span>
@@ -2371,7 +2411,7 @@ function showAddMoneyModal(charId){
 }
 function showConfirmAddMoney(charId, delta, reason, author, isCorrection){
   const c = state.characters.find(c=>c.id===charId);
-  const summary = COIN_KEYS.filter(k=>delta[k]>0).map(k=>`${delta[k]} ${COIN_META[k].abbr}`).join(', ');
+  const summary = coinListText(delta);
   openModal(`
     <h2 class="modal-title">Confirmar</h2>
     <p class="modal-summary">Añadirás <strong>${summary}</strong> a ${escapeHtml(c.name)}.</p>
@@ -2404,7 +2444,7 @@ function showSpendMoneyModal(charId){
     <h2 class="modal-title">Gastar dinero</h2>
     <p class="modal-detail">${escapeHtml(c.name)}</p>
     <div class="coin-inputs">
-      ${COIN_KEYS.map(k=>`<label class="coin-input coin-${k}"><span>${COIN_META[k].abbr} (tienes ${c.coins[k]||0})</span><input type="number" min="0" step="1" inputmode="numeric" value="0" data-coin="${k}"></label>`).join('')}
+      ${COIN_KEYS.map(k=>`<label class="coin-input coin-${k}"><span>${COIN_META[k].abbr} (tienes ${fmtCoin(c.coins[k])})</span><input type="number" min="0" step="1" inputmode="numeric" value="0" data-coin="${k}"></label>`).join('')}
     </div>
     <label class="text-input">Motivo (opcional)<textarea id="reason-input" class="spend-reason" maxlength="255" rows="1" placeholder="Ej: compra de suministros, posada, equipo…"></textarea></label>
     <p class="modal-detail">El movimiento quedará registrado con tu sesión.</p>
@@ -2429,7 +2469,7 @@ function showSpendMoneyModal(charId){
     const spend = spendDeltaWithAutomaticChange(c.coins, amounts);
     if(!spend.ok){
       const missing = spend.requestedTotal - spend.currentTotal;
-      showModalError(`No hay fondos suficientes. Te faltan ${missing} PC de valor total.`);
+      showModalError(`No hay fondos suficientes. Te faltan ${fmtCoin(missing)} PC de valor total.`);
       return;
     }
     const delta = spend.delta;
@@ -2470,7 +2510,33 @@ function showConfirmSpendMoney(charId, delta, reason, author, isCorrection){
 
 
 /* ---- transfer between characters ---- */
-async function showTransferModal(charId){
+// Agrupa los destinatarios por jugador (en el orden que entrega el servidor) para elegir
+// primero el jugador y después su personaje, en lugar de una única lista interminable.
+function groupTransferTargets(targets){
+  const groups = [];
+  const byPlayer = new Map();
+  targets.forEach(t=>{
+    const key = String(t.playerId || t.playerName);
+    let group = byPlayer.get(key);
+    if(!group){
+      const player = state.players.find(p=>p.id===t.playerId);
+      group = {
+        id:key,
+        name: player ? displayPlayerName(player) : t.playerName,
+        special: !!player && isSpecialPlayer(player),
+        targets:[]
+      };
+      byPlayer.set(key, group);
+      groups.push(group);
+    }
+    t.playerLabel = group.name;
+    group.targets.push(t);
+  });
+  groups.forEach(g=>g.targets.sort((a,b)=>String(a.name).localeCompare(String(b.name),'es',{sensitivity:'base',ignorePunctuation:true})));
+  return groups;
+}
+
+async function showTransferModal(charId, prefill=null){
   const c = state.characters.find(x=>x.id===charId);
   if(!c) return;
 
@@ -2492,16 +2558,32 @@ async function showTransferModal(charId){
       return;
     }
 
+    const groups = groupTransferTargets(targets);
+    const playerOption = g=>`<option value="${escapeHtml(g.id)}">${escapeHtml(g.name)} · ${g.targets.length} personaje${g.targets.length===1?'':'s'}</option>`;
+    const normalGroups = groups.filter(g=>!g.special);
+    const specialGroups = groups.filter(g=>g.special);
+    const playerOptions = specialGroups.length
+      ? `${normalGroups.length?`<optgroup label="Jugadores">${normalGroups.map(playerOption).join('')}</optgroup>`:''}<optgroup label="Archivo">${specialGroups.map(playerOption).join('')}</optgroup>`
+      : normalGroups.map(playerOption).join('');
+
     document.querySelector('.modal-card').innerHTML = `
       <h2 class="modal-title">Transferir dinero</h2>
       <p class="modal-detail">Desde <strong>${escapeHtml(c.name)}</strong></p>
-      <label class="select-input">Personaje que recibirá
-        <select id="transfer-target">
-          ${targets.map(t=>`<option value="${escapeHtml(t.id)}">${escapeHtml(t.name)} — ${escapeHtml(t.playerName)}</option>`).join('')}
-        </select>
-      </label>
+      <div class="transfer-recipient">
+        <label class="select-input">1 · Jugador que recibirá
+          <select id="transfer-player">
+            <option value="">Elige un jugador…</option>
+            ${playerOptions}
+          </select>
+        </label>
+        <label class="select-input">2 · Personaje que recibirá
+          <select id="transfer-target" disabled>
+            <option value="">Primero elige un jugador</option>
+          </select>
+        </label>
+      </div>
       <div class="coin-inputs">
-        ${COIN_KEYS.map(k=>`<label class="coin-input coin-${k}"><span>${COIN_META[k].abbr} (tienes ${c.coins[k]||0})</span><input type="number" min="0" step="1" inputmode="numeric" value="0" data-coin="${k}"></label>`).join('')}
+        ${COIN_KEYS.map(k=>`<label class="coin-input coin-${k}"><span>${COIN_META[k].abbr} (tienes ${fmtCoin(c.coins[k])})</span><input type="number" min="0" step="1" inputmode="numeric" value="0" data-coin="${k}"></label>`).join('')}
       </div>
       <label class="text-input">Motivo (opcional)<input type="text" id="transfer-reason" maxlength="120" placeholder="Pago, préstamo, reparto..."></label>
       <div class="modal-actions">
@@ -2511,19 +2593,55 @@ async function showTransferModal(charId){
       <div id="modal-error" class="modal-error"></div>
     `;
 
+    const playerSelect = document.getElementById('transfer-player');
+    const targetSelect = document.getElementById('transfer-target');
+    const fillTargetOptions = ()=>{
+      const group = groups.find(g=>g.id===playerSelect.value);
+      if(!group){
+        targetSelect.innerHTML = '<option value="">Primero elige un jugador</option>';
+        targetSelect.disabled = true;
+        return;
+      }
+      const placeholder = group.targets.length > 1 ? '<option value="">Elige un personaje…</option>' : '';
+      targetSelect.innerHTML = placeholder + group.targets.map(t=>`<option value="${escapeHtml(t.id)}">${escapeHtml(t.name)}</option>`).join('');
+      targetSelect.disabled = false;
+    };
+    playerSelect.addEventListener('change', ()=>{
+      fillTargetOptions();
+      showModalError('');
+      if(!targetSelect.value) targetSelect.focus();
+    });
+    targetSelect.addEventListener('change', ()=>showModalError(''));
+
+    // Al volver desde la confirmación se conserva lo que ya se había elegido.
+    const previousTarget = prefill && targets.find(t=>t.id===prefill.targetId);
+    if(previousTarget){
+      playerSelect.value = String(previousTarget.playerId || previousTarget.playerName);
+      fillTargetOptions();
+      targetSelect.value = previousTarget.id;
+      COIN_KEYS.forEach(k=>{
+        const input = document.querySelector(`[data-coin="${k}"]`);
+        if(input && prefill.amounts && prefill.amounts[k]) input.value = prefill.amounts[k];
+      });
+      document.getElementById('transfer-reason').value = prefill.reason || '';
+    }else{
+      playerSelect.focus();
+    }
+
     document.getElementById('transfer-continue').onclick = ()=>{
+      const targetId = targetSelect.value;
+      const target = targets.find(t=>t.id===targetId);
+      if(!target){ showModalError('Elige el jugador y el personaje que recibirá el dinero.'); return; }
       const coinRead = readCoinInputs();
       if(!coinRead.ok){ showModalError(`${COIN_META[coinRead.coin].label}: ${coinRead.message}`); return; }
       const amounts = coinRead.values;
       if(!COIN_KEYS.some(k=>amounts[k]>0)){ showModalError('Ingresa al menos una cantidad mayor que cero.'); return; }
       for(const k of COIN_KEYS){
         if(amounts[k] > (c.coins[k]||0)){
-          showModalError(`No hay suficiente ${COIN_META[k].label}. Disponible: ${c.coins[k]||0}.`);
+          showModalError(`No hay suficiente ${COIN_META[k].label}. Disponible: ${fmtCoin(c.coins[k])}.`);
           return;
         }
       }
-      const targetId = document.getElementById('transfer-target').value;
-      const target = targets.find(t=>t.id===targetId);
       const reason = document.getElementById('transfer-reason').value.trim();
       showConfirmTransfer(charId,target,amounts,reason);
     };
@@ -2538,25 +2656,26 @@ async function showTransferModal(charId){
 function showConfirmTransfer(sourceId,target,amounts,reason){
   const source = state.characters.find(x=>x.id===sourceId);
   if(!source || !target) return;
-  const summary = COIN_KEYS.filter(k=>amounts[k]>0).map(k=>`${amounts[k]} ${COIN_META[k].abbr}`).join(', ');
+  const summary = coinListText(amounts);
 
   openModal(`
     <h2 class="modal-title">Confirmar transferencia</h2>
     <div class="transfer-confirm-card">
       <div><small>SALE DE</small><strong>${escapeHtml(source.name)}</strong></div>
       <span class="transfer-confirm-arrow">→</span>
-      <div><small>RECIBE</small><strong>${escapeHtml(target.name)}</strong><em>${escapeHtml(target.playerName)}</em></div>
+      <div><small>RECIBE</small><strong>${escapeHtml(target.name)}</strong><em>${escapeHtml(target.playerLabel || target.playerName)}</em></div>
     </div>
     <div class="transfer-confirm-amount">${summary}</div>
     ${reason?`<p class="modal-detail">Motivo: ${escapeHtml(reason)}</p>`:''}
     <label class="transfer-confirm-check"><input type="checkbox" id="transfer-confirm-check"> <span>Confirmo que revisé el destinatario y las cantidades.</span></label>
     <div class="modal-actions">
-      <button class="btn btn-secondary" onclick="showTransferModal('${sourceId}')">Atrás</button>
+      <button class="btn btn-secondary" id="transfer-back-btn">Atrás</button>
       <button class="btn btn-primary" id="confirm-transfer-btn" disabled>Confirmar y transferir</button>
     </div>
     <div id="modal-error" class="modal-error"></div>
   `);
 
+  document.getElementById('transfer-back-btn').onclick = ()=>showTransferModal(sourceId,{targetId:target.id,amounts,reason});
   const confirmCheck=document.getElementById('transfer-confirm-check');
   const confirmTransferButton=document.getElementById('confirm-transfer-btn');
   confirmCheck.addEventListener('change',()=>{confirmTransferButton.disabled=!confirmCheck.checked;});
@@ -2582,13 +2701,15 @@ function showConfirmTransfer(sourceId,target,amounts,reason){
         const targetIndex=state.characters.findIndex(item=>item.id===data.target.id);
         if(targetIndex!==-1) Object.assign(state.characters[targetIndex],data.target);
       }
+      // El historial del destinatario cambió en el servidor: se recarga al abrir su banca.
+      delete state.movementsCache[target.id];
 
       closeModal();
       toast('success',`Transferencia enviada a ${target.name}.`);
       render();
     }catch(e){
       btn.disabled = false;
-      btn.textContent = 'Transferir';
+      btn.textContent = 'Confirmar y transferir';
       showModalError(e.message || 'No se pudo completar la transferencia.');
     }
   };
@@ -2627,7 +2748,7 @@ function showExchangeModal(charId){
     if(giveType===receiveType){ preview.textContent = 'Selecciona dos monedas diferentes.'; return; }
     const receiveAmt = exchangeCalc(giveType, amountRead.value, receiveType);
     if(receiveAmt===null){ preview.textContent = 'La conversión no es exacta; cambia la cantidad.'; return; }
-    preview.innerHTML = `Entregarás <strong>${amountRead.value} ${COIN_META[giveType].abbr}</strong> y recibirás <strong>${receiveAmt} ${COIN_META[receiveType].abbr}</strong>.`;
+    preview.innerHTML = `Entregarás <strong>${fmtCoin(amountRead.value)} ${COIN_META[giveType].abbr}</strong> y recibirás <strong>${fmtCoin(receiveAmt)} ${COIN_META[receiveType].abbr}</strong>.`;
   };
   ['give-coin','give-amount','receive-coin'].forEach(id=>{
     document.getElementById(id).addEventListener('input', updateExchangePreview);
@@ -2642,7 +2763,7 @@ function showExchangeModal(charId){
     if(!amountRead.ok){ showModalError(amountRead.message); return; }
     const giveAmt = amountRead.value;
     if(giveType===receiveType){ showModalError('Elige dos monedas diferentes.'); return; }
-    if(giveAmt > (c.coins[giveType]||0)){ showModalError(`No hay suficiente ${COIN_META[giveType].label} (${COIN_META[giveType].abbr}). Disponible: ${c.coins[giveType]||0}.`); return; }
+    if(giveAmt > (c.coins[giveType]||0)){ showModalError(`No hay suficiente ${COIN_META[giveType].label} (${COIN_META[giveType].abbr}). Disponible: ${fmtCoin(c.coins[giveType])}.`); return; }
     const receiveAmt = exchangeCalc(giveType, giveAmt, receiveType);
     if(receiveAmt===null){ showModalError('Esa cantidad no permite una conversión exacta. Prueba con otra cantidad.'); return; }
     const author = state.user ? state.user.displayName : ''; 
@@ -2653,7 +2774,7 @@ function showConfirmExchange(charId, giveType, giveAmt, receiveType, receiveAmt,
   const c = state.characters.find(c=>c.id===charId);
   openModal(`
     <h2 class="modal-title">Confirmar cambio</h2>
-    <p class="modal-summary">Entregarás <strong>${giveAmt} ${COIN_META[giveType].abbr}</strong> y recibirás <strong>${receiveAmt} ${COIN_META[receiveType].abbr}</strong>.</p>
+    <p class="modal-summary">Entregarás <strong>${fmtCoin(giveAmt)} ${COIN_META[giveType].abbr}</strong> y recibirás <strong>${fmtCoin(receiveAmt)} ${COIN_META[receiveType].abbr}</strong>.</p>
     ${author?`<p class="modal-detail">Registrado por: ${escapeHtml(author)}</p>`:''}
     <div class="modal-actions">
       <button class="btn btn-secondary" id="back-btn">Atrás</button>
