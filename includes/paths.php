@@ -53,3 +53,22 @@ function favor_v(string $absolutePath): string
     $time = @filemtime($absolutePath);
     return '?v=' . ($time !== false ? $time : '1');
 }
+
+/**
+ * Tiendas: quita la foto de producto si el archivo no existe, para que se use
+ * directamente la imagen de respaldo en vez de pedir cientos de fotos que dan 404.
+ * Recorre listas y categorías anidadas de productos.json.
+ */
+function favor_shop_drop_missing_images(array $products, string $shopDir): array
+{
+    foreach ($products as $key => $value) {
+        if (!is_array($value)) continue;
+        if (isset($value['image']) && is_string($value['image']) && $value['image'] !== ''
+            && !preg_match('#^(?:https?:)?//#i', $value['image'])
+            && !is_file($shopDir . '/' . ltrim(rawurldecode($value['image']), '/'))) {
+            $value['image'] = '';
+        }
+        $products[$key] = favor_shop_drop_missing_images($value, $shopDir);
+    }
+    return $products;
+}

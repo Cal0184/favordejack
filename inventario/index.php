@@ -53,7 +53,7 @@ $config = [
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="theme-color" content="#061813">
     <title>Inventario · Favor de Jack</title>
-    <link rel="stylesheet" href="assets/inventory.css?v=13.1.1">
+    <link rel="stylesheet" href="assets/inventory.css<?= favor_v(__DIR__ . '/assets/inventory.css') ?>">
     <style>
         :root{
             --inventory-bg-image:url(<?= json_encode($visualAssets['background'], JSON_UNESCAPED_SLASHES) ?>);
@@ -283,6 +283,6 @@ $config = [
 <div class="toast-stack" id="toastStack" aria-live="polite" aria-atomic="true"></div>
 
 <script id="inventoryConfig" type="application/json"><?= json_encode($config, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) ?></script>
-<script src="assets/inventory.js?v=13.1.1" defer></script>
+<script src="assets/inventory.js<?= favor_v(__DIR__ . '/assets/inventory.js') ?>" defer></script>
 </body>
 </html>

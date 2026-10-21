@@ -11,7 +11,7 @@ $dataError = null;
 if (is_file($productsPath)) {
     $decoded = json_decode((string)file_get_contents($productsPath), true);
     if (is_array($decoded)) {
-        $products = $decoded;
+        $products = favor_shop_drop_missing_images($decoded, __DIR__);
     } else {
         $dataError = 'No fue posible leer productos.json.';
     }
@@ -43,7 +43,7 @@ $shopData = [
 <meta name="theme-color" content="#160c07">
 <title>La Dama de las Llamas · Favor de Jack</title>
 <meta name="description" content="Herrería La Dama de las Llamas. Forja, compra y venta de armas y armaduras, objetos mágicos y mejoras arcanas.">
-<link rel="stylesheet" href="style.css?v=1">
+<link rel="stylesheet" href="style.css<?= favor_v(__DIR__ . '/style.css') ?>">
 </head>
 <body>
 <?php favor_auth_widget(); ?>
@@ -270,6 +270,6 @@ $shopData = [
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script id="shopData" type="application/json"><?= json_encode($shopData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP) ?></script>
-<script src="app.js?v=1" defer></script>
+<script src="app.js<?= favor_v(__DIR__ . '/app.js') ?>" defer></script>
 </body>
 </html>

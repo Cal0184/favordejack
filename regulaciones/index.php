@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 
+require_once dirname(__DIR__) . '/includes/paths.php';
 $authPath = dirname(__DIR__) . '/includes/auth.php';
 $user = null;
 
@@ -54,7 +55,7 @@ $categories = array_keys($categories);
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cinzel+Decorative:wght@700&family=EB+Garamond:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/regulations.css">
+<link rel="stylesheet" href="assets/regulations.css<?= favor_v(__DIR__ . '/assets/regulations.css') ?>">
 </head>
 <body>
 <header class="topbar">
@@ -155,6 +156,6 @@ $categories = array_keys($categories);
     </footer>
 </main>
 
-<script src="assets/regulations.js" defer></script>
+<script src="assets/regulations.js<?= favor_v(__DIR__ . '/assets/regulations.js') ?>" defer></script>
 </body>
 </html>

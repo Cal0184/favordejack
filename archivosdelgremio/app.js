@@ -63,33 +63,11 @@
         if (!value) return '';
         if (/^(https?:|data:)/i.test(value)) return value;
 
-        if (value.startsWith(FAVOR_BASE + 'media/icons/')) {
-            return FAVOR_BASE + 'bancadigital/icons/' + value.slice((FAVOR_BASE + 'media/icons/').length);
-        }
-        if (value.startsWith(FAVOR_BASE + 'media/characters/')) {
-            return FAVOR_BASE + 'bancadigital/characters/' + value.slice((FAVOR_BASE + 'media/characters/').length);
-        }
-        if (value.startsWith('/')) return value;
-
-        if (value.startsWith('media/icons/')) {
-            return FAVOR_BASE + 'bancadigital/icons/' + value.slice('media/icons/'.length);
-        }
-        if (value.startsWith('media/characters/')) {
-            return FAVOR_BASE + 'bancadigital/characters/' + value.slice('media/characters/'.length);
-        }
-        if (value.startsWith('icons/')) {
-            return FAVOR_BASE + 'bancadigital/icons/' + value.slice('icons/'.length);
-        }
-        if (value.startsWith('characters/')) {
-            return FAVOR_BASE + 'bancadigital/characters/' + value.slice('characters/'.length);
-        }
-        if (value.startsWith('bancadigital/icons/')) {
-            return FAVOR_BASE + 'bancadigital/icons/' + value.slice('bancadigital/icons/'.length);
-        }
-        if (value.startsWith('bancadigital/characters/')) {
-            return FAVOR_BASE + 'bancadigital/characters/' + value.slice('bancadigital/characters/'.length);
-        }
-        return value;
+        // Todas las imágenes de jugadores y personajes viven en media/ (fase 2).
+        let path = value.startsWith(FAVOR_BASE) ? value.slice(FAVOR_BASE.length) : value;
+        if (path.startsWith('/')) return path;
+        path = path.replace(/^(?:bancadigital\/)?(icons|characters)\//, 'media/$1/');
+        return path.startsWith('media/') ? FAVOR_BASE + path : value;
     }
 
     function imageHtml(character, extra = '') {

@@ -25,40 +25,10 @@ function clean(?string $value): string {
 }
 
 function portrait_url(?string $url): string {
+    // Todas las imágenes de jugadores y personajes viven en media/ (fase 2);
+    // favor_asset_url() traduce las rutas antiguas de bancadigital/.
     $value = trim(str_replace('\\', '/', (string)$url));
-    if ($value === '') return '';
-
-    if (preg_match('~^(https?:|data:)~i', $value)) return $value;
-
-    if (str_starts_with($value, favor_base_path() . 'media/icons/')) {
-        return favor_base_path() . 'bancadigital/icons/' . substr($value, strlen(favor_base_path() . 'media/icons/'));
-    }
-    if (str_starts_with($value, favor_base_path() . 'media/characters/')) {
-        return favor_base_path() . 'bancadigital/characters/' . substr($value, strlen(favor_base_path() . 'media/characters/'));
-    }
-
-    if (str_starts_with($value, '/')) return $value;
-
-    if (str_starts_with($value, 'media/icons/')) {
-        return favor_base_path() . 'bancadigital/icons/' . substr($value, strlen('media/icons/'));
-    }
-    if (str_starts_with($value, 'media/characters/')) {
-        return favor_base_path() . 'bancadigital/characters/' . substr($value, strlen('media/characters/'));
-    }
-    if (str_starts_with($value, 'icons/')) {
-        return favor_base_path() . 'bancadigital/icons/' . substr($value, strlen('icons/'));
-    }
-    if (str_starts_with($value, 'characters/')) {
-        return favor_base_path() . 'bancadigital/characters/' . substr($value, strlen('characters/'));
-    }
-    if (str_starts_with($value, 'bancadigital/icons/')) {
-        return favor_base_path() . 'bancadigital/icons/' . substr($value, strlen('bancadigital/icons/'));
-    }
-    if (str_starts_with($value, 'bancadigital/characters/')) {
-        return favor_base_path() . 'bancadigital/characters/' . substr($value, strlen('bancadigital/characters/'));
-    }
-
-    return favor_asset_url($value);
+    return $value === '' ? '' : favor_asset_url($value);
 }
 
 
@@ -253,7 +223,7 @@ SQL;
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=<?= (int)(@filemtime(__DIR__ . '/style.css') ?: time()) ?>">
+    <link rel="stylesheet" href="style.css<?= favor_v(__DIR__ . '/style.css') ?>">
 </head>
 <body>
 <div class="wood-backdrop" aria-hidden="true"></div>
@@ -547,6 +517,6 @@ window.GUILD_STATE = <?= json_encode([
     'api' => 'api.php',
 ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
 </script>
-<script src="app.js?v=<?= (int)(@filemtime(__DIR__ . '/app.js') ?: time()) ?>"></script>
+<script src="app.js<?= favor_v(__DIR__ . '/app.js') ?>"></script>
 </body>
 </html>
