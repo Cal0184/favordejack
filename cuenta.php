@@ -22,6 +22,8 @@ try {
         if ($action==='save_hint') {
             $hint=trim((string)($_POST['hint'] ?? ''));
             if (mb_strlen($hint,'UTF-8')>255) throw new RuntimeException('El recordatorio no puede superar 255 caracteres.');
+            $stmt=$db->prepare('SELECT PasswordHash,Salt,PasswordIterations FROM Usuario WHERE ID=? LIMIT 1'); $stmt->bind_param('i',$id); $stmt->execute(); $pw=$stmt->get_result()->fetch_assoc(); $stmt->close();
+            if ($pw && favor_hint_reveals_password($pw,$hint)) throw new RuntimeException('El recordatorio contiene tu contraseña. Cualquiera puede leerlo desde «Olvidé mi contraseña», así que escribe solo una pista.');
             $stmt=$db->prepare('UPDATE Usuario SET PasswordHint=? WHERE ID=?'); $stmt->bind_param('si',$hint,$id); $stmt->execute(); $stmt->close();
             $notice='Recordatorio guardado.';
         } elseif ($action==='change_password') {

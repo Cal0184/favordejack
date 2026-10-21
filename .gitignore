@@ -30,3 +30,4 @@ Thumbs.db
 # --- Paquetes de respaldo (contienen datos) ---
 respaldos/*
 !respaldos/.htaccess
+tiendas/descuentos.json

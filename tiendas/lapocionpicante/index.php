@@ -1,8 +1,11 @@
 <?php
 declare(strict_types=1);
 require_once dirname(__DIR__, 2) . '/includes/auth-widget.php';
+require_once dirname(__DIR__, 2) . '/includes/descuentos.php';
 favor_session_start();
 favor_session_close();
+$discount = favor_discount_shop_data($GLOBALS['__favor_auth_widget_user'] ?? null);
+$discount['manageUrl'] = favor_base_path() . 'tiendas/descuentos.php';
 
 $productsPath = __DIR__ . '/productos.json';
 $products = [];
@@ -26,6 +29,7 @@ $shopData = [
         'seller' => 'Yamo-Yamo',
         'backUrl' => favor_base_path() . 'mapa/',
     ],
+    'discount' => $discount,
 ];
 ?>
 <!doctype html>
@@ -36,7 +40,7 @@ $shopData = [
 <meta name="theme-color" content="#120d17">
 <title>La Poción Picante · Favor de Jack</title>
 <meta name="description" content="Catálogo digital de La Poción Picante: curación, remedios, blindaje, esencias, conjuros y néctares.">
-<link rel="stylesheet" href="style.css?v=1">
+<link rel="stylesheet" href="style.css?v=2">
 </head>
 <body>
 <?php favor_auth_widget(); ?>
@@ -111,6 +115,8 @@ $shopData = [
         </div>
         <p>Los productos están agrupados por familia y subcategoría. Las fichas conservan los efectos, duraciones, aplicaciones y salvaciones indicados en el documento de la tienda.</p>
     </div>
+
+    <div class="discount-bar" id="discountBar" hidden></div>
 
     <div class="catalog-workbench">
         <div class="workbench-label"><span>Registro alquímico</span><i></i></div>
@@ -202,6 +208,6 @@ $shopData = [
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script id="shopData" type="application/json"><?= json_encode($shopData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP) ?></script>
-<script src="app.js?v=1" defer></script>
+<script src="app.js?v=2" defer></script>
 </body>
 </html>

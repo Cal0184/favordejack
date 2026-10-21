@@ -377,6 +377,7 @@ h1,h2,h3,.display{ font-family:'Cinzel', Georgia, serif; letter-spacing:.02em; }
 .bank-total strong{ display:inline-block; color:var(--gold-bright); background:var(--ink); padding:2px 10px; border-radius:6px; font-size:1.3rem; line-height:1.25; font-variant-numeric:lining-nums; overflow-wrap:anywhere; }
 
 .coin-pouch-row{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin:14px 0; }
+.coin-pouch-row.coins-3{ grid-template-columns:repeat(3,minmax(0,1fr)); }
 .coin-pouch{
   position:relative;overflow:hidden;background:rgba(255,255,255,.35); border:1px solid var(--parchment-shadow); border-radius:10px;
   padding:12px 6px; text-align:center; container-type:inline-size;
@@ -732,6 +733,7 @@ h1,h2,h3,.display{ font-family:'Cinzel', Georgia, serif; letter-spacing:.02em; }
 .characters-grid .character-wealth strong{color:var(--ink);font-size:1.08em;font-weight:600;font-variant-numeric:lining-nums}
 /* Las monedas se reparten en 4 columnas sólo si caben cifras grandes; si no, 2×2. */
 .characters-grid .mini-coins{grid-template-columns:repeat(4,minmax(0,1fr));margin:7px 0 8px;gap:5px}
+.mini-coins.coins-3,.characters-grid .mini-coins.coins-3{grid-template-columns:repeat(3,minmax(0,1fr))}
 .characters-grid .mini-coin{padding:5px 4px 4px;text-align:center;font-family:'Cinzel',serif;font-size:.68rem;letter-spacing:.04em;min-width:0;container-type:inline-size}
 .characters-grid .mini-coin strong{font-family:'EB Garamond',serif;font-size:1.35rem;font-size:min(1.35rem,33cqi);line-height:1.1;letter-spacing:0;font-variant-numeric:lining-nums tabular-nums;overflow-wrap:anywhere}
 .characters-grid .mini-coin strong.is-long{font-size:1rem;font-size:min(1.1rem,23cqi)}
@@ -1156,6 +1158,12 @@ const COIN_META = {
   pc:{label:'Cobre', abbr:'PC'}
 };
 const RATE = { ppt:1000, po:100, pl:10, pc:1 }; // valor en piezas de cobre
+// El platino ya no se usa en la mesa: no se ofrece ni se entrega como cambio.
+// Solo aparece si un personaje todavía guarda alguna pieza antigua.
+const UI_COIN_KEYS = ['po','pl','pc'];
+function shownCoinKeys(coins){
+  return (Number(coins?.ppt)||0) > 0 ? COIN_KEYS : UI_COIN_KEYS;
+}
 const TYPE_LABEL = {
   add:'Dinero añadido', spend:'Dinero gastado', exchange:'Cambio de monedas',
   initial:'Saldo inicial', correction:'Corrección'
@@ -1859,7 +1867,7 @@ function renderCharacters(){
           ${statusBadge}
           <div class="character-name">${escapeHtml(c.name)}</div>
           <div class="character-wealth">Riqueza equivalente: <strong>${fmtGold(total)}&nbsp;PO</strong></div>
-          <div class="mini-coins">${COIN_KEYS.map(k=>{
+          <div class="mini-coins coins-${shownCoinKeys(c.coins).length}">${shownCoinKeys(c.coins).map(k=>{
             const amount=fmtCoin(c.coins[k]);
             return `<div class="mini-coin mini-${k}" title="${COIN_META[k].label}"><strong class="${coinFigureClass(amount)}">${amount}</strong>${COIN_META[k].abbr}</div>`;
           }).join('')}</div>
@@ -1892,7 +1900,8 @@ async function renderBank(){
   const total = totalGold(c.coins);
   const textOnly = isTextOnlyCharacter(c);
 
-  const pouches = COIN_KEYS.map(k=>{
+  const pouchKeys = shownCoinKeys(c.coins);
+  const pouches = pouchKeys.map(k=>{
     const amount = fmtCoin(c.coins[k]);
     return `
     <div class="coin-pouch coin-${k}" title="${COIN_META[k].label}">
@@ -1917,7 +1926,7 @@ async function renderBank(){
       const sign = v>0? '+':'-';
       return `<span class="coin-tag ${v>0?'positive':'negative'}">${sign}${fmtCoin(Math.abs(v))} ${COIN_META[k].abbr}</span>`;
     }).join(' ');
-    const resultParts = COIN_KEYS.map(k=>`<strong>${fmtCoin(mv.resultBalance[k])}</strong> ${COIN_META[k].abbr}`).join(' · ');
+    const resultParts = shownCoinKeys(mv.resultBalance).map(k=>`<strong>${fmtCoin(mv.resultBalance[k])}</strong> ${COIN_META[k].abbr}`).join(' · ');
     return `<div class="history-item">
       <div class="history-top">
         <span class="history-type ${mv.type}">${TYPE_LABEL[mv.type]||mv.type}</span>
@@ -1963,7 +1972,7 @@ async function renderBank(){
               ${c.description ? `<p>${escapeHtml(c.description)}</p>` : ''}
               ${c.notes ? `<p class="notes"><strong>Notas:</strong> ${escapeHtml(c.notes)}</p>` : ''}
             </div>` : ''}
-            <div class="coin-pouch-row">${pouches}</div>
+            <div class="coin-pouch-row coins-${pouchKeys.length}">${pouches}</div>
             ${canEditCharacter(c) ? `<div class="action-row">
               <button class="btn btn-primary" onclick="showAddMoneyModal('${c.id}')">Añadir dinero</button>
               <button class="btn btn-primary" onclick="showSpendMoneyModal('${c.id}')">Gastar dinero</button>
@@ -2342,7 +2351,7 @@ function showAddCharacterModal(){
     <label class="text-input">Notas personales<textarea id="notes-input" maxlength="600" placeholder="Recordatorios, deudas, objetivos o información útil…"></textarea></label>
     <p class="modal-detail" style="text-align:left;margin-top:-4px;">Saldo inicial (opcional)</p>
     <div class="coin-inputs">
-      ${COIN_KEYS.map(k=>`<label class="coin-input coin-${k}"><span>${COIN_META[k].abbr}</span><input type="number" min="0" step="1" inputmode="numeric" value="0" data-coin="${k}"></label>`).join('')}
+      ${UI_COIN_KEYS.map(k=>`<label class="coin-input coin-${k}"><span>${COIN_META[k].abbr}</span><input type="number" min="0" step="1" inputmode="numeric" value="0" data-coin="${k}"></label>`).join('')}
     </div>
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
@@ -2381,7 +2390,7 @@ function showAddMoneyModal(charId){
     <h2 class="modal-title">Añadir dinero</h2>
     <p class="modal-detail">${escapeHtml(c.name)}</p>
     <div class="coin-inputs">
-      ${COIN_KEYS.map(k=>`<label class="coin-input coin-${k}"><span>${COIN_META[k].abbr}</span><input type="number" min="0" step="1" inputmode="numeric" value="0" data-coin="${k}"></label>`).join('')}
+      ${UI_COIN_KEYS.map(k=>`<label class="coin-input coin-${k}"><span>${COIN_META[k].abbr}</span><input type="number" min="0" step="1" inputmode="numeric" value="0" data-coin="${k}"></label>`).join('')}
     </div>
     <label class="text-input">Motivo (opcional)<textarea id="reason-input" class="spend-reason" maxlength="255" rows="1" placeholder="Ej: recompensa, venta, devolución…"></textarea></label>
     <p class="modal-detail">El movimiento quedará registrado con tu sesión.</p>
@@ -2444,7 +2453,7 @@ function showSpendMoneyModal(charId){
     <h2 class="modal-title">Gastar dinero</h2>
     <p class="modal-detail">${escapeHtml(c.name)}</p>
     <div class="coin-inputs">
-      ${COIN_KEYS.map(k=>`<label class="coin-input coin-${k}"><span>${COIN_META[k].abbr} (tienes ${fmtCoin(c.coins[k])})</span><input type="number" min="0" step="1" inputmode="numeric" value="0" data-coin="${k}"></label>`).join('')}
+      ${UI_COIN_KEYS.map(k=>`<label class="coin-input coin-${k}"><span>${COIN_META[k].abbr} (tienes ${fmtCoin(c.coins[k])})</span><input type="number" min="0" step="1" inputmode="numeric" value="0" data-coin="${k}"></label>`).join('')}
     </div>
     <label class="text-input">Motivo (opcional)<textarea id="reason-input" class="spend-reason" maxlength="255" rows="1" placeholder="Ej: compra de suministros, posada, equipo…"></textarea></label>
     <p class="modal-detail">El movimiento quedará registrado con tu sesión.</p>
@@ -2476,16 +2485,20 @@ function showSpendMoneyModal(charId){
     const reason = document.getElementById('reason-input').value.trim();
     const author = state.user ? state.user.displayName : ''; 
     const isCorrection = document.getElementById('correction-input').checked;
-    showConfirmSpendMoney(charId, delta, reason, author, isCorrection);
+    showConfirmSpendMoney(charId, delta, reason, author, isCorrection, amounts);
   };
 }
-function showConfirmSpendMoney(charId, delta, reason, author, isCorrection){
+function showConfirmSpendMoney(charId, delta, reason, author, isCorrection, amounts){
   const c = state.characters.find(c=>c.id===charId);
-  const spentCopper = -COIN_KEYS.reduce((total,k)=>total + (delta[k]||0) * RATE[k], 0);
-  const summary = coinListText(copperToCoins(spentCopper));
+  // Se muestra lo que la persona escribió (100 PL siguen siendo 100 PL), no su
+  // equivalente en monedas mayores. Si hubo que romper monedas, se detalla aparte.
+  const summary = coinListText(amounts);
+  const brokeCoins = COIN_KEYS.some(k=>(delta[k]||0) !== -(amounts[k]||0));
+  const changeText = COIN_KEYS.filter(k=>delta[k]).map(k=>`${delta[k]>0?'+':'−'}${fmtCoin(Math.abs(delta[k]))} ${COIN_META[k].abbr}`).join(', ');
   openModal(`
     <h2 class="modal-title">Confirmar</h2>
     <p class="modal-summary">Gastarás <strong>${summary}</strong> de ${escapeHtml(c.name)}.</p>
+    ${brokeCoins?`<p class="modal-detail">Como no tienes justo esas monedas, se cobrará así (con cambio automático): ${changeText}.</p>`:''}
     ${reason?`<p class="modal-detail">Motivo: ${escapeHtml(reason)}</p>`:''}
     ${author?`<p class="modal-detail">Registrado por: ${escapeHtml(author)}</p>`:''}
     <div class="modal-actions">
@@ -2583,7 +2596,7 @@ async function showTransferModal(charId, prefill=null){
         </label>
       </div>
       <div class="coin-inputs">
-        ${COIN_KEYS.map(k=>`<label class="coin-input coin-${k}"><span>${COIN_META[k].abbr} (tienes ${fmtCoin(c.coins[k])})</span><input type="number" min="0" step="1" inputmode="numeric" value="0" data-coin="${k}"></label>`).join('')}
+        ${shownCoinKeys(c.coins).map(k=>`<label class="coin-input coin-${k}"><span>${COIN_META[k].abbr} (tienes ${fmtCoin(c.coins[k])})</span><input type="number" min="0" step="1" inputmode="numeric" value="0" data-coin="${k}"></label>`).join('')}
       </div>
       <label class="text-input">Motivo (opcional)<input type="text" id="transfer-reason" maxlength="120" placeholder="Pago, préstamo, reparto..."></label>
       <div class="modal-actions">
@@ -2720,15 +2733,16 @@ function showConfirmTransfer(sourceId,target,amounts,reason){
 function showExchangeModal(charId){
   const c = state.characters.find(c=>c.id===charId);
   const options = k=>`<option value="${k}">${COIN_META[k].label} (${COIN_META[k].abbr})</option>`;
+  const giveKeys = shownCoinKeys(c.coins);
   openModal(`
     <h2 class="modal-title">Cambiar monedas</h2>
     <p class="modal-detail">${escapeHtml(c.name)}</p>
     <label class="select-input">Moneda que entregarás
-      <select id="give-coin">${COIN_KEYS.map(options).join('')}</select>
+      <select id="give-coin">${giveKeys.map(options).join('')}</select>
     </label>
     <label class="text-input">Cantidad a entregar<input type="number" min="1" step="1" inputmode="numeric" id="give-amount" value="1"></label>
     <label class="select-input">Moneda que recibirás
-      <select id="receive-coin">${COIN_KEYS.map(options).join('')}</select>
+      <select id="receive-coin">${UI_COIN_KEYS.map(options).join('')}</select>
     </label>
     <div id="exchange-preview" class="operation-preview">Elige las monedas y una cantidad para ver el cambio.</div>
     <p class="modal-detail">El movimiento quedará registrado con tu sesión.</p>
@@ -2738,7 +2752,8 @@ function showExchangeModal(charId){
     </div>
     <div id="modal-error" class="modal-error"></div>
   `);
-  document.getElementById('receive-coin').value = COIN_KEYS[1];
+  document.getElementById('give-coin').value = 'po';
+  document.getElementById('receive-coin').value = 'pl';
   const updateExchangePreview = ()=>{
     const giveType = document.getElementById('give-coin').value;
     const receiveType = document.getElementById('receive-coin').value;
