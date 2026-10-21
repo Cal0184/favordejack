@@ -163,7 +163,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 emporio_update_json(EMPORIO_CATALOG_FILE, static fn(array $raw): array => normalize_catalog($raw) + normalize_catalog($back));
                 @unlink($dir . '/catalog-retirado.json');
             }
-            $notice = "Devolví $restored archivo(s) a la tienda. Si siguen siendo duplicados, la tienda los vuelve a ocultar hasta que marques «Mostrar las dos».";
+            // Quita las carpetas que quedaron vacías.
+            $dirs = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST);
+            foreach ($dirs as $d) if ($d->isDir()) @rmdir($d->getPathname());
+            @rmdir($dir);
+            $notice = "Devolví $restored archivo(s) a la tienda. Si siguen siendo duplicados, la tienda los vuelve a ocultar hasta que marques «Son objetos distintos».";
         }
     } catch (Throwable $ex) {
         $error = $ex->getMessage();
