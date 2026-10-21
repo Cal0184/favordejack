@@ -19,7 +19,7 @@
   },
   {
     "id": "nuevo-emporio",
-    "name": "El Nuevo Emporio",
+    "name": "El Emporio de Ecix's",
     "category": "Objetos mágicos · Curiosidades",
     "description": "Objetos mágicos, servicios y mercancía extraordinaria.",
     "url": "tiendas/emporio/",
@@ -31,7 +31,7 @@
     "sellers": [
       {
         "name": "Ecix's",
-        "image": "../media/shops/ecix/ecix.png",
+        "image": "../media/shops/ecix/ecix-260.webp",
         "fallback": "../media/shops/ecix/ecix-fallback.svg"
       }
     ]

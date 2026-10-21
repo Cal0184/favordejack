@@ -42,3 +42,14 @@ function favor_url_html(string $path = ''): string
 {
     return htmlspecialchars(favor_url($path), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
+
+/**
+ * «?v=fecha» para CSS, JS e imágenes propias: el navegador las guarda en caché
+ * mucho tiempo (ver .htaccess) y las vuelve a pedir solo cuando cambia el archivo.
+ * Uso: href="style.css<?= favor_v(__DIR__ . '/style.css') ?>"
+ */
+function favor_v(string $absolutePath): string
+{
+    $time = @filemtime($absolutePath);
+    return '?v=' . ($time !== false ? $time : '1');
+}
