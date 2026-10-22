@@ -95,6 +95,60 @@ function img_db_refs(): array
     return array_keys($refs);
 }
 
+/**
+ * Rutas que la Banca prueba sola cuando un personaje no tiene imagen guardada
+ * media/{icons,characters}/<jugador>/<personaje>.webp (como characterImagePath).
+ */
+function img_auto_paths(): array
+{
+    $aliases = ['aliche de fleur' => 'aliche', 'julieta ciero' => 'julieta', 'pahnaetiel' => 'pan', 'samantha masoch' => 'samantha', 'iván greco' => 'ivangreco'];
+    $name = static fn(string $v): string => str_replace(['<', '>', ':', '"', '/', '\\', '|', '?', '*'], '', mb_strtolower(trim($v), 'UTF-8'));
+    $out = [];
+    $db = favor_db();
+    try {
+        $res = $db->query('SELECT j.Nombre AS jugador, p.Nombre AS personaje, p.IconUrl AS icons, p.PortraitUrl AS characters FROM Personaje p JOIN Jugador j ON j.ID = p.Jugador');
+        while ($row = $res->fetch_assoc()) {
+            $player = $name((string)$row['jugador']);
+            $file = $name((string)$row['personaje']);
+            $file = $aliases[$file] ?? $file;
+            if ($player === '' || $file === '') continue;
+            foreach (['icons', 'characters'] as $folder) {
+                if (trim((string)$row[$folder]) === '') $out["media/$folder/$player/$file.webp"] = true;
+            }
+        }
+    } finally {
+        $db->close();
+    }
+    return $out;
+}
+
+/**
+ * Misma imagen guardada con varios nombres dentro de media/ (por ejemplo
+ * «theragazos» y «theregazos»): se queda la que usa la web y el resto sobra.
+ * Si ninguna se usa, se queda una (la de nombre más limpio).
+ */
+function img_same_content_extras(array $files, array $used): array
+{
+    $bySize = [];
+    foreach ($files as $f) $bySize[(int)@filesize(IMG_ROOT . '/' . $f)][] = $f;
+    $extras = [];
+    foreach ($bySize as $same) {
+        if (count($same) < 2) continue;
+        $byHash = [];
+        foreach ($same as $f) $byHash[(string)@md5_file(IMG_ROOT . '/' . $f)][] = $f;
+        foreach ($byHash as $group) {
+            if (count($group) < 2) continue;
+            $keep = array_values(array_filter($group, static fn(string $f): bool => isset($used[$f])));
+            if (!$keep) {
+                usort($group, static fn(string $a, string $b): int => [str_contains($a, '#U'), $a !== mb_strtolower($a, 'UTF-8'), strlen($a)] <=> [str_contains($b, '#U'), $b !== mb_strtolower($b, 'UTF-8'), strlen($b)]);
+                $keep = [$group[0]];
+            }
+            foreach ($group as $f) if (!in_array($f, $keep, true)) $extras[] = $f;
+        }
+    }
+    return $extras;
+}
+
 function img_move(string $relative, string $toDir): bool
 {
     $from = IMG_ROOT . '/' . $relative;
@@ -229,6 +283,10 @@ function img_plan(): array
         }
         if ($twinUsed || ($fixed !== $f && isset($final[$fixed]))) $retire[] = $f;
     }
+
+    $used = $refSet + img_auto_paths();
+    $remaining = array_values(array_filter($media, static fn(string $f): bool => !in_array($f, $retire, true)));
+    foreach (img_same_content_extras($remaining, $used) as $f) $retire[] = $f;
 
     $big = [];
     foreach (array_keys($final) as $f) {
