@@ -201,8 +201,17 @@ function img_tree_bytes(string $relative): int
 function img_replaced(): array
 {
     $out = [];
+    // Carpetas que la web usa: si alguna es un enlace que apunta dentro de lo que
+    // se iba a apartar (p. ej. Cartas → emporio/Cartas), eso no se toca.
+    $live = array_filter(array_map(static fn(string $d): string|false => realpath(IMG_ROOT . '/' . $d), ['tiendas/emporio/Cartas', 'tiendas/emporio', 'media', 'assets']));
     foreach (IMG_REPLACED as $old => $new) {
-        if (file_exists(IMG_ROOT . '/' . $old) && is_file(IMG_ROOT . '/' . $new)) $out[$old] = img_tree_bytes($old);
+        if (!file_exists(IMG_ROOT . '/' . $old) || !is_file(IMG_ROOT . '/' . $new)) continue;
+        $real = realpath(IMG_ROOT . '/' . $old);
+        $inUse = false;
+        foreach ($live as $path) {
+            if ($real !== false && ($path === $real || str_starts_with($path, $real . DIRECTORY_SEPARATOR))) $inUse = true;
+        }
+        if (!$inUse) $out[$old] = img_tree_bytes($old);
     }
     return $out;
 }
