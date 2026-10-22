@@ -100,11 +100,11 @@ $shopData = [
 
     <div class="hero-vendors">
         <div class="vendor vendor-white">
-            <img src="assets/vendedores/blanco.png" alt="El Señor Blanco">
+            <img src="../../media/shops/lavaritaeconomica/blanco.webp" alt="El Señor Blanco">
             <div class="name-tag white"><small>EL SEÑOR</small><strong>BLANCO</strong></div>
         </div>
         <div class="vendor vendor-pink">
-            <img src="assets/vendedores/pinkman.png" alt="Pinkman">
+            <img src="../../media/shops/lavaritaeconomica/pinkman.webp" alt="Pinkman">
             <div class="name-tag pink"><small>SOCIO / APRENDIZ</small><strong>PINKMAN</strong></div>
         </div>
     </div>
@@ -211,16 +211,16 @@ $shopData = [
         </div>
 
         <div class="featured-cards">
-            <figure><img src="assets/cartas/ira-del-barbaro.png" alt="Carta Ira del Bárbaro"><figcaption>Ira del Bárbaro</figcaption></figure>
-            <figure><img src="assets/cartas/acelerador.png" alt="Carta Acelerador"><figcaption>Acelerador</figcaption></figure>
-            <figure><img src="assets/cartas/mentas-del-bardo.png" alt="Carta Mentas del Bardo"><figcaption>Mentas del Bardo</figcaption></figure>
+            <figure><img src="assets/cartas/ira-del-barbaro.webp" alt="Carta Ira del Bárbaro"><figcaption>Ira del Bárbaro</figcaption></figure>
+            <figure><img src="assets/cartas/acelerador.webp" alt="Carta Acelerador"><figcaption>Acelerador</figcaption></figure>
+            <figure><img src="assets/cartas/mentas-del-bardo.webp" alt="Carta Mentas del Bardo"><figcaption>Mentas del Bardo</figcaption></figure>
         </div>
     </div>
 </section>
 
 <section class="vendors-section" id="vendedores">
     <article class="seller-profile white-profile">
-        <div class="seller-art"><img src="assets/vendedores/blanco.png" alt="El Señor Blanco"></div>
+        <div class="seller-art"><img src="../../media/shops/lavaritaeconomica/blanco.webp" alt="El Señor Blanco"></div>
         <div class="seller-copy">
             <span class="evidence-label">SUJETO A</span>
             <h2>El Señor Blanco</h2>
@@ -235,7 +235,7 @@ $shopData = [
             <p>Un aprendiz demasiado emocionado para estar a cargo de magia peligrosa. Sonríe, vende rápido y no sabe cómo funcionan la mitad de las cosas que ofrece.</p>
             <blockquote>“Bro, prende esto… creo que es seguro.”</blockquote>
         </div>
-        <div class="seller-art"><img src="assets/vendedores/pinkman.png" alt="Pinkman"></div>
+        <div class="seller-art"><img src="../../media/shops/lavaritaeconomica/pinkman.webp" alt="Pinkman"></div>
     </article>
 </section>
 </main>

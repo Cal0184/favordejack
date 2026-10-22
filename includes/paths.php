@@ -54,6 +54,16 @@ function favor_v(string $absolutePath): string
     return '?v=' . ($time !== false ? $time : '1');
 }
 
+/** URL de un archivo del sitio (relativa a la raíz) con su ?v= para la caché. */
+function favor_static(string $relative): string
+{
+    $relative = ltrim($relative, '/');
+    return favor_base_path() . $relative . favor_v(dirname(__DIR__) . '/' . $relative);
+}
+
+/** El logo del gremio: un solo archivo para todas las páginas. */
+const FAVOR_LOGO = 'assets/logo-favor-de-jack.webp';
+
 /**
  * Tiendas: quita la foto de producto si el archivo no existe, para que se use
  * directamente la imagen de respaldo en vez de pedir cientos de fotos que dan 404.

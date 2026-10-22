@@ -112,7 +112,7 @@ $shopData = [
                 <span class="quote-label">Madeline dice</span>
                 <p id="heroSellerQuote">“Menos palabras. Más puntería.”</p>
             </div>
-            <img src="assets/madeline-ironslinger.png" alt="Madeline Ironslinger sosteniendo un arma de fuego">
+            <img src="../../media/shops/balas-y-sangre/madeline-ironslinger.webp" alt="Madeline Ironslinger sosteniendo un arma de fuego">
             <div class="seller-nameplate" aria-hidden="true">
                 <small>Maestra del taller</small>
                 <strong>Madeline Ironslinger</strong>
@@ -225,7 +225,7 @@ $shopData = [
         <div class="seller-art-panel">
             <div class="seller-art-bg" aria-hidden="true"></div>
             <div class="seller-silhouette" aria-hidden="true"></div>
-            <img src="assets/madeline-ironslinger.png" alt="Madeline Ironslinger, vendedora de Balas y Sangre">
+            <img src="../../media/shops/balas-y-sangre/madeline-ironslinger.webp" alt="Madeline Ironslinger, vendedora de Balas y Sangre">
             <div class="seller-stamp" aria-hidden="true">B&amp;S</div>
         </div>
 

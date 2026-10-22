@@ -34,10 +34,10 @@ function emporio_retire_file(string $from, string $dir, string $relative): bool
     return @rename($from, $to);
 }
 
-/** Copias WebP que acompañan a una carta. */
+/** Miniatura que acompaña a una carta. */
 function emporio_derived_files(string $id): array
 {
-    return [emporio_mini_path($id), emporio_mini_path($id, 240), emporio_large_path($id)];
+    return [emporio_mini_path($id)];
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -135,6 +135,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $renamed++;
                 }
             }
+            // Copias de versiones anteriores (Cartas/webp/, miniaturas de 240 px).
+            foreach (emporio_old_copies() as $p) {
+                if (emporio_retire_file($p, $dir, substr($p, strlen(__DIR__) + 1))) $moved++;
+            }
+            foreach (['Cartas/webp'] as $empty) @rmdir(__DIR__ . '/' . $empty);
             if ($retiredCatalog) {
                 emporio_update_json(EMPORIO_CATALOG_FILE, static function (array $raw) use ($retiredCatalog, $dir): array {
                     $catalog = normalize_catalog($raw);
@@ -156,6 +161,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $relative = substr($file->getPathname(), strlen($dir) + 1);
                 if ($relative === 'catalog-retirado.json') continue;
                 $target = __DIR__ . '/' . $relative;
+                if (!is_dir(dirname($target))) @mkdir(dirname($target), 0775, true);
                 if (!is_file($target) && @rename($file->getPathname(), $target)) $restored++;
             }
             $back = load_json_file($dir . '/catalog-retirado.json');
@@ -183,7 +189,8 @@ $hashes = emporio_hashes($all, 8.0);
 $dupes = emporio_find_duplicates($all, $hashes);
 $hidden = [];
 foreach ($dupes as $g) foreach ($g['hide'] as $id) $hidden[$id] = $g['keep'];
-$missingWebp = count(array_filter($all, static fn(array $c): bool => emporio_mini_url($c['id'], $c['file']) === null || emporio_large_url($c['id'], $c['file']) === null));
+$missingWebp = emporio_cards_pending_webp($all);
+$oldCopies = emporio_old_copies();
 $brokenNames = array_filter($all, static fn(array $c): bool => emporio_fix_name($c['file']) !== $c['file']);
 $twinFiles = array_sum(array_map(static fn(array $c): int => count($c['twins']), $all));
 $orphans = array_diff_key($catalog, $all);
@@ -287,10 +294,10 @@ table{width:100%;border-collapse:collapse;font-size:.85rem}td,th{padding:6px 8px
 
 <section class="box">
     <h2>Retirar archivos sobrantes</h2>
-    <p>Hay <b><?= count($hidden) ?></b> carta(s) duplicada(s) oculta(s), <b><?= $twinFiles ?></b> copia(s) extra del mismo objeto y <b><?= count($brokenNames) ?></b> nombre(s) con tildes rotas («#U00f3n»).</p>
+    <p>Hay <b><?= count($hidden) ?></b> carta(s) duplicada(s) oculta(s), <b><?= $twinFiles ?></b> copia(s) extra del mismo objeto (por ejemplo el PNG de una carta que ya está en WebP), <b><?= count($oldCopies) ?></b> copia(s) de versiones anteriores y <b><?= count($brokenNames) ?></b> nombre(s) con tildes rotas («#U00f3n»).</p>
     <p class="muted">Al pulsar el botón, los archivos sobrantes se <b>mueven</b> a <code>tiendas/emporio/data/retirados/&lt;fecha&gt;/</code> (no se borran) y su ficha del catálogo se guarda ahí mismo. Los nombres rotos se copian con el nombre correcto. Se puede deshacer abajo. Haz antes un respaldo desde «Mi cuenta → Respaldo de la web».</p>
     <form method="post" action="?vista=limpieza" onsubmit="return confirm('¿Mover los archivos sobrantes a data/retirados/? Se puede deshacer desde esta misma página.')">
-        <input type="hidden" name="csrf" value="<?= e($csrf) ?>"><button name="action" value="retire" type="submit" <?= ($hidden || $twinFiles || $brokenNames) ? '' : 'disabled' ?>>Retirar sobrantes y arreglar nombres</button>
+        <input type="hidden" name="csrf" value="<?= e($csrf) ?>"><button name="action" value="retire" type="submit" <?= ($hidden || $twinFiles || $brokenNames || $oldCopies) ? '' : 'disabled' ?>>Retirar sobrantes y arreglar nombres</button>
     </form>
     <?php if ($retiredRuns): ?>
         <h3>Retiros anteriores</h3>
@@ -305,7 +312,7 @@ table{width:100%;border-collapse:collapse;font-size:.85rem}td,th{padding:6px 8px
 
 <section class="box">
     <h2>Imágenes WebP</h2>
-    <p><?= $missingWebp ? "Faltan copias WebP de <b>$missingWebp</b> carta(s). Se crean solas, unas 15 cada vez que abres esta página: recárgala hasta que diga 0." : '✓ Todas las cartas tienen sus copias WebP (240, 480 y tamaño completo).' ?><?= $madeMinis ? " En esta visita se crearon $madeMinis." : '' ?></p>
+    <p><?= $missingWebp ? "Faltan <b>$missingWebp</b> carta(s) por pasar a WebP o sin miniatura. Se hacen solas, unas 15 cada vez que abres esta página: recárgala hasta que diga 0 y después pulsa «Retirar sobrantes» para apartar los PNG." : '✓ Todas las cartas están en WebP y tienen su miniatura.' ?><?= $madeMinis ? " En esta visita se crearon $madeMinis." : '' ?></p>
 </section>
 
 <section class="box">

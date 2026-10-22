@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Banca Per-Favore — Favor de Jack</title>
-<link rel="icon" type="image/webp" href="iconhand.webp">
+<link rel="icon" type="image/webp" href="<?= favor_static(FAVOR_LOGO) ?>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cinzel+Decorative:wght@700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
@@ -1032,14 +1032,14 @@ body{display:flex;flex-direction:column;min-height:100vh}
   <div class="topbar-inner new-topbar-inner">
     <a class="topbar-back-link" href="<?= favor_base_path() ?>" aria-label="Volver a Favor de Jack">← <span>Favor de Jack</span></a>
     <div class="compact-brand">
-      <div class="seal compact-seal" aria-hidden="true"><img src="iconhand.webp" alt=""></div>
+      <div class="seal compact-seal" aria-hidden="true"><img src="<?= favor_static(FAVOR_LOGO) ?>" alt=""></div>
       <h1 class="app-title wordmark">Banca Per-Favore</h1>
     </div>
     <div class="account-slot">
       <a id="session-login" class="header-login" href="<?= favor_base_path() ?>login.php?next=<?= rawurlencode(favor_base_path()) ?>bancadigital%2F" hidden>Iniciar sesión</a>
       <details id="session-menu" class="user-menu" hidden>
         <summary>
-          <span class="header-user-avatar"><img id="session-avatar" src="iconhand.webp" alt=""></span>
+          <span class="header-user-avatar"><img id="session-avatar" src="<?= favor_static(FAVOR_LOGO) ?>" alt=""></span>
           <span id="session-name">Mi cuenta</span><span class="user-chevron">⌄</span>
         </summary>
         <div class="user-menu-panel">
@@ -1071,7 +1071,7 @@ body{display:flex;flex-direction:column;min-height:100vh}
           <button id="hub-own-bank" class="hub-action-card primary" type="button" onclick="enterMyBank()">
             <span class="hub-action-eyebrow">Acceso personal</span>
             <span class="hub-action-top">
-              <span id="hub-own-icon" class="hub-action-icon hub-own-icon" aria-hidden="true"><img id="hub-own-avatar" src="iconhand.webp" alt=""></span>
+              <span id="hub-own-icon" class="hub-action-icon hub-own-icon" aria-hidden="true"><img id="hub-own-avatar" src="<?= favor_static(FAVOR_LOGO) ?>" alt=""></span>
               <span class="hub-action-copy">
                 <span class="hub-action-title">Mi Banca</span>
                 <span id="hub-own-meta" class="hub-action-meta">Cargando tu cuenta…</span>
@@ -1686,7 +1686,7 @@ function renderHub(){
     }else{
       ownIcon.style.setProperty('--icon-bg','#22402F');
       ownAvatar.onerror=null;
-      ownAvatar.src='iconhand.webp';
+      ownAvatar.src='<?= favor_static(FAVOR_LOGO) ?>';
     }
   }
 

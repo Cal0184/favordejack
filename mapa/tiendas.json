@@ -13,7 +13,7 @@
     "sellers": [
       {
         "name": "Madeline Ironslinger",
-        "image": "assets/vendedores/madeline-ironslinger.png"
+        "image": "../media/shops/balas-y-sangre/madeline-ironslinger.webp"
       }
     ]
   },
@@ -50,11 +50,11 @@
     "sellers": [
       {
         "name": "Gaston",
-        "image": "assets/vendedores/gaston.png"
+        "image": "../media/shops/ladamadelasllamas/gaston.webp"
       },
       {
         "name": "Axe Rein",
-        "image": "assets/vendedores/axe-rein.png"
+        "image": "../media/shops/ladamadelasllamas/axe-rein.webp"
       }
     ]
   },
@@ -72,7 +72,7 @@
     "sellers": [
       {
         "name": "Yamo-Yamo",
-        "image": "assets/vendedores/yamo-yamo.png"
+        "image": "../media/shops/lapocionpicante/yamo-yamo.webp"
       }
     ]
   },
@@ -90,11 +90,11 @@
     "sellers": [
       {
         "name": "El Señor Blanco",
-        "image": "assets/vendedores/blanco.png"
+        "image": "../media/shops/lavaritaeconomica/blanco.webp"
       },
       {
         "name": "Pinkman",
-        "image": "assets/vendedores/pinkman.png"
+        "image": "../media/shops/lavaritaeconomica/pinkman.webp"
       }
     ]
   },

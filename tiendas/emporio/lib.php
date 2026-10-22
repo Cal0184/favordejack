@@ -215,7 +215,8 @@ function emporio_catalog(): array
 
 function card_url(string $file): string
 {
-    return 'Cartas/' . rawurlencode($file);
+    $mtime = @filemtime(EMPORIO_CARTAS_DIR . '/' . $file);
+    return 'Cartas/' . rawurlencode($file) . ($mtime ? '?v=' . $mtime : '');
 }
 
 function saved_value(array $saved, string $field, mixed $fallback): mixed
@@ -224,7 +225,7 @@ function saved_value(array $saved, string $field, mixed $fallback): mixed
     return $fallback;
 }
 
-/** Archivos de imagen de Cartas/, uno por ID (si hay PNG y WebP gana el WebP). */
+/** Archivos de imagen de Cartas/, uno por ID (si hay PNG y WebP gana el WebP; el PNG queda como copia sobrante). */
 function emporio_card_files(): array
 {
     if (!is_dir(EMPORIO_CARTAS_DIR)) return [];
@@ -289,10 +290,8 @@ function emporio_all_cards(?array $catalog = null): array
             'description' => $description,
             'described' => $description !== '',
             'inCatalog' => $saved !== [],
-            'url' => emporio_large_url($id, $file) ?? card_url($file),
-            'original' => card_url($file),
+            'url' => card_url($file),
             'thumb' => emporio_mini_url($id, $file) ?? card_url($file),
-            'thumbSmall' => emporio_mini_url($id, $file, 240),
         ];
     }
     uasort($cards, static fn(array $a, array $b): int => strnatcasecmp(emporio_ascii($a['name']), emporio_ascii($b['name'])));

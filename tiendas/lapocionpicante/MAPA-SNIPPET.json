@@ -5,7 +5,7 @@
   "category": "Botica · Elixires · Alquimia",
   "description": "Curación, remedios, blindajes alquímicos, esencias, conjuros embotellados y néctares draconianos.",
   "url": "/favordejack/tiendas/pocion-picante/",
-  "sellerImage": "assets/vendedores/yamo-yamo.png",
+  "sellerImage": "../media/shops/lapocionpicante/yamo-yamo.webp",
   "x": 60.0,
   "y": 58.0,
   "enabled": false

@@ -5,7 +5,7 @@
   "category": "Herrería · Forja · Mejoras arcanas",
   "description": "Herrería de oficio con compraventa de armas y armaduras y un banco separado para mejoras mágicas.",
   "url": "/favordejack/tiendas/dama-de-las-llamas/",
-  "sellerImage": "assets/vendedores/gaston.png",
+  "sellerImage": "../media/shops/ladamadelasllamas/gaston.webp",
   "x": 31.0,
   "y": 48.0,
   "enabled": false

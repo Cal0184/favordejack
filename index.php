@@ -508,7 +508,7 @@ button,summary{font:inherit}
         </a>
 
         <div class="emblem" aria-hidden="true">
-            <img src="assets/logo-favor-de-jack.webp" alt="">
+            <img src="<?= favor_static(FAVOR_LOGO) ?>" alt="">
         </div>
 
         <a class="scene" href="<?= route('map', $routes) ?>" aria-label="Abrir Waterdeep">

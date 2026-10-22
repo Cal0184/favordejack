@@ -86,7 +86,7 @@ $shopData = [
 
     <div class="seller-stage" id="yamo-yamo">
         <div class="seller-name">Yamo-Yamo</div>
-        <img src="assets/vendedores/yamo-yamo.png" alt="Yamo-Yamo">
+        <img src="../../media/shops/lapocionpicante/yamo-yamo.webp" alt="Yamo-Yamo">
     </div>
 </section>
 
@@ -187,7 +187,7 @@ $shopData = [
 <section class="seller-section">
     <div class="seller-art">
         <div class="seller-aura" aria-hidden="true"></div>
-        <img src="assets/vendedores/yamo-yamo.png" alt="Yamo-Yamo">
+        <img src="../../media/shops/lapocionpicante/yamo-yamo.webp" alt="Yamo-Yamo">
     </div>
     <div class="seller-simple">
         <p class="eyebrow">Vendedor</p>

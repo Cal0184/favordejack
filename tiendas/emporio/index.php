@@ -173,9 +173,8 @@ $shopData = [
                     <button class="card-image" type="button" aria-label="Ver detalles de <?= e($card['name']) ?>">
                         <img loading="lazy" decoding="async" width="480" height="667"
                             src="<?= e($card['thumb']) ?>"
-                            <?php if ($card['thumbSmall']): ?>srcset="<?= e($card['thumbSmall']) ?> 240w, <?= e($card['thumb']) ?> 480w" sizes="(max-width: 560px) 46vw, 240px"<?php endif; ?>
                             alt="<?= e($card['name']) ?>"
-                            data-fallback="<?= e($card['original']) ?>">
+                            data-fallback="<?= e($card['url']) ?>">
                     </button>
                     <div class="card-body">
                         <span class="category"><?= e($card['category']) ?></span>
