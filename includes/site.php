@@ -159,7 +159,8 @@ function favor_site_bar(): void
     if ($printed) return;
     $printed = true;
 
-    $user = $GLOBALS['__favor_auth_widget_user'] ?? favor_session_user();
+    // Sesión leída al cargar auth-widget.php (null = invitado); no se reabre aquí.
+    $user = array_key_exists('__favor_auth_widget_user', $GLOBALS) ? $GLOBALS['__favor_auth_widget_user'] : null;
     $isAdmin = $user && ($user['role'] ?? '') === 'admin';
     $ctx = favor_page_context();
     $base = favor_base_path();
