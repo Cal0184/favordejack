@@ -83,8 +83,8 @@ h1{margin:0 0 6px;color:#e5c37e;font-weight:500}
 </style>
 <?php favor_head('Descuento del gremio · Favor de Jack'); ?>
 </head>
-<body>
-<?php favor_site_bar(); ?>
+<body class="favor-plain">
+<?php favor_site_bar(); ?><div class="favor-pad">
 <div class="wrap">
     <div class="top"><a href="<?= favor_base_path() ?>mapa/">← Mapa de Waterdeep</a><a href="<?= favor_base_path() ?>tiendas/lapocionpicante/">La Poción Picante →</a></div>
     <h1>Descuento del gremio</h1>
@@ -138,5 +138,5 @@ if(q){
     });
 }
 </script>
-</body>
+</div></body>
 </html>

@@ -394,8 +394,8 @@ if (!array_key_exists($emoji, $allowedEmojis)) {
 <?php favor_head('Mi perfil · Favor de Jack'); ?>
 </head>
 
-<body style="--profile:<?=hp($bg)?>
-<?php favor_site_bar(); ?>">
+<body style="--profile:<?=hp($bg)?>">
+<?php favor_site_bar(); ?>
 
 
 <div class="top">

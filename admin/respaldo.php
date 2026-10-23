@@ -137,10 +137,9 @@ summary{cursor:pointer;color:#e0b26a}
 </style>
 <?php favor_head('Respaldo · Favor de Jack'); ?>
 </head>
-<body>
-<?php favor_site_bar(); ?>
+<body class="favor-plain">
+<?php favor_site_bar(); ?><div class="favor-pad">
 <main>
-    <a href="<?= favor_url_html() ?>">← Favor de Jack</a>
     <h1>Respaldo de la web</h1>
     <p class="sub">Un paquete guarda la base de datos y todas las imágenes y datos que no están en GitHub. Con el código de GitHub y un paquete puedes montar la web en cualquier dominio o proveedor.</p>
 
@@ -200,5 +199,5 @@ summary{cursor:pointer;color:#e0b26a}
         </form>
     </section>
 </main>
-</body>
+</div></body>
 </html>

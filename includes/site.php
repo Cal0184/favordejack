@@ -127,6 +127,8 @@ function favor_head(string $title = '', string $description = ''): void
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Emblema del Favor de Jack sobre la Sede del Gremio">
 <meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=EB+Garamond:wght@400;600&display=swap">
 <link rel="stylesheet" href="<?= favor_h(favor_static('assets/favor-ui.css')) ?>">
 <script src="<?= favor_h(favor_static('assets/favor-ui.js')) ?>" defer></script>
 <?php
