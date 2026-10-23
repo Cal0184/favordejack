@@ -37,9 +37,10 @@ function asset(string $path): string
 <link href="<?= asset('base.css') ?>" rel="stylesheet"/>
 <link href="<?= asset('dice.css') ?>" rel="stylesheet"/>
 <link href="<?= asset('jack.css') ?>" rel="stylesheet"/>
-<link href="<?= e(favor_static(FAVOR_LOGO)) ?>" rel="icon" type="image/webp"/></head>
+<link href="<?= e(favor_static(FAVOR_LOGO)) ?>" rel="icon" type="image/webp"/><?php favor_head('Lanzador de dados · Favor de Jack'); ?>
+</head>
 <body>
-<?php favor_auth_widget(); ?>
+<?php favor_site_bar(); ?>
 <div class="jack-page-shell">
 <header class="jack-hero jack-hero-v2">
 <img alt="Icono del Favor de Jack" class="jack-brand-icon" src="<?= e(favor_static(FAVOR_LOGO)) ?>"/>
@@ -48,9 +49,6 @@ function asset(string $path): string
 <h1>El Favor de <span>Jack</span></h1>
 <p class="jack-subtitle">Lanza. Mira cómo gira el destino. Acepta el resultado.</p>
 </div>
-<a class="jack-back-button" href="<?= favor_url_html() ?>" aria-label="Volver a El Favor de Jack">
-<span aria-hidden="true">←</span> Volver
-</a>
 </header>
 <main>
 <div class="responsive" id="fast_dice_roller_block"><div class="jack-left-column"><div class="dice_attribute_container responsive" id="dice_attribute_container">

@@ -51,13 +51,12 @@ $shopData = [
     <meta name="description" content="Armería-taller de Madeline Ironslinger. Armas de fuego, munición, pólvora y herramientas.">
     <link rel="icon" href="assets/placeholders/arma.svg" type="image/svg+xml">
     <link rel="stylesheet" href="style.css<?= favor_v(__DIR__ . '/style.css') ?>">
+<?php favor_head('Balas y Sangre · Favor de Jack', 'Armería, munición y herramientas en Waterdeep.'); ?>
 </head>
 <body>
-<?php favor_auth_widget(); ?>
+<?php favor_site_bar(); ?>
 <header class="topbar" id="topbar">
-    <a class="back-link" href="<?= favor_base_path() ?>" aria-label="Volver a Favor de Jack">
-        <span aria-hidden="true">←</span> Favor de Jack
-    </a>
+    <span class="back-link" aria-hidden="true"></span>
 
     <a class="brand" href="#inicio" aria-label="Ir al inicio de Balas y Sangre">
         <span class="brand-mark" aria-hidden="true"><i></i>B&amp;S<i></i></span>
@@ -263,7 +262,7 @@ $shopData = [
 <footer class="footer">
     <span><b>Balas y Sangre</b> · Catálogo digital del Favor de Jack</span>
     <span class="footer-mark" aria-hidden="true">◆</span>
-    <a href="<?= favor_base_path() ?>">Volver a Favor de Jack</a>
+    <a href="<?= favor_base_path() ?>mapa/">Volver al mapa de Waterdeep</a>
 </footer>
 
 <div class="modal" id="productModal" aria-hidden="true">

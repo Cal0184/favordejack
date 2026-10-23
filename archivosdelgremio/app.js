@@ -622,7 +622,9 @@
     });
 
     $('#adminLogout')?.addEventListener('click', () => {
-        window.location.href = FAVOR_BASE + 'logout.php?next=' + encodeURIComponent(FAVOR_BASE + 'archivosdelgremio/');
+        // Cierra sesión con el formulario de la barra común (POST con token).
+        if (window.favorLogout) window.favorLogout();
+        else window.location.href = FAVOR_BASE + 'logout.php';
     });
 
     // ------------------------------------------------------------

@@ -84,7 +84,7 @@ function favor_current_user(bool $refresh = false): ?array
     try {
         $id = (int)$cached['id'];
         $stmt = $db->prepare(
-            'SELECT u.ID,u.Username,u.Jugador,u.Rol,u.Activo,j.Nombre AS JugadorNombre,j.Activo AS JugadorActivo '
+            'SELECT u.ID,u.Username,u.Jugador,u.Rol,u.Activo,j.Nombre AS JugadorNombre,j.Activo AS JugadorActivo,j.IconUrl,j.IconBg,j.Emoji '
             . 'FROM Usuario u LEFT JOIN Jugador j ON j.ID=u.Jugador WHERE u.ID=? LIMIT 1'
         );
         $stmt->bind_param('i', $id);
@@ -107,9 +107,20 @@ function favor_current_user(bool $refresh = false): ?array
         'role' => (string)$row['Rol'],
         'active' => true,
         'displayName' => (string)$row['JugadorNombre'],
-    ];
+    ] + favor_user_visual($row);
     $_SESSION['favor_user'] = $user;
     return $user;
+}
+
+/** Icono del jugador para la barra común (se guarda en la sesión). */
+function favor_user_visual(array $row): array
+{
+    $bg = trim((string)($row['IconBg'] ?? ''));
+    return [
+        'iconUrl' => trim((string)($row['IconUrl'] ?? '')),
+        'iconBg' => preg_match('/^#[0-9A-Fa-f]{6}$/', $bg) ? $bg : '',
+        'emoji' => mb_substr(trim((string)($row['Emoji'] ?? '')), 0, 16, 'UTF-8'),
+    ];
 }
 
 function favor_is_logged_in(): bool
@@ -153,7 +164,7 @@ function favor_login(string $username, string $password): array
 
         $stmt = $db->prepare(
             'SELECT u.ID,u.Username,u.PasswordHash,u.Salt,u.PasswordIterations,u.Jugador,u.Rol,u.Activo, '
-            . 'j.Nombre AS JugadorNombre,j.Activo AS JugadorActivo '
+            . 'j.Nombre AS JugadorNombre,j.Activo AS JugadorActivo,j.IconUrl,j.IconBg,j.Emoji '
             . 'FROM Usuario u LEFT JOIN Jugador j ON j.ID=u.Jugador WHERE LOWER(u.Username)=LOWER(?) LIMIT 1'
         );
         $stmt->bind_param('s', $username);
@@ -183,7 +194,7 @@ function favor_login(string $username, string $password): array
         'role' => (string)$row['Rol'],
         'active' => true,
         'displayName' => (string)$row['JugadorNombre'],
-    ];
+    ] + favor_user_visual($row);
     $_SESSION['favor_user'] = $user;
     $_SESSION['favor_csrf'] = bin2hex(random_bytes(24));
     return $user;

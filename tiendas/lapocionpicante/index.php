@@ -41,11 +41,12 @@ $shopData = [
 <title>La Poción Picante · Favor de Jack</title>
 <meta name="description" content="Catálogo digital de La Poción Picante: curación, remedios, blindaje, esencias, conjuros y néctares.">
 <link rel="stylesheet" href="style.css<?= favor_v(__DIR__ . '/style.css') ?>">
+<?php favor_head('La Poción Picante · Favor de Jack', 'Pociones, esencias y néctares para aventureros.'); ?>
 </head>
 <body>
-<?php favor_auth_widget(); ?>
+<?php favor_site_bar(); ?>
 <header class="topbar">
-    <a class="back-link" href="<?= favor_base_path() ?>mapa/">← Mapa de Waterdeep</a>
+    <span class="back-link" aria-hidden="true"></span>
     <a class="brand" href="#inicio">
         <span class="brand-bottle" aria-hidden="true">◈</span>
         <span><strong>La Poción Picante</strong><small>Botica · Elixires · Alquimia</small></span>

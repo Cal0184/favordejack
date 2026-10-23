@@ -37,13 +37,14 @@ $shopData = [
 <title>La Varita Económica · Favor de Jack</title>
 <meta name="description" content="Mercado clandestino de pergaminos, brebajes, objetos mágicos dudosos y mercancía defectuosa.">
 <link rel="stylesheet" href="style.css<?= favor_v(__DIR__ . '/style.css') ?>">
+<?php favor_head('La Varita Económica · Favor de Jack', 'Pergaminos baratos y magia de procedencia cuestionable.'); ?>
 </head>
 <body>
-<?php favor_auth_widget(); ?>
+<?php favor_site_bar(); ?>
 <div class="noise" aria-hidden="true"></div>
 
 <header class="topbar">
-    <a class="back-link" href="<?= favor_base_path() ?>mapa/">← Waterdeep</a>
+    <span class="back-link" aria-hidden="true"></span>
     <a class="brand" href="#inicio">
         <span class="brand-symbol">Vₑ</span>
         <span><strong>La Varita Económica</strong><small>Sin factura · Sin preguntas</small></span>
@@ -71,12 +72,10 @@ $shopData = [
         <div class="contraband-stamp">MERCANCÍA NO DECLARADA</div>
         <p class="eyebrow">Debajo de la mesa · probablemente legal en algún plano</p>
 
-        <div class="chemical-title">
-            <span class="chem-box"><b>Va</b><small>??</small></span>
-            <h1>rita</h1>
-            <span class="chem-box green"><b>Ec</b><small>Au</small></span>
-            <h1>onómica</h1>
-        </div>
+        <h1 class="chemical-title" aria-label="La Varita Económica">
+            <span class="chem-word" aria-hidden="true"><span class="chem-box"><b>Va</b><small>??</small></span><span class="chem-rest">rita</span></span>
+            <span class="chem-word" aria-hidden="true"><span class="chem-box green"><b>Ec</b><small>Au</small></span><span class="chem-rest">onómica</span></span>
+        </h1>
 
         <p class="hero-lead">Pergaminos baratos, magia de procedencia cuestionable, mezclas experimentales, mercancía restringida y objetos cuyo defecto viene incluido en el precio.</p>
 

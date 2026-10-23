@@ -1,4 +1,4 @@
-<?php require_once dirname(__DIR__) . '/includes/paths.php'; ?>
+<?php require_once dirname(__DIR__) . '/includes/auth-widget.php'; require_once dirname(__DIR__) . '/includes/paths.php'; ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -1012,8 +1012,10 @@ body{display:flex;flex-direction:column;min-height:100vh}
 
 </style>
 
+<?php favor_head('Banca Per-Favore · Favor de Jack'); ?>
 </head>
 <body>
+<?php favor_site_bar(); ?>
 
 <div id="vault-intro" aria-hidden="true">
   <div class="vault-light"></div>
@@ -1030,12 +1032,11 @@ body{display:flex;flex-direction:column;min-height:100vh}
 <div class="sticky-shell">
 <header class="topbar">
   <div class="topbar-inner new-topbar-inner">
-    <a class="topbar-back-link" href="<?= favor_base_path() ?>" aria-label="Volver a Favor de Jack">← <span>Favor de Jack</span></a>
     <div class="compact-brand">
       <div class="seal compact-seal" aria-hidden="true"><img src="<?= favor_static(FAVOR_LOGO) ?>" alt=""></div>
       <h1 class="app-title wordmark">Banca Per-Favore</h1>
     </div>
-    <div class="account-slot">
+    <div class="account-slot" hidden style="display:none">
       <a id="session-login" class="header-login" href="<?= favor_base_path() ?>login.php?next=<?= rawurlencode(favor_base_path()) ?>bancadigital%2F" hidden>Iniciar sesión</a>
       <details id="session-menu" class="user-menu" hidden>
         <summary>

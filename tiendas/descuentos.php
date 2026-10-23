@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 require_once dirname(__DIR__) . '/includes/descuentos.php';
+require_once dirname(__DIR__) . '/includes/auth-widget.php';
 favor_session_start();
 header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
 
@@ -80,8 +81,10 @@ h1{margin:0 0 6px;color:#e5c37e;font-weight:500}
 .note{margin-top:14px;color:#8c7b65;font-size:.85rem}
 [hidden]{display:none!important}
 </style>
+<?php favor_head('Descuento del gremio · Favor de Jack'); ?>
 </head>
 <body>
+<?php favor_site_bar(); ?>
 <div class="wrap">
     <div class="top"><a href="<?= favor_base_path() ?>mapa/">← Mapa de Waterdeep</a><a href="<?= favor_base_path() ?>tiendas/lapocionpicante/">La Poción Picante →</a></div>
     <h1>Descuento del gremio</h1>

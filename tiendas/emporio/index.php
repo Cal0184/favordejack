@@ -52,8 +52,10 @@ $shopData = [
 <link rel="preload" as="image" href="../../media/shops/ecix/interior-960.webp" media="(max-width: 960px)">
 <link rel="preload" as="image" href="../../media/shops/ecix/interior.webp" media="(min-width: 961px)">
 <link rel="stylesheet" href="assets/emporio.css<?= favor_v(__DIR__ . '/assets/emporio.css') ?>">
+<?php favor_head('El Emporio de Ecix\'s · Favor de Jack', 'Objetos mágicos y servicios del Emporio de Ecix\'s.'); ?>
 </head>
 <body>
+<?php favor_site_bar(); ?>
 <a class="skip" href="#catalogo">Saltar al catálogo</a>
 <header class="site-header">
     <a class="brand" href="./" aria-label="El Emporio de Ecix's, inicio">
@@ -68,7 +70,6 @@ $shopData = [
         <button id="servicesTab" class="tab" type="button" aria-pressed="false">Servicios</button>
         <?php if ($user): ?><button id="ordersTab" class="tab" type="button" aria-pressed="false">Mis pedidos</button><?php endif; ?>
         <?php if ($isAdmin): ?><a href="admin.php">Admin</a><?php endif; ?>
-        <a href="<?= e(favor_base_path()) ?>mapa/">← Mapa</a>
     </nav>
 </header>
 
@@ -245,6 +246,5 @@ $shopData = [
 
 <script id="emporio-data" type="application/json"><?= json_encode($shopData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?></script>
 <script src="assets/emporio.js<?= favor_v(__DIR__ . '/assets/emporio.js') ?>" defer></script>
-<?php favor_auth_widget(); ?>
 </body>
 </html>

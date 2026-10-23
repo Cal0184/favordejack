@@ -64,11 +64,12 @@ function markerClass(array $shop): string {
 <title>Mapa Comercial de Waterdeep · Favor de Jack</title>
 <meta name="description" content="Mapa interactivo de las tiendas digitalizadas de Waterdeep.">
 <link rel="stylesheet" href="style.css<?= favor_v(__DIR__ . '/style.css') ?>">
+<?php favor_head('Mapa comercial de Waterdeep · Favor de Jack', 'Las tiendas de Waterdeep para los aventureros del Favor de Jack.'); ?>
 </head>
 <body>
-<?php favor_auth_widget(); ?>
+<?php favor_site_bar(); ?>
 <header class="map-header">
-    <a class="home-link" href="<?= favor_base_path() ?>"><span aria-hidden="true">←</span><span>Favor de Jack</span></a>
+    <span class="home-link" aria-hidden="true"></span>
 
     <div class="map-title">
         <span class="title-ornament">✦</span>

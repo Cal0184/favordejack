@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 require_once __DIR__ . '/lib.php';
+require_once dirname(__DIR__, 2) . '/includes/auth-widget.php';
 favor_session_start();
 header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
 header('X-Frame-Options: DENY');
@@ -16,7 +17,9 @@ if (($user['role'] ?? '') !== 'admin') {
     http_response_code(403);
     ?><!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Admin · Emporio</title>
     <style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0d0907;color:#eadcc0;font-family:Georgia,serif}main{width:min(430px,92vw);padding:28px;border:1px solid #72512e;border-radius:12px;background:#17100c}h1{color:#e8c785}a{display:inline-block;padding:10px 15px;border:1px solid #8b6737;border-radius:7px;background:#2b1b10;color:#efd09a;text-decoration:none}</style>
-    </head><body><main><h1>Administración del Emporio</h1><p>Solo una cuenta de administrador puede editar el catálogo de Ecix's.</p><a href="index.php">Volver a la tienda</a></main></body></html><?php
+    <?php favor_head('Admin del Emporio · Favor de Jack'); ?>
+</head><body>
+<?php favor_site_bar(); ?><main><h1>Administración del Emporio</h1><p>Solo una cuenta de administrador puede editar el catálogo de Ecix's.</p><a href="index.php">Volver a la tienda</a></main></body></html><?php
     exit;
 }
 
@@ -210,7 +213,9 @@ section.box{margin:0 0 22px;padding:18px;border:1px solid #483522;border-radius:
 .orders{display:grid;gap:12px}.order{display:grid;grid-template-columns:1fr minmax(260px,340px);gap:14px;padding:14px;border:1px solid #483522;border-radius:10px;background:#15100c}.order h3{margin:0 0 4px;color:#e4c388}.order ul{margin:6px 0;padding-left:18px;line-height:1.5}.muted{color:#8c7b65;font:600 .76rem system-ui,sans-serif}.state{display:inline-block;padding:3px 9px;border-radius:99px;border:1px solid #5d4228;font:800 .65rem system-ui,sans-serif;text-transform:uppercase;letter-spacing:.08em}.state-pendiente{border-color:#c49251;color:#f0cd85}.state-aprobado{border-color:#5a7a3d;color:#b8d39a}.state-entregado{border-color:#4f6f8f;color:#a9c6e3}.state-rechazado,.state-cancelado{border-color:#7a3d38;color:#e5a69d}
 table{width:100%;border-collapse:collapse;font-size:.85rem}td,th{padding:6px 8px;border-bottom:1px solid #2f2218;text-align:left}
 @media(max-width:700px){.toolbar{position:relative;top:auto;flex-direction:column;align-items:stretch}.card{grid-template-columns:1fr}.card img{width:100%;height:260px}.order{grid-template-columns:1fr}}
-</style></head><body>
+</style><?php favor_head('Admin del Emporio · Favor de Jack'); ?>
+</head><body>
+<?php favor_site_bar(); ?>
 <header><h1>Admin · El Emporio de Ecix's</h1>
 <nav aria-label="Secciones del admin">
     <a href="?vista=cartas" class="<?= $view === 'cartas' ? 'active' : '' ?>">Cartas</a>

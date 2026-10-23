@@ -4,9 +4,11 @@ declare(strict_types=1);
 require_once __DIR__ . '/auth.php';
 require_once dirname(__DIR__) . '/includes/assets.php';
 require_once dirname(__DIR__) . '/includes/ficha-import.php';
+require_once dirname(__DIR__) . '/includes/auth-widget.php';
 
 favor_session_start();
 $id = (string)($_GET['id'] ?? '');
+$GLOBALS['favor_back'] = ['archivosdelgremio/?character=' . rawurlencode($id), 'a su archivo'];
 
 function h(mixed $value): string
 {
@@ -87,8 +89,10 @@ $mod = static fn(?int $v): string => $v === null ? '' : (($m = intdiv($v - 10 + 
         .btn { color:#f3e6c8; background:#5a3a1c; border-radius:8px; padding:6px 12px; text-decoration:none; }
         @media (max-width:520px) { ul.list { columns:1; } }
     </style>
+<?php favor_head('Hoja de personaje · Favor de Jack'); ?>
 </head>
 <body>
+<?php favor_site_bar(); ?>
 <div class="wrap">
 <?php if (!$row): ?>
     <div class="top"><h1>Hoja no encontrada</h1><a href="<?= favor_base_path() ?>archivosdelgremio/">← Archivos del Gremio</a></div>
@@ -102,7 +106,6 @@ $mod = static fn(?int $v): string => $v === null ? '' : (($m = intdiv($v - 10 + 
         <div>
             <?php if ($canEdit): ?><a class="btn" href="?id=<?= h(rawurlencode($id)) ?>&amp;pdf=1" target="_blank" rel="noopener">PDF original</a>
             <a class="btn" href="importar-ficha.php?character=<?= h(rawurlencode($id)) ?>">Reimportar</a><?php endif; ?>
-            <a href="<?= favor_base_path() ?>archivosdelgremio/?character=<?= h(rawurlencode($id)) ?>">← Volver al Archivo</a>
         </div>
     </div>
 

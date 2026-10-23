@@ -8,6 +8,7 @@ declare(strict_types=1);
  */
 require_once dirname(__DIR__) . '/includes/auth.php';
 require_once dirname(__DIR__) . '/includes/respaldo.php';
+require_once dirname(__DIR__) . '/includes/auth-widget.php';
 
 favor_session_start();
 header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
@@ -134,8 +135,10 @@ summary{cursor:pointer;color:#e0b26a}
 .restore{display:grid;gap:8px;margin-top:10px}
 .note{font-size:.92rem;color:#bba98a}
 </style>
+<?php favor_head('Respaldo · Favor de Jack'); ?>
 </head>
 <body>
+<?php favor_site_bar(); ?>
 <main>
     <a href="<?= favor_url_html() ?>">← Favor de Jack</a>
     <h1>Respaldo de la web</h1>
