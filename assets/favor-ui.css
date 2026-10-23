@@ -125,3 +125,6 @@ body.favor-plain{padding:0!important;display:block!important;place-items:initial
     :where(button,[role="button"],select,input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="hidden"]),.btn,.tab,.topnav a){min-height:44px}
     :where(.topnav a,.tab,.chip,.filter-chip,.category-tab){display:inline-flex;align-items:center}
 }
+
+.favor-notice{margin:0!important;padding:10px 16px!important;background:#f5dfae;color:#4a2f0c;font:600 16px/1.35 var(--favor-font);text-align:center;border-bottom:1px solid #b07a2a}
+.favor-notice a{color:#6d3b12!important;text-decoration:underline!important}

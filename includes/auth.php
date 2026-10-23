@@ -317,24 +317,3 @@ function favor_password_matches(array $row, string $password): bool
     $calc = hash_pbkdf2('sha256', $password, (string)$row['Salt'], (int)$row['PasswordIterations'], 64, false);
     return hash_equals(strtolower(trim((string)$row['PasswordHash'])), strtolower(trim($calc)));
 }
-
-/**
- * ¿El recordatorio deja ver la contraseña? Prueba el texto completo y cada
- * palabra suelta (hasta 6), porque el recordatorio lo puede leer cualquiera
- * que escriba el usuario en «Olvidé mi contraseña».
- */
-function favor_hint_reveals_password(array $row, string $hint): bool
-{
-    $hint = trim($hint);
-    if ($hint === '') return false;
-    $candidates = [$hint];
-    $words = preg_split('/[\s,;:"\'()¿?¡!]+/u', $hint, -1, PREG_SPLIT_NO_EMPTY) ?: [];
-    foreach (array_unique($words) as $word) {
-        if (count($candidates) > 6) break;
-        if ($word !== $hint && mb_strlen($word, 'UTF-8') >= 3) $candidates[] = $word;
-    }
-    foreach ($candidates as $candidate) {
-        if (favor_password_matches($row, $candidate)) return true;
-    }
-    return false;
-}

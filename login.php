@@ -2,6 +2,7 @@
 declare(strict_types=1);
 require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/auth-widget.php';
+require_once __DIR__ . '/includes/clave.php';
 favor_session_start();
 header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
 
@@ -12,7 +13,16 @@ $user = favor_current_user();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         favor_verify_csrf((string)($_POST['csrf'] ?? ''));
-        favor_login((string)($_POST['username'] ?? ''), (string)($_POST['password'] ?? ''));
+        $logged = favor_login((string)($_POST['username'] ?? ''), (string)($_POST['password'] ?? ''));
+        // Con una contraseña temporal del DM, lo primero es cambiarla.
+        try {
+            $db = favor_db();
+            try { $mustChange = favor_reset_must_change($db, (int)$logged['id']); } finally { $db->close(); }
+        } catch (Throwable $e) { $mustChange = false; }
+        if ($mustChange) {
+            $_SESSION['favor_must_change'] = true;
+            $next = favor_base_path() . 'cuenta.php';
+        }
         header('Location: ' . $next, true, 303);
         exit;
     } catch (Throwable $e) {

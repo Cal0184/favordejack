@@ -247,6 +247,9 @@ function favor_site_bar(): void
         <button type="button" class="favor-btn favor-sheet-close">Cerrar</button>
     </div>
 </div>
+<?php if ($user && !empty($_SESSION['favor_must_change']) && $ctx['page'] !== 'cuenta.php'): ?>
+<p class="favor-notice" role="status">Entraste con una contraseña temporal. <a href="<?= favor_h($base . 'cuenta.php') ?>">Cámbiala en Mi cuenta</a>.</p>
+<?php endif; ?>
 <span id="favor-contenido" tabindex="-1"></span>
 <?php
 }
