@@ -92,7 +92,7 @@ function markerClass(array $shop): string {
         <div>
             <p class="overline">Waterdeep · comercio disponible</p>
             <h2>¿A dónde vamos?</h2>
-            <p>Los sellos del mapa corresponden únicamente a tiendas que ya tienen página. Pasa sobre uno para abrir la ficha; haz click para entrar.</p>
+            <p>Los sellos del mapa son las tiendas que ya tienen página. Pasa el cursor o toca un sello para ver su ficha; haz clic o tócalo otra vez para entrar.</p>
         </div>
         <div class="intro-side">
             <div class="intro-stats">
@@ -132,7 +132,7 @@ function markerClass(array $shop): string {
 
             <div class="directory-note">
                 <span>⌖</span>
-                <p>En móvil: primer toque abre la ficha; segundo toque entra. El zoom no cambia las coordenadas de las tiendas.</p>
+                <p>En el móvil: un toque abre la ficha y el segundo entra. Pellizca con dos dedos para acercar el plano.</p>
             </div>
         </aside>
 
