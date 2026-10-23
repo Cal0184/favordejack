@@ -1956,7 +1956,7 @@ async function renderBank(){
             </div>` : ''}
             <div class="coin-pouch-row coins-${pouchKeys.length}">${pouches}</div>
             ${canEditCharacter(c) ? `<div class="action-row">
-              <button class="btn btn-primary" onclick="showAddMoneyModal('${c.id}')">Añadir dinero</button>
+              ${isAdminUser() ? `<button class="btn btn-primary" onclick="showAddMoneyModal('${c.id}')">Añadir dinero</button>` : ''}
               <button class="btn btn-primary" onclick="showSpendMoneyModal('${c.id}')">Gastar dinero</button>
               <button class="btn btn-secondary" onclick="showExchangeModal('${c.id}')">Cambiar monedas</button>
               <button class="btn btn-secondary" onclick="showTransferModal('${c.id}')">Transferir</button>
@@ -2322,7 +2322,8 @@ function showAddPlayerModal(){
 /* ---- add character ---- */
 function showAddCharacterModal(){
   const owner=selectedPlayer();
-  if(owner && !isSpecialPlayer(owner) && activeCharacterCount(owner.id)>=5){
+  // Límite de 5 personajes activos por jugador; el admin puede pasarlo.
+  if(owner && !isSpecialPlayer(owner) && !isAdminUser() && activeCharacterCount(owner.id)>=5){
     toast('error','Este jugador ya tiene el máximo de 5 personajes activos.');
     return;
   }
@@ -2331,10 +2332,10 @@ function showAddCharacterModal(){
     <label class="text-input">Nombre del personaje<input type="text" id="name-input" maxlength="60" autofocus></label>
     <label class="text-input">Descripción corta<textarea id="description-input" maxlength="180" placeholder="Quién es, qué hace o cómo lo conocen…"></textarea></label>
     <label class="text-input">Notas personales<textarea id="notes-input" maxlength="600" placeholder="Recordatorios, deudas, objetivos o información útil…"></textarea></label>
-    <p class="modal-detail" style="text-align:left;margin-top:-4px;">Saldo inicial (opcional)</p>
+    ${isAdminUser() ? `<p class="modal-detail" style="text-align:left;margin-top:-4px;">Saldo inicial (opcional)</p>
     <div class="coin-inputs">
       ${UI_COIN_KEYS.map(k=>`<label class="coin-input coin-${k}"><span>${COIN_META[k].abbr}</span><input type="number" min="0" step="1" inputmode="numeric" value="0" data-coin="${k}"></label>`).join('')}
-    </div>
+    </div>` : `<p class="modal-detail" style="text-align:left;margin-top:-4px;">El personaje empieza con 0 monedas: el DM le pone el saldo inicial.</p>`}
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
       <button class="btn btn-primary" id="save-btn">Guardar</button>
@@ -2376,7 +2377,7 @@ function showAddMoneyModal(charId){
     </div>
     <label class="text-input">Motivo (opcional)<textarea id="reason-input" class="spend-reason" maxlength="255" rows="1" placeholder="Ej: recompensa, venta, devolución…"></textarea></label>
     <p class="modal-detail">El movimiento quedará registrado con tu sesión.</p>
-    <label class="checkbox-input"><input type="checkbox" id="correction-input"> Marcar como corrección</label>
+    ${isAdminUser() ? `<label class="checkbox-input"><input type="checkbox" id="correction-input"> Marcar como corrección</label>` : ''}
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
       <button class="btn btn-primary" id="continue-btn">Continuar</button>
@@ -2396,7 +2397,7 @@ function showAddMoneyModal(charId){
     if(!any){ showModalError('Ingresa al menos una cantidad mayor que cero.'); return; }
     const reason = document.getElementById('reason-input').value.trim();
     const author = state.user ? state.user.displayName : ''; 
-    const isCorrection = document.getElementById('correction-input').checked;
+    const isCorrection = isAdminUser() && !!document.getElementById('correction-input')?.checked;
     showConfirmAddMoney(charId, delta, reason, author, isCorrection);
   };
 }
@@ -2439,7 +2440,7 @@ function showSpendMoneyModal(charId){
     </div>
     <label class="text-input">Motivo (opcional)<textarea id="reason-input" class="spend-reason" maxlength="255" rows="1" placeholder="Ej: compra de suministros, posada, equipo…"></textarea></label>
     <p class="modal-detail">El movimiento quedará registrado con tu sesión.</p>
-    <label class="checkbox-input"><input type="checkbox" id="correction-input"> Marcar como corrección</label>
+    ${isAdminUser() ? `<label class="checkbox-input"><input type="checkbox" id="correction-input"> Marcar como corrección</label>` : ''}
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
       <button class="btn btn-primary" id="continue-btn">Continuar</button>
@@ -2466,7 +2467,7 @@ function showSpendMoneyModal(charId){
     const delta = spend.delta;
     const reason = document.getElementById('reason-input').value.trim();
     const author = state.user ? state.user.displayName : ''; 
-    const isCorrection = document.getElementById('correction-input').checked;
+    const isCorrection = isAdminUser() && !!document.getElementById('correction-input')?.checked;
     showConfirmSpendMoney(charId, delta, reason, author, isCorrection, amounts);
   };
 }
