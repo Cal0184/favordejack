@@ -207,7 +207,7 @@ function asset(string $path): string
 <div class="s_d"></div>
 </div>
 <div class="dice_wrapper" id="dice_wrapper">
-<div class="d_2 dice_element" id="d_2" onclick="rollDice('clickDice')">
+<div class="d_2 dice_element" id="d_2" onclick="rollAgain()">
 <div class="f_d_2">
 <p class="t_f_d_2">1</p>
 </div>
@@ -217,7 +217,7 @@ function asset(string $path): string
 <div class="s_f_d_2"></div>
 <div class="s_f_d_2"></div>
 </div>
-<div class="d_4 dice_element" id="d_4" onclick="rollDice('clickDice')">
+<div class="d_4 dice_element" id="d_4" onclick="rollAgain()">
 <div class="f_d_4">
 <p class="t_f_d_4 t_f_d_4_left">2</p>
 <p class="t_f_d_4 t_f_d_4_up">1</p>
@@ -239,7 +239,7 @@ function asset(string $path): string
 <p class="t_f_d_4 t_f_d_4_right">2</p>
 </div>
 </div>
-<div class="d_6 dice_element" id="d_6" onclick="rollDice('clickDice')">
+<div class="d_6 dice_element" id="d_6" onclick="rollAgain()">
 <div class="f_d_6">
 <p class="t_f_d_6">4</p>
 </div>
@@ -259,7 +259,7 @@ function asset(string $path): string
 <p class="t_f_d_6">6</p>
 </div>
 </div>
-<div class="d_8 dice_element" id="d_8" onclick="rollDice('clickDice')">
+<div class="d_8 dice_element" id="d_8" onclick="rollAgain()">
 <div class="f_d_8">
 <p class="t_f_d_8">1</p>
 </div>
@@ -285,7 +285,7 @@ function asset(string $path): string
 <p class="t_f_d_8">2</p>
 </div>
 </div>
-<div class="d_10 dice_element" id="d_10" onclick="rollDice('clickDice')">
+<div class="d_10 dice_element" id="d_10" onclick="rollAgain()">
 <div class="f_d_10">
 <p class="t_f_d_10">1</p>
 </div>
@@ -317,7 +317,7 @@ function asset(string $path): string
 <p class="t_f_d_10">10</p>
 </div>
 </div>
-<div class="d_12 dice_element" id="d_12" onclick="rollDice('clickDice')">
+<div class="d_12 dice_element" id="d_12" onclick="rollAgain()">
 <div class="f_d_12">
 <p class="t_f_d_12">1</p>
 </div>
@@ -355,7 +355,7 @@ function asset(string $path): string
 <p class="t_f_d_12">7</p>
 </div>
 </div>
-<div class="d_20 dice_element" id="d_20" onclick="rollDice('clickDice')">
+<div class="d_20 dice_element" id="d_20" onclick="rollAgain()">
 <div class="f_d_20">
 <p class="t_f_d_20">1</p>
 </div>
@@ -417,7 +417,7 @@ function asset(string $path): string
 <p class="t_f_d_20">20</p>
 </div>
 </div>
-<div class="d_custom dice_element" id="d_custom" onclick="rollDice('clickDice')">
+<div class="d_custom dice_element" id="d_custom" onclick="rollAgain()">
 <div class="f_d_custom">
 <p class="t_f_d_custom" id="t_f_d_custom"></p>
 </div>
@@ -459,7 +459,7 @@ function asset(string $path): string
 </div>
 </div>
 </div><div class="dnd_roll_again_container responsive">
-<div class="dnd_roll_again_element dnd_roll_again_element_1" onclick="rollDice(diceNumber)">
+<div class="dnd_roll_again_element dnd_roll_again_element_1" onclick="rollAgain()">
 <p class="dnd_roll_again_text">Lanzar de nuevo</p>
 </div>
 <div class="dnd_roll_again_element dnd_roll_again_element_2" onclick="goToSection('selectDice')">
