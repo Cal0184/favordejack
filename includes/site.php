@@ -223,7 +223,7 @@ function favor_site_bar(): void
     <?php foreach (FAVOR_NAV_MOBILE as $key): [$label, $path, $icon] = $items[$key]; ?>
         <a href="<?= favor_h($base . $path) ?>"<?= $ctx['section'] === $key ? ' aria-current="page"' : '' ?>><?= favor_nav_icon($icon) ?><span><?= favor_h($label) ?></span></a>
     <?php endforeach; ?>
-    <button type="button" class="favor-more-toggle" aria-expanded="false" aria-controls="favor-more"><?= favor_nav_icon('more') ?><span>Más</span></button>
+    <button type="button" class="favor-more-toggle" aria-expanded="false" aria-controls="favor-more"<?= isset($items[$ctx['section']]) && !in_array($ctx['section'], FAVOR_NAV_MOBILE, true) ? ' data-current="1"' : '' ?>><?= favor_nav_icon('more') ?><span>Más</span></button>
 </nav>
 <div class="favor-sheet" id="favor-more" data-favor-theme="<?= favor_h($ctx['theme']) ?>" role="dialog" aria-modal="true" aria-label="Más secciones" hidden>
     <div class="favor-sheet-panel">

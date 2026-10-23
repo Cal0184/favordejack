@@ -95,7 +95,7 @@
     .favor-tabbar{position:fixed;left:0;right:0;bottom:0;z-index:9400;display:grid;grid-template-columns:repeat(5,1fr);padding:0 4px env(safe-area-inset-bottom)!important;border-top:1px solid var(--favor-line);background:var(--favor-bg);box-shadow:0 -8px 20px rgba(0,0,0,.45);font:13px/1.1 var(--favor-font)}
     .favor-tabbar a,.favor-tabbar button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:var(--favor-tab-h);padding:6px 2px;border:0;background:transparent;color:var(--favor-muted)!important;font:600 13px/1.1 var(--favor-font);text-decoration:none!important;cursor:pointer}
     .favor-tabbar .favor-icon{width:24px;height:24px}
-    .favor-tabbar [aria-current="page"],.favor-tabbar [aria-expanded="true"]{color:var(--favor-accent-2)!important}
+    .favor-tabbar [aria-current="page"],.favor-tabbar [aria-expanded="true"],.favor-tabbar [data-current]{color:var(--favor-accent-2)!important}
     .favor-tabbar [aria-current="page"] .favor-icon{filter:drop-shadow(0 0 6px var(--favor-accent))}
     body{padding-bottom:calc(var(--favor-tab-h) + 8px + env(safe-area-inset-bottom))!important}
     html{scroll-padding-bottom:calc(var(--favor-tab-h) + 8px)}
@@ -118,3 +118,10 @@ body.favor-plain{padding:0!important;display:block!important;place-items:initial
 
 /* Foco del teclado visible en toda la web (algunas secciones lo quitaban con outline:none). */
 :where(a,button,input,select,textarea,summary,[tabindex],[role="button"]):focus-visible{outline:3px solid #f5d590!important;outline-offset:2px!important}
+
+/* Pantallas táctiles: botones y campos de al menos 44 px para tocarlos con el pulgar.
+   :where() deja que cada sección mantenga su diseño; solo sube la altura mínima. */
+@media (pointer:coarse){
+    :where(button,[role="button"],select,input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="hidden"]),.btn,.tab,.topnav a){min-height:44px}
+    :where(.topnav a,.tab,.chip,.filter-chip,.category-tab){display:inline-flex;align-items:center}
+}
