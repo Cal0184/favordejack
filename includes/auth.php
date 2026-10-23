@@ -143,12 +143,14 @@ function favor_login(string $username, string $password): array
     $username = mb_strtolower(trim($username), 'UTF-8');
     if ($username === '' || $password === '') throw new RuntimeException('Escribe tu usuario y contraseña.');
 
-    $now = time();
-    $blocked = (int)($_SESSION['favor_login_blocked_until'] ?? 0);
-    if ($blocked > $now) throw new RuntimeException('Demasiados intentos. Espera un minuto e inténtalo otra vez.');
-
     $db = favor_db();
     try {
+        // El límite se guarda en la base de datos: borrar cookies o cambiar de
+        // navegador no da intentos nuevos.
+        $keys = favor_login_keys($username);
+        $wait = favor_login_wait($db, $keys);
+        if ($wait > 0) throw new RuntimeException(favor_login_wait_message($wait));
+
         $stmt = $db->prepare(
             'SELECT u.ID,u.Username,u.PasswordHash,u.Salt,u.PasswordIterations,u.Jugador,u.Rol,u.Activo, '
             . 'j.Nombre AS JugadorNombre,j.Activo AS JugadorActivo '
@@ -158,27 +160,19 @@ function favor_login(string $username, string $password): array
         $stmt->execute();
         $row = $stmt->get_result()->fetch_assoc();
         $stmt->close();
+
+        $valid = $row && (int)$row['Activo'] === 1 && $row['JugadorNombre'] !== null && (int)$row['JugadorActivo'] === 1
+            && favor_password_matches($row, $password);
+
+        if (!$valid) {
+            $wait = favor_login_fail($db, $keys);
+            $message = 'Usuario o contraseña incorrectos.';
+            if ($wait > 0) $message .= ' ' . favor_login_wait_message($wait);
+            throw new RuntimeException($message);
+        }
+        favor_login_clear($db, $keys['user']);
     } finally {
         $db->close();
-    }
-
-    $valid = false;
-    if ($row && (int)$row['Activo'] === 1 && $row['JugadorNombre'] !== null && (int)$row['JugadorActivo'] === 1) {
-        $calc = hash_pbkdf2('sha256', $password, (string)$row['Salt'], (int)$row['PasswordIterations'], 64, false);
-        $valid = hash_equals(
-            strtolower(trim((string)$row['PasswordHash'])),
-            strtolower(trim($calc))
-        );
-    }
-
-    if (!$valid) {
-        $attempts = (int)($_SESSION['favor_login_attempts'] ?? 0) + 1;
-        $_SESSION['favor_login_attempts'] = $attempts;
-        if ($attempts >= 5) {
-            $_SESSION['favor_login_attempts'] = 0;
-            $_SESSION['favor_login_blocked_until'] = $now + 60;
-        }
-        throw new RuntimeException('Usuario o contraseña incorrectos.');
     }
 
     session_regenerate_id(true);
@@ -192,9 +186,108 @@ function favor_login(string $username, string $password): array
     ];
     $_SESSION['favor_user'] = $user;
     $_SESSION['favor_csrf'] = bin2hex(random_bytes(24));
-    $_SESSION['favor_login_attempts'] = 0;
-    unset($_SESSION['favor_login_blocked_until']);
     return $user;
+}
+
+/*
+ * Límite de intentos de entrada.
+ * Por usuario: FAVOR_LOGIN_MAX_FAILS fallos seguidos bloquean esa cuenta
+ * FAVOR_LOGIN_LOCK_SECONDS. Por conexión (IP): un tope más alto frena a quien
+ * prueba muchos usuarios distintos. Un acierto borra los fallos de la cuenta.
+ */
+const FAVOR_LOGIN_MAX_FAILS = 5;
+const FAVOR_LOGIN_MAX_FAILS_IP = 20;
+const FAVOR_LOGIN_LOCK_SECONDS = 900;
+
+function favor_login_keys(string $username): array
+{
+    $ip = (string)($_SERVER['REMOTE_ADDR'] ?? '');
+    return [
+        'user' => 'u:' . hash('sha256', $username),
+        'ip' => 'ip:' . hash('sha256', $ip),
+    ];
+}
+
+function favor_login_table(mysqli $db): void
+{
+    static $ready = false;
+    if ($ready) return;
+    $db->query("CREATE TABLE IF NOT EXISTS LoginIntento (
+        Clave char(67) NOT NULL PRIMARY KEY,
+        Fallos int unsigned NOT NULL DEFAULT 0,
+        Primero int unsigned NOT NULL DEFAULT 0,
+        BloqueadoHasta int unsigned NOT NULL DEFAULT 0
+    ) ENGINE=InnoDB DEFAULT CHARSET=ascii");
+    $ready = true;
+}
+
+/** Segundos que faltan para poder intentarlo otra vez (0 = puede entrar). */
+function favor_login_wait(mysqli $db, array $keys): int
+{
+    favor_login_table($db);
+    $now = time();
+    $stmt = $db->prepare('SELECT MAX(BloqueadoHasta) AS Hasta FROM LoginIntento WHERE Clave IN (?,?)');
+    $stmt->bind_param('ss', $keys['user'], $keys['ip']);
+    $stmt->execute();
+    $until = (int)($stmt->get_result()->fetch_assoc()['Hasta'] ?? 0);
+    $stmt->close();
+    return max(0, $until - $now);
+}
+
+/** Apunta un fallo y devuelve cuánto hay que esperar si con él se llegó al tope. */
+function favor_login_fail(mysqli $db, array $keys): int
+{
+    favor_login_table($db);
+    $now = time();
+    $windowStart = $now - FAVOR_LOGIN_LOCK_SECONDS;
+    $wait = 0;
+    foreach (['user' => FAVOR_LOGIN_MAX_FAILS, 'ip' => FAVOR_LOGIN_MAX_FAILS_IP] as $kind => $max) {
+        $key = $keys[$kind];
+        // Los fallos viejos (fuera de la ventana) no cuentan.
+        $stmt = $db->prepare(
+            'INSERT INTO LoginIntento (Clave,Fallos,Primero,BloqueadoHasta) VALUES (?,1,?,0) '
+            . 'ON DUPLICATE KEY UPDATE Fallos=IF(Primero<?,1,Fallos+1), Primero=IF(Primero<?,VALUES(Primero),Primero)'
+        );
+        $stmt->bind_param('siii', $key, $now, $windowStart, $windowStart);
+        $stmt->execute();
+        $stmt->close();
+
+        $stmt = $db->prepare('SELECT Fallos FROM LoginIntento WHERE Clave=?');
+        $stmt->bind_param('s', $key);
+        $stmt->execute();
+        $fails = (int)($stmt->get_result()->fetch_assoc()['Fallos'] ?? 0);
+        $stmt->close();
+
+        if ($fails >= $max) {
+            $until = $now + FAVOR_LOGIN_LOCK_SECONDS;
+            $stmt = $db->prepare('UPDATE LoginIntento SET Fallos=0, Primero=?, BloqueadoHasta=? WHERE Clave=?');
+            $stmt->bind_param('iis', $now, $until, $key);
+            $stmt->execute();
+            $stmt->close();
+            $wait = FAVOR_LOGIN_LOCK_SECONDS;
+        }
+    }
+    // Limpieza ligera de filas que ya no sirven.
+    $old = $now - 86400;
+    $stmt = $db->prepare('DELETE FROM LoginIntento WHERE BloqueadoHasta<? AND Primero<?');
+    $stmt->bind_param('ii', $now, $old);
+    $stmt->execute();
+    $stmt->close();
+    return $wait;
+}
+
+function favor_login_clear(mysqli $db, string $key): void
+{
+    $stmt = $db->prepare('DELETE FROM LoginIntento WHERE Clave=?');
+    $stmt->bind_param('s', $key);
+    $stmt->execute();
+    $stmt->close();
+}
+
+function favor_login_wait_message(int $seconds): string
+{
+    $minutes = max(1, (int)ceil($seconds / 60));
+    return 'Demasiados intentos fallidos. Espera ' . $minutes . ($minutes === 1 ? ' minuto' : ' minutos') . ' e inténtalo otra vez.';
 }
 
 function favor_logout(): void

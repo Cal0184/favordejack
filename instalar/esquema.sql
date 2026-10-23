@@ -169,6 +169,15 @@ CREATE TABLE IF NOT EXISTS `PersonajeRelacion` (
   KEY `idx_relacion_b` (`PersonajeB`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Límite de intentos de entrada (includes/auth.php). Se puede vaciar sin perder nada.
+CREATE TABLE IF NOT EXISTS `LoginIntento` (
+  `Clave` char(67) NOT NULL,
+  `Fallos` int(10) unsigned NOT NULL DEFAULT 0,
+  `Primero` int(10) unsigned NOT NULL DEFAULT 0,
+  `BloqueadoHasta` int(10) unsigned NOT NULL DEFAULT 0,
+  PRIMARY KEY (`Clave`)
+) ENGINE=InnoDB DEFAULT CHARSET=ascii;
+
 CREATE TABLE IF NOT EXISTS `Usuario` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `Username` varchar(50) NOT NULL,
