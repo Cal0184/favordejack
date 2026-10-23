@@ -115,3 +115,6 @@ body.favor-plain{padding:0!important;display:block!important;place-items:initial
 .favor-center{min-height:calc(100vh - var(--favor-bar-h));display:grid;place-items:center;padding:22px 14px;box-sizing:border-box}
 .favor-pad{padding:24px 16px;box-sizing:border-box}
 @media (max-width:819px){.favor-center{min-height:calc(100vh - var(--favor-bar-h) - var(--favor-tab-h))}.favor-pad{padding:14px 12px}}
+
+/* Foco del teclado visible en toda la web (algunas secciones lo quitaban con outline:none). */
+:where(a,button,input,select,textarea,summary,[tabindex],[role="button"]):focus-visible{outline:3px solid #f5d590!important;outline-offset:2px!important}

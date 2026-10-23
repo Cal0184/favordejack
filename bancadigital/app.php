@@ -21,6 +21,7 @@
   --forest:#22402F;
   --forest-dark:#152A1E;
   --gold:#A97C1F;
+  --gold-text:#6b4c0e; /* dorado para letra pequeña sobre pergamino (contraste 5:1) */
   --gold-bright:#CDA23A;
   --ppt:#5E7A96;
   --ppt-dark:#33475A;
@@ -142,7 +143,7 @@ h1,h2,h3,.display{ font-family:'Cinzel', Georgia, serif; letter-spacing:.02em; }
   text-align:center; font-size:.9rem; box-shadow:0 2px 8px rgba(46,33,22,.08);
 }
 .local-notice strong{ color:var(--ink); }
-.wealth-line{ margin-top:7px; font-size:.82rem; color:var(--gold); font-weight:600; }
+.wealth-line{ margin-top:7px; font-size:.82rem; color:var(--gold-text); font-weight:600; }
 .mini-coins{ display:grid; grid-template-columns:repeat(4,1fr); gap:5px; margin:10px 0 12px; }
 .mini-coin{
   border:1px solid rgba(91,70,50,.14); border-radius:7px; padding:4px 2px;
@@ -686,7 +687,7 @@ h1,h2,h3,.display{ font-family:'Cinzel', Georgia, serif; letter-spacing:.02em; }
 .banca-layout{display:grid;grid-template-columns:225px minmax(0,1fr);min-height:650px}
 .players-sidebar{padding:16px 12px 18px;background:linear-gradient(180deg,rgba(248,237,211,.92),rgba(224,205,163,.92));border-right:1px solid rgba(137,100,43,.45);box-shadow:8px 0 24px rgba(70,45,23,.08);min-width:0}
 .sidebar-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 5px 10px}
-.sidebar-kicker{display:block;color:var(--gold);font-family:'Cinzel',serif;font-size:.62rem;text-transform:uppercase;letter-spacing:.16em}
+.sidebar-kicker{display:block;color:var(--gold-text);font-family:'Cinzel',serif;font-size:.62rem;text-transform:uppercase;letter-spacing:.16em}
 .sidebar-heading h2{margin:0;color:var(--burgundy-dark);font-size:1.08rem}
 .sidebar-icon-btn{width:30px;height:30px;border-radius:50%;border:1px solid #9b742d;background:#f6e6bc;color:#6e4c15;font:700 1.15rem/1 'Cinzel',serif;cursor:pointer}
 .sidebar-icon-btn:hover{background:#fff0c8;transform:translateY(-1px)}
@@ -714,7 +715,7 @@ h1,h2,h3,.display{ font-family:'Cinzel', Georgia, serif; letter-spacing:.02em; }
 .workspace-avatar img{display:block;width:100%;height:100%;object-fit:cover}
 .workspace-heading{min-width:0;flex:1}
 .workspace-heading h2{margin:0;color:var(--burgundy-dark);font-size:clamp(1.2rem,2vw,1.65rem)}
-.workspace-handle{color:var(--gold);font-family:'Cinzel',serif;font-size:.75rem;margin-top:1px}
+.workspace-handle{color:var(--gold-text);font-family:'Cinzel',serif;font-size:.75rem;margin-top:1px}
 .workspace-meta{color:var(--ink-soft);font-size:.9rem;margin-top:3px}
 .workspace-meta strong{color:var(--burgundy-dark);font-size:1.12em;font-weight:600;font-variant-numeric:lining-nums}
 .workspace-actions{display:flex;align-items:center;justify-content:flex-end;gap:7px;flex-wrap:wrap}

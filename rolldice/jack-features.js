@@ -1069,3 +1069,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     renderSavedRolls();
 });
+
+// Teclado: los controles antiguos son <div onclick>. Se vuelven botones accesibles
+// (Tab para llegar, Enter o Espacio para pulsar) sin cambiar su aspecto.
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('[onclick]').forEach(el => {
+        if (el.matches('a, button, input, select, textarea, label')) return;
+        if (el.classList.contains('dice_element')) return; // el dado 3D ya tiene «Lanzar de nuevo»
+        el.setAttribute('role', 'button');
+        el.tabIndex = 0;
+        if (!el.hasAttribute('aria-label') && el.title) el.setAttribute('aria-label', el.title);
+        el.addEventListener('keydown', event => {
+            if (event.key !== 'Enter' && event.key !== ' ') return;
+            event.preventDefault();
+            el.click();
+        });
+    });
+});

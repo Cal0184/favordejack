@@ -7,13 +7,6 @@
 
     var lastFocus = null;
 
-    function isVisible(el) {
-        if (!el || el.hidden) return false;
-        var style = window.getComputedStyle(el);
-        if (style.display === 'none' || style.visibility === 'hidden' || Number(style.opacity) === 0) return false;
-        return el.getClientRects().length > 0;
-    }
-
     function setOpen(toggle, panel, open) {
         if (!toggle || !panel) return;
         toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
@@ -49,29 +42,11 @@
         return true;
     }
 
-    /*
-     * Cualquier ventana emergente de las secciones: si está a la vista, Escape
-     * pulsa su botón de cerrar. Así funcionan igual las ventanas antiguas de
-     * cada tienda o módulo, aunque no tengan su propio código para Escape.
-     */
-    var DIALOGS = '[role="dialog"]:not(#favor-more),[aria-modal="true"]:not(#favor-more),.modal.open,.modal.show,.modal.active,.modal.is-open,.lightbox.open,.overlay.open,.drawer.open,[data-favor-dialog]';
-    var CLOSERS = '[data-close],[data-favor-close],.modal-close,.close-modal,.drawer-close,.close-btn,.btn-close,.close,[aria-label^="Cerrar"],[title^="Cerrar"]';
-
-    function closeTopDialog() {
-        var open = Array.prototype.filter.call(document.querySelectorAll(DIALOGS), isVisible);
-        if (!open.length) return false;
-        var dialog = open[open.length - 1];
-        var closer = Array.prototype.find.call(dialog.querySelectorAll(CLOSERS), isVisible);
-        if (closer) { closer.click(); return true; }
-        return false;
-    }
-
     document.addEventListener('keydown', function (event) {
         if (event.key !== 'Escape' || event.defaultPrevented) return;
-        if (closeSheet() || closeAccount(true)) { event.preventDefault(); return; }
-        // Las páginas que ya manejan Escape lo hacen antes (defaultPrevented).
-        if (document.querySelector('dialog[open]')) return; // <dialog> se cierra solo
-        if (closeTopDialog()) event.preventDefault();
+        // Las ventanas de cada sección (Banca, Archivos, Inventario, tiendas) ya se
+        // cierran con Escape en su propio código; aquí, el menú y la hoja comunes.
+        if (closeSheet() || closeAccount(true)) event.preventDefault();
     });
 
     document.addEventListener('click', function (event) {
