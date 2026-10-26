@@ -30,7 +30,7 @@ function updateStageWidth(preserve=true){
  const prev=stage.getBoundingClientRect(),prevW=prev.width||1,prevH=prev.height||1;
  const cx=(viewport.scrollLeft+viewport.clientWidth/2)/prevW;
  const cy=(viewport.scrollTop+viewport.clientHeight/2)/prevH;
- baseWidth=baseMapWidth();stage.style.width=`${Math.round(baseWidth*zoom)}px`;
+ baseWidth=baseMapWidth();stage.style.width=`${Math.round(baseWidth*zoom)}px`;syncFit();
  requestAnimationFrame(()=>{
    if(!preserve)return;
    const r=stage.getBoundingClientRect();
@@ -46,13 +46,16 @@ function setZoomAt(v,clientX,clientY){
  const vr=viewport.getBoundingClientRect(),r=stage.getBoundingClientRect();
  const px=clientX-vr.left,py=clientY-vr.top;
  const fx=(viewport.scrollLeft+px)/(r.width||1),fy=(viewport.scrollTop+py)/(r.height||1);
- zoom=next;stage.style.width=`${Math.round(baseWidth*zoom)}px`;
+ zoom=next;stage.style.width=`${Math.round(baseWidth*zoom)}px`;syncFit();
  const n=stage.getBoundingClientRect();
- viewport.scrollLeft=fx*n.width-px;viewport.scrollTop=fy*n.height-py;
+ if(!isFit()){viewport.scrollLeft=fx*n.width-px;viewport.scrollTop=fy*n.height-py}
  if(resetLabel)resetLabel.textContent=`${Math.round(zoom*100)}%`;
  markers.forEach(m=>{if(m.classList.contains('touch-open'))placeCard(m)});
 }
 // Ficha de la tienda en móvil: encima o debajo del sello y siempre dentro de la pantalla.
+// Móvil sin zoom: el plano entero a la vista y la página se desplaza normal (sin scroll dentro del mapa).
+const isFit=()=>isCompact()&&zoom<=1.001;
+function syncFit(){board?.classList.toggle('fit',isFit());if(isFit()){viewport.scrollLeft=0;viewport.scrollTop=0}}
 function placeCard(marker){
  if(!isCompact())return;
  const card=marker.querySelector('.shop-card');if(!card)return;
@@ -66,13 +69,21 @@ function placeCard(marker){
 function revealCard(marker){
  if(!isCompact())return;
  const card=marker.querySelector('.shop-card');if(!card)return;
- requestAnimationFrame(()=>{
+ // Esperar a que termine la animación de la ficha para medirla bien.
+ setTimeout(()=>{
    const vr=viewport.getBoundingClientRect(),cr=card.getBoundingClientRect(),mr=marker.getBoundingClientRect();
    const top=Math.min(cr.top,mr.top),bottom=Math.max(cr.bottom,mr.bottom);
    let dy=0;
+   const smooth=window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth';
+   if(isFit()){
+     const bar=document.querySelector('.favor-tabbar'),floor=innerHeight-(bar&&bar.offsetHeight&&getComputedStyle(bar).display!=='none'?bar.offsetHeight:0);
+     if(top<8)dy=top-8;else if(bottom>floor-8)dy=bottom-floor+8;
+     if(dy)window.scrollBy({top:dy,behavior:smooth});
+     return;
+   }
    if(top<vr.top+6)dy=top-vr.top-6;else if(bottom>vr.bottom-6)dy=bottom-vr.bottom+6;
    if(dy)viewport.scrollBy({top:dy,behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
- });
+ },220);
 }
 function openMarker(m){
  markers.forEach(x=>{if(x!==m)x.classList.remove('touch-open')});
@@ -117,7 +128,7 @@ document.querySelectorAll('[data-zoom]').forEach(btn=>btn.addEventListener('clic
 
 directory.forEach(btn=>btn.addEventListener('click',()=>{
  // En móvil la lista va debajo del plano: subir hasta el plano antes de mostrar la tienda.
- if(isCompact()&&board){
+ if(isCompact()&&!isFit()&&board){
    const r=board.getBoundingClientRect();
    if(r.top<0||r.top>innerHeight*.35)board.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
  }
@@ -197,7 +208,19 @@ viewport.addEventListener('touchmove',e=>{
  const t=e.touches;
  setZoomAt(pinch.zoom*touchDist(t)/pinch.dist,(t[0].clientX+t[1].clientX)/2,(t[0].clientY+t[1].clientY)/2);
 },{passive:false});
-viewport.addEventListener('touchend',e=>{if(e.touches.length<2)pinch=null});
+// Doble toque: acerca donde tocaste; otro doble toque vuelve al plano entero.
+let lastTap=0,lastX=0,lastY=0,multi=false;
+viewport.addEventListener('touchstart',e=>{if(e.touches.length>1)multi=true},{passive:true});
+viewport.addEventListener('touchend',e=>{
+ if(e.touches.length<2)pinch=null;
+ if(e.touches.length)return;
+ const t=e.changedTouches[0],now=Date.now();
+ if(multi||e.target.closest('.shop-marker')){multi=false;lastTap=0;return}
+ if(now-lastTap<320&&Math.hypot(t.clientX-lastX,t.clientY-lastY)<30){
+   e.preventDefault();lastTap=0;
+   if(zoom>1.4){setZoomAt(minZoom(),t.clientX,t.clientY)}else setZoomAt(2.2,t.clientX,t.clientY);
+ }else{lastTap=now;lastX=t.clientX;lastY=t.clientY}
+},{passive:false});
 // Ctrl + rueda (o el gesto de pellizco del trackpad) en el ordenador.
 viewport.addEventListener('wheel',e=>{
  if(!e.ctrlKey)return;
@@ -209,9 +232,10 @@ function syncCompact(){board?.classList.toggle('compact',isCompact());if(isCompa
 
 function init(){
  syncCompact();
+ if(coarse&&status&&!status.dataset.touched)status.textContent='Toca un sello; doble toque o dos dedos para acercar.';
  zoom=1;
  updateStageWidth(false);
- requestAnimationFrame(()=>{if(activeShop&&!editMode)centerShop(activeShop,false)});
+ requestAnimationFrame(()=>{if(activeShop&&!editMode&&!isCompact())centerShop(activeShop,false)});
 }
 if(image.complete)init();else image.addEventListener('load',init,{once:true});
 let rt=0;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{syncCompact();updateStageWidth(true);markers.forEach(m=>{if(m.classList.contains('touch-open'))placeCard(m)})},100)});
