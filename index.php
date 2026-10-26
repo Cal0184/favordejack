@@ -476,6 +476,7 @@ button,summary{font:inherit}
                 </div>
                 <a href="<?= favor_base_path() ?>cuenta.php">Mi cuenta</a>
                 <a href="<?= favor_base_path() ?>perfil.php">Mi perfil</a>
+                <?php if (($sessionUser['role'] ?? '') === 'admin'): ?><a href="<?= favor_base_path() ?>tiendas/descuentos.php">Descuentos de tiendas</a><?php endif; ?>
                 <a class="danger" href="<?= favor_base_path() ?>logout.php">Cerrar sesión</a>
             </div>
         </details>

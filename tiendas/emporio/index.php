@@ -5,6 +5,7 @@ require_once __DIR__ . '/lib.php';
 
 $user = $GLOBALS['__favor_auth_widget_user'] ?? null;
 $csrf = $user ? favor_csrf() : '';
+$discount = favor_discount_shop_data($user, EMPORIO_DISCOUNT_SHOP);
 favor_session_close();
 
 [$cards, $dupes] = emporio_shop_cards();
@@ -38,6 +39,14 @@ $shopData = [
     'characters' => emporio_characters($user),
     'orders' => array_map('emporio_order_public', emporio_orders_for($user, 20)),
     'csrf' => $csrf,
+    'discount' => [
+        'active' => $discount['active'],
+        'percent' => $discount['percent'],
+        'rule' => $discount['rule'],
+        'available' => array_column(array_filter($discount['characters'], static fn(array $c): bool => $c['available']), 'name', 'id'),
+        'used' => array_column(array_filter($discount['characters'], static fn(array $c): bool => !$c['available']), 'usedItem', 'id'),
+        'manageUrl' => $discount['manageUrl'],
+    ],
     'loginUrl' => favor_base_path() . 'login.php?next=' . rawurlencode(favor_base_path() . 'tiendas/emporio/'),
 ];
 ?>

@@ -3,9 +3,8 @@ declare(strict_types=1);
 require_once dirname(__DIR__, 2) . '/includes/auth-widget.php';
 require_once dirname(__DIR__, 2) . '/includes/descuentos.php';
 favor_session_start();
+$discount = favor_discount_shop_data($GLOBALS['__favor_auth_widget_user'] ?? null, 'pocion-picante');
 favor_session_close();
-$discount = favor_discount_shop_data($GLOBALS['__favor_auth_widget_user'] ?? null);
-$discount['manageUrl'] = favor_base_path() . 'tiendas/descuentos.php';
 
 $productsPath = __DIR__ . '/productos.json';
 $products = [];

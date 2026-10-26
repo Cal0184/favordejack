@@ -139,7 +139,7 @@ function sync() {
     els.noResults.hidden = !(shown === 0 && cardEls.length > 0);
     if (els.budgetInfo) {
         els.budgetInfo.innerHTML = who
-            ? `<b>${esc(who.name)}</b> tiene <b>${esc(po(who.goldExact))}</b> en la Banca.`
+            ? `<b>${esc(who.name)}</b> tiene <b>${esc(po(who.goldExact))}</b> en la Banca.${discountNote(who.id)}`
             : 'Elige un personaje para ver qué le alcanza.';
     }
 
@@ -206,6 +206,52 @@ function toggleCompare(id) {
         compare.push(id);
     }
     sync();
+}
+
+/* ---------- descuento de la tienda (lo define el DM, una vez por personaje) ---------- */
+const DISCOUNT = DATA.discount || {active: false};
+const hasDiscount = id => !!(DISCOUNT.active && DISCOUNT.available && DISCOUNT.available[id]);
+const dealText = () => `${DISCOUNT.percent} %${DISCOUNT.rule ? ' ' + DISCOUNT.rule : ''}`;
+function discountNote(id) {
+    if (!DISCOUNT.active) return '';
+    if (hasDiscount(id)) return ` <span class="deal-on">✦ Tiene ${esc(dealText())}: se aplica al enviar el pedido.</span>`;
+    if (DISCOUNT.used && id in DISCOUNT.used) return ` <span class="deal-off">Ya usó su descuento${DISCOUNT.used[id] ? ' (' + esc(DISCOUNT.used[id]) + ')' : ''}.</span>`;
+    return '';
+}
+/** Objetos mágicos del pedido que pueden llevar el descuento, el más caro primero. */
+function discountCandidates() {
+    return order.map(l => ({id: l.id, ...ORDER_ITEMS[l.id]}))
+        .filter(i => !i.id.startsWith('servicio:') && i.pricePo !== null)
+        .sort((a, b) => b.pricePo - a.pricePo);
+}
+function discountBlock(characterId, chosen) {
+    if (!DISCOUNT.active || !characterId) return '';
+    const name = characters[characterId]?.name || 'Este personaje';
+    if (!hasDiscount(characterId)) return discountNote(characterId) ? `<p class="order-deal off">${discountNote(characterId)}</p>` : '';
+    const list = discountCandidates();
+    if (!list.length) return `<p class="order-deal">✦ ${esc(name)} tiene ${esc(dealText())}, pero este pedido no tiene objetos mágicos con precio.</p>`;
+    const pick = list.find(i => i.id === chosen) || list[0];
+    const save = Math.round(pick.pricePo * DISCOUNT.percent) / 100;
+    return `<div class="order-deal on">
+        <label class="deal-check"><input type="checkbox" name="useDiscount" checked> Usar el descuento de ${esc(name)}: <b>${esc(dealText())}</b></label>
+        <label class="field"><span class="field-label">Objeto con descuento</span>
+            <select name="discountItem">${list.map(i => `<option value="${esc(i.id)}" ${i.id === pick.id ? 'selected' : ''}>${esc(i.name)} · ${esc(i.price)}</option>`).join('')}</select></label>
+        <p class="muted">Ahorra ${esc(po(save))}. Se usa una sola vez; si el pedido se cancela o Ecix's lo rechaza, lo recupera.</p>
+    </div>`;
+}
+function orderDiscountAmount(form) {
+    if (!form?.useDiscount?.checked || !form.discountItem) return 0;
+    const item = ORDER_ITEMS[form.discountItem.value];
+    return item && item.pricePo !== null ? Math.round(item.pricePo * DISCOUNT.percent) / 100 : 0;
+}
+function refreshOrderDeal(form) {
+    const box = form.querySelector('#orderDeal');
+    if (box) box.innerHTML = discountBlock(form.character.value, form.discountItem?.value);
+    const {total, unknown} = orderTotal();
+    const save = orderDiscountAmount(form);
+    form.querySelector('#orderTotalValue').innerHTML = save
+        ? `<s class="muted">${esc(po(total))}</s> ${esc(po(total - save))}${unknown ? ' + precios a consultar' : ''}`
+        : `${esc(po(total))}${unknown ? ' + precios a consultar' : ''}`;
 }
 
 function orderTotal() {
@@ -333,10 +379,11 @@ function orderForm() {
                     <button class="remove" type="button" data-remove="${esc(l.id)}" aria-label="Quitar ${esc(item.name)}">×</button>
                 </li>`;
             }).join('')}</ul>
-            <div class="order-total"><span>Total estimado</span><span>${esc(po(total))}${unknown ? ' + precios a consultar' : ''}</span></div>
+            <div class="order-total"><span>Total estimado</span><span id="orderTotalValue">${esc(po(total))}${unknown ? ' + precios a consultar' : ''}</span></div>
             ${warning}
             <label class="field"><span class="field-label">Personaje que compra</span>
                 <select name="character" required data-autofocus><option value="">— Elige personaje —</option>${options}</select></label>
+            <div id="orderDeal"></div>
             <label class="field"><span class="field-label">Mensaje para Ecix's (opcional)</span>
                 <textarea name="note" maxlength="500" placeholder="Para cuándo lo necesitas, si quieres regatear…"></textarea></label>
             <div class="detail-actions">
@@ -344,6 +391,11 @@ function orderForm() {
                 <button type="button" data-act="empty">Vaciar pedido</button>
             </div>
         </form>`, 'order');
+    const form = $('#orderForm');
+    if (form) {
+        refreshOrderDeal(form);
+        form.addEventListener('change', e => { if (['character', 'discountItem', 'useDiscount'].includes(e.target.name)) refreshOrderDeal(form); });
+    }
 }
 
 async function sendOrder(form) {
@@ -353,10 +405,15 @@ async function sendOrder(form) {
         const res = await fetch('pedidos.php', {
             method: 'POST',
             headers: {'Content-Type': 'application/json', 'X-CSRF-Token': DATA.csrf},
-            body: JSON.stringify({action: 'create', character: form.character.value, note: form.note.value, items: order}),
+            body: JSON.stringify({action: 'create', character: form.character.value, note: form.note.value, items: order,
+                discountItem: form.useDiscount?.checked && form.discountItem ? form.discountItem.value : ''}),
         });
         const out = await res.json().catch(() => ({ok: false, error: 'El servidor no respondió bien.'}));
         if (!out.ok) throw new Error(out.error || 'No se pudo enviar el pedido.');
+        if (out.order.discount && DISCOUNT.available) {
+            delete DISCOUNT.available[form.character.value];
+            (DISCOUNT.used ||= {})[form.character.value] = out.order.discount.item;
+        }
         order = [];
         saveOrder();
         DATA.orders.unshift(out.order);
@@ -382,7 +439,7 @@ async function cancelOrder(id) {
         if (!out.ok) throw new Error(out.error || 'No se pudo cancelar.');
         DATA.orders = DATA.orders.map(o => o.id === id ? out.order : o);
         renderOrders();
-        toast('Pedido cancelado.');
+        toast(out.notice ? 'Pedido cancelado. ' + out.notice : 'Pedido cancelado.');
     } catch (err) { toast(err.message); }
 }
 
@@ -402,6 +459,7 @@ function renderOrders() {
             </header>
             <p class="muted">${esc(date(o.created))}${o.total !== null ? ' · Total estimado ' + esc(po(o.total)) : ''}</p>
             <ul>${o.items.map(i => `<li>${Number(i.qty) > 1 ? Number(i.qty) + ' × ' : ''}${esc(i.name)} <span class="muted">${esc(i.price)}</span></li>`).join('')}</ul>
+            ${o.discount ? `<p class="order-deal-line">✦ Descuento ${esc(o.discount.percent)} % en ${esc(o.discount.item)}: −${esc(po(o.discount.amount))}${['cancelado', 'rechazado'].includes(o.state) ? ' · devuelto al personaje' : ''}</p>` : ''}
             ${o.note ? `<p class="muted">Tu mensaje: ${esc(o.note)}</p>` : ''}
             ${o.reply ? `<p class="reply">Ecix's: ${esc(o.reply)}</p>` : ''}
             ${o.state === 'pendiente' && !DATA.user.admin ? `<button class="tool-btn secondary" type="button" data-cancel="${esc(o.id)}">Cancelar pedido</button>` : ''}

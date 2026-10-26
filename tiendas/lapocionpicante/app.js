@@ -24,11 +24,12 @@ const modal=document.getElementById('productModal');
 const modalContent=document.getElementById('modalContent');
 const toast=document.getElementById('toast');
 
-let category='Todos',favoritesOnly=false,lastFocused=null,toastTimer=0;
+let category='Todos',favoritesOnly=false,lastFocused=null,toastTimer=0,openId='';
 let favorites=loadFavorites();
 
-// Descuento del gremio: se elige con qué personaje se compra y, si ese personaje
-// está marcado, los precios se muestran rebajados.
+// Descuento de la tienda (lo define el DM): cada personaje lo usa una vez.
+// Se elige con qué personaje se compra; si aún lo tiene, los precios se ven
+// rebajados y la ficha de la poción permite usarlo.
 const discount=data.discount||{};
 const buyers=Array.isArray(discount.characters)?discount.characters:[];
 const discountBar=document.getElementById('discountBar');
@@ -36,37 +37,67 @@ let buyerId=loadBuyer();
 
 function loadBuyer(){try{const id=localStorage.getItem('lpp:buyer')||'';return buyers.some(c=>c.id===id)?id:''}catch(_){return''}}
 function saveBuyer(){try{localStorage.setItem('lpp:buyer',buyerId)}catch(_){}}
-function activePercent(){const b=buyers.find(c=>c.id===buyerId);return b&&b.discount?Math.max(0,Math.min(100,Number(discount.percent)||0)):0}
+function buyer(){return buyers.find(c=>c.id===buyerId)||null}
+function activePercent(){const b=buyer();return discount.active&&b&&b.available?Math.max(0,Math.min(100,Number(discount.percent)||0)):0}
+function dealText(){return `${Number(discount.percent)||0} %${discount.rule?' '+discount.rule:''}`}
 function coinsText(copper){
  const po=Math.floor(copper/100),pl=Math.floor(copper%100/10),pc=copper%10,parts=[];
  if(po)parts.push(`${po.toLocaleString('es-CL')} Po`);if(pl)parts.push(`${pl} Pl`);if(pc)parts.push(`${pc} Pc`);
  return parts.join(' ')||'0 Po'
 }
-function priceHtml(p){
- const pct=activePercent();
+function discounted(p,pct){
  const m=String(p.price??'').trim().match(/^(\d+(?:[.,]\d+)?)\s*po$/i);
- if(!pct||!m)return esc(p.price);
- const copper=Math.round(Number(m[1].replace(',','.'))*100*(100-pct)/100);
- return `<s class="price-old">${esc(p.price)}</s> <b class="price-new">${esc(coinsText(copper))}</b>`
+ return m?coinsText(Math.round(Number(m[1].replace(',','.'))*100*(100-pct)/100)):null
 }
+function priceHtml(p){
+ const pct=activePercent(),d=pct?discounted(p,pct):null;
+ if(!d)return esc(p.price);
+ return `<s class="price-old">${esc(p.price)}</s> <b class="price-new">${esc(d)}</b>`
+}
+function shortDate(iso){const d=new Date(iso);return isNaN(d)?'':d.toLocaleDateString('es-CL',{day:'numeric',month:'short'})}
 function renderDiscountBar(){
  if(!discountBar)return;
- if(!buyers.length){discountBar.hidden=true;return}
+ if(!buyers.length||!discount.active){discountBar.hidden=true;return}
  const groups=new Map();
  buyers.forEach(c=>{if(!groups.has(c.playerName))groups.set(c.playerName,[]);groups.get(c.playerName).push(c)});
- const opt=c=>`<option value="${esc(c.id)}"${c.id===buyerId?' selected':''}>${esc(c.name)}${c.discount?' · con descuento':''}</option>`;
+ const opt=c=>`<option value="${esc(c.id)}"${c.id===buyerId?' selected':''}>${esc(c.name)}${c.available?' · descuento disponible':' · descuento usado'}</option>`;
  const options=groups.size>1
   ?[...groups].map(([name,list])=>`<optgroup label="${esc(name)}">${list.map(opt).join('')}</optgroup>`).join('')
   :buyers.map(opt).join('');
- const pct=activePercent(),b=buyers.find(c=>c.id===buyerId);
- const state=!b?'Elige un personaje para ver si tiene descuento.'
-  :pct?`<strong>${esc(b.name)}</strong> tiene descuento del gremio: −${pct} % en los precios.`
-  :`${esc(b.name)} no tiene descuento del gremio.`;
+ const b=buyer();
+ const state=!b?`Descuento de Yamo-Yamo: <strong>${esc(dealText())}</strong> de cada personaje. Elige con quién compras.`
+  :b.available?`<strong>${esc(b.name)}</strong> tiene ${esc(dealText())}. Abre la poción que quiera y pulsa «Usar descuento».`
+  :`${esc(b.name)} ya usó su descuento${b.usedItem?` (${esc(b.usedItem)}${b.usedAt&&shortDate(b.usedAt)?', '+esc(shortDate(b.usedAt)):''})`:''}. Solo el DM puede devolvérselo.`;
  discountBar.innerHTML=`<label class="discount-pick"><span>Comprar como</span><select id="buyerSelect"><option value="">— Sin elegir —</option>${options}</select></label>
- <p class="discount-state${pct?' on':''}">${state}</p>
- <a class="discount-manage" href="${esc(discount.manageUrl||'#')}">${discount.admin?'Marcar descuentos':'Ver descuentos'}</a>`;
+ <p class="discount-state${activePercent()?' on':''}">${state}</p>
+ ${discount.admin&&discount.manageUrl?`<a class="discount-manage" href="${esc(discount.manageUrl)}">Panel de descuentos</a>`:''}`;
  discountBar.hidden=false;
- document.getElementById('buyerSelect').addEventListener('change',e=>{buyerId=e.target.value;saveBuyer();renderDiscountBar();render()})
+ document.getElementById('buyerSelect').addEventListener('change',e=>{buyerId=e.target.value;saveBuyer();renderDiscountBar();render();if(modal?.classList.contains('open')&&openId)openProduct(openId)})
+}
+function discountBox(p){
+ if(!discount.active||!buyers.length)return'';
+ const b=buyer();
+ if(!b)return `<div class="discount-box">Elige arriba con qué personaje compras para usar el descuento (${esc(dealText())}).</div>`;
+ if(!b.available)return '';
+ const d=discounted(p,Number(discount.percent)||0);
+ return `<div class="discount-box on"><p><strong>${esc(b.name)}</strong> puede usar su descuento aquí${d?`: paga <b>${esc(d)}</b> en vez de ${esc(p.price)}`:''}.</p>
+ <button class="discount-use" type="button" data-use-discount="${esc(p.id)}">Usar descuento en esta poción</button>
+ <small>Se usa una sola vez por personaje.</small></div>`
+}
+async function useDiscount(id,btn){
+ const p=products.find(x=>x.id===id),b=buyer();if(!p||!b)return;
+ if(!confirm(`¿Usar el descuento de ${b.name} en ${p.name}? Después ya no lo tendrá en esta tienda.`))return;
+ btn.disabled=true;btn.textContent='Guardando…';
+ try{
+  const r=await fetch(discount.useUrl,{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':discount.csrf||''},body:JSON.stringify({shop:'pocion-picante',character:b.id,item:p.id})});
+  const j=await r.json().catch(()=>({ok:false,error:'El servidor no respondió bien.'}));
+  if(!j.ok)throw new Error(j.error||'No se pudo usar el descuento.');
+  b.available=false;b.usedItem=j.item;b.usedAt=new Date().toISOString();
+  renderDiscountBar();render();
+  const box=btn.closest('.discount-box');
+  if(box)box.outerHTML=`<div class="discount-box done">✓ Listo: <strong>${esc(j.character)}</strong> compra ${esc(j.item)}${j.paid?` por <b>${esc(j.paid)}</b>`:''}. Avísale al DM para que lo cobre en la Banca.</div>`;
+  toastMsg('Descuento usado');
+ }catch(err){btn.disabled=false;btn.textContent='Usar descuento en esta poción';alert(err.message)}
 }
 
 function loadFavorites(){try{const x=JSON.parse(localStorage.getItem('lpp:favorites')||'[]');return new Set(Array.isArray(x)?x:[])}catch(_){return new Set()}}
@@ -123,7 +154,8 @@ function toastMsg(msg){if(!toast)return;clearTimeout(toastTimer);toast.textConte
 function toggleFavorite(id){const p=products.find(x=>x.id===id);if(!p)return;if(favorites.has(id)){favorites.delete(id);toastMsg(`${p.name} retirado de favoritos`)}else{favorites.add(id);toastMsg(`${p.name} guardado para revisar`)}saveFavorites();render()}
 function openProduct(id){
  const p=products.find(x=>x.id===id);if(!p||!modal||!modalContent)return;
- lastFocused=document.activeElement;
+ if(!modal.classList.contains('open'))lastFocused=document.activeElement;
+ openId=id;
  const accent=colors[p.majorCategory]||'#ad8ec0';
  const stats=[];
  if(p.duration)stats.push(['Duración',p.duration]);
@@ -136,6 +168,7 @@ function openProduct(id){
   <span class="product-category">${esc(p.majorCategory)}</span>
   <h2 id="modalTitle">${esc(p.name)}</h2>
   <div class="detail-price">${priceHtml(p)}</div>
+  ${discountBox(p)}
   <div class="detail-sub">${esc(p.subcategory)}</div>
   ${statsHtml}
   <div class="detail-description"><p>${esc(p.effect)}</p></div>
@@ -154,6 +187,7 @@ favBtn?.addEventListener('click',()=>{favoritesOnly=!favoritesOnly;render()});
 document.addEventListener('click',e=>{
  const f=e.target.closest('[data-favorite]');if(f){e.preventDefault();e.stopPropagation();toggleFavorite(f.dataset.favorite);return}
  const o=e.target.closest('[data-open]');if(o){openProduct(o.dataset.open);return}
+ const u=e.target.closest('[data-use-discount]');if(u){useDiscount(u.dataset.useDiscount,u);return}
  if(e.target.closest('[data-close-modal]'))closeModal()
 });
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal?.classList.contains('open'))closeModal()});

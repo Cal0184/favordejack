@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 require_once dirname(__DIR__, 2) . '/includes/auth.php';
 require_once __DIR__ . '/miniaturas.php';
+require_once dirname(__DIR__, 2) . '/includes/descuentos.php';
 
 const EMPORIO_CARTAS_DIR = __DIR__ . '/Cartas';
 const EMPORIO_DATA_DIR = __DIR__ . '/data';
@@ -592,5 +593,41 @@ function emporio_order_public(array $o): array
         'total' => $o['total'] ?? null,
         'note' => (string)($o['note'] ?? ''),
         'reply' => (string)($o['reply'] ?? ''),
+        'discount' => is_array($o['discount'] ?? null) ? $o['discount'] : null,
     ];
+}
+
+/** Estados en que un pedido ya no sigue adelante: el descuento vuelve al personaje. */
+const EMPORIO_ORDER_CLOSED = ['rechazado', 'cancelado'];
+const EMPORIO_DISCOUNT_SHOP = 'nuevo-emporio';
+
+/**
+ * Al cambiar de estado un pedido con descuento: si se cancela o rechaza, el
+ * personaje lo recupera; si vuelve a seguir adelante, lo gasta de nuevo.
+ * Devuelve un aviso para el admin o ''.
+ */
+function emporio_order_discount_sync(array $order, string $oldState, string $by): string
+{
+    if (!is_array($order['discount'] ?? null)) return '';
+    $character = ['id' => (string)($order['characterId'] ?? ''), 'name' => (string)($order['characterName'] ?? ''), 'playerName' => (string)($order['playerName'] ?? '')];
+    $wasClosed = in_array($oldState, EMPORIO_ORDER_CLOSED, true);
+    $isClosed = in_array((string)$order['state'], EMPORIO_ORDER_CLOSED, true);
+    try {
+        if ($isClosed && !$wasClosed) {
+            favor_discount_restore(EMPORIO_DISCOUNT_SHOP, $character, $by, (string)$order['id'], 'pedido ' . $order['state']);
+            return $character['name'] . ' recupera su descuento.';
+        }
+        if ($wasClosed && !$isClosed) {
+            favor_discount_use(EMPORIO_DISCOUNT_SHOP, $character, [
+                'item' => (string)($order['discount']['item'] ?? ''),
+                'price' => (string)($order['discount']['price'] ?? ''),
+                'paid' => (string)($order['discount']['paid'] ?? ''),
+                'order' => (string)$order['id'],
+            ], $by);
+            return $character['name'] . ' vuelve a gastar su descuento en este pedido.';
+        }
+    } catch (Throwable $e) {
+        return 'Ojo con el descuento: ' . $e->getMessage();
+    }
+    return '';
 }

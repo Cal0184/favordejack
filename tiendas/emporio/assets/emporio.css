@@ -176,3 +176,15 @@ footer{padding:35px 20px 80px;border-top:1px solid #2f2117;color:#6f6456;text-al
 }
 @media(hover:none){.kbd-hint{display:none}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
+
+/* Descuento de la tienda */
+.deal-on { display: block; margin-top: 3px; color: #a9d690; }
+.deal-off { display: block; margin-top: 3px; color: #b8a58c; }
+.order-deal { margin: 12px 0; padding: 12px 14px; border: 1px dashed #5a4128; border-radius: 10px; background: #120d09; }
+.order-deal.on { border: 1px solid #5c8a4a; background: #121b0e; }
+.order-deal.off { color: #b8a58c; }
+.order-deal .field { margin: 10px 0 6px; }
+.order-deal p { margin: 4px 0 0; }
+.deal-check { display: flex; align-items: center; gap: 9px; cursor: pointer; }
+.deal-check input { width: 18px; height: 18px; accent-color: #9fcf86; }
+.order-deal-line { color: #a9d690; }

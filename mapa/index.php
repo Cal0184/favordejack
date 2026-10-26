@@ -77,6 +77,7 @@ function markerClass(array $shop): string {
     </div>
 
     <div class="header-actions">
+        <?php if ((($GLOBALS['__favor_auth_widget_user'] ?? null)['role'] ?? '') === 'admin'): ?><a class="roll20-link" href="<?= favor_base_path() ?>tiendas/descuentos.php">✦ Descuentos</a><?php endif; ?>
         <a class="roll20-link" href="https://app.roll20.net/campaigns/details/20586133/-" target="_blank" rel="noopener noreferrer">⚔ Abrir Roll20</a>
         <div class="header-count"><strong><?= count($shops) ?>/<?= count($allShops) ?></strong><span>tiendas digitalizadas</span></div>
     </div>

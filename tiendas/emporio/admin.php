@@ -67,20 +67,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $state = (string)($_POST['state'] ?? '');
             if (!isset(EMPORIO_ORDER_STATES[$state])) throw new RuntimeException('Estado no válido.');
             $reply = mb_substr(trim((string)($_POST['reply'] ?? '')), 0, 500, 'UTF-8');
-            emporio_update_json(EMPORIO_ORDERS_FILE, static function (array $orders, &$found) use ($id, $state, $reply): array {
+            $updated = emporio_update_json(EMPORIO_ORDERS_FILE, static function (array $orders, &$found) use ($id, $state, $reply): array {
                 foreach ($orders as &$o) {
                     if (is_array($o) && ($o['id'] ?? '') === $id) {
+                        $o['oldState'] = (string)($o['state'] ?? '');
                         $o['state'] = $state;
                         $o['reply'] = $reply;
                         $o['updated'] = date('c');
-                        $found = true;
+                        $found = $o;
+                        unset($o['oldState']);
                     }
                 }
                 unset($o);
                 if (!$found) throw new RuntimeException('No encontré ese pedido.');
                 return $orders;
             });
-            $notice = 'Pedido actualizado.';
+            $notice = trim('Pedido actualizado. ' . emporio_order_discount_sync($updated, (string)$updated['oldState'], (string)$user['username']));
         } elseif ($action === 'keep_both' || $action === 'prefer' || $action === 'reset_dupes') {
             emporio_update_json(EMPORIO_DUPES_FILE, static function (array $data) use ($action): array {
                 $data['keepBoth'] = array_values(array_filter((array)($data['keepBoth'] ?? []), 'is_string'));
@@ -203,7 +205,7 @@ favor_session_close();
 <style>[hidden]{display:none!important}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#3e2818,#0d0907 45%);color:#eadcc0;font-family:Georgia,serif}header{position:sticky;top:0;z-index:20;display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap;padding:14px 4vw;border-bottom:1px solid #5a4128;background:#100b08ee;backdrop-filter:blur(10px)}header h1{margin:0;color:#e5c37e;font-size:1.4rem}nav{display:flex;gap:8px;flex-wrap:wrap}a,button{padding:9px 13px;border:1px solid #76562f;border-radius:7px;background:#21150e;color:#ebcb91;text-decoration:none;font:inherit;cursor:pointer}nav a.active{background:#4a3018;border-color:#c49251}.badge{display:inline-block;min-width:20px;margin-left:4px;padding:0 6px;border-radius:99px;background:#a3452f;color:#fff;font:700 .72rem/20px system-ui,sans-serif;text-align:center}
 main{width:min(1350px,94vw);margin:26px auto 70px}.toolbar{position:sticky;top:70px;z-index:10;display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:20px;padding:10px;border:1px solid #493724;border-radius:9px;background:#100b08ee;backdrop-filter:blur(10px)}.toolbar input{width:min(460px,100%);padding:11px;border:1px solid #5a4128;border-radius:7px;background:#0b0806;color:#fff}
-.notice,.error,.info{padding:11px 13px;margin:10px 0;border-radius:7px;line-height:1.45}.notice{border:1px solid #61734e;background:#142013;color:#b9d4a6}.error{border:1px solid #864d48;background:#271311;color:#efb8b0}.info{border:1px solid #5a4128;background:#16100c;color:#cdb68d}
+.discount-line{color:#b9d4a6}.notice,.error,.info{padding:11px 13px;margin:10px 0;border-radius:7px;line-height:1.45}.notice{border:1px solid #61734e;background:#142013;color:#b9d4a6}.error{border:1px solid #864d48;background:#271311;color:#efb8b0}.info{border:1px solid #5a4128;background:#16100c;color:#cdb68d}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(350px,1fr));gap:16px}.card{display:grid;grid-template-columns:120px 1fr;gap:14px;padding:13px;border:1px solid #483522;border-radius:10px;background:#15100c;box-shadow:0 15px 35px #0005}.card.is-hidden{opacity:.6;border-style:dashed}.card img{width:120px;height:168px;object-fit:contain;background:#090604;border:1px solid #33251a}.card h2{margin:0 0 8px;color:#e4c388;font-size:1.05rem}
 label{display:grid;gap:4px;margin:7px 0;color:#a99880;font-size:.8rem}input,textarea,select{width:100%;padding:9px;border:1px solid #4b3825;border-radius:6px;background:#090604;color:#f4e5ca;font:inherit}textarea{min-height:120px;resize:vertical;line-height:1.45}.row{display:grid;grid-template-columns:1fr 110px;gap:8px}.check{display:flex;align-items:center;gap:8px}.check input{width:auto}.filename{color:#776b5c;word-break:break-all;font-size:.72rem}.id-note{margin-top:3px;color:#665b4d;font:600 .65rem system-ui,sans-serif}.warn{color:#e5a69d;font:600 .75rem system-ui,sans-serif}.save{width:100%;margin-top:8px}.empty{padding:30px;border:1px dashed #5a4128;text-align:center;color:#8c7b65}
 section.box{margin:0 0 22px;padding:18px;border:1px solid #483522;border-radius:10px;background:#130e0a}section.box h2{margin:0 0 10px;color:#e5c37e}.dupe{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;padding:12px 0;border-top:1px solid #2f2218}.dupe figure{margin:0;width:130px;text-align:center;font-size:.78rem}.dupe figure img{width:120px;height:168px;object-fit:contain;background:#090604;border:2px solid #33251a}.dupe figure.keep img{border-color:#6f8f4d}.dupe figure figcaption b{display:block;color:#e4c388}.dupe form{display:flex;flex-direction:column;gap:6px;min-width:220px}
@@ -216,6 +218,7 @@ table{width:100%;border-collapse:collapse;font-size:.85rem}td,th{padding:6px 8px
     <a href="?vista=cartas" class="<?= $view === 'cartas' ? 'active' : '' ?>">Cartas</a>
     <a href="?vista=pedidos" class="<?= $view === 'pedidos' ? 'active' : '' ?>">Pedidos<?php if ($pendingOrders): ?><span class="badge"><?= $pendingOrders ?></span><?php endif; ?></a>
     <a href="?vista=limpieza" class="<?= $view === 'limpieza' ? 'active' : '' ?>">Duplicados y limpieza<?php if ($dupes): ?><span class="badge"><?= count($dupes) ?></span><?php endif; ?></a>
+    <a href="../descuentos.php?tienda=nuevo-emporio">Descuentos</a>
     <a href="index.php">Ver tienda</a>
 </nav></header>
 <main>
@@ -255,7 +258,8 @@ table{width:100%;border-collapse:collapse;font-size:.85rem}td,th{padding:6px 8px
             <p class="muted"><?= e(date('d-m-Y H:i', strtotime($p['created']) ?: time())) ?> · <span class="state state-<?= e($p['state']) ?>"><?= e($p['stateLabel']) ?></span>
             <?php if (isset($o['characterGold'])): ?> · tenía <?= e(number_format((float)$o['characterGold'], 0, ',', '.')) ?> po al pedir<?php endif; ?></p>
             <ul><?php foreach ($p['items'] as $i): ?><li><?= (int)($i['qty'] ?? 1) > 1 ? (int)$i['qty'] . ' × ' : '' ?><?= e((string)($i['name'] ?? '')) ?> <span class="muted"><?= e((string)($i['price'] ?? '')) ?></span></li><?php endforeach; ?></ul>
-            <?php if ($p['total'] !== null): ?><p><b>Total estimado: <?= e(number_format((float)$p['total'], 0, ',', '.')) ?> po</b></p><?php endif; ?>
+            <?php if ($p['discount']): ?><p class="discount-line">✦ Descuento <?= (int)$p['discount']['percent'] ?> % en <?= e((string)$p['discount']['item']) ?>: −<?= e(number_format((float)$p['discount']['amount'], fmod((float)$p['discount']['amount'], 1) ? 2 : 0, ',', '.')) ?> po (paga <?= e((string)$p['discount']['paid']) ?>)<?= in_array($p['state'], EMPORIO_ORDER_CLOSED, true) ? ' · devuelto al personaje' : '' ?></p><?php endif; ?>
+            <?php if ($p['total'] !== null): ?><p><b>Total estimado: <?= e(number_format((float)$p['total'], fmod((float)$p['total'], 1) ? 2 : 0, ',', '.')) ?> po</b></p><?php endif; ?>
             <?php if ($p['note'] !== ''): ?><p class="muted">Mensaje: <?= e($p['note']) ?></p><?php endif; ?>
         </div>
         <form method="post" action="?vista=pedidos">
