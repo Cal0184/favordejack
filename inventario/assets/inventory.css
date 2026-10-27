@@ -378,3 +378,51 @@ body::before{
     max-height:none!important;
   }
 }
+
+/* ==========================================================================
+   v13.1 — CARGA SIN REPETICIONES + TARJETAS CON IMAGEN COMPLETA
+   ========================================================================== */
+
+/* Repintado en el sitio (datos revalidados o recién guardados): sin volver a animar
+   toda la lista; solo el objeto que se acaba de tocar vuelve a entrar. */
+.is-settled .inventory-row,
+.is-settled .item-card{animation:none}
+.is-settled .is-fresh{animation:rowIn .34s cubic-bezier(.2,.75,.2,1) both}
+
+/* Mientras llega el inventario, «Añadir objeto» se ve en espera (como «Guardando…» en el editor);
+   un clic se recuerda y abre el editor en cuanto llegan los datos. */
+.hero-button.is-waiting,.hero-button.is-waiting:hover{opacity:.55;cursor:wait;transform:none}
+
+/* Revalidación en segundo plano: gira el icono en vez de insertar un aviso que mueve la lista. */
+.refresh-inventory span{display:inline-block}
+.refresh-inventory.is-busy span{animation:inventorySpin .9s linear infinite}
+@keyframes inventorySpin{to{transform:rotate(360deg)}}
+
+/* Tarjetas: la ilustración se ve entera (sin recortes). El hueco que queda a los lados
+   continúa el tono del borde de cada imagen de categoría para que no se note la unión. */
+.item-card__visual{width:100%;height:auto;aspect-ratio:16/10;max-height:200px}
+.item-card__visual>.item-visual--combat{background:linear-gradient(180deg,#071616,#0a1c1a 50%,#051212)}
+.item-card__visual>.item-visual--magic{background:linear-gradient(180deg,#051416,#051418 50%,#030f12)}
+.item-card__visual>.item-visual--utility{background:linear-gradient(180deg,#091918,#081b19 50%,#071313)}
+.item-card__visual>.item-visual--vanity{background:linear-gradient(180deg,#0b1c1c,#0b201f 50%,#0a1c1c)}
+.item-card__visual>.item-visual img{object-fit:contain;object-position:center}
+
+/* El menú de acciones no debe ocupar todo el pie y recortar la categoría. */
+.item-card__footer .actions-menu{width:auto;flex:0 0 auto}
+.item-card__footer .category-chip{min-width:0}
+
+/* En móvil la cabecera de la tabla debía ocultarse: la regla original quedaba anulada
+   por el orden de la cascada y aparecía como una caja de pergamino vacía. */
+@media(max-width:860px){.inventory-row--header{display:none}}
+
+/* Barra de filtros: entre 861 y 1536 px no cabía en una fila y el selector
+   Tarjetas/Lista quedaba aplastado (a 1366 px "Lista" casi no se veía). Ahí pasa a dos
+   filas: buscador + vista + actualizar arriba y los tres desplegables debajo, a partes iguales. */
+.view-switch{min-width:max-content}
+@media(min-width:861px) and (max-width:1536px){
+  .inventory-filters{display:flex;flex-wrap:wrap;row-gap:0}
+  .inventory-filters::after{content:"";order:1;flex:0 0 100%;height:8px}
+  .inventory-filters .search-box{flex:1 1 0;min-width:0}
+  .inventory-filters .refresh-inventory{flex:0 0 42px}
+  .inventory-filters .filter-select{order:2;flex:1 1 0;min-width:0}
+}

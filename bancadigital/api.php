@@ -274,7 +274,7 @@ try {
         }
 
         $stmt = $db->prepare(
-            'SELECT p.ID, p.Nombre, j.Nombre AS JugadorNombre '
+            'SELECT p.ID, p.Nombre, p.Jugador, j.Nombre AS JugadorNombre '
             . 'FROM Personaje p INNER JOIN Jugador j ON j.ID = p.Jugador '
             . 'WHERE p.Activo = 1 AND j.Activo = 1 AND p.ID <> ? '
             . 'ORDER BY j.Orden, p.Orden, p.Nombre'
@@ -287,6 +287,7 @@ try {
             $targets[] = [
                 'id' => (string)$row['ID'],
                 'name' => (string)$row['Nombre'],
+                'playerId' => (string)$row['Jugador'],
                 'playerName' => (string)$row['JugadorNombre'],
             ];
         }

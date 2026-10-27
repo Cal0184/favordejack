@@ -47,22 +47,15 @@ if ($user) {
                 $bg = '#22402F';
             }
 
-            $icon = favor_safe_asset_input((string)($_POST['iconUrl'] ?? ''));
-            if (trim((string)($_POST['iconUrl'] ?? '')) !== '' && $icon === '') {
-                throw new RuntimeException(
-                    'La URL del icono no es válida. Usa https:// o una ruta dentro de ' . favor_base_path() . 'media/.'
-                );
-            }
-
+            // El icono con imagen (IconUrl) ya no se edita desde el perfil: se conserva tal cual.
             $stmt = $db->prepare(
-                'UPDATE Jugador SET Handle=?, Emoji=?, IconBg=?, IconUrl=? WHERE ID=?'
+                'UPDATE Jugador SET Handle=?, Emoji=?, IconBg=? WHERE ID=?'
             );
             $stmt->bind_param(
-                'sssss',
+                'ssss',
                 $handle,
                 $emoji,
                 $bg,
-                $icon,
                 $user['playerId']
             );
             $stmt->execute();
@@ -244,8 +237,6 @@ if (!array_key_exists($emoji, $allowedEmojis)) {
             gap:6px;
         }
 
-        .field.full{grid-column:1/-1}
-
         .field>span{
             color:#c8ad7c;
             font-size:.82rem;
@@ -395,7 +386,6 @@ if (!array_key_exists($emoji, $allowedEmojis)) {
                 grid-template-columns:1fr;
             }
 
-            .field.full,
             .emoji-field{
                 grid-column:auto;
             }
@@ -505,24 +495,13 @@ if (!array_key_exists($emoji, $allowedEmojis)) {
                             <?php endforeach; ?>
                         </div>
                     </div>
-
-                    <label class="field full">
-                        <span>URL del icono</span>
-                        <input
-                            name="iconUrl"
-                            id="iconUrlInput"
-                            maxlength="500"
-                            value="<?=hp((string)($player['IconUrl'] ?? ''))?>"
-                            placeholder="https://... o media/profiles/..."
-                        >
-                    </label>
                 </div>
 
                 <div class="help">
-                    El emoji ahora se elige únicamente desde la lista disponible.
-                    Si dejas la URL vacía, se usa el emoji seleccionado sobre el color elegido.
-                    Las imágenes compartidas del proyecto viven bajo
-                    <strong><?= favor_base_path() ?>media/</strong>.
+                    El emoji se elige únicamente desde la lista disponible y se muestra sobre el color de fondo elegido.
+                    <?php if ($iconUrl): ?>
+                        Tu icono usa una imagen asignada por la administración del gremio; el emoji queda como respaldo.
+                    <?php endif; ?>
                 </div>
 
                 <div class="actions">

@@ -267,6 +267,17 @@
     const infoBox = (label, value) => value ? `<div class="info-box"><span>${esc(label)}</span><strong>${esc(value)}</strong></div>` : '';
     const statBox = (label, value) => `<div class="stat-box"><span>${esc(label)}</span><strong>${value !== '' ? esc(value) : '—'}</strong></div>`;
 
+    // Al abrir un modal la página pierde su barra de scroll: guardamos su hueco
+    // para que el libro y los marcadores de fondo no se ensanchen ni se muevan.
+    function setModalOpen(open) {
+        const root = document.documentElement;
+        if (open && !document.body.classList.contains('modal-open')) {
+            root.classList.toggle('keep-gutter', window.innerWidth > root.clientWidth);
+        }
+        document.body.classList.toggle('modal-open', open);
+        if (!open) root.classList.remove('keep-gutter');
+    }
+
     function openCharacter(c) {
         if (!characterModal || !characterModalContent || !c) return;
         const raceLine = [c.race, c.raceType].filter(Boolean).join(' · ');
@@ -309,15 +320,30 @@
                     ${c.updated ? `<p class="folio-footer">Última anotación: ${esc(c.updated)}</p>` : ''}
                 </div>
             </div>`;
+        // Si el retrato aún no ha llegado, al cargar no debe agrandar el folio
+        // (movía "Ir a su Banca" bajo el cursor y sacaba una barra de scroll).
+        const portrait = $('.folio-art img', characterModalContent);
+        if (portrait && !portrait.naturalWidth) {
+            const art = portrait.parentElement;
+            art.classList.add('is-pending');
+            // Cuando llega se muestra entero, pero nunca bajo el cursor: si está sobre los
+            // botones, espera a que salga de ellos.
+            portrait.addEventListener('load', () => {
+                const actions = $('.folio-actions', characterModalContent);
+                const release = () => art.classList.remove('is-pending');
+                if (actions?.matches(':hover')) actions.addEventListener('pointerleave', release, { once: true });
+                else release();
+            }, { once: true });
+        }
         characterModal.classList.add('open');
         characterModal.setAttribute('aria-hidden', 'false');
-        document.body.classList.add('modal-open');
+        setModalOpen(true);
         history.replaceState(null, '', `#personaje=${encodeURIComponent(c.id)}`);
     }
     function closeCharacter() {
         characterModal?.classList.remove('open');
         characterModal?.setAttribute('aria-hidden', 'true');
-        document.body.classList.remove('modal-open');
+        setModalOpen(false);
         if (location.hash.startsWith('#personaje=')) history.replaceState(null, '', location.pathname + location.search);
     }
     grid?.addEventListener('click', e => {
@@ -596,12 +622,12 @@
         adminModalContent.innerHTML = html;
         adminModal.classList.add('open');
         adminModal.setAttribute('aria-hidden', 'false');
-        document.body.classList.add('modal-open');
+        setModalOpen(true);
     }
     function closeAdminModal() {
         adminModal?.classList.remove('open');
         adminModal?.setAttribute('aria-hidden', 'true');
-        document.body.classList.remove('modal-open');
+        setModalOpen(false);
     }
     $$('[data-close-admin]').forEach(el => el.addEventListener('click', closeAdminModal));
 

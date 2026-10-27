@@ -358,6 +358,12 @@ select:focus,input:focus,textarea:focus{border-color:#79531f;box-shadow:0 0 0 3p
 .folio-grid{display:grid;grid-template-columns:minmax(270px,38%) 1fr;min-height:620px}
 .folio-art{position:relative;background:#493829;min-height:620px}.folio-art img{width:100%;height:100%;display:block;object-fit:cover;object-position:center top;filter:saturate(.9) sepia(.05)}
 .folio-art::after{content:"";position:absolute;inset:0;box-shadow:inset -25px 0 40px #2413078c}
+/* El folio no cambia de tamaño después de abrirse: su barra de scroll tiene el hueco
+   guardado (del tono del borde de la página cuando no hace falta), y un retrato que aún
+   no había llegado ocupa el alto que ya hay en vez de estirarlo. */
+/* En móvil el folio ocupa toda la pantalla: ahí no hace falta reservar el hueco. */
+@media(min-width:681px){.folio-modal{scrollbar-gutter:stable;background:#d1b886}}
+.folio-art.is-pending img{position:absolute;inset:0}
 .folio-content{position:relative;padding:42px 38px;background:linear-gradient(90deg,#d6bf8e,#f0e2be 7%,#eddfbb 95%,#d1b886);overflow:hidden}
 .folio-content::before{content:"";position:absolute;inset:0;opacity:.18;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.25'/%3E%3C/svg%3E")}
 .folio-kicker,.folio-content>*{position:relative;z-index:1}
@@ -377,6 +383,7 @@ select:focus,input:focus,textarea:focus{border-color:#79531f;box-shadow:0 0 0 3p
 
 .toast{position:fixed;z-index:160;right:22px;bottom:22px;max-width:min(420px,calc(100% - 44px));padding:11px 15px;border:1px solid #9d7a45;background:#2b1a10;color:#f1e0b9;box-shadow:0 12px 30px #0009;opacity:0;transform:translateY(12px);pointer-events:none;transition:.2s ease}.toast.show{opacity:1;transform:none}.toast.bad{background:#551f23;border-color:#9b4c50}
 body.modal-open{overflow:hidden}
+html.keep-gutter{scrollbar-gutter:stable}
 
 .error-sheet{max-width:850px;margin:50px auto;min-height:0}.error-sheet h2{font-family:'Cinzel',serif;color:#6e272d}.error-sheet p{word-break:break-word}
 
@@ -766,6 +773,13 @@ body.modal-open{overflow:hidden}
     }
     .book-tab::before{display:none}
 }
+/* En móvil cada marcador conserva su ancho y la barra se desliza por dentro,
+   como pedía la regla de 680px (la de arriba los aplastaba y los nombres se montaban).
+   Si caben todos, se reparten la barra entera. */
+@media(max-width:680px){
+    .book-tabs{justify-content:flex-start}
+    .book-tab,.book-tab:hover,.book-tab.active{flex:1 0 auto}
+}
 
 /* Personajes no activos: el archivo sigue visible, pero queda claramente
    "apagado" sin necesidad de poner un cartel encima. */
@@ -1045,7 +1059,9 @@ body.modal-open{overflow:hidden}
     font-style:italic;
     font-size:.78rem;
 }
-.catalog-dots{display:flex;align-items:center;justify-content:center;gap:6px;min-height:14px}
+/* Con muchos expedientes los puntos bajan de línea: si no, en móvil la página
+   quedaba más ancha que la pantalla y el folio del personaje se cortaba a la derecha. */
+.catalog-dots{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px;min-width:0;min-height:14px}
 .catalog-dot{
     width:8px;height:8px;padding:0;
     border:1px solid #8d6a3b;
@@ -1242,9 +1258,14 @@ body.modal-open{overflow:hidden}
 /* V3.8 · Acciones entre módulos y Relaciones */
 .book-tab.relation-link{text-decoration:none}
 .folio-actions{position:relative;z-index:2;display:flex;gap:8px;flex-wrap:wrap;margin-top:20px;padding-top:15px;border-top:1px solid #ad9364}
-.folio-action{display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:8px 12px;border:1px solid #8b6737;border-radius:4px;background:#d8c08d;color:#4b321e;text-decoration:none;font-weight:700;font-size:.82rem}
+.folio-action{position:relative;display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:8px 12px;border:1px solid #8b6737;border-radius:4px;background:#d8c08d;color:#4b321e;text-decoration:none;font-weight:700;font-size:.82rem;transition:transform .18s ease,box-shadow .18s ease,background-color .18s ease,border-color .18s ease,color .18s ease}
 .folio-action.primary{background:linear-gradient(#7e5b2d,#5b3d1f);color:#f7e7c1;border-color:#67451f}
-.folio-action:hover{filter:brightness(1.05);transform:translateY(-1px)}
+/* Hover sin filter ni cambios de tamaño: el botón se eleva y brilla, sin mover el folio. */
+.folio-action:hover{transform:translateY(-2px);background-color:#e5cf9f;border-color:#6f4b24;box-shadow:0 6px 12px #4328143d,inset 0 0 0 1px #f8ebc9aa}
+.folio-action.primary:hover{color:#fff4d8;border-color:#4f3317;box-shadow:0 6px 14px #2d180b59,inset 0 0 0 1px #d9b56d88}
+/* Al elevarse deja debajo una franja invisible: con el cursor en el borde inferior
+   el botón no pierde el hover ni sube y baja sin parar. */
+.folio-action:hover::after{content:"";position:absolute;left:-1px;right:-1px;top:100%;height:4px}
 
 /* Categoría NPC */
 .admin-status-chip.npc{background:#4d3f67;color:#f2e8ff;border-color:#76649a}
