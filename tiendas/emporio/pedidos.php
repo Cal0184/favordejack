@@ -131,7 +131,14 @@ try {
         out(['ok' => true, 'order' => emporio_order_public($order)]);
     }
 
-    if ($action === 'cancel' || $action === 'state') {
+    if ($action === 'state') {
+        if (!$isAdmin) throw new RuntimeException('Solo el admin cambia el estado de un pedido.');
+        $reply = mb_substr(trim((string)($input['reply'] ?? '')), 0, 500, 'UTF-8');
+        [$updated, $note] = emporio_order_set_state((string)($input['id'] ?? ''), (string)($input['state'] ?? ''), $reply, emporio_final_price($input['final'] ?? ''), $user);
+        out(['ok' => true, 'order' => emporio_order_public($updated), 'notice' => $note]);
+    }
+
+    if ($action === 'cancel') {
         $id = (string)($input['id'] ?? '');
         $state = $action === 'cancel' ? 'cancelado' : (string)($input['state'] ?? '');
         if (!isset(EMPORIO_ORDER_STATES[$state])) throw new RuntimeException('Estado no válido.');

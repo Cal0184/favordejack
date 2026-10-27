@@ -66,7 +66,8 @@ function favor_page_context(): array
         'login.php' => ['cuenta', $hub, 'gremio'],
         'olvide-clave.php' => ['cuenta', ['login.php', 'a Entrar'], 'gremio'],
         'logout.php' => ['cuenta', $hub, 'gremio'],
-        'admin/respaldo.php' => ['cuenta', $account, 'gremio'],
+        'admin/index.php' => ['cuenta', $hub, 'gremio'],
+        'admin/respaldo.php' => ['cuenta', ['admin/', 'al Panel del DM'], 'gremio'],
         'admin/imagenes.php' => ['cuenta', $account, 'gremio'],
         'timetoplay/index.php' => ['wiki', $hub, 'gremio'],
         'tiendas/descuentos.php' => ['mapa', $map, 'gremio'],
@@ -173,6 +174,7 @@ function favor_site_bar(): void
         $accountLinks[] = ['Mi perfil', 'perfil.php'];
         $accountLinks[] = ['Mi cuenta', 'cuenta.php'];
         if ($isAdmin) {
+            $accountLinks[] = ['Panel del DM', 'admin/'];
             $accountLinks[] = ['Wiki del DM', 'timetoplay/'];
             $accountLinks[] = ['Admin del Emporio', 'tiendas/emporio/admin.php'];
             $accountLinks[] = ['Descuentos', 'tiendas/descuentos.php'];

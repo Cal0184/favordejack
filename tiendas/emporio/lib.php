@@ -17,6 +17,7 @@ require_once dirname(__DIR__, 2) . '/includes/auth.php';
 require_once __DIR__ . '/miniaturas.php';
 require_once dirname(__DIR__, 2) . '/includes/descuentos.php';
 require_once dirname(__DIR__, 2) . '/includes/compras.php';
+require_once dirname(__DIR__, 2) . '/includes/discord.php';
 
 const EMPORIO_CARTAS_DIR = __DIR__ . '/Cartas';
 const EMPORIO_DATA_DIR = __DIR__ . '/data';
@@ -691,5 +692,70 @@ function emporio_order_charge_sync(array &$order, ?float $finalPo, string $by): 
         return 'Devuelto ' . favor_copper_label((int)$charge['copper']) . ' a ' . ($order['characterName'] ?? '') . ($removed ? ' y ' . ($removed === 1 ? 'quitado 1 objeto' : 'quitados ' . $removed . ' objetos') . ' del Inventario.' : '.') . ($kept > 0 ? ' Ojo: ' . $kept . ' ya no estaban (los borraron a mano).' : '');
     }
     return '';
+}
+
+/** Aviso en Discord de una compra recién cobrada. Devuelve '' o el motivo del fallo. */
+function emporio_order_announce(array $order): string
+{
+    $lines = [];
+    foreach ((array)($order['items'] ?? []) as $it) {
+        $qty = (int)($it['qty'] ?? 1);
+        $lines[] = '• ' . ($qty > 1 ? $qty . ' × ' : '') . (string)($it['name'] ?? '');
+    }
+    $copper = (int)($order['charge']['copper'] ?? 0);
+    return favor_discord_send(
+        'compras',
+        '🛒 ' . ($order['characterName'] ?? 'Alguien') . ' compró en el Emporio de Ecix\'s',
+        implode("\n", $lines),
+        [
+            ['Jugador', (string)($order['playerName'] ?? '')],
+            ['Pagó', favor_copper_label($copper)],
+            ['Descuento', is_array($order['discount'] ?? null) ? (int)$order['discount']['percent'] . ' % en ' . $order['discount']['item'] : ''],
+            ['Ecix\'s dice', (string)($order['reply'] ?? '')],
+        ]
+    );
+}
+
+/** «12,5» o «12.5» del formulario a po; '' = sin precio final. */
+function emporio_final_price(mixed $raw): ?float
+{
+    $raw = str_replace(',', '.', trim((string)$raw));
+    return $raw !== '' && is_numeric($raw) ? max(0.0, (float)$raw) : null;
+}
+
+/**
+ * El DM cambia el estado de un pedido (admin del Emporio y Panel del DM):
+ * cobra o devuelve en la Banca, ajusta el descuento y avisa en Discord.
+ * Devuelve [pedido, aviso para el admin]. Si no se puede cobrar, lanza y el
+ * pedido queda como estaba.
+ */
+function emporio_order_set_state(string $id, string $state, ?string $reply, ?float $final, array $user): array
+{
+    if (!isset(EMPORIO_ORDER_STATES[$state])) throw new RuntimeException('Estado no válido.');
+    $by = (string)($user['displayName'] ?? $user['username'] ?? 'DM');
+    $chargeNote = '';
+    $oldState = '';
+    $updated = emporio_update_json(EMPORIO_ORDERS_FILE, static function (array $orders, &$found) use ($id, $state, $reply, $final, $by, &$chargeNote, &$oldState): array {
+        foreach ($orders as &$o) {
+            if (is_array($o) && ($o['id'] ?? '') === $id) {
+                $oldState = (string)($o['state'] ?? '');
+                $o['state'] = $state;
+                if ($reply !== null) $o['reply'] = $reply;
+                $o['updated'] = date('c');
+                // Cobra o devuelve en la Banca; si falla, el pedido no cambia.
+                $chargeNote = emporio_order_charge_sync($o, $final, $by);
+                $found = $o;
+            }
+        }
+        unset($o);
+        if (!$found) throw new RuntimeException('No encontré ese pedido.');
+        return $orders;
+    });
+    if ($chargeNote !== '' && is_array($updated['charge'] ?? null)) {
+        $fail = emporio_order_announce($updated);
+        if ($fail !== '' && !str_starts_with($fail, 'Sin webhook')) $chargeNote .= ' (El aviso a Discord falló: ' . $fail . ')';
+    }
+    $note = trim($chargeNote . ' ' . emporio_order_discount_sync($updated, $oldState, (string)($user['username'] ?? $by)));
+    return [$updated, $note];
 }
 

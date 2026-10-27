@@ -8,6 +8,7 @@ require_once __DIR__ . '/auth.php';
 require_once dirname(__DIR__) . '/includes/assets.php';
 require_once dirname(__DIR__) . '/includes/imagenes.php';
 require_once dirname(__DIR__) . '/includes/migrations.php';
+require_once dirname(__DIR__) . '/includes/discord.php';
 guild_session_start();
 
 function respond(bool $ok, array $data = [], int $status = 200): never
@@ -348,9 +349,15 @@ try {
         if (!is_array($participants)) $participants = [];
 
         $db = db();
+        $oldMissionState = null;
+        $missionNames = [];
         $db->begin_transaction();
         try {
             if ($missionId > 0) {
+                $stmt = $db->prepare('SELECT Estado FROM Mision WHERE ID=? LIMIT 1');
+                bind_execute($stmt, [(string)$missionId]);
+                $oldMissionState = (string)($stmt->get_result()->fetch_assoc()['Estado'] ?? '');
+                $stmt->close();
                 $stmt = $db->prepare('UPDATE Mision SET Nombre=?,Fecha=?,Tipo=?,Estado=?,Descripcion=?,RecompensaGeneral=? WHERE ID=?');
                 bind_execute($stmt, [$name, $date !== '' ? $date : null, $type, $state, $description, $generalReward, (string)$missionId]);
                 $stmt->close();
@@ -379,6 +386,7 @@ try {
                 $char = $lookup->get_result()->fetch_assoc();
                 $lookup->close();
                 if (!$char) continue;
+                $missionNames[] = (string)$char['Nombre'];
 
                 $reward = mb_substr(trim((string)($part['reward'] ?? '')), 0, 255, 'UTF-8');
                 $notes = mb_substr(trim((string)($part['notes'] ?? '')), 0, 65535, 'UTF-8');
@@ -405,6 +413,22 @@ try {
             throw $e;
         } finally {
             $db->close();
+        }
+
+        // Aviso en Discord: misión nueva o que cambia de estado.
+        if ($oldMissionState === null || mb_strtolower($oldMissionState, 'UTF-8') !== mb_strtolower($state, 'UTF-8')) {
+            favor_discord_send(
+                'misiones',
+                ($oldMissionState === null ? '📜 Nueva misión: ' : '📜 Misión ' . mb_strtolower($state, 'UTF-8') . ': ') . $name,
+                mb_substr($description, 0, 600, 'UTF-8'),
+                [
+                    ['Estado', $state],
+                    ['Tipo', $type],
+                    ['Fecha', $date !== '' ? date('d-m-Y', strtotime($date) ?: time()) : ''],
+                    ['Participantes', implode(', ', $missionNames)],
+                    ['Recompensa', $generalReward],
+                ]
+            );
         }
 
         respond(true, ['message' => 'Misión guardada.', 'id' => $missionId]);

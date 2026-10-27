@@ -47,7 +47,7 @@ function favor_copper_label(int $copper): string
 function favor_coins_pay(array $coins, int $cost): array
 {
     if (favor_coins_copper($coins) < $cost) {
-        throw new RuntimeException('No tiene oro suficiente: tiene ' . favor_copper_label(favor_coins_copper($coins)) . ' y la compra cuesta ' . favor_copper_label($cost) . '.');
+        throw new RuntimeException('No le alcanza: tiene ' . favor_copper_label(favor_coins_copper($coins)) . ' y hacen falta ' . favor_copper_label($cost) . '.');
     }
     $left = [];
     foreach (FAVOR_COIN_COPPER as $coin => $value) $left[$coin] = max(0, (int)($coins[$coin] ?? 0));
@@ -188,6 +188,68 @@ function favor_purchase_refund(string $charId, array $charge, string $reason, st
     } catch (Throwable $e) {
         $db->rollback();
         throw $e;
+    } finally {
+        $db->close();
+    }
+}
+
+/**
+ * El DM da (o quita) la misma cantidad a varios personajes, cada uno con su
+ * movimiento en la Banca. Devuelve [nombre => '' si salió bien, o el motivo].
+ */
+function favor_bank_adjust(array $charIds, int $copper, bool $give, string $reason, string $author): array
+{
+    $results = [];
+    $db = favor_db();
+    try {
+        foreach (array_unique($charIds) as $charId) {
+            $charId = (string)$charId;
+            $db->begin_transaction();
+            try {
+                $old = favor_bank_lock($db, $charId);
+                if ($give) {
+                    $new = $old;
+                    $new['po'] += intdiv($copper, 100);
+                    $new['pl'] += intdiv($copper % 100, 10);
+                    $new['pc'] += $copper % 10;
+                } else {
+                    $new = favor_coins_pay($old, $copper);
+                }
+                favor_bank_movement($db, $charId, $old, $new, $give ? 'add' : 'spend', $reason, $author);
+                $db->commit();
+                $results[$charId] = '';
+            } catch (Throwable $e) {
+                $db->rollback();
+                $results[$charId] = $e instanceof RuntimeException ? $e->getMessage() : 'Error de la base de datos.';
+            }
+        }
+    } finally {
+        $db->close();
+    }
+    return $results;
+}
+
+/** Últimos movimientos de la Banca, con el nombre del personaje. */
+function favor_bank_recent(int $limit = 25): array
+{
+    $db = favor_db();
+    try {
+        $stmt = $db->prepare(
+            'SELECT m.Fecha, m.Tipo, m.DeltaPlatino, m.DeltaOro, m.DeltaPlata, m.DeltaCobre, m.Motivo, m.Autor, p.Nombre '
+            . 'FROM Movimiento m LEFT JOIN Personaje p ON p.ID = m.Personaje ORDER BY m.Fecha DESC LIMIT ?'
+        );
+        $stmt->bind_param('i', $limit);
+        $stmt->execute();
+        $rows = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+        $stmt->close();
+        return array_map(static fn(array $r): array => [
+            'at' => (string)$r['Fecha'],
+            'type' => (string)$r['Tipo'],
+            'copper' => (int)$r['DeltaPlatino'] * 1000 + (int)$r['DeltaOro'] * 100 + (int)$r['DeltaPlata'] * 10 + (int)$r['DeltaCobre'],
+            'reason' => (string)$r['Motivo'],
+            'author' => (string)$r['Autor'],
+            'character' => (string)($r['Nombre'] ?? '¿?'),
+        ], $rows);
     } finally {
         $db->close();
     }

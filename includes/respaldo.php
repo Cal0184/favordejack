@@ -35,6 +35,7 @@ function favor_backup_paths(): array
         'tiendas/lavaritaeconomica/productos.json',
         'regulaciones/data/regulations.json',
         'mapa/tiendas.json',
+        'admin/data/',
     ];
 }
 

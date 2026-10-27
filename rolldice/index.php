@@ -2,6 +2,8 @@
 declare(strict_types=1);
 require_once dirname(__DIR__) . '/includes/auth-widget.php';
 favor_session_start();
+$diceUser = favor_current_user();
+$diceCsrf = $diceUser ? favor_csrf() : '';
 favor_session_close();
 
 header('Content-Type: text/html; charset=UTF-8');
@@ -474,6 +476,7 @@ function asset(string $path): string
 </main>
 
 </div>
+<?php if ($diceUser): ?><script>window.FAVOR_DADOS = <?= json_encode(['csrf' => $diceCsrf, 'aviso' => 'aviso.php'], JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) ?>;</script><?php endif; ?>
 <script src="<?= asset('dice.js') ?>"></script>
 <script src="<?= asset('jack-features.js') ?>"></script></body>
 </html>

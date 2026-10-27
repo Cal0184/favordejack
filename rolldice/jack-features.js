@@ -105,7 +105,27 @@ window.rollDice = function(selectedDiceNumber) {
         const label = historyItem.querySelector('.roll_history_element_name_left_text');
         if (label) label.textContent = jackRollLabel();
     }
+    jackAnnounceCritical();
 };
+
+// Un 20 o un 1 natural en un solo d20 se avisa en Discord (si el DM lo activó),
+// cuando termina la animación para no adelantar el resultado.
+function jackAnnounceCritical() {
+    const cfg = window.FAVOR_DADOS;
+    if (!cfg || Number(diceNumber) !== 20 || Number(diceAmount) !== 1) return;
+    const die = rollResult[1];
+    if (die !== 20 && die !== 1) return;
+    const payload = { die, total: rollResult[0], label: jackRollLabel(), mode: jackRollMode };
+    const delay = rollMode === 'animation' ? animationDuration : 0;
+    setTimeout(() => {
+        fetch(cfg.aviso, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': cfg.csrf },
+            body: JSON.stringify(payload),
+            credentials: 'same-origin'
+        }).catch(() => {});
+    }, delay);
+}
 
 // El historial extendido incluye también el modo de tirada y, cuando corresponde, los dos dados comparados.
 window.logFunction = function() {

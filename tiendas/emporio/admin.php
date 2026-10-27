@@ -70,28 +70,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $state = (string)($_POST['state'] ?? '');
             if (!isset(EMPORIO_ORDER_STATES[$state])) throw new RuntimeException('Estado no válido.');
             $reply = mb_substr(trim((string)($_POST['reply'] ?? '')), 0, 500, 'UTF-8');
-            $finalRaw = str_replace(',', '.', trim((string)($_POST['final'] ?? '')));
-            $final = $finalRaw !== '' && is_numeric($finalRaw) ? max(0.0, (float)$finalRaw) : null;
-            $chargeNote = '';
-            $by = (string)($user['displayName'] ?? $user['username']);
-            $updated = emporio_update_json(EMPORIO_ORDERS_FILE, static function (array $orders, &$found) use ($id, $state, $reply, $final, $by, &$chargeNote): array {
-                foreach ($orders as &$o) {
-                    if (is_array($o) && ($o['id'] ?? '') === $id) {
-                        $o['oldState'] = (string)($o['state'] ?? '');
-                        $o['state'] = $state;
-                        $o['reply'] = $reply;
-                        $o['updated'] = date('c');
-                        // Cobra o devuelve en la Banca; si falla, el pedido no cambia.
-                        $chargeNote = emporio_order_charge_sync($o, $final, $by);
-                        $found = $o;
-                        unset($o['oldState']);
-                    }
-                }
-                unset($o);
-                if (!$found) throw new RuntimeException('No encontré ese pedido.');
-                return $orders;
-            });
-            $notice = trim('Pedido actualizado. ' . $chargeNote . ' ' . emporio_order_discount_sync($updated, (string)$updated['oldState'], (string)$user['username']));
+            [, $note] = emporio_order_set_state($id, $state, $reply, emporio_final_price($_POST['final'] ?? ''), $user);
+            $notice = trim('Pedido actualizado. ' . $note);
         } elseif ($action === 'keep_both' || $action === 'prefer' || $action === 'reset_dupes') {
             emporio_update_json(EMPORIO_DUPES_FILE, static function (array $data) use ($action): array {
                 $data['keepBoth'] = array_values(array_filter((array)($data['keepBoth'] ?? []), 'is_string'));
