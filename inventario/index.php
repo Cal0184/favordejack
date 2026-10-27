@@ -10,10 +10,6 @@ favor_session_start();
 $user = favor_current_user();
 $csrf = favor_csrf();
 
-ob_start();
-favor_auth_widget();
-$authWidget = (string)ob_get_clean();
-
 if (session_status() === PHP_SESSION_ACTIVE) {
     session_write_close();
 }
@@ -60,9 +56,10 @@ $config = [
             --inventory-paper-image:url(<?= json_encode($visualAssets['parchment'], JSON_UNESCAPED_SLASHES) ?>);
         }
     </style>
+<?php favor_head('Inventario · Favor de Jack'); ?>
 </head>
 <body>
-<?= $authWidget ?>
+<?php favor_site_bar(); ?>
 
 <header class="topbar" id="inventoryTopbar">
     <div class="brand" aria-label="Favor de Jack">
@@ -79,9 +76,6 @@ $config = [
 
     <div class="topbar__end">
         <span class="topbar__motto">Buenas historias<br>siempre encuentran su camino.</span>
-        <a class="hub-button" href="<?= favor_base_path() ?>" aria-label="Salir del Inventario y volver al Hub">
-            <span aria-hidden="true">←</span> Volver al Hub
-        </a>
     </div>
 </header>
 

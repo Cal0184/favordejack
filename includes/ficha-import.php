@@ -152,8 +152,10 @@ function ficha_plan(mysqli $db, array $parsed, ?string $characterId): array
         if ($oldText === $newText) continue;
         $fields[] = [
             'col' => $col, 'label' => $label, 'old' => $oldText, 'new' => $newText,
-            // No pisa por defecto una biografía ya escrita.
-            'checked' => !($col === 'Biografia' && trim($oldText) !== ''),
+            'isNew' => trim($oldText) === '',
+            // Por defecto se queda lo que ya está escrito cuando es más completo:
+            // una biografía existente, o un nombre como "Agni Vaelthorne" frente a "Agni".
+            'useSheet' => ficha_default_use_sheet($col, $oldText, $newText),
         ];
     }
 
@@ -161,10 +163,12 @@ function ficha_plan(mysqli $db, array $parsed, ?string $characterId): array
     foreach ($parsed['items'] as $i => $item) {
         $existing = $existingItems[ficha_fold($item['name'])] ?? null;
         $diffs = $existing ? ficha_item_diffs($existing, $item) : [];
+        $kind = $item['kind'] ?? 'item';
         $items[] = $item + [
             'index' => $i,
-            // nuevo = se añade; igual = ya está tal cual; distinto = ya existe con diferencias (se pregunta).
-            'status' => $existing === null ? 'nuevo' : ($diffs ? 'distinto' : 'igual'),
+            // nuevo = se añade; igual = ya está tal cual; distinto = ya existe con diferencias (se pregunta);
+            // conjuro / dinero = no es un objeto: no se propone salvo que se marque a mano.
+            'status' => $existing !== null ? ($diffs ? 'distinto' : 'igual') : ($kind === 'spell' ? 'conjuro' : ($kind === 'money' ? 'dinero' : 'nuevo')),
             'diffs' => $diffs,
         ];
     }
@@ -175,6 +179,15 @@ function ficha_plan(mysqli $db, array $parsed, ?string $characterId): array
         'fields' => $fields,
         'items' => $items,
     ];
+}
+
+function ficha_default_use_sheet(string $col, string $old, string $new): bool
+{
+    $old = trim($old);
+    if ($old === '') return true;
+    if ($col === 'Biografia') return false;
+    if ($col === 'NombreCompleto' && mb_strlen($old) > mb_strlen($new) && str_starts_with(ficha_fold($old), ficha_fold($new))) return false;
+    return true;
 }
 
 /** Objetos actuales del personaje, por nombre normalizado. */

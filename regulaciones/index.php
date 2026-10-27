@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 require_once dirname(__DIR__) . '/includes/paths.php';
+require_once dirname(__DIR__) . '/includes/auth-widget.php';
 $authPath = dirname(__DIR__) . '/includes/auth.php';
 $user = null;
 
@@ -56,10 +57,11 @@ $categories = array_keys($categories);
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cinzel+Decorative:wght@700&family=EB+Garamond:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/regulations.css<?= favor_v(__DIR__ . '/assets/regulations.css') ?>">
+<?php favor_head('Reglamento · Favor de Jack'); ?>
 </head>
 <body>
+<?php favor_site_bar(); ?>
 <header class="topbar">
-    <a class="back-link" href="<?= favor_base_path() ?>" aria-label="Volver al Hub">← Volver al Hub</a>
     <div class="identity">
         <?php if ($user): ?>
             <span><?= rg_h((string)($user['displayName'] ?? $user['username'] ?? 'Aventurero')) ?></span>

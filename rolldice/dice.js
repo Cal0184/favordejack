@@ -148,7 +148,7 @@ function toggleAnimationHistory(){
         
         document.getElementById(`roll_animation_element_main`).classList.remove("animate");
 
-        diceRollerAnimation(rollResult[rollResult.length - 1], false);
+        if (rollResult.length > 1) diceRollerAnimation(rollResult[rollResult.length - 1], false);
     }else if(rollMode == "history"){
         document.getElementById("dice_animation_scene").style.display = "none";
         document.getElementById("roll_history_container").style.display = "block";
@@ -182,7 +182,9 @@ function setCustomRollDice(){
 function customRollDice(){
     let customValue = parseInt(document.getElementById("dice_roll_button_custom_input").value);
 
-    if(customValue >= maxDiceNumber){
+    if(isNaN(customValue)){
+        rollDice(1);
+    } else if(customValue >= maxDiceNumber){
         rollDice(maxDiceNumber - 1);
     } else if(customValue <= 0){
         rollDice(1);
@@ -228,7 +230,7 @@ function rollDiceFastMode(){
     document.getElementById("roll_history_element_result_center_text_main").innerHTML = `${rollResultString}`;
     document.getElementById("roll_history_element_result_right_text_main").textContent = `${diceAdvantageSign}${Math.abs(diceAdvantageAmount)}`;
 
-    document.getElementById("roll_history_element_container").innerHTML = `
+    addCompactHistoryEntry(`
         <div id="history_element_${rollIndex}" class="roll_history_element">
             <div class="roll_history_element_name_result_container responsive_space-between">
                 <p class="roll_history_element_name_left_text">${diceAmount}d${diceNumber} ${diceAdvantageSign} ${Math.abs(diceAdvantageAmount)}</p>
@@ -239,19 +241,23 @@ function rollDiceFastMode(){
                 <p class="roll_history_element_result_center_text responsive_left">${rollResultString}</p>
                 <p class="roll_history_element_result_right_text">${diceAdvantageSign}${Math.abs(diceAdvantageAmount)}</p>
             </div>
-        </div>` + document.getElementById("roll_history_element_container").innerHTML;
-
-    // Tras una fórmula el elemento anterior puede no existir: comprobar antes de usarlo.
-    const previousElement = document.getElementById(`history_element_${rollIndex - 1}`);
-    if (rollIndex > 1 && previousElement) previousElement.style.display = "block";
-
-    if (rollIndex == 2) document.getElementById("history_element_0")?.remove();
-
-    document.getElementById(`history_element_${rollIndex - maxHistorySize}`)?.remove();
+        </div>`);
 
     triggerMainElementAnimation("history");
 
     logFunction();
+}
+
+// Historial corto: la tirada nueva queda oculta (se ve arriba como resultado) y la
+// anterior se muestra. Se poda por cantidad, así sirve también para las fórmulas.
+function addCompactHistoryEntry(html){
+    const container = document.getElementById("roll_history_element_container");
+    if (!container) return;
+    document.getElementById("history_element_0")?.remove();
+    container.insertAdjacentHTML("afterbegin", html);
+    const previous = container.children[1];
+    if (previous) previous.style.display = "block";
+    while (container.children.length > maxHistorySize) container.lastElementChild.remove();
 }
 
 function logFunction(){
@@ -470,6 +476,8 @@ function diceRollerAnimation(faceResult, animationMode) {
     if ([2, 4, 6, 8, 10, 12, 20].includes(diceNumber)) {
         rotationsKey = `d_${diceNumber}`;
         rotation = diceFaceRotations[rotationsKey][faceResult - 1];
+        // Antes de la primera tirada no hay cara que mostrar.
+        if (!rotation) return;
     } else {
         rotationsKey = "d_custom";
         rotation = { x: 5, y: -36, z: 0 };

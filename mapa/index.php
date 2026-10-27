@@ -64,11 +64,12 @@ function markerClass(array $shop): string {
 <title>Mapa Comercial de Waterdeep · Favor de Jack</title>
 <meta name="description" content="Mapa interactivo de las tiendas digitalizadas de Waterdeep.">
 <link rel="stylesheet" href="style.css<?= favor_v(__DIR__ . '/style.css') ?>">
+<?php favor_head('Mapa comercial de Waterdeep · Favor de Jack', 'Las tiendas de Waterdeep para los aventureros del Favor de Jack.'); ?>
 </head>
 <body>
-<?php favor_auth_widget(); ?>
+<?php favor_site_bar(); ?>
 <header class="map-header">
-    <a class="home-link" href="<?= favor_base_path() ?>"><span aria-hidden="true">←</span><span>Favor de Jack</span></a>
+    <span class="home-link" aria-hidden="true"></span>
 
     <div class="map-title">
         <span class="title-ornament">✦</span>
@@ -92,7 +93,7 @@ function markerClass(array $shop): string {
         <div>
             <p class="overline">Waterdeep · comercio disponible</p>
             <h2>¿A dónde vamos?</h2>
-            <p>Los sellos del mapa corresponden únicamente a tiendas que ya tienen página. Pasa sobre uno para abrir la ficha; haz click para entrar.</p>
+            <p>Los sellos del mapa son las tiendas que ya tienen página. Pasa el cursor o toca un sello para ver su ficha; haz clic o tócalo otra vez para entrar.</p>
         </div>
         <div class="intro-side">
             <div class="intro-stats">
@@ -132,7 +133,7 @@ function markerClass(array $shop): string {
 
             <div class="directory-note">
                 <span>⌖</span>
-                <p>En móvil: primer toque abre la ficha; segundo toque entra. El zoom no cambia las coordenadas de las tiendas.</p>
+                <p>En el móvil: un toque abre la ficha y el segundo entra. Pellizca con dos dedos para acercar el plano.</p>
             </div>
         </aside>
 

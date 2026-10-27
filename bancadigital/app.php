@@ -1,4 +1,4 @@
-<?php require_once dirname(__DIR__) . '/includes/paths.php'; ?>
+<?php require_once dirname(__DIR__) . '/includes/auth-widget.php'; require_once dirname(__DIR__) . '/includes/paths.php'; ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -21,6 +21,7 @@
   --forest:#22402F;
   --forest-dark:#152A1E;
   --gold:#A97C1F;
+  --gold-text:#6b4c0e; /* dorado para letra pequeña sobre pergamino (contraste 5:1) */
   --gold-bright:#CDA23A;
   --ppt:#5E7A96;
   --ppt-dark:#33475A;
@@ -142,7 +143,7 @@ h1,h2,h3,.display{ font-family:'Cinzel', Georgia, serif; letter-spacing:.02em; }
   text-align:center; font-size:.9rem; box-shadow:0 2px 8px rgba(46,33,22,.08);
 }
 .local-notice strong{ color:var(--ink); }
-.wealth-line{ margin-top:7px; font-size:.82rem; color:var(--gold); font-weight:600; }
+.wealth-line{ margin-top:7px; font-size:.82rem; color:var(--gold-text); font-weight:600; }
 .mini-coins{ display:grid; grid-template-columns:repeat(4,1fr); gap:5px; margin:10px 0 12px; }
 .mini-coin{
   border:1px solid rgba(91,70,50,.14); border-radius:7px; padding:4px 2px;
@@ -686,7 +687,7 @@ h1,h2,h3,.display{ font-family:'Cinzel', Georgia, serif; letter-spacing:.02em; }
 .banca-layout{display:grid;grid-template-columns:225px minmax(0,1fr);min-height:650px}
 .players-sidebar{padding:16px 12px 18px;background:linear-gradient(180deg,rgba(248,237,211,.92),rgba(224,205,163,.92));border-right:1px solid rgba(137,100,43,.45);box-shadow:8px 0 24px rgba(70,45,23,.08);min-width:0}
 .sidebar-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 5px 10px}
-.sidebar-kicker{display:block;color:var(--gold);font-family:'Cinzel',serif;font-size:.62rem;text-transform:uppercase;letter-spacing:.16em}
+.sidebar-kicker{display:block;color:var(--gold-text);font-family:'Cinzel',serif;font-size:.62rem;text-transform:uppercase;letter-spacing:.16em}
 .sidebar-heading h2{margin:0;color:var(--burgundy-dark);font-size:1.08rem}
 .sidebar-icon-btn{width:30px;height:30px;border-radius:50%;border:1px solid #9b742d;background:#f6e6bc;color:#6e4c15;font:700 1.15rem/1 'Cinzel',serif;cursor:pointer}
 .sidebar-icon-btn:hover{background:#fff0c8;transform:translateY(-1px)}
@@ -714,7 +715,7 @@ h1,h2,h3,.display{ font-family:'Cinzel', Georgia, serif; letter-spacing:.02em; }
 .workspace-avatar img{display:block;width:100%;height:100%;object-fit:cover}
 .workspace-heading{min-width:0;flex:1}
 .workspace-heading h2{margin:0;color:var(--burgundy-dark);font-size:clamp(1.2rem,2vw,1.65rem)}
-.workspace-handle{color:var(--gold);font-family:'Cinzel',serif;font-size:.75rem;margin-top:1px}
+.workspace-handle{color:var(--gold-text);font-family:'Cinzel',serif;font-size:.75rem;margin-top:1px}
 .workspace-meta{color:var(--ink-soft);font-size:.9rem;margin-top:3px}
 .workspace-meta strong{color:var(--burgundy-dark);font-size:1.12em;font-weight:600;font-variant-numeric:lining-nums}
 .workspace-actions{display:flex;align-items:center;justify-content:flex-end;gap:7px;flex-wrap:wrap}
@@ -1012,8 +1013,10 @@ body{display:flex;flex-direction:column;min-height:100vh}
 
 </style>
 
+<?php favor_head('Banca Per-Favore · Favor de Jack'); ?>
 </head>
 <body>
+<?php favor_site_bar(); ?>
 
 <div id="vault-intro" aria-hidden="true">
   <div class="vault-light"></div>
@@ -1030,12 +1033,11 @@ body{display:flex;flex-direction:column;min-height:100vh}
 <div class="sticky-shell">
 <header class="topbar">
   <div class="topbar-inner new-topbar-inner">
-    <a class="topbar-back-link" href="<?= favor_base_path() ?>" aria-label="Volver a Favor de Jack">← <span>Favor de Jack</span></a>
     <div class="compact-brand">
       <div class="seal compact-seal" aria-hidden="true"><img src="<?= favor_static(FAVOR_LOGO) ?>" alt=""></div>
       <h1 class="app-title wordmark">Banca Per-Favore</h1>
     </div>
-    <div class="account-slot">
+    <div class="account-slot" hidden style="display:none">
       <a id="session-login" class="header-login" href="<?= favor_base_path() ?>login.php?next=<?= rawurlencode(favor_base_path()) ?>bancadigital%2F" hidden>Iniciar sesión</a>
       <details id="session-menu" class="user-menu" hidden>
         <summary>
@@ -1954,7 +1956,7 @@ async function renderBank(){
             </div>` : ''}
             <div class="coin-pouch-row coins-${pouchKeys.length}">${pouches}</div>
             ${canEditCharacter(c) ? `<div class="action-row">
-              <button class="btn btn-primary" onclick="showAddMoneyModal('${c.id}')">Añadir dinero</button>
+              ${isAdminUser() ? `<button class="btn btn-primary" onclick="showAddMoneyModal('${c.id}')">Añadir dinero</button>` : ''}
               <button class="btn btn-primary" onclick="showSpendMoneyModal('${c.id}')">Gastar dinero</button>
               <button class="btn btn-secondary" onclick="showExchangeModal('${c.id}')">Cambiar monedas</button>
               <button class="btn btn-secondary" onclick="showTransferModal('${c.id}')">Transferir</button>
@@ -2320,7 +2322,8 @@ function showAddPlayerModal(){
 /* ---- add character ---- */
 function showAddCharacterModal(){
   const owner=selectedPlayer();
-  if(owner && !isSpecialPlayer(owner) && activeCharacterCount(owner.id)>=5){
+  // Límite de 5 personajes activos por jugador; el admin puede pasarlo.
+  if(owner && !isSpecialPlayer(owner) && !isAdminUser() && activeCharacterCount(owner.id)>=5){
     toast('error','Este jugador ya tiene el máximo de 5 personajes activos.');
     return;
   }
@@ -2329,10 +2332,10 @@ function showAddCharacterModal(){
     <label class="text-input">Nombre del personaje<input type="text" id="name-input" maxlength="60" autofocus></label>
     <label class="text-input">Descripción corta<textarea id="description-input" maxlength="180" placeholder="Quién es, qué hace o cómo lo conocen…"></textarea></label>
     <label class="text-input">Notas personales<textarea id="notes-input" maxlength="600" placeholder="Recordatorios, deudas, objetivos o información útil…"></textarea></label>
-    <p class="modal-detail" style="text-align:left;margin-top:-4px;">Saldo inicial (opcional)</p>
+    ${isAdminUser() ? `<p class="modal-detail" style="text-align:left;margin-top:-4px;">Saldo inicial (opcional)</p>
     <div class="coin-inputs">
       ${UI_COIN_KEYS.map(k=>`<label class="coin-input coin-${k}"><span>${COIN_META[k].abbr}</span><input type="number" min="0" step="1" inputmode="numeric" value="0" data-coin="${k}"></label>`).join('')}
-    </div>
+    </div>` : `<p class="modal-detail" style="text-align:left;margin-top:-4px;">El personaje empieza con 0 monedas: el DM le pone el saldo inicial.</p>`}
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
       <button class="btn btn-primary" id="save-btn">Guardar</button>
@@ -2374,7 +2377,7 @@ function showAddMoneyModal(charId){
     </div>
     <label class="text-input">Motivo (opcional)<textarea id="reason-input" class="spend-reason" maxlength="255" rows="1" placeholder="Ej: recompensa, venta, devolución…"></textarea></label>
     <p class="modal-detail">El movimiento quedará registrado con tu sesión.</p>
-    <label class="checkbox-input"><input type="checkbox" id="correction-input"> Marcar como corrección</label>
+    ${isAdminUser() ? `<label class="checkbox-input"><input type="checkbox" id="correction-input"> Marcar como corrección</label>` : ''}
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
       <button class="btn btn-primary" id="continue-btn">Continuar</button>
@@ -2394,7 +2397,7 @@ function showAddMoneyModal(charId){
     if(!any){ showModalError('Ingresa al menos una cantidad mayor que cero.'); return; }
     const reason = document.getElementById('reason-input').value.trim();
     const author = state.user ? state.user.displayName : ''; 
-    const isCorrection = document.getElementById('correction-input').checked;
+    const isCorrection = isAdminUser() && !!document.getElementById('correction-input')?.checked;
     showConfirmAddMoney(charId, delta, reason, author, isCorrection);
   };
 }
@@ -2437,7 +2440,7 @@ function showSpendMoneyModal(charId){
     </div>
     <label class="text-input">Motivo (opcional)<textarea id="reason-input" class="spend-reason" maxlength="255" rows="1" placeholder="Ej: compra de suministros, posada, equipo…"></textarea></label>
     <p class="modal-detail">El movimiento quedará registrado con tu sesión.</p>
-    <label class="checkbox-input"><input type="checkbox" id="correction-input"> Marcar como corrección</label>
+    ${isAdminUser() ? `<label class="checkbox-input"><input type="checkbox" id="correction-input"> Marcar como corrección</label>` : ''}
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
       <button class="btn btn-primary" id="continue-btn">Continuar</button>
@@ -2464,7 +2467,7 @@ function showSpendMoneyModal(charId){
     const delta = spend.delta;
     const reason = document.getElementById('reason-input').value.trim();
     const author = state.user ? state.user.displayName : ''; 
-    const isCorrection = document.getElementById('correction-input').checked;
+    const isCorrection = isAdminUser() && !!document.getElementById('correction-input')?.checked;
     showConfirmSpendMoney(charId, delta, reason, author, isCorrection, amounts);
   };
 }

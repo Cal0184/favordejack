@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/assets.php';
+require_once __DIR__ . '/includes/auth-widget.php';
 
 favor_session_start();
 $sessionUser = favor_current_user();
@@ -28,38 +29,6 @@ function h(string $value): string
     return htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
 
-$playerVisual = [
-    'iconUrl' => '',
-    'iconBg'  => '#5b554d',
-    'emoji'   => '🛡️',
-];
-
-// El Hub solo necesita tres datos visuales del jugador. La sesión ya fue liberada
-// antes de esta consulta, así que esta lectura no bloquea otras requests del usuario.
-if ($sessionUser) {
-    try {
-        $db = favor_db();
-        try {
-            $stmt = $db->prepare('SELECT IconUrl, IconBg, Emoji FROM Jugador WHERE ID=? LIMIT 1');
-            $stmt->bind_param('s', $sessionUser['playerId']);
-            $stmt->execute();
-            $row = $stmt->get_result()->fetch_assoc();
-            $stmt->close();
-
-            if ($row) {
-                $playerVisual['iconUrl'] = favor_asset_url((string)($row['IconUrl'] ?? ''));
-                $bg = trim((string)($row['IconBg'] ?? ''));
-                if (preg_match('/^#[0-9A-Fa-f]{6}$/', $bg)) $playerVisual['iconBg'] = $bg;
-                $emoji = trim((string)($row['Emoji'] ?? ''));
-                if ($emoji !== '') $playerVisual['emoji'] = mb_substr($emoji, 0, 16, 'UTF-8');
-            }
-        } finally {
-            $db->close();
-        }
-    } catch (Throwable $e) {
-        // El Hub debe seguir funcionando aunque el perfil visual no pueda cargarse.
-    }
-}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -388,16 +357,15 @@ button,summary{font:inherit}
 }
 .nav-card.coming-soon:hover{transform:none;border-color:rgba(157,120,66,.48);box-shadow:inset 0 0 0 3px #0a0806,inset 0 0 0 4px rgba(195,161,106,.10),0 10px 20px rgba(0,0,0,.25)}
 .nav-card.coming-soon .nav-title::after{
-    content:"COMING SOON";
-    position:absolute;
-    top:8px;
-    right:10px;
-    padding:2px 7px;
+    content:"Próximamente";
+    display:table;
+    margin:5px 0 2px;
+    padding:2px 8px;
     border:1px solid rgba(195,161,106,.38);
     border-radius:9px;
     background:rgba(9,7,5,.8);
     color:#b8a182;
-    font-size:.52rem;
+    font-size:.66rem;
     line-height:1.25;
     letter-spacing:.08em;
 }
@@ -431,69 +399,31 @@ button,summary{font:inherit}
     .header{min-height:145px;padding:24px 12px 18px;align-items:start}
     .brand{margin-top:22px}.header::before,.header::after{display:none}
     .user-menu{top:9px;right:2px}.user-name{display:none}.user-crown{display:none}
-    .hero{grid-template-columns:1fr;gap:12px;padding:58px 4px 12px}.scene{min-height:280px}
-    .emblem{width:150px;top:28px;transform:translate(-50%,0)}
+    .hero{grid-template-columns:1fr;gap:12px;padding:8px 4px 12px}.scene{min-height:280px}
+    /* En el móvil el emblema va encima de las imágenes, sin taparlas. */
+    .emblem{position:relative;left:auto;top:auto;order:-1;width:120px;margin:0 auto 4px;transform:none}
     .scene-copy{left:18px;right:18px;bottom:15px}.scene-action{min-width:94px;padding:7px 10px}
     .nav-grid{padding:4px;gap:10px}
 }
 @media(max-width:520px){
     .brand{font-size:2.35rem;letter-spacing:.025em}.subtitle{font-size:.64rem;gap:7px}
-    .hero{padding-top:72px}.scene{min-height:235px}.scene-copy{grid-template-columns:1fr}.scene-action{display:none}
+    .scene{min-height:235px}.scene-copy{grid-template-columns:1fr}.scene-action{display:none}
     .nav-grid{grid-template-columns:1fr}.nav-card{min-height:88px;grid-template-columns:58px 1fr 18px;padding:12px 13px}
     .nav-icon{width:42px;height:42px}.nav-icon svg{width:38px;height:38px}
     .user-popover{position:fixed;right:8px;top:60px;width:min(220px,calc(100vw - 16px))}
 }
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
 </style>
+<?php favor_head('Favor de Jack · Gremio de Aventureros'); ?>
 </head>
 <body>
+<?php favor_site_bar(); ?>
 <main class="shell">
     <header class="header">
         <div>
             <h1 class="brand">Favor de Jack</h1>
             <div class="subtitle">Gremio de Aventureros</div>
         </div>
-
-        <?php if ($sessionUser): ?>
-        <details class="user-menu">
-            <summary aria-label="Abrir menú de usuario">
-                <span class="user-avatar" style="--avatar-bg:<?= h($playerVisual['iconBg']) ?>">
-                    <?php if ($playerVisual['iconUrl'] !== ''): ?>
-                        <img src="<?= h($playerVisual['iconUrl']) ?>" alt="" decoding="async" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'">
-                        <span class="avatar-fallback" style="display:none"><?= h($playerVisual['emoji']) ?></span>
-                    <?php else: ?>
-                        <span class="avatar-fallback"><?= h($playerVisual['emoji']) ?></span>
-                    <?php endif; ?>
-                </span>
-                <span class="user-name"><?= h((string)$sessionUser['displayName']) ?></span>
-                <?php if (($sessionUser['role'] ?? '') === 'admin'): ?><span class="user-crown" title="Administrador">♛</span><?php endif; ?>
-                <svg class="user-chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m5 7 5 5 5-5"/></svg>
-            </summary>
-            <div class="user-popover">
-                <div class="user-popover-head">
-                    <strong><?= h((string)$sessionUser['displayName']) ?></strong>
-                    <small><?= ($sessionUser['role'] ?? '') === 'admin' ? 'Administrador' : 'Aventurero' ?></small>
-                </div>
-                <a href="<?= favor_base_path() ?>cuenta.php">Mi cuenta</a>
-                <a href="<?= favor_base_path() ?>perfil.php">Mi perfil</a>
-                <?php if (($sessionUser['role'] ?? '') === 'admin'): ?><a href="<?= favor_base_path() ?>tiendas/descuentos.php">Descuentos de tiendas</a><?php endif; ?>
-                <a class="danger" href="<?= favor_base_path() ?>logout.php">Cerrar sesión</a>
-            </div>
-        </details>
-        <?php else: ?>
-        <details class="user-menu">
-            <summary aria-label="Abrir acceso de usuario">
-                <span class="user-avatar" style="--avatar-bg:#514b43"><span class="avatar-fallback">♙</span></span>
-                <span class="user-name">Cuenta</span>
-                <svg class="user-chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m5 7 5 5 5-5"/></svg>
-            </summary>
-            <div class="user-popover">
-                <div class="user-popover-head"><strong>Modo lectura</strong><small>Inicia sesión para modificar datos</small></div>
-                <a href="<?= favor_base_path() ?>login.php">Iniciar sesión</a>
-                <a href="<?= favor_base_path() ?>olvide-clave.php">Olvidé mi contraseña</a>
-            </div>
-        </details>
-        <?php endif; ?>
     </header>
 
     <section class="hero" aria-label="Accesos principales">
