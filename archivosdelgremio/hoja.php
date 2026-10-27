@@ -48,10 +48,11 @@ header('Content-Type: text/html; charset=utf-8');
 if (!$row) http_response_code(404);
 $s = $data['hoja'] ?? [];
 $p = $data['perfil'] ?? [];
-$block = static function (string $title, ?string $text): string {
+$block = static function (string $title, ?string $text, string $icon = '✦'): string {
     $text = trim((string)$text);
-    return $text === '' ? '' : '<section class="card"><h2>' . h($title) . '</h2><div class="text">' . nl2br(h($text)) . '</div></section>';
+    return $text === '' ? '' : '<section class="fx-card"><div class="fx-head"><span class="ico" aria-hidden="true">' . $icon . '</span><h2>' . h($title) . '</h2></div><div class="fx-text">' . h($text) . '</div></section>';
 };
+$base = favor_base_path();
 $mod = static fn(?int $v): string => $v === null ? '' : (($m = intdiv($v - 10 + 20, 2) - 10) >= 0 ? '+' . $m : (string)$m);
 ?>
 <!doctype html>
@@ -59,116 +60,104 @@ $mod = static fn(?int $v): string => $v === null ? '' : (($m = intdiv($v - 10 + 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#2b1a10">
-    <title><?= h($row ? $row['Nombre'] . ' · Hoja' : 'Hoja no encontrada') ?> · Archivos del Gremio</title>
-    <link rel="icon" href="<?= favor_base_path() ?>favicon.ico">
-    <style>
-        :root { --ink:#2b1a10; --paper:#f3e6c8; --paper2:#e9d6ac; --muted:#6b5338; --line:#c9ad78; }
-        * { box-sizing:border-box; }
-        body { margin:0; background:#1d120b; color:var(--ink); font:16px/1.5 Georgia, "Times New Roman", serif; }
-        .wrap { max-width:1000px; margin:0 auto; padding:24px 16px 64px; }
-        .top { display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:center; color:#e8d3a4; margin-bottom:16px; }
-        .top a { color:#e8d3a4; }
-        h1 { margin:0; font-size:1.7rem; }
-        .sub { color:#cdb68a; margin:2px 0 0; }
-        .card { background:var(--paper); border:1px solid var(--line); border-radius:10px; padding:16px 18px; margin-bottom:14px; box-shadow:0 6px 24px rgba(0,0,0,.35); }
-        h2 { margin:0 0 10px; font-size:1.05rem; border-bottom:1px solid var(--line); padding-bottom:4px; }
-        .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:8px; }
-        .stat { background:var(--paper2); border-radius:8px; padding:8px; text-align:center; }
-        .stat b { display:block; font-size:.72rem; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); }
-        .stat span { font-size:1.3rem; }
-        .stat small { display:block; color:var(--muted); }
-        .cols { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:14px; }
-        ul.list { list-style:none; margin:0; padding:0; columns:2; column-gap:18px; }
-        ul.list li { display:flex; justify-content:space-between; gap:8px; border-bottom:1px dotted var(--line); padding:2px 0; break-inside:avoid; }
-        ul.list li.prof { font-weight:bold; }
-        table { width:100%; border-collapse:collapse; }
-        td, th { text-align:left; padding:5px 6px; border-bottom:1px solid var(--line); }
-        .text { white-space:normal; overflow-wrap:anywhere; }
-        .muted { color:var(--muted); font-size:.9rem; }
-        .btn { color:#f3e6c8; background:#5a3a1c; border-radius:8px; padding:6px 12px; text-decoration:none; }
-        @media (max-width:520px) { ul.list { columns:1; } }
-    </style>
+    <meta name="theme-color" content="#061813">
+    <title><?= h($row ? $row['Nombre'] . ' · Hoja' : 'Hoja no encontrada') ?> · Favor de Jack</title>
+    <link rel="icon" href="<?= h($base) ?>favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="ficha.css?v=<?= (int)@filemtime(__DIR__ . '/ficha.css') ?>">
+    <style>:root{--bg-image:url("<?= h($base) ?>inventario/assets/ui/inventory-bg.webp");--paper-image:url("<?= h($base) ?>inventario/assets/ui/inventory-parchment.webp")}</style>
 <?php favor_head('Hoja de personaje · Favor de Jack'); ?>
 </head>
 <body>
 <?php favor_site_bar(); ?>
-<div class="wrap">
+<header class="fx-top">
+    <nav>
+        <?php if ($row): ?><a class="fx-btn hide-sm" href="<?= h($base) ?>inventario/?character=<?= h(rawurlencode($id)) ?>">Inventario</a><?php endif; ?>
+    </nav>
+</header>
+<main class="fx-wrap">
 <?php if (!$row): ?>
-    <div class="top"><h1>Hoja no encontrada</h1><a href="<?= favor_base_path() ?>archivosdelgremio/">← Archivos del Gremio</a></div>
-    <div class="card">Este personaje todavía no tiene una ficha importada.</div>
+    <section class="fx-card"><div class="fx-head"><span class="ico">📜</span><h2>Hoja no encontrada</h2></div><p class="fx-lead">Este personaje todavía no tiene una ficha importada.</p></section>
 <?php else: ?>
-    <div class="top">
-        <div>
-            <h1><?= h($p['NombreCompleto'] ?? $row['Nombre']) ?></h1>
-            <p class="sub"><?= h(implode(' · ', array_filter([$s['claseNivel'] ?? '', $p['Raza'] ?? '', $s['trasfondo'] ?? '', $s['alineamiento'] ?? '', 'Jugador: ' . ($row['JugadorNombre'] ?? $row['Jugador'])]))) ?></p>
+    <section class="fx-card">
+        <div class="fx-hero">
+            <div>
+                <span class="fx-eyebrow">Jugador: <?= h($row['JugadorNombre'] ?? $row['Jugador']) ?></span>
+                <h1><?= h($p['NombreCompleto'] ?? $row['Nombre']) ?></h1>
+                <div class="sub"><?= h(implode(' · ', array_filter([$s['claseNivel'] ?? '', $p['Raza'] ?? '', $s['trasfondo'] ?? '', $s['alineamiento'] ?? '']))) ?></div>
+            </div>
+            <?php if ($canEdit): ?>
+                <div class="fx-links">
+                    <a class="fx-btn" href="?id=<?= h(rawurlencode($id)) ?>&amp;pdf=1" target="_blank" rel="noopener">PDF original</a>
+                    <a class="fx-btn fx-btn--primary" href="importar-ficha.php?character=<?= h(rawurlencode($id)) ?>">Reimportar ficha</a>
+                </div>
+            <?php endif; ?>
         </div>
-        <div>
-            <?php if ($canEdit): ?><a class="btn" href="?id=<?= h(rawurlencode($id)) ?>&amp;pdf=1" target="_blank" rel="noopener">PDF original</a>
-            <a class="btn" href="importar-ficha.php?character=<?= h(rawurlencode($id)) ?>">Reimportar</a><?php endif; ?>
-        </div>
-    </div>
-
-    <section class="card">
-        <div class="grid">
+        <div class="fx-stats">
             <?php foreach (['Fuerza' => 'FUE', 'Destreza' => 'DES', 'Constitucion' => 'CON', 'Inteligencia' => 'INT', 'Sabiduria' => 'SAB', 'Carisma' => 'CAR'] as $k => $label): ?>
-                <div class="stat"><b><?= $label ?></b><span><?= h($p[$k] ?? '—') ?></span><small><?= h($mod(isset($p[$k]) ? (int)$p[$k] : null)) ?></small></div>
+                <div class="fx-stat"><b><?= $label ?></b><span><?= h($p[$k] ?? '—') ?></span><small><?= h($mod(isset($p[$k]) ? (int)$p[$k] : null)) ?></small></div>
+            <?php endforeach; ?>
+        </div>
+        <hr class="fx-divider">
+        <div class="fx-grid">
+            <?php foreach (['ca' => 'Clase de armadura', 'pgMax' => 'PG máximos', 'pgTemporales' => 'PG temporales', 'iniciativa' => 'Iniciativa', 'velocidad' => 'Velocidad', 'dadosGolpe' => 'Dados de golpe', 'competencia' => 'Competencia', 'percepcionPasiva' => 'Percepción pasiva', 'experiencia' => 'Experiencia'] as $k => $label): ?>
+                <?php if (($s[$k] ?? '') !== ''): ?><div class="fx-box"><b><?= h($label) ?></b><span><?= h($s[$k]) ?></span></div><?php endif; ?>
             <?php endforeach; ?>
         </div>
     </section>
 
-    <section class="card">
-        <div class="grid">
-            <?php foreach (['ca' => 'Clase de armadura', 'iniciativa' => 'Iniciativa', 'velocidad' => 'Velocidad', 'pgMax' => 'PG máximos', 'pgTemporales' => 'PG temporales', 'dadosGolpe' => 'Dados de golpe', 'competencia' => 'Competencia', 'percepcionPasiva' => 'Percepción pasiva', 'experiencia' => 'Experiencia'] as $k => $label): ?>
-                <?php if (($s[$k] ?? '') !== ''): ?><div class="stat"><b><?= h($label) ?></b><span><?= h($s[$k]) ?></span></div><?php endif; ?>
-            <?php endforeach; ?>
-        </div>
-    </section>
-
-    <div class="cols">
+    <div class="fx-cols">
         <?php if (!empty($s['salvaciones'])): ?>
-            <section class="card"><h2>Tiradas de salvación</h2><ul class="list">
-                <?php foreach ($s['salvaciones'] as $x): ?><li class="<?= !empty($x['proficient']) ? 'prof' : '' ?>"><span><?= !empty($x['proficient']) ? '● ' : '○ ' ?><?= h($x['name']) ?></span><span><?= h($x['value']) ?></span></li><?php endforeach; ?>
+            <section class="fx-card"><div class="fx-head"><span class="ico" aria-hidden="true">⛨</span><h2>Tiradas de salvación</h2></div><ul class="fx-list">
+                <?php foreach ($s['salvaciones'] as $x): ?><li class="<?= !empty($x['proficient']) ? 'prof' : '' ?>"><span><span class="dot"><?= !empty($x['proficient']) ? '●' : '○' ?></span><?= h($x['name']) ?></span><span><?= h($x['value']) ?></span></li><?php endforeach; ?>
             </ul></section>
         <?php endif; ?>
         <?php if (!empty($s['habilidades'])): ?>
-            <section class="card"><h2>Habilidades</h2><ul class="list">
-                <?php foreach ($s['habilidades'] as $x): ?><li class="<?= !empty($x['proficient']) ? 'prof' : '' ?>"><span><?= !empty($x['proficient']) ? '● ' : '○ ' ?><?= h($x['name']) ?></span><span><?= h($x['value']) ?></span></li><?php endforeach; ?>
+            <section class="fx-card"><div class="fx-head"><span class="ico" aria-hidden="true">✧</span><h2>Habilidades</h2></div><ul class="fx-list">
+                <?php foreach ($s['habilidades'] as $x): ?><li class="<?= !empty($x['proficient']) ? 'prof' : '' ?>"><span><span class="dot"><?= !empty($x['proficient']) ? '●' : '○' ?></span><?= h($x['name']) ?></span><span><?= h($x['value']) ?></span></li><?php endforeach; ?>
             </ul></section>
         <?php endif; ?>
     </div>
+    <div style="height:18px"></div>
 
     <?php if (!empty($s['ataques'])): ?>
-        <section class="card"><h2>Ataques</h2><table>
-            <tr><th>Nombre</th><th>Bonificador</th><th>Daño / tipo</th></tr>
+        <section class="fx-card"><div class="fx-head"><span class="ico" aria-hidden="true">⚔</span><h2>Ataques</h2></div>
+            <table class="fx-table"><tr><th>Nombre</th><th>Bonificador</th><th>Daño / tipo</th></tr>
             <?php foreach ($s['ataques'] as $a): ?><tr><td><?= h($a['name']) ?></td><td><?= h($a['bonus']) ?></td><td><?= h($a['damage']) ?></td></tr><?php endforeach; ?>
-        </table><?php if (($s['ataquesNotas'] ?? '') !== ''): ?><p class="text"><?= nl2br(h($s['ataquesNotas'])) ?></p><?php endif; ?></section>
-    <?php endif; ?>
-
-    <div class="cols">
-        <?= $block('Rasgos de personalidad', $s['personalidad'] ?? '') ?>
-        <?= $block('Ideales', $s['ideales'] ?? '') ?>
-        <?= $block('Vínculos', $s['vinculos'] ?? '') ?>
-        <?= $block('Defectos', $s['defectos'] ?? '') ?>
-    </div>
-    <?= $block('Rasgos y atributos', $s['rasgos'] ?? '') ?>
-    <?= $block('Rasgos y atributos adicionales', $s['rasgosAdicionales'] ?? '') ?>
-    <?= $block('Otras competencias e idiomas', $s['competenciasIdiomas'] ?? '') ?>
-    <?php if (!empty($s['aspecto'])): ?>
-        <section class="card"><h2>Aspecto</h2><div class="grid">
-            <?php foreach ($s['aspecto'] as $k => $v): ?><div class="stat"><b><?= h($k) ?></b><span style="font-size:1rem"><?= h($v) ?></span></div><?php endforeach; ?>
-        </div></section>
-    <?php endif; ?>
-    <?= $block('Aliados y organizaciones', $s['aliados'] ?? '') ?>
-    <?= $block('Historia del personaje', $p['Biografia'] ?? '') ?>
-    <?php if (!empty($s['conjuros'])): $c = $s['conjuros']; ?>
-        <section class="card"><h2>Conjuros</h2>
-            <p><?= h(implode(' · ', array_filter([($c['clase'] ?? '') !== '' ? 'Clase: ' . $c['clase'] : '', ($c['aptitud'] ?? '') !== '' ? 'Aptitud: ' . $c['aptitud'] : '', ($c['cd'] ?? '') !== '' ? 'CD: ' . $c['cd'] : '', ($c['ataque'] ?? '') !== '' ? 'Ataque: ' . $c['ataque'] : '']))) ?></p>
-            <?php if (!empty($c['lista'])): ?><p><?= h(implode(' · ', $c['lista'])) ?></p><?php endif; ?>
+            </table>
+            <?php if (($s['ataquesNotas'] ?? '') !== ''): ?><p class="fx-text"><?= h($s['ataquesNotas']) ?></p><?php endif; ?>
         </section>
     <?php endif; ?>
-    <p class="muted" style="color:#cdb68a">Importada el <?= h(substr((string)$row['Importado'], 0, 16)) ?> (UTC)<?= $row['ImportadoPor'] ? ' por ' . h($row['ImportadoPor']) : '' ?>.</p>
+
+    <?php if (!empty($s['conjuros'])): $c = $s['conjuros']; ?>
+        <section class="fx-card"><div class="fx-head"><span class="ico" aria-hidden="true">✺</span><h2>Conjuros</h2></div>
+            <?php $info = array_filter([($c['clase'] ?? '') !== '' ? 'Clase: ' . $c['clase'] : '', ($c['aptitud'] ?? '') !== '' ? 'Aptitud: ' . $c['aptitud'] : '', ($c['cd'] ?? '') !== '' ? 'CD: ' . $c['cd'] : '', ($c['ataque'] ?? '') !== '' ? 'Ataque: ' . $c['ataque'] : '']); ?>
+            <?php if ($info): ?><div class="fx-pills" style="margin:0 0 12px"><?php foreach ($info as $i): ?><span class="fx-pill gold"><?= h($i) ?></span><?php endforeach; ?></div><?php endif; ?>
+            <?php if (!empty($c['lista'])): ?><div class="fx-chips"><?php foreach ($c['lista'] as $sp): ?><span class="fx-chip"><?= h($sp) ?></span><?php endforeach; ?></div><?php endif; ?>
+        </section>
+    <?php endif; ?>
+
+    <div class="fx-cols">
+        <?= $block('Rasgos de personalidad', $s['personalidad'] ?? '', '☙') ?>
+        <?= $block('Ideales', $s['ideales'] ?? '', '☼') ?>
+        <?= $block('Vínculos', $s['vinculos'] ?? '', '∞') ?>
+        <?= $block('Defectos', $s['defectos'] ?? '', '☠') ?>
+    </div>
+    <div style="height:18px"></div>
+    <?= $block('Rasgos y atributos', $s['rasgos'] ?? '', '✦') ?>
+    <?= $block('Rasgos y atributos adicionales', $s['rasgosAdicionales'] ?? '', '✧') ?>
+    <?= $block('Otras competencias e idiomas', $s['competenciasIdiomas'] ?? '', '✎') ?>
+    <?php if (!empty($s['aspecto'])): ?>
+        <section class="fx-card"><div class="fx-head"><span class="ico" aria-hidden="true">◐</span><h2>Aspecto</h2></div><div class="fx-grid">
+            <?php foreach ($s['aspecto'] as $k => $v): ?><div class="fx-box"><b><?= h($k) ?></b><span style="font-size:1rem"><?= h($v) ?></span></div><?php endforeach; ?>
+        </div></section>
+    <?php endif; ?>
+    <?= $block('Aliados y organizaciones', $s['aliados'] ?? '', '⚑') ?>
+    <?= $block('Historia del personaje', $p['Biografia'] ?? '', '📜') ?>
+    <p class="fx-foot">Ficha importada el <?= h(substr((string)$row['Importado'], 0, 16)) ?> (UTC)<?= $row['ImportadoPor'] ? ' por ' . h($row['ImportadoPor']) : '' ?>.</p>
 <?php endif; ?>
-</div>
+</main>
 </body>
 </html>
