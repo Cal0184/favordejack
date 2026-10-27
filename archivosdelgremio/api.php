@@ -6,6 +6,7 @@ header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
 
 require_once __DIR__ . '/auth.php';
 require_once dirname(__DIR__) . '/includes/assets.php';
+require_once dirname(__DIR__) . '/includes/imagenes.php';
 require_once dirname(__DIR__) . '/includes/migrations.php';
 guild_session_start();
 
@@ -127,17 +128,15 @@ function uploaded_portrait(array $file, string $playerName, string $characterNam
     $target = $directory . '/' . $base . '.' . $targetExtension;
     $converted = false;
 
-    if ($mime !== 'image/webp' && function_exists('imagewebp')) {
-        $image = null;
-        if ($mime === 'image/jpeg' && function_exists('imagecreatefromjpeg')) $image = @imagecreatefromjpeg($tmp);
-        if ($mime === 'image/png' && function_exists('imagecreatefrompng')) $image = @imagecreatefrompng($tmp);
-        if ($image !== false && $image !== null) {
-            if (function_exists('imagepalettetotruecolor')) @imagepalettetotruecolor($image);
-            @imagealphablending($image, true);
-            @imagesavealpha($image, true);
+    // Fotos del móvil: se enderezan (EXIF) y se reducen al tamaño del retrato.
+    if (favor_image_gd_ready()) {
+        $image = favor_image_open($tmp);
+        if ($image !== null) {
+            [$maxW, $maxH] = FAVOR_IMAGE_LIMITS['characters'];
+            $image = favor_image_fit($image, $maxW, $maxH);
             $targetExtension = 'webp';
             $target = $directory . '/' . $base . '.webp';
-            $converted = @imagewebp($image, $target, 90);
+            $converted = favor_image_save($image, $target, 85);
             imagedestroy($image);
         }
     }

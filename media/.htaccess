@@ -2,3 +2,13 @@ Options -Indexes
 <FilesMatch "\.(php|phtml|phar|cgi|pl|py|sh)$">
     Require all denied
 </FilesMatch>
+
+# Fase 2: las imágenes de jugadores y personajes viven en media/. Mientras no
+# se ejecute «Ordenar imágenes» (admin/imagenes.php), lo que todavía no esté
+# aquí se busca en la copia antigua de bancadigital/.
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_URI} ^(.*/)media/(icons|characters)/(.+)$
+    RewriteRule ^ %1bancadigital/%2/%3 [L]
+</IfModule>

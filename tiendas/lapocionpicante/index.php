@@ -3,9 +3,8 @@ declare(strict_types=1);
 require_once dirname(__DIR__, 2) . '/includes/auth-widget.php';
 require_once dirname(__DIR__, 2) . '/includes/descuentos.php';
 favor_session_start();
+$discount = favor_discount_shop_data($GLOBALS['__favor_auth_widget_user'] ?? null, 'pocion-picante');
 favor_session_close();
-$discount = favor_discount_shop_data($GLOBALS['__favor_auth_widget_user'] ?? null);
-$discount['manageUrl'] = favor_base_path() . 'tiendas/descuentos.php';
 
 $productsPath = __DIR__ . '/productos.json';
 $products = [];
@@ -14,7 +13,7 @@ $dataError = null;
 if (is_file($productsPath)) {
     $decoded = json_decode((string) file_get_contents($productsPath), true);
     if (is_array($decoded)) {
-        $products = $decoded;
+        $products = favor_shop_drop_missing_images($decoded, __DIR__);
     } else {
         $dataError = 'No fue posible leer productos.json.';
     }
@@ -40,7 +39,7 @@ $shopData = [
 <meta name="theme-color" content="#120d17">
 <title>La Poción Picante · Favor de Jack</title>
 <meta name="description" content="Catálogo digital de La Poción Picante: curación, remedios, blindaje, esencias, conjuros y néctares.">
-<link rel="stylesheet" href="style.css?v=2">
+<link rel="stylesheet" href="style.css<?= favor_v(__DIR__ . '/style.css') ?>">
 </head>
 <body>
 <?php favor_auth_widget(); ?>
@@ -86,7 +85,7 @@ $shopData = [
 
     <div class="seller-stage" id="yamo-yamo">
         <div class="seller-name">Yamo-Yamo</div>
-        <img src="assets/vendedores/yamo-yamo.png" alt="Yamo-Yamo">
+        <img src="../../media/shops/lapocionpicante/yamo-yamo.webp" alt="Yamo-Yamo">
     </div>
 </section>
 
@@ -187,7 +186,7 @@ $shopData = [
 <section class="seller-section">
     <div class="seller-art">
         <div class="seller-aura" aria-hidden="true"></div>
-        <img src="assets/vendedores/yamo-yamo.png" alt="Yamo-Yamo">
+        <img src="../../media/shops/lapocionpicante/yamo-yamo.webp" alt="Yamo-Yamo">
     </div>
     <div class="seller-simple">
         <p class="eyebrow">Vendedor</p>
@@ -208,6 +207,6 @@ $shopData = [
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script id="shopData" type="application/json"><?= json_encode($shopData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP) ?></script>
-<script src="app.js?v=2" defer></script>
+<script src="app.js<?= favor_v(__DIR__ . '/app.js') ?>" defer></script>
 </body>
 </html>

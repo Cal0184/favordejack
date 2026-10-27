@@ -37,12 +37,12 @@ function asset(string $path): string
 <link href="<?= asset('base.css') ?>" rel="stylesheet"/>
 <link href="<?= asset('dice.css') ?>" rel="stylesheet"/>
 <link href="<?= asset('jack.css') ?>" rel="stylesheet"/>
-<link href="<?= asset('images/jack-hand.webp') ?>" rel="icon" type="image/webp"/></head>
+<link href="<?= e(favor_static(FAVOR_LOGO)) ?>" rel="icon" type="image/webp"/></head>
 <body>
 <?php favor_auth_widget(); ?>
 <div class="jack-page-shell">
 <header class="jack-hero jack-hero-v2">
-<img alt="Icono del Favor de Jack" class="jack-brand-icon" src="<?= asset('images/jack-hand.webp') ?>"/>
+<img alt="Icono del Favor de Jack" class="jack-brand-icon" src="<?= e(favor_static(FAVOR_LOGO)) ?>"/>
 <div class="jack-hero-copy">
 <p class="jack-kicker">LA SUERTE ESTÁ ECHADA</p>
 <h1>El Favor de <span>Jack</span></h1>

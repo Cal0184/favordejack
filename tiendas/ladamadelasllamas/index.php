@@ -11,7 +11,7 @@ $dataError = null;
 if (is_file($productsPath)) {
     $decoded = json_decode((string)file_get_contents($productsPath), true);
     if (is_array($decoded)) {
-        $products = $decoded;
+        $products = favor_shop_drop_missing_images($decoded, __DIR__);
     } else {
         $dataError = 'No fue posible leer productos.json.';
     }
@@ -43,7 +43,7 @@ $shopData = [
 <meta name="theme-color" content="#160c07">
 <title>La Dama de las Llamas · Favor de Jack</title>
 <meta name="description" content="Herrería La Dama de las Llamas. Forja, compra y venta de armas y armaduras, objetos mágicos y mejoras arcanas.">
-<link rel="stylesheet" href="style.css?v=1">
+<link rel="stylesheet" href="style.css<?= favor_v(__DIR__ . '/style.css') ?>">
 </head>
 <body>
 <?php favor_auth_widget(); ?>
@@ -99,14 +99,14 @@ $shopData = [
 
     <div class="hero-vendors" aria-label="Gaston y Axe Rein">
         <div class="vendor gaston">
-            <img src="assets/vendedores/gaston.png" alt="Gaston, herrero principal">
+            <img src="../../media/shops/ladamadelasllamas/gaston.webp" alt="Gaston, herrero principal">
             <div class="vendor-plate">
                 <small>Herrero principal</small>
                 <strong>Gaston</strong>
             </div>
         </div>
         <div class="vendor axe">
-            <img src="assets/vendedores/axe-rein.png" alt="Axe Rein, especialista en efectos mágicos">
+            <img src="../../media/shops/ladamadelasllamas/axe-rein.webp" alt="Axe Rein, especialista en efectos mágicos">
             <div class="vendor-plate arcane">
                 <small>Efectos y mejoras arcanas</small>
                 <strong>Axe Rein</strong>
@@ -212,7 +212,7 @@ $shopData = [
     </div>
 
     <article class="master-card gaston-card">
-        <div class="master-art"><img src="assets/vendedores/gaston.png" alt="Gaston"></div>
+        <div class="master-art"><img src="../../media/shops/ladamadelasllamas/gaston.webp" alt="Gaston"></div>
         <div class="master-copy">
             <span class="role physical-role">Herrero principal</span>
             <h3>Gaston</h3>
@@ -228,7 +228,7 @@ $shopData = [
             <p>El lado más experimental del taller. Axe trabaja sobre piezas ya existentes para añadir efectos, utilidades y mejoras mágicas. Su banco se reconoce rápido: suele ser el que brilla.</p>
             <div class="master-tags arcane-tags"><span>Runas</span><span>Encantamientos</span><span>Mejoras +1 / +2</span></div>
         </div>
-        <div class="master-art axe-art"><img src="assets/vendedores/axe-rein.png" alt="Axe Rein"></div>
+        <div class="master-art axe-art"><img src="../../media/shops/ladamadelasllamas/axe-rein.webp" alt="Axe Rein"></div>
     </article>
 </section>
 
@@ -270,6 +270,6 @@ $shopData = [
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script id="shopData" type="application/json"><?= json_encode($shopData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP) ?></script>
-<script src="app.js?v=1" defer></script>
+<script src="app.js<?= favor_v(__DIR__ . '/app.js') ?>" defer></script>
 </body>
 </html>

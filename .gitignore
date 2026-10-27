@@ -31,3 +31,8 @@ Thumbs.db
 respaldos/*
 !respaldos/.htaccess
 tiendas/descuentos.json
+
+# --- Emporio de Ecix's: pedidos y decisiones del admin (van en el respaldo) ---
+tiendas/emporio/data/pedidos.json
+tiendas/emporio/data/duplicados.json
+tiendas/emporio/data/retirados/

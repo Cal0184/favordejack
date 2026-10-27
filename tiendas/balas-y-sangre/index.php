@@ -11,7 +11,7 @@ $dataError = null;
 if (is_file($productsPath)) {
     $decoded = json_decode((string) file_get_contents($productsPath), true);
     if (is_array($decoded)) {
-        $products = $decoded;
+        $products = favor_shop_drop_missing_images($decoded, __DIR__);
     } else {
         $dataError = 'No fue posible leer productos.json.';
     }
@@ -50,7 +50,7 @@ $shopData = [
     <title>Balas y Sangre · Favor de Jack</title>
     <meta name="description" content="Armería-taller de Madeline Ironslinger. Armas de fuego, munición, pólvora y herramientas.">
     <link rel="icon" href="assets/placeholders/arma.svg" type="image/svg+xml">
-    <link rel="stylesheet" href="style.css?v=2">
+    <link rel="stylesheet" href="style.css<?= favor_v(__DIR__ . '/style.css') ?>">
 </head>
 <body>
 <?php favor_auth_widget(); ?>
@@ -112,7 +112,7 @@ $shopData = [
                 <span class="quote-label">Madeline dice</span>
                 <p id="heroSellerQuote">“Menos palabras. Más puntería.”</p>
             </div>
-            <img src="assets/madeline-ironslinger.png" alt="Madeline Ironslinger sosteniendo un arma de fuego">
+            <img src="../../media/shops/balas-y-sangre/madeline-ironslinger.webp" alt="Madeline Ironslinger sosteniendo un arma de fuego">
             <div class="seller-nameplate" aria-hidden="true">
                 <small>Maestra del taller</small>
                 <strong>Madeline Ironslinger</strong>
@@ -225,7 +225,7 @@ $shopData = [
         <div class="seller-art-panel">
             <div class="seller-art-bg" aria-hidden="true"></div>
             <div class="seller-silhouette" aria-hidden="true"></div>
-            <img src="assets/madeline-ironslinger.png" alt="Madeline Ironslinger, vendedora de Balas y Sangre">
+            <img src="../../media/shops/balas-y-sangre/madeline-ironslinger.webp" alt="Madeline Ironslinger, vendedora de Balas y Sangre">
             <div class="seller-stamp" aria-hidden="true">B&amp;S</div>
         </div>
 
@@ -278,6 +278,6 @@ $shopData = [
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script id="shopData" type="application/json"><?= json_encode($shopData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP) ?></script>
-<script src="app.js?v=2" defer></script>
+<script src="app.js<?= favor_v(__DIR__ . '/app.js') ?>" defer></script>
 </body>
 </html>

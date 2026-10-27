@@ -10,7 +10,7 @@ $dataError = null;
 if (is_file($productsPath)) {
     $decoded = json_decode((string)file_get_contents($productsPath), true);
     if (is_array($decoded)) {
-        $products = $decoded;
+        $products = favor_shop_drop_missing_images($decoded, __DIR__);
     } else {
         $dataError = 'No fue posible leer productos.json.';
     }
@@ -36,7 +36,7 @@ $shopData = [
 <meta name="theme-color" content="#090d0a">
 <title>La Varita Económica · Favor de Jack</title>
 <meta name="description" content="Mercado clandestino de pergaminos, brebajes, objetos mágicos dudosos y mercancía defectuosa.">
-<link rel="stylesheet" href="style.css?v=1">
+<link rel="stylesheet" href="style.css<?= favor_v(__DIR__ . '/style.css') ?>">
 </head>
 <body>
 <?php favor_auth_widget(); ?>
@@ -100,11 +100,11 @@ $shopData = [
 
     <div class="hero-vendors">
         <div class="vendor vendor-white">
-            <img src="assets/vendedores/blanco.png" alt="El Señor Blanco">
+            <img src="../../media/shops/lavaritaeconomica/blanco.webp" alt="El Señor Blanco">
             <div class="name-tag white"><small>EL SEÑOR</small><strong>BLANCO</strong></div>
         </div>
         <div class="vendor vendor-pink">
-            <img src="assets/vendedores/pinkman.png" alt="Pinkman">
+            <img src="../../media/shops/lavaritaeconomica/pinkman.webp" alt="Pinkman">
             <div class="name-tag pink"><small>SOCIO / APRENDIZ</small><strong>PINKMAN</strong></div>
         </div>
     </div>
@@ -211,16 +211,16 @@ $shopData = [
         </div>
 
         <div class="featured-cards">
-            <figure><img src="assets/cartas/ira-del-barbaro.png" alt="Carta Ira del Bárbaro"><figcaption>Ira del Bárbaro</figcaption></figure>
-            <figure><img src="assets/cartas/acelerador.png" alt="Carta Acelerador"><figcaption>Acelerador</figcaption></figure>
-            <figure><img src="assets/cartas/mentas-del-bardo.png" alt="Carta Mentas del Bardo"><figcaption>Mentas del Bardo</figcaption></figure>
+            <figure><img src="assets/cartas/ira-del-barbaro.webp" alt="Carta Ira del Bárbaro"><figcaption>Ira del Bárbaro</figcaption></figure>
+            <figure><img src="assets/cartas/acelerador.webp" alt="Carta Acelerador"><figcaption>Acelerador</figcaption></figure>
+            <figure><img src="assets/cartas/mentas-del-bardo.webp" alt="Carta Mentas del Bardo"><figcaption>Mentas del Bardo</figcaption></figure>
         </div>
     </div>
 </section>
 
 <section class="vendors-section" id="vendedores">
     <article class="seller-profile white-profile">
-        <div class="seller-art"><img src="assets/vendedores/blanco.png" alt="El Señor Blanco"></div>
+        <div class="seller-art"><img src="../../media/shops/lavaritaeconomica/blanco.webp" alt="El Señor Blanco"></div>
         <div class="seller-copy">
             <span class="evidence-label">SUJETO A</span>
             <h2>El Señor Blanco</h2>
@@ -235,7 +235,7 @@ $shopData = [
             <p>Un aprendiz demasiado emocionado para estar a cargo de magia peligrosa. Sonríe, vende rápido y no sabe cómo funcionan la mitad de las cosas que ofrece.</p>
             <blockquote>“Bro, prende esto… creo que es seguro.”</blockquote>
         </div>
-        <div class="seller-art"><img src="assets/vendedores/pinkman.png" alt="Pinkman"></div>
+        <div class="seller-art"><img src="../../media/shops/lavaritaeconomica/pinkman.webp" alt="Pinkman"></div>
     </article>
 </section>
 </main>
@@ -256,6 +256,6 @@ $shopData = [
 <div class="toast" id="toast" aria-live="polite"></div>
 
 <script id="shopData" type="application/json"><?= json_encode($shopData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP) ?></script>
-<script src="app.js?v=1" defer></script>
+<script src="app.js<?= favor_v(__DIR__ . '/app.js') ?>" defer></script>
 </body>
 </html>

@@ -476,6 +476,7 @@ button,summary{font:inherit}
                 </div>
                 <a href="<?= favor_base_path() ?>cuenta.php">Mi cuenta</a>
                 <a href="<?= favor_base_path() ?>perfil.php">Mi perfil</a>
+                <?php if (($sessionUser['role'] ?? '') === 'admin'): ?><a href="<?= favor_base_path() ?>tiendas/descuentos.php">Descuentos de tiendas</a><?php endif; ?>
                 <a class="danger" href="<?= favor_base_path() ?>logout.php">Cerrar sesión</a>
             </div>
         </details>
@@ -508,7 +509,7 @@ button,summary{font:inherit}
         </a>
 
         <div class="emblem" aria-hidden="true">
-            <img src="assets/logo-favor-de-jack.webp" alt="">
+            <img src="<?= favor_static(FAVOR_LOGO) ?>" alt="">
         </div>
 
         <a class="scene" href="<?= route('map', $routes) ?>" aria-label="Abrir Waterdeep">

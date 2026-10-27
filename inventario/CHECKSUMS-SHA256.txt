@@ -8,4 +8,4 @@ b162d3a7f32bc5d461c2b894635de17427ece6ccdbcbb1c3711135bf2e358116  ./assets/items
 48fa1740244f634efec4c6fa0b1481b1ba00a32056b3136ce331ee20fb1ee90a  ./assets/ui/favor-logo.svg
 4b507fd1cf9533ee7ad4c93448ffeff914596c0912428db7ececd01b9e97a004  ./assets/ui/inventory-bg.webp
 69f3fa9a9cc56f4376c46d655361e46f9bc5a444bdf1634cead7030473b12bec  ./assets/ui/inventory-parchment.webp
-232a5c6f6ede7f1780e8a2ac12c6dca2db34b1944d1ed1610006a679c3ba2027  ./index.php
+b8e1e690c8c43d1955197ec0fa505a861a93e75168f9f4d44c9583a675d869d6  ./index.php

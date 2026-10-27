@@ -44,4 +44,4 @@ Importa `instalar/esquema.sql` en una base vacía. Crea todas las tablas, sin us
 
 ## Qué archivos no están en GitHub
 
-Están en `.gitignore`: `config.local.php`, `bancadigital/config.php`, `respaldos/`, `media/characters|icons|profiles/`, `bancadigital/data/`, `bancadigital/icons|characters/`, `emporio/Cartas/`, `archivosdelgremio/fichas/` y los JSON de usuarios y pedidos del Emporio antiguo. Todo eso viaja en el paquete.
+Están en `.gitignore`: `config.local.php`, `bancadigital/config.php`, `respaldos/`, `media/characters|icons|profiles/`, `bancadigital/data/`, `bancadigital/icons|characters/` (copia antigua, vacía tras «Ordenar imágenes»), `archivosdelgremio/fichas/`, y los pedidos y decisiones del Emporio de Ecix's (`tiendas/emporio/data/`). Todo eso viaja en el paquete, junto con las cartas de `tiendas/emporio/Cartas/`.

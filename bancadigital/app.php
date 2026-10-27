@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Banca Per-Favore — Favor de Jack</title>
-<link rel="icon" type="image/webp" href="iconhand.webp">
+<link rel="icon" type="image/webp" href="<?= favor_static(FAVOR_LOGO) ?>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cinzel+Decorative:wght@700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
@@ -1032,14 +1032,14 @@ body{display:flex;flex-direction:column;min-height:100vh}
   <div class="topbar-inner new-topbar-inner">
     <a class="topbar-back-link" href="<?= favor_base_path() ?>" aria-label="Volver a Favor de Jack">← <span>Favor de Jack</span></a>
     <div class="compact-brand">
-      <div class="seal compact-seal" aria-hidden="true"><img src="iconhand.webp" alt=""></div>
+      <div class="seal compact-seal" aria-hidden="true"><img src="<?= favor_static(FAVOR_LOGO) ?>" alt=""></div>
       <h1 class="app-title wordmark">Banca Per-Favore</h1>
     </div>
     <div class="account-slot">
       <a id="session-login" class="header-login" href="<?= favor_base_path() ?>login.php?next=<?= rawurlencode(favor_base_path()) ?>bancadigital%2F" hidden>Iniciar sesión</a>
       <details id="session-menu" class="user-menu" hidden>
         <summary>
-          <span class="header-user-avatar"><img id="session-avatar" src="iconhand.webp" alt=""></span>
+          <span class="header-user-avatar"><img id="session-avatar" src="<?= favor_static(FAVOR_LOGO) ?>" alt=""></span>
           <span id="session-name">Mi cuenta</span><span class="user-chevron">⌄</span>
         </summary>
         <div class="user-menu-panel">
@@ -1071,7 +1071,7 @@ body{display:flex;flex-direction:column;min-height:100vh}
           <button id="hub-own-bank" class="hub-action-card primary" type="button" onclick="enterMyBank()">
             <span class="hub-action-eyebrow">Acceso personal</span>
             <span class="hub-action-top">
-              <span id="hub-own-icon" class="hub-action-icon hub-own-icon" aria-hidden="true"><img id="hub-own-avatar" src="iconhand.webp" alt=""></span>
+              <span id="hub-own-icon" class="hub-action-icon hub-own-icon" aria-hidden="true"><img id="hub-own-avatar" src="<?= favor_static(FAVOR_LOGO) ?>" alt=""></span>
               <span class="hub-action-copy">
                 <span class="hub-action-title">Mi Banca</span>
                 <span id="hub-own-meta" class="hub-action-meta">Cargando tu cuenta…</span>
@@ -1291,33 +1291,13 @@ function resolveAssetSrc(src){
   // URLs externas y data URLs se respetan tal cual.
   if(/^(https?:|data:)/i.test(value)) return value;
 
-  // Compatibilidad con rutas absolutas antiguas que apuntaban a <?= favor_base_path() ?>media/.
-  // Las imágenes reales de Banca viven dentro de <?= favor_base_path() ?>bancadigital/.
-  if(value.startsWith('<?= favor_base_path() ?>media/icons/')){
-    return '<?= favor_base_path() ?>bancadigital/icons/'+value.slice('<?= favor_base_path() ?>media/icons/'.length);
-  }
-  if(value.startsWith('<?= favor_base_path() ?>media/characters/')){
-    return '<?= favor_base_path() ?>bancadigital/characters/'+value.slice('<?= favor_base_path() ?>media/characters/'.length);
-  }
-
-  // Las rutas absolutas correctas se dejan intactas.
-  if(value.startsWith('/')) return value;
-
-  // La BD puede seguir guardando "media/..." para no requerir ninguna migración.
-  if(value.startsWith('media/icons/')){
-    return '<?= favor_base_path() ?>bancadigital/icons/'+value.slice('media/icons/'.length);
-  }
-  if(value.startsWith('media/characters/')){
-    return '<?= favor_base_path() ?>bancadigital/characters/'+value.slice('media/characters/'.length);
-  }
-
-  // Compatibilidad con variantes históricas de ruta.
-  if(value.startsWith('icons/')) return '<?= favor_base_path() ?>bancadigital/icons/'+value.slice('icons/'.length);
-  if(value.startsWith('characters/')) return '<?= favor_base_path() ?>bancadigital/characters/'+value.slice('characters/'.length);
-  if(value.startsWith('bancadigital/icons/')) return '<?= favor_base_path() ?>bancadigital/icons/'+value.slice('bancadigital/icons/'.length);
-  if(value.startsWith('bancadigital/characters/')) return '<?= favor_base_path() ?>bancadigital/characters/'+value.slice('bancadigital/characters/'.length);
-
-  return value;
+  // Todas las imágenes de jugadores y personajes viven en media/ (fase 2).
+  // Las rutas antiguas (bancadigital/icons/, icons/, characters/…) se traducen.
+  const base='<?= favor_base_path() ?>';
+  let path=value.startsWith(base)?value.slice(base.length):value;
+  if(path.startsWith('/')) return path;
+  path=path.replace(/^(?:bancadigital\/)?(icons|characters)\//,'media/$1/');
+  return path.startsWith('media/')?base+path:value;
 }
 
 function characterImagePath(character, folder){
@@ -1328,7 +1308,7 @@ function characterImagePath(character, folder){
   const characterFile = characterFileName(character);
   if(!playerFolder || !characterFile) return PLACEHOLDER_PORTRAIT;
 
-  return `<?= favor_base_path() ?>bancadigital/${folder}/${encodeURIComponent(playerFolder)}/${encodeURIComponent(characterFile)}.webp`;
+  return `<?= favor_base_path() ?>media/${folder}/${encodeURIComponent(playerFolder)}/${encodeURIComponent(characterFile)}.webp`;
 }
 
 function characterIconImgAttrs(character, eager=false){
@@ -1706,7 +1686,7 @@ function renderHub(){
     }else{
       ownIcon.style.setProperty('--icon-bg','#22402F');
       ownAvatar.onerror=null;
-      ownAvatar.src='iconhand.webp';
+      ownAvatar.src='<?= favor_static(FAVOR_LOGO) ?>';
     }
   }
 
@@ -2142,7 +2122,7 @@ function showPlayerHandleModal(playerId){
 function showEditPlayerModal(playerId){
   const p = state.players.find(x=>x.id===playerId);
   if(!p) return;
-  const adminImageField=isAdminUser()?`<label class="text-input">URL del icono <input type="text" id="player-icon-url" maxlength="300" value="${escapeHtml(p.iconUrl||'')}" placeholder="media/icons/... o https://..."><small>Solo administrador · acepta media/icons/... y lo resuelve dentro de <?= favor_base_path() ?>bancadigital/.</small></label>`:'';
+  const adminImageField=isAdminUser()?`<label class="text-input">URL del icono <input type="text" id="player-icon-url" maxlength="300" value="${escapeHtml(p.iconUrl||'')}" placeholder="media/icons/... o https://..."><small>Solo administrador · acepta media/icons/... o una dirección https://.</small></label>`:'';
   openModal(`
     <h2 class="modal-title">Editar jugador</h2>
     <label class="text-input">Nombre del jugador<input type="text" id="name-input" maxlength="60" value="${escapeHtml(p.name)}" autofocus></label>
@@ -2201,8 +2181,8 @@ function showEditCharacterModal(charId){
   const adminImageFields=isAdminUser()?`
     <div class="admin-image-fields">
       <p class="modal-detail"><strong>Imágenes globales · administrador</strong><br>Cambiar estas URLs actualiza la fuente usada por Banca, Inventario y Archivos del Gremio.</p>
-      <label class="text-input">URL del icono<input type="text" id="character-icon-url" maxlength="300" value="${escapeHtml(c.iconUrl||'')}" placeholder="media/icons/jugador/personaje.webp"><small>Recomendado: media/icons/jugador/personaje.webp. Se carga desde bancadigital/icons.</small></label>
-      <label class="text-input">URL del retrato<input type="text" id="character-portrait-url" maxlength="300" value="${escapeHtml(c.portraitUrl||'')}" placeholder="media/characters/jugador/personaje.webp"><small>Recomendado: media/characters/jugador/personaje.webp. Déjalo vacío para usar la ruta automática de bancadigital/characters.</small></label>
+      <label class="text-input">URL del icono<input type="text" id="character-icon-url" maxlength="300" value="${escapeHtml(c.iconUrl||'')}" placeholder="media/icons/jugador/personaje.webp"><small>Recomendado: media/icons/jugador/personaje.webp.</small></label>
+      <label class="text-input">URL del retrato<input type="text" id="character-portrait-url" maxlength="300" value="${escapeHtml(c.portraitUrl||'')}" placeholder="media/characters/jugador/personaje.webp"><small>Recomendado: media/characters/jugador/personaje.webp. Déjalo vacío para usar la ruta automática de media/characters.</small></label>
     </div>`:'';
   openModal(`
     <h2 class="modal-title">Editar personaje</h2>

@@ -63,7 +63,7 @@ function markerClass(array $shop): string {
 <meta name="theme-color" content="#17100b">
 <title>Mapa Comercial de Waterdeep · Favor de Jack</title>
 <meta name="description" content="Mapa interactivo de las tiendas digitalizadas de Waterdeep.">
-<link rel="stylesheet" href="style.css?v=3">
+<link rel="stylesheet" href="style.css<?= favor_v(__DIR__ . '/style.css') ?>">
 </head>
 <body>
 <?php favor_auth_widget(); ?>
@@ -77,6 +77,7 @@ function markerClass(array $shop): string {
     </div>
 
     <div class="header-actions">
+        <?php if ((($GLOBALS['__favor_auth_widget_user'] ?? null)['role'] ?? '') === 'admin'): ?><a class="roll20-link" href="<?= favor_base_path() ?>tiendas/descuentos.php">✦ Descuentos</a><?php endif; ?>
         <a class="roll20-link" href="https://app.roll20.net/campaigns/details/20586133/-" target="_blank" rel="noopener noreferrer">⚔ Abrir Roll20</a>
         <div class="header-count"><strong><?= count($shops) ?>/<?= count($allShops) ?></strong><span>tiendas digitalizadas</span></div>
     </div>
@@ -221,6 +222,6 @@ function markerClass(array $shop): string {
 <script>
 window.WATERDEEP_SHOPS = <?= json_encode($shops, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP) ?>;
 </script>
-<script src="app.js?v=3" defer></script>
+<script src="app.js<?= favor_v(__DIR__ . '/app.js') ?>" defer></script>
 </body>
 </html>
