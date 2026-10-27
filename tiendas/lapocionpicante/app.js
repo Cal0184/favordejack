@@ -27,6 +27,48 @@ const toast=document.getElementById('toast');
 let category='Todos',favoritesOnly=false,lastFocused=null,toastTimer=0;
 let favorites=loadFavorites();
 
+// Descuento del gremio: se elige con qué personaje se compra y, si ese personaje
+// está marcado, los precios se muestran rebajados.
+const discount=data.discount||{};
+const buyers=Array.isArray(discount.characters)?discount.characters:[];
+const discountBar=document.getElementById('discountBar');
+let buyerId=loadBuyer();
+
+function loadBuyer(){try{const id=localStorage.getItem('lpp:buyer')||'';return buyers.some(c=>c.id===id)?id:''}catch(_){return''}}
+function saveBuyer(){try{localStorage.setItem('lpp:buyer',buyerId)}catch(_){}}
+function activePercent(){const b=buyers.find(c=>c.id===buyerId);return b&&b.discount?Math.max(0,Math.min(100,Number(discount.percent)||0)):0}
+function coinsText(copper){
+ const po=Math.floor(copper/100),pl=Math.floor(copper%100/10),pc=copper%10,parts=[];
+ if(po)parts.push(`${po.toLocaleString('es-CL')} Po`);if(pl)parts.push(`${pl} Pl`);if(pc)parts.push(`${pc} Pc`);
+ return parts.join(' ')||'0 Po'
+}
+function priceHtml(p){
+ const pct=activePercent();
+ const m=String(p.price??'').trim().match(/^(\d+(?:[.,]\d+)?)\s*po$/i);
+ if(!pct||!m)return esc(p.price);
+ const copper=Math.round(Number(m[1].replace(',','.'))*100*(100-pct)/100);
+ return `<s class="price-old">${esc(p.price)}</s> <b class="price-new">${esc(coinsText(copper))}</b>`
+}
+function renderDiscountBar(){
+ if(!discountBar)return;
+ if(!buyers.length){discountBar.hidden=true;return}
+ const groups=new Map();
+ buyers.forEach(c=>{if(!groups.has(c.playerName))groups.set(c.playerName,[]);groups.get(c.playerName).push(c)});
+ const opt=c=>`<option value="${esc(c.id)}"${c.id===buyerId?' selected':''}>${esc(c.name)}${c.discount?' · con descuento':''}</option>`;
+ const options=groups.size>1
+  ?[...groups].map(([name,list])=>`<optgroup label="${esc(name)}">${list.map(opt).join('')}</optgroup>`).join('')
+  :buyers.map(opt).join('');
+ const pct=activePercent(),b=buyers.find(c=>c.id===buyerId);
+ const state=!b?'Elige un personaje para ver si tiene descuento.'
+  :pct?`<strong>${esc(b.name)}</strong> tiene descuento del gremio: −${pct} % en los precios.`
+  :`${esc(b.name)} no tiene descuento del gremio.`;
+ discountBar.innerHTML=`<label class="discount-pick"><span>Comprar como</span><select id="buyerSelect"><option value="">— Sin elegir —</option>${options}</select></label>
+ <p class="discount-state${pct?' on':''}">${state}</p>
+ <a class="discount-manage" href="${esc(discount.manageUrl||'#')}">${discount.admin?'Marcar descuentos':'Ver descuentos'}</a>`;
+ discountBar.hidden=false;
+ document.getElementById('buyerSelect').addEventListener('change',e=>{buyerId=e.target.value;saveBuyer();renderDiscountBar();render()})
+}
+
 function loadFavorites(){try{const x=JSON.parse(localStorage.getItem('lpp:favorites')||'[]');return new Set(Array.isArray(x)?x:[])}catch(_){return new Set()}}
 function saveFavorites(){try{localStorage.setItem('lpp:favorites',JSON.stringify([...favorites]))}catch(_){}}
 function esc(v){return String(v??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;')}
@@ -55,7 +97,7 @@ function card(p){
  return `<article class="product-card" style="--accent:${accent}">
  <div class="product-media">${img(p)}<button class="favorite-icon ${fav?'active':''}" type="button" data-favorite="${esc(p.id)}" aria-pressed="${fav?'true':'false'}">♥</button></div>
  <div class="product-body">
-  <div class="product-meta"><span class="product-category">${esc(p.majorCategory)}</span><span class="product-price">${esc(p.price)}</span></div>
+  <div class="product-meta"><span class="product-category">${esc(p.majorCategory)}</span><span class="product-price">${priceHtml(p)}</span></div>
   <h3>${esc(p.name)}</h3><span class="product-subcategory">${esc(p.subcategory)}</span>
   ${quick(p)?`<div class="product-quick">${quick(p)}</div>`:''}
   <p class="product-description">${esc(p.effect)}</p>
@@ -93,7 +135,7 @@ function openProduct(id){
  <div class="detail-body">
   <span class="product-category">${esc(p.majorCategory)}</span>
   <h2 id="modalTitle">${esc(p.name)}</h2>
-  <div class="detail-price">${esc(p.price)}</div>
+  <div class="detail-price">${priceHtml(p)}</div>
   <div class="detail-sub">${esc(p.subcategory)}</div>
   ${statsHtml}
   <div class="detail-description"><p>${esc(p.effect)}</p></div>
@@ -115,5 +157,6 @@ document.addEventListener('click',e=>{
  if(e.target.closest('[data-close-modal]'))closeModal()
 });
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal?.classList.contains('open'))closeModal()});
+renderDiscountBar();
 render();
 })();

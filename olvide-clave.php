@@ -10,12 +10,18 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
         favor_verify_csrf((string)($_POST['csrf'] ?? ''));
         $asked=trim((string)($_POST['username'] ?? ''));
         if ($asked==='') throw new RuntimeException('Escribe tu usuario.');
+        // Evita que alguien pruebe usuarios en masa para leer recordatorios ajenos.
+        $now=time(); $tries=array_values(array_filter((array)($_SESSION['favor_hint_tries'] ?? []), static fn($t)=>is_int($t) && $t>$now-300));
+        if (count($tries)>=5) throw new RuntimeException('Demasiadas consultas seguidas. Espera unos minutos e inténtalo otra vez.');
+        $tries[]=$now; $_SESSION['favor_hint_tries']=$tries;
         $db=favor_db();
-        try { $stmt=$db->prepare('SELECT PasswordHint,Activo FROM Usuario WHERE LOWER(Username)=LOWER(?) LIMIT 1'); $stmt->bind_param('s',$asked); $stmt->execute(); $row=$stmt->get_result()->fetch_assoc(); $stmt->close(); }
+        try { $stmt=$db->prepare('SELECT PasswordHint,Activo,PasswordHash,Salt,PasswordIterations FROM Usuario WHERE LOWER(Username)=LOWER(?) LIMIT 1'); $stmt->bind_param('s',$asked); $stmt->execute(); $row=$stmt->get_result()->fetch_assoc(); $stmt->close(); }
         finally { $db->close(); }
         if (!$row || (int)$row['Activo']!==1) throw new RuntimeException('No encontramos una cuenta activa con ese usuario.');
         $hint=trim((string)($row['PasswordHint'] ?? ''));
         if ($hint==='') $hint='Todavía no dejaste un recordatorio para esta cuenta.';
+        // Si el recordatorio es (o contiene) la contraseña, mostrarlo dejaría entrar a cualquiera.
+        elseif (favor_hint_reveals_password($row,$hint)) $hint='Tu recordatorio contenía la contraseña, así que está oculto. Pide al DM que te ponga una contraseña nueva y luego escribe solo una pista en «Mi cuenta».';
     } catch(Throwable $e) { $error=$e->getMessage(); }
 }
 ?>

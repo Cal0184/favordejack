@@ -462,6 +462,9 @@ try {
                 if (is_array($initialCoins)) {
                     foreach (COINS as $coin) {
                         $value = $initialCoins[$coin] ?? 0;
+                        if ($coin === 'ppt' && $value !== 0) {
+                            throw new DomainException('El platino ya no se usa en la Banca.');
+                        }
                         if (!is_int($value) || $value < 0 || $value > MAX_COIN_VALUE) {
                             throw new DomainException('Saldo inicial inválido.');
                         }
@@ -868,6 +871,8 @@ try {
             $delta[$coin] = $value;
         }
 
+        // El platino ya no se reparte: solo puede salir de la bolsa (gastarlo o cambiarlo).
+        if ($delta['ppt'] > 0) respond(['ok' => false, 'error' => 'El platino ya no se usa en la Banca.'], 400);
         if ($type === 'add' && min($delta) < 0) respond(['ok' => false, 'error' => 'Movimiento de ingreso inválido.'], 400);
         // Un gasto puede incluir cambio automático: por ejemplo -1 PO +9 PL +9 PC
         // equivale a gastar 1 PC. Validamos el valor total, no cada denominación aislada.

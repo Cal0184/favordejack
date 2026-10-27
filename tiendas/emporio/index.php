@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 require_once dirname(__DIR__, 2) . '/includes/paths.php';
+require_once __DIR__ . '/miniaturas.php';
 
 header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
 header('Pragma: no-cache');
@@ -188,6 +189,7 @@ function scan_cards(array $catalog, array $overrides): array {
             'description' => $description,
             'available' => $available,
             'url' => card_url($file),
+            'thumb' => emporio_mini_url($id, $file) ?? card_url($file),
         ];
     }
 
@@ -344,7 +346,7 @@ footer{padding:35px 20px 50px;border-top:1px solid #2f2117;color:#6f6456;text-al
                     data-availability="<?= $soldOut ? 'soldout' : 'available' ?>"
                 >
                     <button class="card-image" type="button" aria-label="Ver detalles de <?= e($card['name']) ?>">
-                        <img loading="lazy" src="<?= e($card['url']) ?>" alt="<?= e($card['name']) ?>">
+                        <img loading="lazy" decoding="async" src="<?= e($card['thumb']) ?>" alt="<?= e($card['name']) ?>">
                     </button>
                     <div class="card-body">
                         <span class="category"><?= e($card['category']) ?></span>
@@ -534,7 +536,7 @@ function compareNow(){
     if(selected.length!==2)return;
     modal(`<div class="compare-grid">${selected.map(c=>`
         <article class="compare-item">
-            <img src="${esc(c.url)}" alt="${esc(c.name)}">
+            <img src="${esc(c.thumb)}" alt="${esc(c.name)}">
             <h3>${esc(c.name)}</h3>
             <p class="compare-meta">${esc(c.price)} · ${Number(c.stock)<=0?'Agotado':'Stock: '+Number(c.stock)}</p>
             <div class="compare-description">${descriptionHtml(c.description)}</div>

@@ -33,6 +33,7 @@ function favor_backup_paths(): array
         'tiendas/ladamadelasllamas/productos.json',
         'tiendas/lapocionpicante/productos.json',
         'tiendas/lapocionpicante/registro-descuentos.json',
+        'tiendas/descuentos.json',
         'tiendas/lavaritaeconomica/productos.json',
         'regulaciones/data/regulations.json',
         'mapa/tiendas.json',
