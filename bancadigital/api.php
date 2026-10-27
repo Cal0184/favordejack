@@ -410,7 +410,8 @@ try {
             // NewBanca 2.0: máximo 5 personajes activos por jugador real.
             // Las categorías técnicas NPC / Muertos / Personajes fuera no cuentan como jugadores.
             // Se valida tanto al crear como al reactivar un personaje previamente desactivado.
-            if (!is_text_only_player_name($playerName) && $active === 1 && (!$oldRow || (int)$oldRow['Activo'] !== 1)) {
+            // El admin puede pasar el límite (por ejemplo, para personajes de prueba o especiales).
+            if (!$isAdmin && !is_text_only_player_name($playerName) && $active === 1 && (!$oldRow || (int)$oldRow['Activo'] !== 1)) {
                 $stmt = $db->prepare('SELECT COUNT(*) AS Total FROM Personaje WHERE Jugador=? AND Activo=1');
                 $stmt->bind_param('s', $pid);
                 $stmt->execute();
@@ -467,6 +468,10 @@ try {
                         }
                         if (!is_int($value) || $value < 0 || $value > MAX_COIN_VALUE) {
                             throw new DomainException('Saldo inicial inválido.');
+                        }
+                        // Solo el admin pone el saldo inicial: así nadie crea dinero de la nada.
+                        if ($value > 0 && !$isAdmin) {
+                            throw new DomainException('Solo el DM puede poner el saldo inicial de un personaje.');
                         }
                         $coins[$coin] = $value;
                     }
@@ -869,6 +874,12 @@ try {
                 respond(['ok' => false, 'error' => 'Cantidad de monedas inválida.'], 400);
             }
             $delta[$coin] = $value;
+        }
+
+        // Economía: añadir dinero, saldo inicial y correcciones son cosa del DM.
+        // Los jugadores solo gastan, cambian monedas y transfieren.
+        if (in_array($type, ['add', 'initial', 'correction'], true) && ($user['role'] ?? '') !== 'admin') {
+            respond(['ok' => false, 'error' => 'Solo el DM puede añadir dinero o hacer correcciones.'], 403);
         }
 
         // El platino ya no se reparte: solo puede salir de la bolsa (gastarlo o cambiarlo).

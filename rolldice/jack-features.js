@@ -123,7 +123,7 @@ window.logFunction = function() {
     const pairs = jackRollPairs.map(p => `${p.a}/${p.b}→${p.chosen}`).join(' · ');
     const currentIndex = rollIndex;
 
-    const timeoutLog = setTimeout(function () {
+    const writeLog = function () {
         const container = document.getElementById('e_dice_log_container');
         if (!container) return;
         const modeLine = mode === 'normal' ? '' : `<p class="jack-history-mode ${mode}">${jackModeLabel(mode)} · ${pairs}</p>`;
@@ -141,11 +141,32 @@ window.logFunction = function() {
 
         const empty = document.getElementById('e_dice_log_element_0');
         if (empty) empty.remove();
-        const old = document.getElementById(`e_dice_log_element_${currentIndex - (maxHistorySize + maxExtendedHistorySize)}`);
-        if (old) old.remove();
-    }, diceLogTimeout);
+        while (container.children.length > maxHistorySize + maxExtendedHistorySize) {
+            container.lastElementChild.remove();
+        }
+    };
 
-    animationTimeouts.push(timeoutLog);
+    // El registro espera a que termine la animación, pero si llega otra tirada
+    // antes se escribe en el acto: así ninguna tirada se pierde al tirar rápido.
+    const pending = { write: writeLog, timeout: null };
+    pending.timeout = setTimeout(() => jackFlushLog(pending), diceLogTimeout);
+    jackPendingLogs.push(pending);
+};
+
+var jackPendingLogs = [];
+
+function jackFlushLog(pending) {
+    const index = jackPendingLogs.indexOf(pending);
+    if (index === -1) return;
+    jackPendingLogs.splice(index, 1);
+    clearTimeout(pending.timeout);
+    pending.write();
+}
+
+const jackOriginalCancelPreviousAnimations = window.cancelPreviousAnimations;
+window.cancelPreviousAnimations = function() {
+    jackPendingLogs.slice().forEach(jackFlushLog);
+    jackOriginalCancelPreviousAnimations();
 };
 
 const jackOriginalResetDiceAttributes = window.resetDiceAttributes;
@@ -803,6 +824,37 @@ function jackPopulateExpressionResultPanels(parsed, chosen) {
     });
 }
 
+// La fórmula también entra en el historial corto, igual que una tirada simple.
+function jackAddExpressionCompactHistory(parsed, chosen) {
+    const label = `${parsed.normalized}${jackRollMode === 'normal' ? '' : ` · ${jackModeLabel()}`}`;
+    const item = document.createElement('div');
+    item.id = `history_element_${rollIndex}`;
+    item.className = 'roll_history_element';
+    const top = document.createElement('div');
+    top.className = 'roll_history_element_name_result_container responsive_space-between';
+    const name = document.createElement('p');
+    name.className = 'roll_history_element_name_left_text';
+    name.textContent = label;
+    const number = document.createElement('p');
+    number.className = 'roll_history_element_name_right_text';
+    number.textContent = `Tirada #${rollIndex}`;
+    top.append(name, number);
+    const bottom = document.createElement('div');
+    bottom.className = 'roll_history_element_name_result_container responsive_left';
+    const total = document.createElement('p');
+    total.className = 'roll_history_element_result_left_text';
+    total.textContent = chosen.total;
+    const breakdown = document.createElement('p');
+    breakdown.className = 'roll_history_element_result_center_text responsive_left';
+    breakdown.innerHTML = jackExpressionResultSpans(chosen);
+    const mark = document.createElement('p');
+    mark.className = 'roll_history_element_result_right_text';
+    mark.textContent = 'Σ';
+    bottom.append(total, breakdown, mark);
+    item.append(top, bottom);
+    addCompactHistoryEntry(item.outerHTML);
+}
+
 window.rollDiceExpression = function() {
     const input = document.getElementById('jack_expression_input');
     const raw = input ? input.value : '';
@@ -853,6 +905,7 @@ window.rollDiceExpression = function() {
 
     jackRenderExpressionStage(parsed, chosen, comparisonText);
     jackAddExpressionHistory(parsed, chosen, comparisonText);
+    jackAddExpressionCompactHistory(parsed, chosen);
     triggerMainElementAnimation('animation');
 };
 
@@ -862,6 +915,27 @@ window.rollDice = function(selectedDiceNumber) {
     jackLastRollKind = 'basic';
     jackHideExpressionStage();
     return jackV4BaseRollDice(selectedDiceNumber);
+};
+
+// «Lanzar de nuevo» y tocar el dado repiten la última tirada, sea simple o fórmula.
+window.rollAgain = function() {
+    if (jackLastRollKind === 'expression' && jackLastExpression) {
+        const input = document.getElementById('jack_expression_input');
+        if (input) input.value = jackLastExpression;
+        return rollDiceExpression();
+    }
+    return rollDice(diceNumber);
+};
+
+// Al cambiar entre animación e instantánea, la última fórmula sigue a la vista.
+const jackV4BaseToggleAnimationHistory = window.toggleAnimationHistory;
+window.toggleAnimationHistory = function() {
+    jackV4BaseToggleAnimationHistory();
+    if (jackLastRollKind === 'expression' && jackLastExpressionResult) {
+        const { parsed, chosen } = jackLastExpressionResult;
+        jackPopulateExpressionResultPanels(parsed, chosen);
+        if (rollMode === 'animation') jackRenderExpressionStage(parsed, chosen);
+    }
 };
 
 // Guardado V4: conserva también fórmulas completas.
@@ -994,4 +1068,21 @@ document.addEventListener('DOMContentLoaded', () => {
         expressionInput.addEventListener('input', () => jackExpressionError(''));
     }
     renderSavedRolls();
+});
+
+// Teclado: los controles antiguos son <div onclick>. Se vuelven botones accesibles
+// (Tab para llegar, Enter o Espacio para pulsar) sin cambiar su aspecto.
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('[onclick]').forEach(el => {
+        if (el.matches('a, button, input, select, textarea, label')) return;
+        if (el.classList.contains('dice_element')) return; // el dado 3D ya tiene «Lanzar de nuevo»
+        el.setAttribute('role', 'button');
+        el.tabIndex = 0;
+        if (!el.hasAttribute('aria-label') && el.title) el.setAttribute('aria-label', el.title);
+        el.addEventListener('keydown', event => {
+            if (event.key !== 'Enter' && event.key !== ' ') return;
+            event.preventDefault();
+            el.click();
+        });
+    });
 });

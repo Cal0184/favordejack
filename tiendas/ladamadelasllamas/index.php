@@ -44,11 +44,12 @@ $shopData = [
 <title>La Dama de las Llamas · Favor de Jack</title>
 <meta name="description" content="Herrería La Dama de las Llamas. Forja, compra y venta de armas y armaduras, objetos mágicos y mejoras arcanas.">
 <link rel="stylesheet" href="style.css<?= favor_v(__DIR__ . '/style.css') ?>">
+<?php favor_head('La Dama de las Llamas · Favor de Jack', 'Herrería, mejoras arcanas y objetos mágicos.'); ?>
 </head>
 <body>
-<?php favor_auth_widget(); ?>
+<?php favor_site_bar(); ?>
 <header class="topbar">
-    <a class="back-link" href="<?= favor_base_path() ?>mapa/">← Mapa de Waterdeep</a>
+    <span class="back-link" aria-hidden="true"></span>
 
     <a class="brand" href="#inicio">
         <span class="brand-emblem" aria-hidden="true">⚒</span>

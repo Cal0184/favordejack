@@ -8,6 +8,7 @@ require_once __DIR__ . '/auth.php';
 require_once dirname(__DIR__) . '/includes/assets.php';
 require_once dirname(__DIR__) . '/includes/migrations.php';
 require_once dirname(__DIR__) . '/includes/ficha-import.php';
+require_once dirname(__DIR__) . '/includes/auth-widget.php';
 
 favor_session_start();
 $self = favor_base_path() . 'archivosdelgremio/importar-ficha.php';
@@ -164,12 +165,13 @@ $sheet = $parsed['sheet'] ?? [];
         .scroll { overflow-x:auto; }
         @media (max-width:600px) { .hide-sm { display:none; } th, td { padding:6px 4px; } }
     </style>
+<?php favor_head('Importar ficha · Archivos del Gremio'); ?>
 </head>
 <body>
+<?php favor_site_bar(); ?>
 <div class="wrap">
     <div class="top">
         <h1>📜 Importar ficha de personaje</h1>
-        <a href="<?= favor_base_path() ?>archivosdelgremio/">← Archivos del Gremio</a>
     </div>
 
     <?php if ($error !== ''): ?><div class="error" role="alert"><?= h($error) ?></div><?php endif; ?>

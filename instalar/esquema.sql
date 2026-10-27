@@ -169,6 +169,27 @@ CREATE TABLE IF NOT EXISTS `PersonajeRelacion` (
   KEY `idx_relacion_b` (`PersonajeB`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- «Olvidé mi contraseña»: avisos al DM y contraseñas temporales (includes/clave.php).
+CREATE TABLE IF NOT EXISTS `ClaveSolicitud` (
+  `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `Usuario` int(10) unsigned NOT NULL,
+  `Estado` enum('pendiente','temporal','hecha') NOT NULL DEFAULT 'pendiente',
+  `Creado` timestamp NOT NULL DEFAULT current_timestamp(),
+  `Actualizado` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `Autor` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `idx_clave_usuario` (`Usuario`,`Estado`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Límite de intentos de entrada (includes/auth.php). Se puede vaciar sin perder nada.
+CREATE TABLE IF NOT EXISTS `LoginIntento` (
+  `Clave` char(67) NOT NULL,
+  `Fallos` int(10) unsigned NOT NULL DEFAULT 0,
+  `Primero` int(10) unsigned NOT NULL DEFAULT 0,
+  `BloqueadoHasta` int(10) unsigned NOT NULL DEFAULT 0,
+  PRIMARY KEY (`Clave`)
+) ENGINE=InnoDB DEFAULT CHARSET=ascii;
+
 CREATE TABLE IF NOT EXISTS `Usuario` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `Username` varchar(50) NOT NULL,

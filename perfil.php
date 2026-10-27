@@ -391,13 +391,14 @@ if (!array_key_exists($emoji, $allowedEmojis)) {
             }
         }
     </style>
+<?php favor_head('Mi perfil · Favor de Jack'); ?>
 </head>
 
 <body style="--profile:<?=hp($bg)?>">
-<?php favor_auth_widget(); ?>
+<?php favor_site_bar(); ?>
+
 
 <div class="top">
-    <a href="<?= favor_base_path() ?>">← Favor de Jack</a>
     <a href="<?= favor_base_path() ?>cuenta.php">Seguridad de la cuenta</a>
 </div>
 

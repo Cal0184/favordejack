@@ -1,0 +1,130 @@
+/*
+ * Favor de Jack · estilos comunes (barra superior, menú, barra del móvil y botones).
+ * Todo va con el prefijo «favor-» para no chocar con el CSS de cada sección.
+ * Cada tienda tiene sus colores con data-favor-theme (ver includes/site.php).
+ */
+:root{
+    --favor-bg:#100b08;
+    --favor-bg-2:#1b130d;
+    --favor-ink:#f1e4c6;
+    --favor-muted:#c9b896;
+    --favor-accent:#e0b96f;
+    --favor-accent-2:#f5d590;
+    --favor-on-accent:#1a1006;
+    --favor-line:rgba(205,160,82,.5);
+    --favor-danger:#f0a497;
+    --favor-font:'EB Garamond',Georgia,'Times New Roman',serif;
+    --favor-title:'Cinzel',Georgia,'Times New Roman',serif;
+    --favor-bar-h:58px;
+    --favor-tab-h:64px;
+}
+[data-favor-theme="bosque"]{--favor-bg:#08140f;--favor-bg-2:#10221a;--favor-line:rgba(201,169,90,.5)}
+[data-favor-theme="balas"]{--favor-bg:#150c09;--favor-bg-2:#26140f;--favor-accent:#e98f7d;--favor-accent-2:#ffb7a6;--favor-line:rgba(185,92,72,.6)}
+[data-favor-theme="llamas"]{--favor-bg:#130a05;--favor-bg-2:#24130a;--favor-accent:#f39150;--favor-accent-2:#ffc08d;--favor-line:rgba(226,108,45,.55)}
+[data-favor-theme="pocion"]{--favor-bg:#100b14;--favor-bg-2:#1d1424;--favor-accent:#c9aaf0;--favor-accent-2:#e4d2ff;--favor-line:rgba(139,105,193,.6)}
+[data-favor-theme="varita"]{--favor-bg:#070b07;--favor-bg-2:#0f1a11;--favor-accent:#86ee92;--favor-accent-2:#c4ffa0;--favor-line:rgba(116,239,133,.42)}
+[data-favor-theme="emporio"]{--favor-bg:#0d0907;--favor-bg-2:#1c130c;--favor-accent:#e6c27a;--favor-accent-2:#f6d999;--favor-line:rgba(201,161,80,.55)}
+
+/* ---------- Saltar al contenido (teclado) ---------- */
+.favor-skip{position:absolute;left:-9999px;top:6px;z-index:10050;padding:10px 14px;border-radius:8px;background:var(--favor-accent);color:var(--favor-on-accent)!important;font:700 15px/1.2 var(--favor-font);text-decoration:none!important}
+.favor-skip:focus{left:8px}
+#favor-contenido{display:block;height:0;outline:none}
+
+/* ---------- Barra superior ---------- */
+.favor-bar{position:relative;z-index:9000;width:100%;box-sizing:border-box;margin:0;background:linear-gradient(180deg,var(--favor-bg-2),var(--favor-bg));border-bottom:1px solid var(--favor-line);box-shadow:0 6px 18px rgba(0,0,0,.35);color:var(--favor-ink);font:16px/1.25 var(--favor-font);text-align:left}
+.favor-bar *,.favor-tabbar *,.favor-sheet *{box-sizing:border-box;letter-spacing:normal;text-transform:none}
+/* Algunas secciones dan estilo a todos los <header>, <nav> o <a>: aquí se anula. */
+.favor-bar,.favor-tabbar{padding:0!important;margin:0!important;height:auto!important;min-height:0!important;max-width:none!important;border-radius:0!important;inset:auto;transform:none!important;backdrop-filter:none}
+.favor-bar{position:relative!important;top:auto!important;display:block!important}
+.favor-bar p:not([class]),.favor-sheet p:not([class]){margin:0}
+.favor-bar-inner{display:flex;align-items:center;gap:10px;min-height:var(--favor-bar-h);max-width:1500px;margin:0 auto;padding:6px clamp(10px,2.4vw,28px)}
+.favor-icon{width:20px;height:20px;flex:0 0 auto;display:block}
+.favor-brand{display:inline-flex;align-items:center;gap:9px;min-height:44px;padding:0 4px;color:var(--favor-accent-2)!important;text-decoration:none!important;font:600 17px/1 var(--favor-title);letter-spacing:.04em;white-space:nowrap}
+.favor-brand img{width:34px;height:34px;border-radius:50%;background:#efe9df;border:2px solid var(--favor-accent);object-fit:cover;display:block}
+.favor-menu{display:flex;align-items:center;gap:2px;margin-left:auto;flex-wrap:wrap}
+.favor-menu a{display:inline-flex;align-items:center;min-height:44px;padding:0 11px;border-radius:8px;color:var(--favor-muted)!important;text-decoration:none!important;font:600 15px/1 var(--favor-font);white-space:nowrap}
+.favor-menu a:hover{color:var(--favor-accent-2)!important;background:rgba(255,255,255,.05)}
+.favor-menu a[aria-current="page"]{color:var(--favor-accent-2)!important;box-shadow:inset 0 -2px 0 var(--favor-accent)}
+.favor-account{position:relative;margin-left:6px}
+.favor-avatar{position:relative;width:32px;height:32px;display:grid;place-items:center;overflow:hidden;border-radius:50%;border:1px solid var(--favor-accent);background:var(--favor-accent);color:var(--favor-on-accent);font:700 15px/1 var(--favor-title)}
+.favor-avatar img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.favor-account-name{max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ---------- Botones comunes ---------- */
+.favor-btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:44px;padding:0 14px;border:1px solid var(--favor-line);border-radius:9px;background:rgba(255,255,255,.04);color:var(--favor-accent-2)!important;font:600 15px/1.1 var(--favor-font);text-decoration:none!important;cursor:pointer;white-space:nowrap;transition:background .15s,border-color .15s,transform .15s}
+.favor-btn:hover{background:rgba(255,255,255,.09);border-color:var(--favor-accent)}
+.favor-btn:active{transform:translateY(1px)}
+.favor-btn-primary{background:var(--favor-accent);border-color:var(--favor-accent);color:var(--favor-on-accent)!important}
+.favor-btn-primary:hover{background:var(--favor-accent-2)}
+.favor-back{padding:0 12px 0 8px}
+.favor-bar :focus-visible,.favor-tabbar :focus-visible,.favor-sheet :focus-visible,.favor-skip:focus-visible{outline:3px solid var(--favor-accent-2);outline-offset:2px}
+
+/* ---------- Menú de la cuenta ---------- */
+.favor-popover{position:absolute;right:0;top:calc(100% + 8px);z-index:9100;width:240px;padding:8px;border:1px solid var(--favor-line);border-radius:12px;background:var(--favor-bg);box-shadow:0 18px 40px rgba(0,0,0,.6)}
+.favor-popover[hidden],.favor-sheet[hidden]{display:none!important}
+.favor-popover-head{margin:4px 8px 8px;padding-bottom:8px;border-bottom:1px solid var(--favor-line)}
+.favor-popover-head strong{display:block;color:var(--favor-accent-2);font:600 16px/1.2 var(--favor-title)}
+.favor-popover-head small{display:block;margin-top:2px;color:var(--favor-muted);font-size:14px}
+.favor-popover a,.favor-popover button,.favor-sheet-list a,.favor-sheet-list button{display:flex;align-items:center;width:100%;min-height:44px;padding:0 10px;border:0;border-radius:8px;background:transparent;color:var(--favor-ink)!important;font:16px/1.2 var(--favor-font);text-align:left;text-decoration:none!important;cursor:pointer}
+.favor-popover a:hover,.favor-popover button:hover,.favor-sheet-list a:hover,.favor-sheet-list button:hover{background:rgba(255,255,255,.07)}
+.favor-popover form{margin:4px 0 0;padding-top:4px;border-top:1px solid var(--favor-line)}
+.favor-danger{color:var(--favor-danger)!important}
+
+/* ---------- Barra de abajo del móvil y hoja «Más» ---------- */
+.favor-tabbar{display:none}
+.favor-sheet{position:fixed;inset:0;z-index:9500;display:flex;align-items:flex-end;background:rgba(0,0,0,.6)}
+.favor-sheet-panel{width:100%;max-height:85vh;overflow:auto;padding:14px 14px calc(14px + env(safe-area-inset-bottom));border-top:1px solid var(--favor-line);border-radius:18px 18px 0 0;background:var(--favor-bg);color:var(--favor-ink);font:16px/1.25 var(--favor-font);animation:favor-sheet-in .18s ease-out}
+.favor-sheet-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+.favor-sheet-grid a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:76px;padding:8px;border:1px solid var(--favor-line);border-radius:12px;background:var(--favor-bg-2);color:var(--favor-ink)!important;text-align:center;text-decoration:none!important;font:600 14px/1.15 var(--favor-font)}
+.favor-sheet-grid a[aria-current="page"]{border-color:var(--favor-accent);color:var(--favor-accent-2)!important}
+.favor-sheet-grid .favor-icon{width:24px;height:24px;color:var(--favor-accent)}
+.favor-sheet-list{display:grid;gap:2px;padding:6px 0;border-top:1px solid var(--favor-line)}
+.favor-sheet-close{width:100%;margin-top:8px}
+@keyframes favor-sheet-in{from{transform:translateY(30px);opacity:0}to{transform:none;opacity:1}}
+
+@media (max-width:1099px){
+    .favor-menu{display:none}
+    .favor-account{margin-left:auto}
+}
+@media (max-width:819px){
+    :root{--favor-bar-h:54px}
+    .favor-account{display:none}
+    .favor-brand{margin-left:auto;margin-right:auto}
+    .favor-back + .favor-brand{margin-left:auto;margin-right:0}
+    .favor-back-to{display:none}
+    .favor-tabbar{position:fixed;left:0;right:0;bottom:0;z-index:9400;display:grid;grid-template-columns:repeat(5,1fr);padding:0 4px env(safe-area-inset-bottom)!important;border-top:1px solid var(--favor-line);background:var(--favor-bg);box-shadow:0 -8px 20px rgba(0,0,0,.45);font:13px/1.1 var(--favor-font)}
+    .favor-tabbar a,.favor-tabbar button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:var(--favor-tab-h);padding:6px 2px;border:0;background:transparent;color:var(--favor-muted)!important;font:600 13px/1.1 var(--favor-font);text-decoration:none!important;cursor:pointer}
+    .favor-tabbar .favor-icon{width:24px;height:24px}
+    .favor-tabbar [aria-current="page"],.favor-tabbar [aria-expanded="true"],.favor-tabbar [data-current]{color:var(--favor-accent-2)!important}
+    .favor-tabbar [aria-current="page"] .favor-icon{filter:drop-shadow(0 0 6px var(--favor-accent))}
+    body{padding-bottom:calc(var(--favor-tab-h) + 8px + env(safe-area-inset-bottom))!important}
+    html{scroll-padding-bottom:calc(var(--favor-tab-h) + 8px)}
+}
+@media (max-width:380px){.favor-brand span{display:none}}
+@media (prefers-reduced-motion:reduce){.favor-sheet-panel{animation:none}.favor-btn{transition:none}}
+
+/* ---------- Páginas sencillas (cerrar sesión, avisos) ---------- */
+body.favor-page{margin:0;min-height:100vh;background:radial-gradient(circle at top,#3a2416,#130d09 50%,#080605);color:var(--favor-ink);font:18px/1.5 var(--favor-font)}
+.favor-card{margin:40px auto;padding:26px;border:1px solid var(--favor-line);border-radius:14px;background:var(--favor-bg-2);box-shadow:0 20px 50px rgba(0,0,0,.5)}
+.favor-card h1{margin-top:0;color:var(--favor-accent-2);font:600 1.6rem/1.2 var(--favor-title)}
+.favor-narrow{width:min(520px,calc(100% - 28px))}
+
+/* Páginas pequeñas (entrar, mi cuenta, admin): la barra ocupa todo el ancho y el
+   contenido conserva su margen o queda centrado debajo. */
+body.favor-plain{padding:0!important;display:block!important;place-items:initial!important}
+.favor-center{min-height:calc(100vh - var(--favor-bar-h));display:grid;place-items:center;padding:22px 14px;box-sizing:border-box}
+.favor-pad{padding:24px 16px;box-sizing:border-box}
+@media (max-width:819px){.favor-center{min-height:calc(100vh - var(--favor-bar-h) - var(--favor-tab-h))}.favor-pad{padding:14px 12px}}
+
+/* Foco del teclado visible en toda la web (algunas secciones lo quitaban con outline:none). */
+:where(a,button,input,select,textarea,summary,[tabindex],[role="button"]):focus-visible{outline:3px solid #f5d590!important;outline-offset:2px!important}
+
+/* Pantallas táctiles: botones y campos de al menos 44 px para tocarlos con el pulgar.
+   :where() deja que cada sección mantenga su diseño; solo sube la altura mínima. */
+@media (pointer:coarse){
+    :where(button,[role="button"],select,input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="hidden"]),.btn,.tab,.topnav a){min-height:44px}
+    :where(.topnav a,.tab,.chip,.filter-chip,.category-tab){display:inline-flex;align-items:center}
+}
+
+.favor-notice{margin:0!important;padding:10px 16px!important;background:#f5dfae;color:#4a2f0c;font:600 16px/1.35 var(--favor-font);text-align:center;border-bottom:1px solid #b07a2a}
+.favor-notice a{color:#6d3b12!important;text-decoration:underline!important}

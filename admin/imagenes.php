@@ -20,6 +20,7 @@ declare(strict_types=1);
 require_once dirname(__DIR__) . '/includes/auth.php';
 require_once dirname(__DIR__) . '/includes/assets.php';
 require_once dirname(__DIR__) . '/includes/imagenes.php';
+require_once dirname(__DIR__) . '/includes/auth-widget.php';
 
 favor_session_start();
 header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
@@ -382,7 +383,9 @@ try {
     $error = $error ?: $e->getMessage();
 }
 ?><!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Ordenar imágenes · Favor de Jack</title>
-<style>*{box-sizing:border-box}body{margin:0;min-height:100vh;padding:26px;color:#eadcb9;font:17px Georgia,serif;background:radial-gradient(circle at top,#4b2d1a,#17100c 48%,#080605)}.wrap{width:min(860px,100%);margin:auto}.top{display:flex;justify-content:space-between;gap:12px;margin-bottom:16px}.top a{color:#edce91;text-decoration:none}.panel{padding:26px;border:1px solid #98703a;border-radius:12px;background:#e8d7ad;color:#312217;box-shadow:0 20px 55px #0008}h1{margin:0 0 8px;color:#522d22}ul{line-height:1.6}.btn{padding:11px 16px;border:1px solid #76501e;background:#795324;color:#fff0c8;font:inherit;font-weight:600;cursor:pointer}.notice,.error{padding:10px 12px;margin:0 0 16px}.notice{border:1px solid #658052;background:#dae7c7;color:#3e5836}.error{border:1px solid #a95d5a;background:#eed0bd;color:#762c30}.help{font-size:.88rem;color:#786145}details{margin-top:14px}code{font-size:.85rem}</style></head><body><div class="wrap">
+<style>*{box-sizing:border-box}body{margin:0;min-height:100vh;padding:26px;color:#eadcb9;font:17px Georgia,serif;background:radial-gradient(circle at top,#4b2d1a,#17100c 48%,#080605)}.wrap{width:min(860px,100%);margin:auto}.top{display:flex;justify-content:space-between;gap:12px;margin-bottom:16px}.top a{color:#edce91;text-decoration:none}.panel{padding:26px;border:1px solid #98703a;border-radius:12px;background:#e8d7ad;color:#312217;box-shadow:0 20px 55px #0008}h1{margin:0 0 8px;color:#522d22}ul{line-height:1.6}.btn{padding:11px 16px;border:1px solid #76501e;background:#795324;color:#fff0c8;font:inherit;font-weight:600;cursor:pointer}.notice,.error{padding:10px 12px;margin:0 0 16px}.notice{border:1px solid #658052;background:#dae7c7;color:#3e5836}.error{border:1px solid #a95d5a;background:#eed0bd;color:#762c30}.help{font-size:.88rem;color:#786145}details{margin-top:14px}code{font-size:.85rem}</style><?php favor_head('Ordenar imágenes · Favor de Jack'); ?>
+</head><body class="favor-plain">
+<?php favor_site_bar(); ?><div class="favor-pad"><div class="wrap">
 <div class="top"><a href="<?= h(favor_url('cuenta.php')) ?>">← Mi cuenta</a><a href="<?= h(favor_url('admin/respaldo.php')) ?>">Respaldo de la web</a></div>
 <main class="panel">
 <h1>Ordenar imágenes</h1>
@@ -425,4 +428,4 @@ try {
 <?php if ($log): ?><details><summary>Detalle</summary><ul><?php foreach (array_slice($log, 0, 300) as $l): ?><li><code><?= h($l) ?></code></li><?php endforeach; ?></ul></details><?php endif; ?>
 </main></div>
 <?php if ($continue): ?><script>setTimeout(()=>document.getElementById('run')?.submit(),800)</script><?php endif; ?>
-</body></html>
+</div></body></html>

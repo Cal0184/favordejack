@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 require_once dirname(__DIR__) . '/includes/descuentos.php';
+require_once dirname(__DIR__) . '/includes/auth-widget.php';
 favor_session_start();
 header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
 header('X-Robots-Tag: noindex, nofollow');
@@ -108,7 +109,6 @@ $recent = array_reverse(array_values(array_filter($data['log'], static fn(array 
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex">
 <title><?= $shopId ? h($shops[$shopId]['name']) . ' · ' : '' ?>Descuentos · Favor de Jack</title>
-<link rel="icon" type="image/webp" href="<?= h(favor_static(FAVOR_LOGO)) ?>">
 <style>
 :root{--bg:#0d0907;--panel:#15100c;--line:#3a2a1b;--line2:#5a4128;--gold:#e5c37e;--text:#eadcc0;--muted:#a99880;--ok:#9fcf86;--okbg:#14200f;--used:#e3a38f;--usedbg:#2a1511}
 *{box-sizing:border-box}
@@ -174,11 +174,12 @@ button.ghost{border-color:var(--line2);background:transparent;color:var(--muted)
 [hidden]{display:none!important}
 @media(max-width:700px){.settings{grid-template-columns:1fr 1fr}.settings .rule{grid-column:1/-1;order:-1}.players{grid-template-columns:1fr}.hero img{width:64px;height:64px}}
 </style>
+<?php favor_head(($shopId ? $shops[$shopId]['name'] . ' · ' : '') . 'Descuentos · Favor de Jack'); ?>
 </head>
-<body>
+<body class="favor-plain">
+<?php favor_site_bar(); ?><div class="favor-pad">
 <div class="wrap">
 <?php if ($shopId === ''): ?>
-    <div class="top"><a href="<?= h($base) ?>mapa/">← Mapa de Waterdeep</a><a href="<?= h($base) ?>cuenta.php">Mi cuenta</a></div>
     <h1>Descuentos de las tiendas</h1>
     <p class="help">Cada personaje tiene el descuento de una tienda <b>una sola vez</b>. Cuando lo usa queda gastado, hasta que tú lo reactives. Entra a una tienda para ver a todos los personajes por jugador.</p>
     <?php if ($notice): ?><div class="notice"><?= h($notice) ?></div><?php endif; ?>
@@ -338,5 +339,5 @@ document.querySelectorAll('form[data-ask]').forEach(f=>f.addEventListener('submi
 }));
 })();
 </script>
-</body>
+</div></body>
 </html>

@@ -9,6 +9,7 @@ require_once __DIR__ . '/auth.php';
 require_once dirname(__DIR__) . '/includes/assets.php';
 require_once dirname(__DIR__) . '/includes/migrations.php';
 require_once dirname(__DIR__) . '/includes/ficha-import.php';
+require_once dirname(__DIR__) . '/includes/auth-widget.php';
 guild_session_start();
 $csrf = guild_csrf();
 $isAdmin = guild_is_admin();
@@ -224,13 +225,14 @@ SQL;
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css<?= favor_v(__DIR__ . '/style.css') ?>">
+<?php favor_head('Archivos del Gremio · Favor de Jack'); ?>
 </head>
 <body>
+<?php favor_site_bar(); ?>
 <div class="wood-backdrop" aria-hidden="true"></div>
 
 <header class="guild-header">
     <div class="header-beam">
-        <a class="home-rune" href="<?= favor_base_path() ?>" aria-label="Volver a Favor de Jack">← <span>Favor de Jack</span></a>
 
         <div class="guild-brand">
             <span class="brand-ornament" aria-hidden="true">❦</span>
