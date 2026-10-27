@@ -70,13 +70,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $state = (string)($_POST['state'] ?? '');
             if (!isset(EMPORIO_ORDER_STATES[$state])) throw new RuntimeException('Estado no válido.');
             $reply = mb_substr(trim((string)($_POST['reply'] ?? '')), 0, 500, 'UTF-8');
-            $updated = emporio_update_json(EMPORIO_ORDERS_FILE, static function (array $orders, &$found) use ($id, $state, $reply): array {
+            $finalRaw = str_replace(',', '.', trim((string)($_POST['final'] ?? '')));
+            $final = $finalRaw !== '' && is_numeric($finalRaw) ? max(0.0, (float)$finalRaw) : null;
+            $chargeNote = '';
+            $by = (string)($user['displayName'] ?? $user['username']);
+            $updated = emporio_update_json(EMPORIO_ORDERS_FILE, static function (array $orders, &$found) use ($id, $state, $reply, $final, $by, &$chargeNote): array {
                 foreach ($orders as &$o) {
                     if (is_array($o) && ($o['id'] ?? '') === $id) {
                         $o['oldState'] = (string)($o['state'] ?? '');
                         $o['state'] = $state;
                         $o['reply'] = $reply;
                         $o['updated'] = date('c');
+                        // Cobra o devuelve en la Banca; si falla, el pedido no cambia.
+                        $chargeNote = emporio_order_charge_sync($o, $final, $by);
                         $found = $o;
                         unset($o['oldState']);
                     }
@@ -85,7 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (!$found) throw new RuntimeException('No encontré ese pedido.');
                 return $orders;
             });
-            $notice = trim('Pedido actualizado. ' . emporio_order_discount_sync($updated, (string)$updated['oldState'], (string)$user['username']));
+            $notice = trim('Pedido actualizado. ' . $chargeNote . ' ' . emporio_order_discount_sync($updated, (string)$updated['oldState'], (string)$user['username']));
         } elseif ($action === 'keep_both' || $action === 'prefer' || $action === 'reset_dupes') {
             emporio_update_json(EMPORIO_DUPES_FILE, static function (array $data) use ($action): array {
                 $data['keepBoth'] = array_values(array_filter((array)($data['keepBoth'] ?? []), 'is_string'));
@@ -212,7 +218,7 @@ main{width:min(1350px,94vw);margin:26px auto 70px}.toolbar{position:sticky;top:7
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(350px,1fr));gap:16px}.card{display:grid;grid-template-columns:120px 1fr;gap:14px;padding:13px;border:1px solid #483522;border-radius:10px;background:#15100c;box-shadow:0 15px 35px #0005}.card.is-hidden{opacity:.6;border-style:dashed}.card img{width:120px;height:168px;object-fit:contain;background:#090604;border:1px solid #33251a}.card h2{margin:0 0 8px;color:#e4c388;font-size:1.05rem}
 label{display:grid;gap:4px;margin:7px 0;color:#a99880;font-size:.8rem}input,textarea,select{width:100%;padding:9px;border:1px solid #4b3825;border-radius:6px;background:#090604;color:#f4e5ca;font:inherit}textarea{min-height:120px;resize:vertical;line-height:1.45}.row{display:grid;grid-template-columns:1fr 110px;gap:8px}.check{display:flex;align-items:center;gap:8px}.check input{width:auto}.filename{color:#776b5c;word-break:break-all;font-size:.72rem}.id-note{margin-top:3px;color:#665b4d;font:600 .65rem system-ui,sans-serif}.warn{color:#e5a69d;font:600 .75rem system-ui,sans-serif}.save{width:100%;margin-top:8px}.empty{padding:30px;border:1px dashed #5a4128;text-align:center;color:#8c7b65}
 section.box{margin:0 0 22px;padding:18px;border:1px solid #483522;border-radius:10px;background:#130e0a}section.box h2{margin:0 0 10px;color:#e5c37e}.dupe{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;padding:12px 0;border-top:1px solid #2f2218}.dupe figure{margin:0;width:130px;text-align:center;font-size:.78rem}.dupe figure img{width:120px;height:168px;object-fit:contain;background:#090604;border:2px solid #33251a}.dupe figure.keep img{border-color:#6f8f4d}.dupe figure figcaption b{display:block;color:#e4c388}.dupe form{display:flex;flex-direction:column;gap:6px;min-width:220px}
-.orders{display:grid;gap:12px}.order{display:grid;grid-template-columns:1fr minmax(260px,340px);gap:14px;padding:14px;border:1px solid #483522;border-radius:10px;background:#15100c}.order h3{margin:0 0 4px;color:#e4c388}.order ul{margin:6px 0;padding-left:18px;line-height:1.5}.muted{color:#8c7b65;font:600 .76rem system-ui,sans-serif}.state{display:inline-block;padding:3px 9px;border-radius:99px;border:1px solid #5d4228;font:800 .65rem system-ui,sans-serif;text-transform:uppercase;letter-spacing:.08em}.state-pendiente{border-color:#c49251;color:#f0cd85}.state-aprobado{border-color:#5a7a3d;color:#b8d39a}.state-entregado{border-color:#4f6f8f;color:#a9c6e3}.state-rechazado,.state-cancelado{border-color:#7a3d38;color:#e5a69d}
+.orders{display:grid;gap:12px}.order{display:grid;grid-template-columns:1fr minmax(260px,340px);gap:14px;padding:14px;border:1px solid #483522;border-radius:10px;background:#15100c}.order h3{margin:0 0 4px;color:#e4c388}.order ul{margin:6px 0;padding-left:18px;line-height:1.5}.muted{color:#8c7b65;font:600 .76rem system-ui,sans-serif}.state{display:inline-block;padding:3px 9px;border-radius:99px;border:1px solid #5d4228;font:800 .65rem system-ui,sans-serif;text-transform:uppercase;letter-spacing:.08em}.state-pendiente{border-color:#c49251;color:#f0cd85}.state-aprobado{border-color:#5a7a3d;color:#b8d39a}.state-entregado{border-color:#4f6f8f;color:#a9c6e3}.state-rechazado,.state-cancelado{border-color:#7a3d38;color:#e5a69d}.charged-line{color:#b8d39a;font-weight:700}
 table{width:100%;border-collapse:collapse;font-size:.85rem}td,th{padding:6px 8px;border-bottom:1px solid #2f2218;text-align:left}
 @media(max-width:700px){.toolbar{position:relative;top:auto;flex-direction:column;align-items:stretch}.card{grid-template-columns:1fr}.card img{width:100%;height:260px}.order{grid-template-columns:1fr}}
 </style><?php favor_head('Admin del Emporio · Favor de Jack'); ?>
@@ -254,7 +260,7 @@ table{width:100%;border-collapse:collapse;font-size:.85rem}td,th{padding:6px 8px
 <datalist id="categorias"><?php foreach (array_unique(array_column($all, 'category')) as $c): ?><option value="<?= e($c) ?>"><?php endforeach; ?></datalist>
 
 <?php elseif ($view === 'pedidos'): ?>
-<div class="info">Los jugadores arman su pedido desde la tienda y eligen qué personaje compra. Aquí lo apruebas, rechazas o marcas como entregado, con un mensaje opcional que el jugador ve en «Mis pedidos». El oro <b>no</b> se descuenta solo: hazlo en la Banca al aprobar.</div>
+<div class="info">Los jugadores arman su pedido desde la tienda y eligen qué personaje compra. Aquí lo apruebas, rechazas o marcas como entregado, con un mensaje opcional que el jugador ve en «Mis pedidos». Al pasarlo a <b>Aprobado</b> o <b>Entregado</b> se cobra solo en la Banca y los objetos entran al Inventario del personaje. Si después lo rechazas o cancelas, el oro vuelve y esos objetos se quitan.</div>
 <div class="orders">
 <?php foreach ($orders as $o): $p = emporio_order_public($o); ?>
     <article class="order">
@@ -265,11 +271,13 @@ table{width:100%;border-collapse:collapse;font-size:.85rem}td,th{padding:6px 8px
             <ul><?php foreach ($p['items'] as $i): ?><li><?= (int)($i['qty'] ?? 1) > 1 ? (int)$i['qty'] . ' × ' : '' ?><?= e((string)($i['name'] ?? '')) ?> <span class="muted"><?= e((string)($i['price'] ?? '')) ?></span></li><?php endforeach; ?></ul>
             <?php if ($p['discount']): ?><p class="discount-line">✦ Descuento <?= (int)$p['discount']['percent'] ?> % en <?= e((string)$p['discount']['item']) ?>: −<?= e(number_format((float)$p['discount']['amount'], fmod((float)$p['discount']['amount'], 1) ? 2 : 0, ',', '.')) ?> po (paga <?= e((string)$p['discount']['paid']) ?>)<?= in_array($p['state'], EMPORIO_ORDER_CLOSED, true) ? ' · devuelto al personaje' : '' ?></p><?php endif; ?>
             <?php if ($p['total'] !== null): ?><p><b>Total estimado: <?= e(number_format((float)$p['total'], fmod((float)$p['total'], 1) ? 2 : 0, ',', '.')) ?> po</b></p><?php endif; ?>
+            <?php if ($p['charged'] !== null): ?><p class="charged-line">✔ Cobrado en la Banca: <?= e(number_format((float)$p['charged'], fmod((float)$p['charged'], 1) ? 2 : 0, ',', '.')) ?> po</p><?php endif; ?>
             <?php if ($p['note'] !== ''): ?><p class="muted">Mensaje: <?= e($p['note']) ?></p><?php endif; ?>
         </div>
         <form method="post" action="?vista=pedidos">
             <input type="hidden" name="action" value="order_state"><input type="hidden" name="csrf" value="<?= e($csrf) ?>"><input type="hidden" name="id" value="<?= e($p['id']) ?>">
             <label>Estado<select name="state"><?php foreach (EMPORIO_ORDER_STATES as $k => $label): ?><option value="<?= e($k) ?>" <?= $k === $p['state'] ? 'selected' : '' ?>><?= e($label) ?></option><?php endforeach; ?></select></label>
+            <?php if ($p['charged'] === null): ?><label>Precio final (po)<input name="final" inputmode="decimal" placeholder="<?= $p['total'] !== null ? e((string)$p['total']) : 'Obligatorio: hay objetos sin precio' ?>"></label><?php endif; ?>
             <label>Respuesta de Ecix's<textarea name="reply" maxlength="500" style="min-height:70px"><?= e($p['reply']) ?></textarea></label>
             <button type="submit">Guardar</button>
         </form>

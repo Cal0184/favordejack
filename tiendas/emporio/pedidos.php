@@ -5,7 +5,8 @@ require_once __DIR__ . '/lib.php';
 /*
  * Pedidos a Ecix's (JSON). Crear y cancelar: cualquier jugador con sesión.
  * Cambiar el estado y responder: solo admin (desde admin.php).
- * Los pedidos viven en data/pedidos.json; el oro no se toca aquí.
+ * Los pedidos viven en data/pedidos.json. Al aprobarlos se cobra en la Banca
+ * y los objetos entran al Inventario (includes/compras.php).
  */
 
 header('Content-Type: application/json; charset=utf-8');
@@ -138,7 +139,8 @@ try {
         $reply = $action === 'state' ? mb_substr(trim((string)($input['reply'] ?? '')), 0, 500, 'UTF-8') : null;
 
         $oldState = '';
-        $updated = emporio_update_json(EMPORIO_ORDERS_FILE, static function (array $orders, &$result) use ($id, $state, $reply, $user, $isAdmin, $action, &$oldState): array {
+        $chargeNote = '';
+        $updated = emporio_update_json(EMPORIO_ORDERS_FILE, static function (array $orders, &$result) use ($id, $state, $reply, $user, $isAdmin, $action, &$oldState, &$chargeNote): array {
             foreach ($orders as &$o) {
                 if (!is_array($o) || ($o['id'] ?? '') !== $id) continue;
                 $oldState = (string)($o['state'] ?? '');
@@ -149,6 +151,7 @@ try {
                 $o['state'] = $state;
                 if ($reply !== null) $o['reply'] = $reply;
                 $o['updated'] = date('c');
+                $chargeNote = emporio_order_charge_sync($o, null, (string)($user['displayName'] ?? $user['username']));
                 $result = $o;
             }
             unset($o);
@@ -156,7 +159,7 @@ try {
             return $orders;
         });
         $note = emporio_order_discount_sync($updated, $oldState, (string)$user['username']);
-        out(['ok' => true, 'order' => emporio_order_public($updated), 'notice' => $note]);
+        out(['ok' => true, 'order' => emporio_order_public($updated), 'notice' => trim($chargeNote . ' ' . $note)]);
     }
 
     out(['ok' => false, 'error' => 'Acción desconocida.'], 400);

@@ -51,7 +51,7 @@ function favor_safe_asset_input(?string $value): string
     if (preg_match('#^https?://#i', $value)) return mb_substr($value, 0, 500, 'UTF-8');
 
     $path = favor_asset_db_path($value);
-    if (preg_match('#^media/(?:icons|characters|profiles|shops)/[A-Za-z0-9_\-./%()\x{00C0}-\x{024F} ]+$#u', $path)) {
+    if (preg_match('#^(?:media/(?:icons|characters|profiles|shops)|tiendas/emporio/Cartas)/[A-Za-z0-9_\-./%()\x{00C0}-\x{024F} ]+$#u', $path)) {
         return $path;
     }
     return '';
