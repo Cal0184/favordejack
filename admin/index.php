@@ -100,6 +100,31 @@ try { $characters = favor_discount_characters(); } catch (Throwable) { $characte
 $byPlayer = [];
 foreach ($characters as $c) $byPlayer[$c['playerName']][] = $c;
 try { $recent = favor_bank_recent(12); } catch (Throwable) { $recent = []; }
+
+// Misiones recientes con su grupo, para repartir la recompensa de un clic.
+$missions = [];
+try {
+    $db = favor_db();
+    $rows = $db->query("SELECT ID, Nombre, Estado, RecompensaGeneral FROM Mision WHERE Estado IN ('En curso','Completada') ORDER BY Actualizado DESC, ID DESC LIMIT 10")->fetch_all(MYSQLI_ASSOC);
+    $stmt = $db->prepare('SELECT PersonajeID, Recompensa FROM MisionPersonaje WHERE MisionID = ?');
+    foreach ($rows as $r) {
+        $id = (int)$r['ID'];
+        $stmt->bind_param('i', $id);
+        $stmt->execute();
+        $party = array_values(array_filter($stmt->get_result()->fetch_all(MYSQLI_ASSOC), static fn(array $p): bool => isset($characters[(string)$p['PersonajeID']])));
+        if (!$party) continue;
+        $missions[] = [
+            'name' => (string)$r['Nombre'],
+            'state' => (string)$r['Estado'],
+            'reward' => (string)$r['RecompensaGeneral'],
+            'chars' => array_map(static fn(array $p): string => (string)$p['PersonajeID'], $party),
+        ];
+    }
+    $stmt->close();
+    $db->close();
+} catch (Throwable) {
+    $missions = [];
+}
 $discord = favor_discord_config();
 $discordReady = (string)$discord['webhooks']['general'] !== '' || array_filter(array_slice($discord['webhooks'], 1));
 
@@ -183,7 +208,7 @@ ol{padding-left:22px}
         <a href="<?= e(favor_url('tiendas/emporio/admin.php')) ?>">Cartas del Emporio</a>
         <a href="<?= e(favor_url('tiendas/descuentos.php')) ?>">Descuentos</a>
         <a href="<?= e(favor_url('bancadigital/')) ?>">Banca</a>
-        <a href="<?= e(favor_url('tablon/')) ?>">Tablón de misiones</a>
+        <?php if (is_file(dirname(__DIR__) . '/tablon/index.php')): ?><a href="<?= e(favor_url('tablon/')) ?>">Tablón de misiones</a><?php endif; ?>
         <a href="<?= e(favor_url('archivosdelgremio/')) ?>">Misiones (Archivos)</a>
         <a href="<?= e(favor_url('timetoplay/')) ?>">Wiki del DM</a>
         <a href="<?= e(favor_url('admin/respaldo.php')) ?>">Respaldo</a>
@@ -236,6 +261,17 @@ ol{padding-left:22px}
                 <label>Plata (pl)<input type="number" name="pl" min="0" step="1" inputmode="numeric" placeholder="0"></label>
                 <label>Cobre (pc)<input type="number" name="pc" min="0" step="1" inputmode="numeric" placeholder="0"></label>
             </div>
+            <?php if ($missions): ?>
+                <label style="margin-top:8px">Repartir la recompensa de una misión (marca a su grupo)
+                    <select id="mission-pick" style="min-height:42px;padding:8px;border:1px solid #5b4329;border-radius:8px;background:#0b0705;color:#fff;font:inherit">
+                        <option value="">Elige una misión…</option>
+                        <?php foreach ($missions as $m): ?>
+                            <option data-chars="<?= e(json_encode($m['chars'])) ?>" data-reason="<?= e('Recompensa: ' . $m['name']) ?>" data-reward="<?= e($m['reward']) ?>"><?= e($m['name']) ?> · <?= e($m['state']) ?> · <?= count($m['chars']) ?> personajes</option>
+                        <?php endforeach; ?>
+                    </select>
+                </label>
+                <p class="note" id="mission-reward" hidden></p>
+            <?php endif; ?>
             <label style="margin-top:8px">Motivo<input type="text" name="reason" maxlength="200" required placeholder="Recompensa de la misión…"></label>
             <div class="players">
                 <?php foreach ($byPlayer as $player => $list): ?>
@@ -312,6 +348,18 @@ ol{padding-left:22px}
 </main>
 </div>
 <script>
+const pick = document.getElementById('mission-pick');
+if (pick) pick.addEventListener('change', () => {
+    const opt = pick.selectedOptions[0];
+    const hint = document.getElementById('mission-reward');
+    if (!opt || !opt.dataset.chars) { hint.hidden = true; return; }
+    const ids = JSON.parse(opt.dataset.chars);
+    document.querySelectorAll('input[name="chars[]"]').forEach(b => { b.checked = ids.includes(b.value); });
+    document.querySelector('input[name=reason]').value = opt.dataset.reason;
+    document.querySelector('input[name=mode][value=give]').checked = true;
+    hint.textContent = opt.dataset.reward ? 'Recompensa anotada en la misión: ' + opt.dataset.reward + '. Escribe arriba cuánto le toca a cada uno.' : 'La misión no tiene recompensa anotada: escribe arriba cuánto le toca a cada uno.';
+    hint.hidden = false;
+});
 document.querySelectorAll('[data-all]').forEach(btn => btn.addEventListener('click', () => {
     const boxes = btn.closest('.player').querySelectorAll('input[type=checkbox]');
     const all = Array.from(boxes).every(b => b.checked);
