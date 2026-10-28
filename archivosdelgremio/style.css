@@ -1285,8 +1285,10 @@ html.keep-gutter{scrollbar-gutter:stable}
     padding:12px 44px;
 }
 .guild-brand h1{white-space:nowrap}
+/* Centrado respecto de la pantalla: el mismo margen a ambos lados,
+   así queda en el medio y tampoco toca los marcadores. */
 @media(min-width:1181px){
-    .guild-header{padding-right:236px}
+    .guild-header{padding-left:236px;padding-right:236px}
 }
 @media(max-width:1180px){
     .header-beam{grid-template-columns:1fr}
