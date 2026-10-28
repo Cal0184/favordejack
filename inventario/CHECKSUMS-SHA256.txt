@@ -1,6 +1,6 @@
-d1604cd455475616c50b75486d6e10142b81ea0899caf5cffd93200ccd04de62  ./api.php
+b0b41af58777eb5be97213e34c9928c42599605297b45aaf7fc5e84cd62a02ec  ./api.php
 4429da33cd5c9f915771f07bb4792de415d8038bf84f89f8a5644cc07cec7566  ./assets/inventory.css
-fc0c3c90c53b4497fb57f1914f6750a18c911b08508109303ff17cc2733e9334  ./assets/inventory.js
+f11d5ff8a92127bc86ebc6d79ee6ebdb7903164588755cf2ffb0183b7e7dd34e  ./assets/inventory.js
 0587d59f424c842cfca075421011446a973a823a0aefed7a3f9ee2ddbeac2337  ./assets/items/item-arma.webp
 19459d58c88379cbf075a4a31ad67490470abf521f79f556cd580291cf02e1f4  ./assets/items/item-magico.webp
 b162d3a7f32bc5d461c2b894635de17427ece6ccdbcbb1c3711135bf2e358116  ./assets/items/item-utilidad.webp
@@ -8,4 +8,4 @@ b162d3a7f32bc5d461c2b894635de17427ece6ccdbcbb1c3711135bf2e358116  ./assets/items
 48fa1740244f634efec4c6fa0b1481b1ba00a32056b3136ce331ee20fb1ee90a  ./assets/ui/favor-logo.svg
 4b507fd1cf9533ee7ad4c93448ffeff914596c0912428db7ececd01b9e97a004  ./assets/ui/inventory-bg.webp
 69f3fa9a9cc56f4376c46d655361e46f9bc5a444bdf1634cead7030473b12bec  ./assets/ui/inventory-parchment.webp
-b8e1e690c8c43d1955197ec0fa505a861a93e75168f9f4d44c9583a675d869d6  ./index.php
+56e201a310a0a488b88c43f46254468a34df43fc1ffe4d63518ede52ab0c89ae  ./index.php

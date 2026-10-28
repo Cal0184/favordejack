@@ -10,6 +10,8 @@ declare(strict_types=1);
  */
 require_once dirname(__DIR__) . '/tiendas/emporio/lib.php';
 require_once dirname(__DIR__) . '/includes/auth-widget.php';
+require_once dirname(__DIR__) . '/includes/estado.php';
+require_once dirname(__DIR__) . '/includes/clave.php';
 
 favor_session_start();
 header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
@@ -60,6 +62,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($ok) $notice = ($give ? 'Dado ' : 'Quitado ') . favor_copper_label($copper) . ($give ? ' a ' : ' de ') . $names($ok) . '.';
             foreach ($fails as $id => $why) $error .= ($all[$id]['name'] ?? $id) . ': ' . $why . ' ';
             $error = trim($error);
+        } elseif ($action === 'estado') {
+            $db = favor_db();
+            try {
+                $estado = favor_estado_normalizar((string)($_POST['estado'] ?? ''));
+                $note = favor_estado_aplicar($db, (string)($_POST['id'] ?? ''), $estado);
+            } finally {
+                $db->close();
+            }
+            $notice = trim('Estado puesto en «' . $estado . '» en la Banca y en Archivos. ' . $note);
         } elseif ($action === 'discord_save' || $action === 'discord_test') {
             $webhooks = [];
             foreach (array_merge(['general'], array_keys(FAVOR_DISCORD_EVENTS)) as $k) {
@@ -67,16 +78,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             $events = [];
             foreach (array_keys(FAVOR_DISCORD_EVENTS) as $k) $events[$k] = isset($_POST['event'][$k]);
-            favor_discord_update(static function (array $c) use ($webhooks, $events): array {
+            $invite = favor_discord_clean_invite((string)($_POST['invite'] ?? ''));
+            favor_discord_update(static function (array $c) use ($webhooks, $events, $invite): array {
+                $c['invite'] = $invite;
                 $c['webhooks'] = $webhooks;
                 $c['events'] = $events;
                 return $c;
             });
-            $notice = 'Avisos de Discord guardados.';
+            $notice = 'Configuración de Discord guardada.';
             if ($action === 'discord_test') {
                 $sent = 0;
                 $urls = array_unique(array_filter($webhooks));
-                if (!$urls) throw new RuntimeException('Pega primero el enlace del webhook.');
+                if (!$urls) throw new RuntimeException('Guardado. Para probar avisos, pega primero el enlace del webhook.');
                 foreach ($urls as $url) {
                     $fail = favor_discord_send('prueba', '✨ Aviso de prueba', 'Si ves esto, la web de Favor de Jack ya puede avisar en este canal.', [['Enviado por', $by]], $url);
                     if ($fail !== '') throw new RuntimeException('Discord no aceptó el aviso: ' . $fail);
@@ -126,6 +139,31 @@ try {
     $missions = [];
 }
 $discord = favor_discord_config();
+// Jugadores que pidieron una contraseña temporal (se dan en Mi cuenta).
+try {
+    $db = favor_db();
+    $resets = count(favor_reset_pending($db));
+    $db->close();
+} catch (Throwable) {
+    $resets = 0;
+}
+// Personajes cuyo estado no coincide entre la Banca y Archivos (una fila por pareja).
+$mismatch = [];
+try {
+    $db = favor_db();
+    $all = favor_estado_todos($db);
+    $db->close();
+    $seen = [];
+    foreach ($all as $c) {
+        if ($c['coincide'] || isset($seen[$c['id']])) continue;
+        foreach (array_merge([$c['id']], $c['gemelos']) as $g) $seen[$g] = true;
+        $owner = $c['especial'] ? '' : $c['jugadorNombre'];
+        foreach ($c['gemelos'] as $g) if ($owner === '' && !$all[$g]['especial']) $owner = $all[$g]['jugadorNombre'];
+        $mismatch[] = $c + ['dueno' => $owner];
+    }
+} catch (Throwable) {
+    $mismatch = [];
+}
 $discordReady = (string)$discord['webhooks']['general'] !== '' || array_filter(array_slice($discord['webhooks'], 1));
 
 function po_label(float $po): string
@@ -214,6 +252,7 @@ ol{padding-left:22px}
         <a href="<?= e(favor_url('admin/respaldo.php')) ?>">Respaldo</a>
     </nav>
 
+    <?php if ($resets): ?><div class="msg ok" role="status">🔑 <?= $resets === 1 ? 'Un jugador olvidó su contraseña' : $resets . ' jugadores olvidaron su contraseña' ?>. <a href="<?= e(favor_url('cuenta.php')) ?>">Dale una temporal en Mi cuenta</a>.</div><?php endif; ?>
     <?php if ($notice): ?><div class="msg ok" role="status"><?= e($notice) ?></div><?php endif; ?>
     <?php if ($error): ?><div class="msg err" role="alert"><?= e($error) ?></div><?php endif; ?>
 
@@ -287,6 +326,27 @@ ol{padding-left:22px}
         </form>
     </section>
 
+    <?php if ($mismatch): ?>
+    <section class="card" id="estados">
+        <h2>Estados que no coinciden <span class="badge"><?= count($mismatch) ?></span></h2>
+        <p class="note">Estos personajes tienen un estado en la Banca y otro en Archivos. Elige el correcto y se pone igual en las dos (y por tanto en Inventario y Relaciones). Desde ahora, cambiarlo en Archivos lo cambia también en la Banca.</p>
+        <?php foreach ($mismatch as $m): ?>
+            <form method="post" action="#estados" class="order" style="grid-template-columns:1fr auto;align-items:center">
+                <div>
+                    <h3><?= e($m['nombre']) ?> <span class="muted">· <?= e($m['dueno'] ?: 'jugador desconocido') ?></span></h3>
+                    <p class="muted">Banca: <b><?= e($m['estadoBanca'] ?: 'archivado') ?></b> · Archivos: <b><?= e($m['estadoArchivos']) ?></b></p>
+                </div>
+                <div class="actions">
+                    <input type="hidden" name="csrf" value="<?= e($csrf) ?>"><input type="hidden" name="action" value="estado"><input type="hidden" name="id" value="<?= e($m['id']) ?>">
+                    <?php foreach (array_unique(array_filter([$m['estadoArchivos'], $m['estadoBanca'] ?: 'Retirado'])) as $opt): ?>
+                        <button type="submit" name="estado" value="<?= e($opt) ?>">Dejar «<?= e($opt) ?>»</button>
+                    <?php endforeach; ?>
+                </div>
+            </form>
+        <?php endforeach; ?>
+    </section>
+    <?php endif; ?>
+
     <div class="grid2">
         <section class="card" id="actividad">
             <h2>Últimos movimientos de la Banca</h2>
@@ -332,6 +392,7 @@ ol{padding-left:22px}
         </details>
         <form method="post" action="#discord" class="hooks">
             <input type="hidden" name="csrf" value="<?= e($csrf) ?>">
+            <label>Invitación a vuestro Discord (el botón «Háblame por Discord» de la web lleva aquí)<input type="url" name="invite" value="<?= e((string)$discord['invite']) ?>" placeholder="https://discord.gg/…" autocomplete="off"></label>
             <label>Canal general (todos los avisos van aquí)<input type="url" name="webhook[general]" value="<?= e((string)$discord['webhooks']['general']) ?>" placeholder="https://discord.com/api/webhooks/…" autocomplete="off"></label>
             <?php foreach (FAVOR_DISCORD_EVENTS as $k => $label): ?>
                 <div class="player">

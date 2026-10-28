@@ -5,6 +5,7 @@ require_once __DIR__ . '/session.php';
 require_once dirname(__DIR__) . '/includes/assets.php';
 require_once dirname(__DIR__) . '/includes/migrations.php';
 require_once dirname(__DIR__) . '/includes/emojis.php';
+require_once dirname(__DIR__) . '/includes/estado.php';
 
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
@@ -513,6 +514,8 @@ try {
             throw $e;
         }
 
+        // Archivar o reactivar en la Banca se anota también en Archivos.
+        if ($oldRow) favor_estado_desde_banca($db, $id);
         respond([
             'ok' => true,
             'character' => fetch_character($db, $id),
@@ -578,6 +581,7 @@ try {
             throw $e;
         }
 
+        favor_estado_desde_banca($db, $characterId);
         respond(['ok' => true, 'character' => fetch_character($db, $characterId)]);
     }
 
@@ -647,6 +651,7 @@ try {
         $incoming = $body['characters'] ?? null;
         if (!is_array($incoming)) respond(['ok' => false, 'error' => 'Lista de personajes inválida.'], 400);
 
+        $statusChanged = [];
         $db->begin_transaction();
         try {
             foreach ($incoming as $candidate) {
@@ -706,6 +711,7 @@ try {
                 }
 
                 if ($oldRow) {
+                    if ((int)$oldRow['Activo'] !== (int)$active) $statusChanged[] = $id;
                     $stmt = $db->prepare('UPDATE Personaje SET Nombre=?, Descripcion=?, Notas=?, IconUrl=?, PortraitUrl=?, Activo=? WHERE ID=?');
                     $stmt->bind_param('sssssis', $name, $description, $notes, $iconUrl, $portraitUrl, $active, $id);
                 } else {
@@ -730,6 +736,7 @@ try {
             throw $e;
         }
 
+        foreach ($statusChanged as $changedId) favor_estado_desde_banca($db, $changedId);
         respond(['ok' => true, 'characters' => fetch_characters($db, $user)]);
     }
 

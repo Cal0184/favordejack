@@ -317,7 +317,8 @@
             const name = document.createElement('strong');
             name.textContent = character.name;
             const status = document.createElement('small');
-            status.textContent = 'Activo';
+            status.textContent = character.status?.label || 'Activo';
+            if (character.status?.color) status.style.color = character.status.color;
             text.append(name, status);
             button.append(image, text);
             fragment.append(button);
@@ -397,10 +398,10 @@
         mode.className = `status-pill ${payload.canEdit ? 'status-pill--edit' : 'status-pill--read'}`;
         mode.textContent = payload.canEdit ? 'Puedes editar' : 'Modo lectura';
         dom.heroStatus.append(mode);
-        if (!character.active) {
+        if (character.status && character.status.label !== 'Activo') {
             const inactive = document.createElement('span');
             inactive.className = 'status-pill status-pill--inactive';
-            inactive.textContent = 'Personaje inactivo';
+            inactive.textContent = `${character.status.icon} ${character.status.label}`;
             dom.heroStatus.append(inactive);
         }
 

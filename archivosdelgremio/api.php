@@ -9,6 +9,7 @@ require_once dirname(__DIR__) . '/includes/assets.php';
 require_once dirname(__DIR__) . '/includes/imagenes.php';
 require_once dirname(__DIR__) . '/includes/migrations.php';
 require_once dirname(__DIR__) . '/includes/discord.php';
+require_once dirname(__DIR__) . '/includes/estado.php';
 guild_session_start();
 
 function respond(bool $ok, array $data = [], int $status = 200): never
@@ -315,8 +316,15 @@ try {
             $db->close();
         }
 
+        // El estado de Archivos manda: la Banca se coloca igual (Muertos, Personajes Fuera o su jugador).
+        $statusNote = '';
+        if (!$isNew) {
+            $sync = db();
+            try { $statusNote = favor_estado_aplicar($sync, $id, $state); } catch (Throwable) {} finally { $sync->close(); }
+        }
+
         respond(true, [
-            'message' => $isNew ? ($category === 'NPC' ? 'NPC creado y archivado.' : 'Personaje creado y archivado.') : 'Expediente actualizado.',
+            'message' => $isNew ? ($category === 'NPC' ? 'NPC creado y archivado.' : 'Personaje creado y archivado.') : trim('Expediente actualizado. ' . $statusNote),
             'id' => $id,
             'portrait' => $portrait,
         ]);
