@@ -55,22 +55,25 @@
     function paperHTML(m, {onBoard = false} = {}) {
         const p = papers[m.paper] || S.papers[0];
         const broken = m.state === 'Cancelada';
-        const [t, r, b, l] = p.box;
+        const [t, r, b, l] = broken ? p.brokenBox : p.box;
+        const ratio = broken ? p.brokenRatio : p.ratio;
         const font = fonts[m.font] || S.fonts[0];
         const ink = inks[m.ink] || S.inks[0];
         const stamp = STAMPS[m.state];
         const party = m.party || [];
         const shown = party.slice(0, 4);
         const style = onBoard
-            ? `--x:${m.x};--y:${m.y};--w:${(sizes[m.size] || sizes[2]).width};--rot:${m.rot}deg;--ratio:${p.ratio};z-index:${10 + m.layer}`
-            : `--ratio:${p.ratio}`;
+            ? `--x:${m.x};--y:${m.y};--w:${((sizes[m.size] || sizes[2]).width * (p.scale || 1)).toFixed(2)};--rot:${m.rot}deg;--ratio:${ratio};z-index:${10 + m.layer}`
+            : `--ratio:${ratio}`;
         return `<div class="paper${broken ? ' is-broken' : ''} state-${esc(m.state).replace(/\s+/g, '-').toLowerCase()}${onBoard ? ' on-board' : ''}" data-id="${m.id}" style="${style}"${onBoard ? ` role="button" tabindex="0" aria-label="${esc(m.name)} · ${esc(m.state)}"` : ''}>
             <img class="paper-img" src="${esc(broken ? p.broken : p.img)}" alt="" draggable="false">
-            <div class="paper-text" style="top:${t}%;right:${r}%;bottom:${b}%;left:${l}%;font-family:${esc(font.family)};color:${esc(ink.color)}">
-                <div class="paper-fit">
-                    <h3>${esc(m.name)}</h3>
-                    <p>${esc(m.text)}</p>
-                    ${m.reward ? `<p class="paper-reward">Paga: ${esc(m.reward)}</p>` : ''}
+            <div class="paper-ink">
+                <div class="paper-text" style="top:${t}%;right:${r}%;bottom:${b}%;left:${l}%;font-family:${esc(font.family)};color:${esc(ink.color)}">
+                    <div class="paper-fit">
+                        <h3>${esc(m.name)}</h3>
+                        <p>${esc(m.text)}</p>
+                        ${m.reward ? `<p class="paper-reward">Paga: ${esc(m.reward)}</p>` : ''}
+                    </div>
                 </div>
             </div>
             ${shown.length ? `<div class="paper-party">${shown.map(c => `<span class="paper-face" title="${esc(c.name)}">${c.portrait ? `<img src="${esc(c.portrait)}" alt="" draggable="false" loading="lazy">` : `<b>${esc((c.short || c.name).charAt(0))}</b>`}</span>`).join('')}${party.length > shown.length ? `<span class="paper-face more">+${party.length - shown.length}</span>` : ''}</div>` : ''}
@@ -79,21 +82,22 @@
         </div>`;
     }
 
-    // Achica el texto hasta que cabe en el papel. El tamaño queda en cqw (relativo al
-    // ancho del papel), así no hay que recalcularlo cuando cambia el tamaño de la pantalla.
+    // Achica el texto hasta que cabe en el papel. Se busca directo en cqw (% del ancho
+    // del papel), así no hay que recalcularlo cuando cambia el tamaño de la pantalla.
     function fit(paperEl) {
         const box = paperEl.querySelector('.paper-text');
         const inner = paperEl.querySelector('.paper-fit');
-        const width = paperEl.clientWidth;
-        if (!box || !inner || width < 20) return null;
-        let lo = width * 0.02, hi = width * 0.16, best = lo;
+        if (!box || !inner || paperEl.clientWidth < 20) return null;
+        let lo = 2, hi = 16, best = lo;
         for (let i = 0; i < 14; i++) {
             const mid = (lo + hi) / 2;
-            box.style.fontSize = mid + 'px';
+            box.style.fontSize = mid + 'cqw';
             if (inner.scrollHeight <= box.clientHeight + 1 && inner.scrollWidth <= box.clientWidth + 1) { best = mid; lo = mid; } else { hi = mid; }
         }
-        box.style.fontSize = (best / width * 100).toFixed(3) + 'cqw';
-        return best / width;
+        // Un poco de margen: al girar o redondear píxeles una línea puede saltar.
+        best *= 0.97;
+        box.style.fontSize = best.toFixed(3) + 'cqw';
+        return best / 100;
     }
 
     function fitAll(root = document) {
@@ -384,7 +388,7 @@
         stage.innerHTML = paperHTML(preview);
         // La vista previa respeta el tamaño elegido: más chico = menos espacio para el texto.
         const el = stage.querySelector('.paper');
-        el.style.width = (sizes[draft.size].width / sizes[3].width * 100) + '%';
+        el.style.width = Math.min(100, sizes[draft.size].width * (papers[draft.paper].scale || 1) / sizes[3].width * 100) + '%';
         const ratio = fit(el);
         $('#edit-warn').hidden = ratio === null || ratio > 0.045 || !draft.text;
     }
@@ -543,7 +547,10 @@
     setupBoardPointer();
     if (S.admin) setupAdmin();
     // Las letras de Google llegan después: se vuelve a ajustar el texto.
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => fitAll());
+    if (document.fonts) {
+        document.fonts.ready.then(() => fitAll());
+        document.fonts.addEventListener('loadingdone', () => fitAll());
+    }
     // Si el papel cambia mucho de tamaño (girar el móvil) se reajusta.
     let lastW = board.clientWidth;
     window.addEventListener('resize', () => {

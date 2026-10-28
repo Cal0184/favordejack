@@ -21,16 +21,19 @@ require_once __DIR__ . '/assets.php';
  */
 
 /*
- * Papeles. Si en tablon/papeles/ hay un papel-N.png/.webp/.jpg se usa ese; si
- * no, el .svg provisional. Igual para roto-N. «ratio» = ancho/alto de la imagen
- * y «texto» = margen del recuadro del texto en % [arriba, derecha, abajo, izquierda].
+ * Papeles de Cal: tablon/papeles/papel-N.webp y su versión rota roto-N.webp.
+ * «ratio» = ancho/alto de la imagen, «texto» = margen del recuadro del texto en %
+ * [arriba, derecha, abajo, izquierda] (deja libres clavos, rollos y el sello) y
+ * «escala» = ancho relativo en el tablón (el rollo largo es más angosto).
+ * «roto» = [ratio, recuadro del texto] de la versión rota, que tiene otra forma.
  */
 const TABLON_PAPELES = [
-    1 => ['nombre' => 'Pergamino', 'ratio' => 0.72, 'texto' => [12, 12, 10, 12]],
-    2 => ['nombre' => 'Nota', 'ratio' => 0.957, 'texto' => [11, 11, 10, 11]],
-    3 => ['nombre' => 'Rollo', 'ratio' => 0.62, 'texto' => [13, 15, 11, 15]],
-    4 => ['nombre' => 'Cartel', 'ratio' => 1.316, 'texto' => [12, 9, 10, 9]],
-    5 => ['nombre' => 'Hoja', 'ratio' => 0.8, 'texto' => [11, 12, 10, 12]],
+    1 => ['nombre' => 'Pergamino', 'ratio' => 1000 / 1400, 'texto' => [9, 12, 12, 12], 'escala' => 1, 'roto' => [1000 / 900, [14, 12, 26, 12]]],
+    2 => ['nombre' => 'Con sello', 'ratio' => 1000 / 1400, 'texto' => [9, 12, 38, 12], 'escala' => 1.05, 'roto' => [1000 / 900, [20, 10, 26, 10]]],
+    3 => ['nombre' => 'Rollo largo', 'ratio' => 601 / 1400, 'texto' => [10, 14, 10, 14], 'escala' => 0.72, 'roto' => [1000 / 1025, [15, 12, 32, 12]]],
+    4 => ['nombre' => 'Clavado', 'ratio' => 1000 / 980, 'texto' => [13, 11, 14, 11], 'escala' => 1.1, 'roto' => [1000 / 980, [16, 10, 22, 10]]],
+    5 => ['nombre' => 'Nota', 'ratio' => 600 / 675, 'texto' => [18, 13, 20, 13], 'escala' => 0.95, 'roto' => [600 / 675, [22, 14, 30, 13]]],
+    6 => ['nombre' => 'Rollo', 'ratio' => 600 / 800, 'texto' => [16, 14, 13, 14], 'escala' => 0.9, 'roto' => [600 / 548, [24, 12, 22, 14]]],
 ];
 /** Ancho del papel en % del tablón según el tamaño. */
 const TABLON_TAMANOS = [1 => ['Chico', 12], 2 => ['Normal', 16], 3 => ['Grande', 21]];
@@ -50,10 +53,10 @@ function tablon_papel_url(int $papel, bool $roto): string
     $papel = isset(TABLON_PAPELES[$papel]) ? $papel : 1;
     $base = ($roto ? 'roto-' : 'papel-') . $papel;
     $dir = dirname(__DIR__) . '/tablon/papeles/';
-    foreach (['webp', 'png', 'jpg', 'svg'] as $ext) {
+    foreach (['webp', 'png', 'jpg'] as $ext) {
         if (is_file($dir . $base . '.' . $ext)) return favor_static('tablon/papeles/' . $base . '.' . $ext);
     }
-    return favor_static('tablon/papeles/' . $base . '.svg');
+    return favor_static('tablon/papeles/' . $base . '.webp');
 }
 
 /** Lista de papeles para el navegador. */
@@ -61,7 +64,8 @@ function tablon_papeles(): array
 {
     $out = [];
     foreach (TABLON_PAPELES as $id => $p) {
-        $out[] = ['id' => $id, 'name' => $p['nombre'], 'ratio' => $p['ratio'], 'box' => $p['texto'],
+        $out[] = ['id' => $id, 'name' => $p['nombre'], 'ratio' => round($p['ratio'], 4), 'box' => $p['texto'], 'scale' => $p['escala'],
+            'brokenRatio' => round($p['roto'][0], 4), 'brokenBox' => $p['roto'][1],
             'img' => tablon_papel_url($id, false), 'broken' => tablon_papel_url($id, true)];
     }
     return $out;

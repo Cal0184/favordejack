@@ -55,7 +55,7 @@ function tablon_next_layer(mysqli $db): int
 }
 
 /** Entre varios puntos al azar, el más lejos de los papeles que ya están. */
-function tablon_free_spot(mysqli $db): array
+function tablon_free_spot(mysqli $db, float $half): array
 {
     $taken = [];
     $res = $db->query('SELECT PosX,PosY FROM Mision WHERE EnTablon=1');
@@ -65,7 +65,7 @@ function tablon_free_spot(mysqli $db): array
     $bestScore = -1.0;
     for ($i = 0; $i < 60; $i++) {
         $x = random_int(1200, 8800) / 100;
-        $y = random_int(2600, 7400) / 100;
+        $y = min(max(random_int(2600, 7400) / 100, $half + 2), max($half + 2, 98 - $half));
         $score = 1000.0;
         // El tablón es 3:2, así que un % de alto vale 2/3 de un % de ancho.
         foreach ($taken as [$tx, $ty]) $score = min($score, hypot($x - $tx, ($y - $ty) * 2 / 3));
@@ -123,7 +123,9 @@ try {
         }
 
         // Papel nuevo: en el hueco más libre del tablón, algo torcido.
-        [$x, $y] = tablon_free_spot($db);
+        // Medio alto del papel en % del tablón (3:2), para que no quede cortado abajo.
+        $half = TABLON_TAMANOS[$size][1] * TABLON_PAPELES[$paper]['escala'] / TABLON_PAPELES[$paper]['ratio'] * 1.5 / 2;
+        [$x, $y] = tablon_free_spot($db, $half);
         $rot = random_int(-40, 40) / 10;
         tablon_exec($db, "INSERT INTO Mision (Nombre,Tipo,Estado,Descripcion,RecompensaGeneral,CreadoPor,EnTablon,Papel,Tamano,Letra,Tinta,PosX,PosY,Giro,Capa,Detalles) VALUES (?,?,'Publicada',?,?,?,1,?,?,?,?,?,?,?,?,?)",
             [$name, $type, $text, $reward, (string)$admin['username'], $paper, $size, $font, $ink, $x, $y, $rot, tablon_next_layer($db), $details])->close();
