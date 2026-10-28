@@ -64,6 +64,11 @@
     box-shadow:inset 0 0 0 2px #1d0f06,inset 0 0 50px rgba(0,0,0,.6);
     touch-action:pan-x pan-y;
 }
+/* Tablón dibujado por Cal (tablon/papeles/tablon.webp): trae su propio marco. Los
+   rellenos dejan los papeles dentro de las tablas (en % del ancho, el tablón es 3:2). */
+.tablon-board.has-image{padding:4.5% 4.75% 4.4%;background-size:100% 100%;background-repeat:no-repeat;box-shadow:0 18px 40px rgba(0,0,0,.6)}
+.tablon-board.has-image .tablon-surface{background:none;box-shadow:none}
+.tablon-board.has-image .tablon-bolt{display:none}
 .tablon-bolt{position:absolute;width:14px;height:14px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#bdbdbd,#4a4a4a 55%,#151515);box-shadow:0 1px 3px #000}
 .tablon-bolt.b1{left:10px;top:10px}.tablon-bolt.b2{right:10px;top:10px}.tablon-bolt.b3{left:10px;bottom:10px}.tablon-bolt.b4{right:10px;bottom:10px}
 .tablon-empty{position:absolute;inset:40% 20% auto;margin:0;padding:18px;text-align:center;font-size:1.25rem;font-style:italic;color:#f1dca8;background:rgba(20,10,4,.55);border-radius:10px}
