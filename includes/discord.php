@@ -33,7 +33,7 @@ function favor_discord_config(): array
     foreach ($webhooks as $k => $_) $webhooks[$k] = (string)($raw['webhooks'][$k] ?? '');
     $events = [];
     foreach (array_keys(FAVOR_DISCORD_EVENTS) as $k) $events[$k] = (bool)($raw['events'][$k] ?? true);
-    return ['webhooks' => $webhooks, 'events' => $events, 'log' => array_values(array_filter((array)($raw['log'] ?? []), 'is_array'))];
+    return ['webhooks' => $webhooks, 'events' => $events, 'invite' => (string)($raw['invite'] ?? ''), 'log' => array_values(array_filter((array)($raw['log'] ?? []), 'is_array'))];
 }
 
 /** Guarda con candado; $change recibe la configuración y la devuelve. */
@@ -145,4 +145,13 @@ function favor_discord_post(string $url, string $json): array
     $status = 0;
     foreach ($http_response_header ?? [] as $h) if (preg_match('#^HTTP/\S+\s+(\d{3})#', $h, $m)) $status = (int)$m[1];
     return [$status, $body === false && $status === 0 ? 'No pude conectar con Discord.' : ''];
+}
+
+/** Enlace de invitación al servidor de Discord ('' = sin enlace). */
+function favor_discord_clean_invite(string $url): string
+{
+    $url = trim($url);
+    if ($url === '') return '';
+    if (preg_match('#^(?:https?://)?(?:www\.)?(discord\.gg|discord\.com/invite)/([A-Za-z0-9-]+)/?$#', $url, $m)) return 'https://' . $m[1] . '/' . $m[2];
+    throw new RuntimeException('Ese enlace no parece una invitación de Discord (debe ser como https://discord.gg/abc123).');
 }

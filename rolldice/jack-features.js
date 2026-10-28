@@ -202,7 +202,12 @@ window.toggleAnimationHistory = function() {
     updateJackRollModeDetail(true);
 };
 
-function jackStorageRead() {
+// Con sesión iniciada las tiradas se guardan en la cuenta (rolldice/guardadas.php);
+// sin sesión, solo en este navegador como antes.
+const jackAccount = window.FAVOR_DADOS && window.FAVOR_DADOS.tiradas ? window.FAVOR_DADOS : null;
+let jackAccountReady = false;
+
+function jackLocalRead() {
     try {
         const raw = localStorage.getItem(JACK_SAVED_KEY);
         return raw ? JSON.parse(raw) : [];
@@ -211,10 +216,45 @@ function jackStorageRead() {
     }
 }
 
+function jackStorageRead() {
+    return jackAccount && jackAccountReady ? jackSavedRollsMemory.slice() : jackLocalRead();
+}
+
+function jackAccountSave(value) {
+    fetch(jackAccount.tiradas, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': jackAccount.csrf },
+        body: JSON.stringify({ rolls: value }),
+        credentials: 'same-origin'
+    }).catch(() => {});
+}
+
 function jackStorageWrite(value) {
     jackSavedRollsMemory = value;
     try { localStorage.setItem(JACK_SAVED_KEY, JSON.stringify(value)); } catch (error) {}
+    if (jackAccount && jackAccountReady) jackAccountSave(value);
 }
+
+// Al entrar: trae las de la cuenta; la primera vez sube las que había en este navegador.
+function jackAccountLoad() {
+    if (!jackAccount) return;
+    fetch(jackAccount.tiradas, { credentials: 'same-origin' })
+        .then(r => r.json())
+        .then(data => {
+            if (!data || !data.ok) return;
+            let rolls = Array.isArray(data.rolls) ? data.rolls : [];
+            const local = jackLocalRead();
+            jackAccountReady = true;
+            if (!data.saved && local.length) {
+                rolls = local;
+                jackAccountSave(rolls);
+            }
+            jackSavedRollsMemory = rolls;
+            renderSavedRolls();
+        })
+        .catch(() => {});
+}
+document.addEventListener('DOMContentLoaded', jackAccountLoad);
 
 function saveCurrentRoll() {
     const input = document.getElementById('jack_saved_roll_name');

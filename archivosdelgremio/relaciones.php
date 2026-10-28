@@ -4,6 +4,7 @@ require_once dirname(__DIR__) . '/includes/auth.php';
 require_once dirname(__DIR__) . '/includes/assets.php';
 require_once dirname(__DIR__) . '/includes/migrations.php';
 require_once dirname(__DIR__) . '/includes/auth-widget.php';
+require_once dirname(__DIR__) . '/includes/estado.php';
 favor_session_start();
 $user=favor_current_user();
 function hr(string $v):string{return htmlspecialchars($v,ENT_QUOTES|ENT_SUBSTITUTE,'UTF-8');}
@@ -11,14 +12,38 @@ function relation_asset_url(?string $url):string{
  // Todas las imágenes viven en media/ (fase 2); favor_asset_url() traduce las rutas antiguas.
  $value=trim(str_replace('\\','/',(string)$url));return $value===''?'':favor_asset_url($value);
 }
+// Tipos de vínculo con su color (el texto de la relación sigue siendo libre).
+const REL_VINCULOS=[
+ 'familia'=>['Familia','#d1a531'],'amistad'=>['Amistad','#5fa65a'],'amor'=>['Amor','#d0609a'],'aliados'=>['Aliados','#4f8fc6'],
+ 'mentor'=>['Mentor y alumno','#9474cc'],'rivalidad'=>['Rivalidad','#de8a3c'],'enemistad'=>['Enemistad','#c4463e'],'otro'=>['Otro','#9a8a74'],
+];
+/** Adivina el vínculo por el texto («Hermano» → familia) para las relaciones viejas. */
+function rel_guess_vinculo(string $tipo):string{
+ $t=mb_strtolower($tipo,'UTF-8');
+ $map=['familia'=>['herman','padre','madre','hij','prim','tio','tía','abuel','famil','espos','sobrin','cuñad'],'amor'=>['amor','novi','amante','pareja','follaron','casad','enamor','beso'],
+  'enemistad'=>['enemig','odio','odia','venganza','némesis','nemesis','traici'],'rivalidad'=>['rival','competen'],'mentor'=>['mentor','tutor','maestr','alumn','aprendiz','recluta','comandante','discípul','discipul'],
+  'aliados'=>['alia','compañer','companer','socio','equipo','grupo','unidos','gremio'],'amistad'=>['amig','amistad','colega']];
+ foreach($map as $k=>$words)foreach($words as $w)if(str_contains($t,$w))return $k;
+ return 'otro';
+}
+function rel_ensure_vinculo(mysqli $db):void{
+ $r=$db->query("SELECT Valor FROM FavorMeta WHERE Clave='relacion_vinculo_v1' LIMIT 1");if($r&&$r->fetch_assoc())return;
+ $c=$db->query("SHOW COLUMNS FROM PersonajeRelacion LIKE 'Vinculo'");if($c&&!$c->fetch_assoc())$db->query("ALTER TABLE PersonajeRelacion ADD COLUMN Vinculo varchar(20) NULL DEFAULT NULL");
+ $st=$db->prepare('UPDATE PersonajeRelacion SET Vinculo=? WHERE ID=?');
+ foreach($db->query('SELECT ID,Tipo FROM PersonajeRelacion WHERE Vinculo IS NULL')->fetch_all(MYSQLI_ASSOC) as $row){$v=rel_guess_vinculo((string)$row['Tipo']);$id=(int)$row['ID'];$st->bind_param('si',$v,$id);$st->execute();}
+ $st->close();
+ $db->query("INSERT INTO FavorMeta (Clave,Valor) VALUES ('relacion_vinculo_v1','ok') ON DUPLICATE KEY UPDATE Valor='ok'");
+}
 function rel_can_edit(?array $u,array $c):bool{return $u && (($u['role']??'')==='admin'||(string)($u['playerId']??'')===(string)$c['Jugador']);}
 $db=favor_db();$error='';$message='';$characters=[];$relations=[];
 // TEMPORAL 2.2: J013 ('Personajes Fuera') es un contenedor legado de la migracion de Banca.
 // Relaciones trabaja solo con las identidades reales de Archivos hasta rehacer/unificar la BD.
 try{
  favor_ensure_schema($db);
+ rel_ensure_vinculo($db);
+ $estados=favor_estado_todos($db);
  $sql="SELECT p.ID,p.Jugador,p.Nombre,p.IconUrl,p.PortraitUrl,p.Activo,j.Nombre AS JugadorNombre,COALESCE(NULLIF(pp.NombreCompleto,''),p.Nombre) AS NombreCompleto,pp.Estado,COALESCE(NULLIF(pp.Categoria,''),'Personaje') AS Categoria FROM Personaje p LEFT JOIN Jugador j ON j.ID=p.Jugador LEFT JOIN PersonajePerfil pp ON pp.ID=p.ID WHERE p.Jugador <> 'J013' ORDER BY COALESCE(j.Orden,9999),COALESCE(p.Orden,9999),p.Nombre";
- $res=$db->query($sql);while($r=$res->fetch_assoc()){$r['displayName']=(string)($r['NombreCompleto']?:$r['Nombre']);$r['Categoria']=(string)($r['Categoria']?:'Personaje');$characters[(string)$r['ID']]=$r;}$res->free();
+ $res=$db->query($sql);while($r=$res->fetch_assoc()){$r['displayName']=(string)($r['NombreCompleto']?:$r['Nombre']);$r['Estado']=$estados[(string)$r['ID']]['estado']??'Activo';$r['Categoria']=(string)($r['Categoria']?:'Personaje');$characters[(string)$r['ID']]=$r;}$res->free();
  $isAdmin=$user && (($user['role']??'')==='admin');
  $playerId=(string)($user['playerId']??'');
  $editableCharacters=array_filter($characters,fn($c)=>$isAdmin||($playerId!==''&&(string)$c['Jugador']===$playerId));
@@ -33,15 +58,15 @@ try{
   if($action==='add'){
    $other=trim((string)($_POST['other']??''));if($other===''||$other===$focusId||!isset($characters[$other]))throw new RuntimeException('Selecciona otro personaje.');
    $a=$focusId;$b=$other;if(strcmp($a,$b)>0){[$a,$b]=[$b,$a];}
-   $type=mb_substr(trim((string)($_POST['type']??'Unidos')),0,80,'UTF-8')?:'Unidos';$note=mb_substr(trim((string)($_POST['note']??'')),0,500,'UTF-8');$author=(string)($user['username']??'');
-   $st=$db->prepare('INSERT INTO PersonajeRelacion (PersonajeA,PersonajeB,Tipo,Nota,CreadoPor) VALUES (?,?,?,?,?) ON DUPLICATE KEY UPDATE Tipo=VALUES(Tipo),Nota=VALUES(Nota),CreadoPor=VALUES(CreadoPor)');$st->bind_param('sssss',$a,$b,$type,$note,$author);$st->execute();$st->close();$message='Relación guardada.';
+   $type=mb_substr(trim((string)($_POST['type']??'Unidos')),0,80,'UTF-8')?:'Unidos';$vinculo=(string)($_POST['vinculo']??'');if(!isset(REL_VINCULOS[$vinculo]))$vinculo=rel_guess_vinculo($type);$note=mb_substr(trim((string)($_POST['note']??'')),0,500,'UTF-8');$author=(string)($user['username']??'');
+   $st=$db->prepare('INSERT INTO PersonajeRelacion (PersonajeA,PersonajeB,Tipo,Vinculo,Nota,CreadoPor) VALUES (?,?,?,?,?,?) ON DUPLICATE KEY UPDATE Tipo=VALUES(Tipo),Vinculo=VALUES(Vinculo),Nota=VALUES(Nota),CreadoPor=VALUES(CreadoPor)');$st->bind_param('ssssss',$a,$b,$type,$vinculo,$note,$author);$st->execute();$st->close();$message='Relación guardada.';
   }elseif($action==='delete'){
    $id=max(0,(int)($_POST['id']??0));$st=$db->prepare('SELECT PersonajeA,PersonajeB FROM PersonajeRelacion WHERE ID=? LIMIT 1');$st->bind_param('i',$id);$st->execute();$rr=$st->get_result()->fetch_assoc();$st->close();if(!$rr)throw new RuntimeException('La relación ya no existe.');
    if($focusId!==$rr['PersonajeA']&&$focusId!==$rr['PersonajeB'])throw new RuntimeException('Esa relación no pertenece al personaje seleccionado.');
    $st=$db->prepare('DELETE FROM PersonajeRelacion WHERE ID=?');$st->bind_param('i',$id);$st->execute();$st->close();$message='Relación eliminada.';
   }
  }
- $res=$db->query('SELECT ID,PersonajeA,PersonajeB,Tipo,Nota,CreadoPor,Actualizado FROM PersonajeRelacion ORDER BY Actualizado DESC,ID DESC');while($r=$res->fetch_assoc())$relations[]=$r;$res->free();
+ $res=$db->query('SELECT ID,PersonajeA,PersonajeB,Tipo,COALESCE(Vinculo,\'otro\') AS Vinculo,Nota,CreadoPor,Actualizado FROM PersonajeRelacion ORDER BY Actualizado DESC,ID DESC');while($r=$res->fetch_assoc())$relations[]=$r;$res->free();
 }catch(Throwable $e){$error=$e->getMessage();}finally{$db->close();}
 $focus=$focusId!==''?($characters[$focusId]??null):null;$canEdit=$focus?rel_can_edit($user,$focus):false;
 $graphChars=[];$graphRels=[];
@@ -49,16 +74,16 @@ if($focus){
  $ids=[$focusId=>true];foreach($relations as $r){if($r['PersonajeA']===$focusId){$ids[$r['PersonajeB']]=true;}if($r['PersonajeB']===$focusId){$ids[$r['PersonajeA']]=true;}}
  // Incluye un segundo anillo para que se entienda como árbol/red, sin saturar con todo el censo.
  foreach($relations as $r){if(isset($ids[$r['PersonajeA']])||isset($ids[$r['PersonajeB']])){$ids[$r['PersonajeA']]=true;$ids[$r['PersonajeB']]=true;}}
- foreach(array_keys($ids) as $id)if(isset($characters[$id])){$c=$characters[$id];$graphChars[]=['id'=>$id,'name'=>$c['displayName'],'player'=>$c['JugadorNombre'],'category'=>$c['Categoria']??'Personaje','active'=>(int)($c['Activo']??1),'image'=>relation_asset_url((string)($c['PortraitUrl']?:$c['IconUrl']??'')),'focus'=>$id===$focusId];}
+ foreach(array_keys($ids) as $id)if(isset($characters[$id])){$c=$characters[$id];$graphChars[]=['id'=>$id,'name'=>$c['displayName'],'player'=>$c['JugadorNombre'],'category'=>$c['Categoria']??'Personaje','active'=>($c['Estado']??'Activo')==='Activo'?1:0,'estado'=>favor_estado_publico((string)($c['Estado']??'Activo')),'image'=>relation_asset_url((string)($c['PortraitUrl']?:$c['IconUrl']??'')),'focus'=>$id===$focusId];}
  foreach($relations as $r)if(isset($ids[$r['PersonajeA']],$ids[$r['PersonajeB']]))$graphRels[]=$r;
 }else{
- foreach($characters as $id=>$c)$graphChars[]=['id'=>$id,'name'=>$c['displayName'],'player'=>$c['JugadorNombre'],'category'=>$c['Categoria']??'Personaje','active'=>(int)($c['Activo']??1),'image'=>relation_asset_url((string)($c['PortraitUrl']?:$c['IconUrl']??'')),'focus'=>false];$graphRels=$relations;
+ foreach($characters as $id=>$c)$graphChars[]=['id'=>$id,'name'=>$c['displayName'],'player'=>$c['JugadorNombre'],'category'=>$c['Categoria']??'Personaje','active'=>($c['Estado']??'Activo')==='Activo'?1:0,'estado'=>favor_estado_publico((string)($c['Estado']??'Activo')),'image'=>relation_asset_url((string)($c['PortraitUrl']?:$c['IconUrl']??'')),'focus'=>false];$graphRels=$relations;
 }
 $focusRelations=array_values(array_filter($relations,fn($r)=>$focusId!==''&&($r['PersonajeA']===$focusId||$r['PersonajeB']===$focusId)));
 $centralChoices=[];
-foreach($editableCharacters as $id=>$c){$centralChoices[]=['id'=>$id,'name'=>$c['displayName'],'player'=>$c['JugadorNombre'],'category'=>$c['Categoria']??'Personaje','active'=>(int)($c['Activo']??1),'image'=>relation_asset_url((string)($c['PortraitUrl']?:$c['IconUrl']??''))];}
+foreach($editableCharacters as $id=>$c){$centralChoices[]=['id'=>$id,'name'=>$c['displayName'],'player'=>$c['JugadorNombre'],'category'=>$c['Categoria']??'Personaje','active'=>($c['Estado']??'Activo')==='Activo'?1:0,'estado'=>favor_estado_publico((string)($c['Estado']??'Activo')),'image'=>relation_asset_url((string)($c['PortraitUrl']?:$c['IconUrl']??''))];}
 $relationChoices=[];
-foreach($characters as $id=>$c){$relationChoices[]=['id'=>$id,'name'=>$c['displayName'],'player'=>$c['JugadorNombre'],'category'=>$c['Categoria']??'Personaje','active'=>(int)($c['Activo']??1)];}
+foreach($characters as $id=>$c){$relationChoices[]=['id'=>$id,'name'=>$c['displayName'],'player'=>$c['JugadorNombre'],'category'=>$c['Categoria']??'Personaje','active'=>($c['Estado']??'Activo')==='Activo'?1:0,'estado'=>favor_estado_publico((string)($c['Estado']??'Activo'))];}
 $playerNames=array_values(array_unique(array_filter(array_map(fn($c)=>(string)($c['JugadorNombre']??''),$characters))));sort($playerNames,SORT_NATURAL|SORT_FLAG_CASE);
 ?>
 <!doctype html>
@@ -120,6 +145,13 @@ a{color:inherit;text-decoration:none}button,input,select,textarea{font:inherit}
 
 @media(max-width:1080px){.controls-deck{grid-template-columns:1fr 1fr}.controls-deck .panel:last-child{grid-column:1/-1}.hero{grid-column:1/-1}.graph{height:600px}}
 @media(max-width:760px){.topbar{grid-template-columns:auto 1fr}.topbar .navlink:last-child{display:none}.brand{text-align:right}.brand span{display:none}.page{width:calc(100% - 2vw);margin-top:12px}.hero{padding:21px 24px}.controls-deck{grid-template-columns:1fr}.controls-deck .panel:last-child{grid-column:auto}.graph-card{padding:10px;border-width:6px}.graph{height:560px}.graph-head{flex-direction:column}.focus-badge{display:none}.node{width:86px}.node-img{width:56px;height:68px}.node.focus .node-img{width:72px;height:88px}.edge-label{font-size:9px}.filter-grid,.filter-grid.three{grid-template-columns:1fr}}
+.vinculo-chip{display:inline-block;padding:1px 8px;border:1px solid var(--vc);border-radius:99px;background:color-mix(in srgb,var(--vc) 22%,transparent);color:#f3e6c8;font-size:.72rem;font-weight:700;letter-spacing:.02em}
+.vinculo-legend{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.vinculo-pick{display:flex;flex-wrap:wrap;gap:6px}.vinculo-pick label{cursor:pointer}.vinculo-pick input{position:absolute;opacity:0;pointer-events:none}
+.vinculo-pick span{display:inline-block;padding:7px 12px;border:1px solid var(--vc);border-radius:99px;color:#e8d8b6;font-size:.85rem;transition:.15s}
+.vinculo-pick input:checked+span{background:var(--vc);color:#160f0a;font-weight:800;transform:translateY(-1px)}.vinculo-pick input:focus-visible+span{outline:2px solid #f0d08a;outline-offset:2px}
+.edge{transition:stroke-width .18s}.edge.focus{filter:drop-shadow(0 0 3px #0006)}
+.node.gone .node-img{filter:grayscale(.75) brightness(.85)}.estado-mark{display:inline-block;margin-top:2px;padding:0 6px;border-radius:99px;background:var(--ec);color:#fff;font-size:.62rem;font-weight:800}
 </style>
 <?php favor_head('Relaciones · Archivos del Gremio'); ?>
 </head>
@@ -152,7 +184,7 @@ a{color:inherit;text-decoration:none}button,input,select,textarea{font:inherit}
    <div class="filter-grid">
     <div class="wide"><label class="mini-label" for="centralSearch">Buscar</label><input class="control" id="centralSearch" placeholder="Nombre del personaje…"></div>
     <div><label class="mini-label" for="centralCategory">Tipo</label><select class="control" id="centralCategory"><option value="">Todos</option><option value="Personaje">Personajes</option><option value="NPC">NPC</option></select></div>
-    <div><label class="mini-label" for="centralActive">Estado</label><select class="control" id="centralActive"><option value="">Todos</option><option value="1">Activos</option><option value="0">Inactivos</option></select></div>
+    <div><label class="mini-label" for="centralActive">Estado</label><select class="control" id="centralActive"><option value="">Todos</option><?php foreach(array_keys(FAVOR_ESTADOS) as $en):?><option value="<?=hr($en)?>"><?=hr($en)?></option><?php endforeach;?></select></div>
     <?php if($isAdmin):?><div class="wide"><label class="mini-label" for="centralPlayer">Jugador</label><select class="control" id="centralPlayer"><option value="">Todos los jugadores</option><?php foreach($playerNames as $pn):?><option value="<?=hr($pn)?>"><?=hr($pn)?></option><?php endforeach;?></select></div><?php endif;?>
    </div>
    <div class="choice-list" id="centralList"></div><div class="results-note" id="centralCount"></div>
@@ -166,7 +198,7 @@ a{color:inherit;text-decoration:none}button,input,select,textarea{font:inherit}
    <div class="relation-list">
    <?php if(!$focusRelations):?><span class="empty">Todavía no hay relaciones registradas.</span>
    <?php else:foreach($focusRelations as $r):$other=$r['PersonajeA']===$focusId?$r['PersonajeB']:$r['PersonajeA'];$oc=$characters[$other]??null;if(!$oc)continue;?>
-    <div class="relation"><div class="relation-row"><strong><?=hr((string)$oc['displayName'])?></strong><small><?=hr((string)$r['Tipo'])?><?=trim((string)$r['Nota'])!==''?' · '.hr((string)$r['Nota']):''?></small></div>
+    <div class="relation"><div class="relation-row"><strong><?=hr((string)$oc['displayName'])?></strong><small><?php $vk=(string)$r['Vinculo'];[$vl,$vc]=REL_VINCULOS[$vk]??REL_VINCULOS['otro'];?><span class="vinculo-chip" style="--vc:<?=hr($vc)?>"><?=hr($vl)?></span> <?=hr((string)$r['Tipo'])?><?=trim((string)$r['Nota'])!==''?' · '.hr((string)$r['Nota']):''?></small></div>
     <?php if($canEdit):?><form method="post" style="margin-top:8px" onsubmit="return confirm('¿Quitar esta unión?')"><input type="hidden" name="csrf" value="<?=hr(favor_csrf())?>"><input type="hidden" name="character" value="<?=hr($focusId)?>"><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="<?=(int)$r['ID']?>"><button class="button danger" type="submit">Quitar unión</button></form><?php endif;?></div>
    <?php endforeach;endif;?></div>
   </section>
@@ -177,17 +209,19 @@ a{color:inherit;text-decoration:none}button,input,select,textarea{font:inherit}
     <div class="filter-grid three">
      <div class="wide"><label class="mini-label" for="relationSearch">Buscar</label><input class="control" id="relationSearch" placeholder="Nombre del personaje…"></div>
      <div><label class="mini-label" for="relationCategory">Tipo</label><select class="control" id="relationCategory"><option value="">Todos</option><option value="Personaje">Personajes</option><option value="NPC">NPC</option></select></div>
-     <div><label class="mini-label" for="relationActive">Estado</label><select class="control" id="relationActive"><option value="">Todos</option><option value="1">Activos</option><option value="0">Inactivos</option></select></div>
+     <div><label class="mini-label" for="relationActive">Estado</label><select class="control" id="relationActive"><option value="">Todos</option><?php foreach(array_keys(FAVOR_ESTADOS) as $en):?><option value="<?=hr($en)?>"><?=hr($en)?></option><?php endforeach;?></select></div>
      <div><label class="mini-label" for="relationPlayer">Jugador</label><select class="control" id="relationPlayer"><option value="">Todos</option><?php foreach($playerNames as $pn):?><option value="<?=hr($pn)?>"><?=hr($pn)?></option><?php endforeach;?></select></div>
     </div>
     <div class="compact-choice-list" id="relationChoices"></div><div class="results-note" id="relationCount"></div>
     <div class="selected-person" id="selectedPerson"><div><b id="selectedName"></b><span id="selectedMeta"></span></div><button class="button" type="button" id="clearSelected">Cambiar</button></div>
-    <label class="field"><span>Tipo de relación</span><input name="type" maxlength="80" value="Unidos" placeholder="Amigos, familia, rivales…"></label>
+    <div class="field"><span>Vínculo</span><div class="vinculo-pick"><?php foreach(REL_VINCULOS as $vk=>[$vl,$vc]):?><label style="--vc:<?=hr($vc)?>"><input type="radio" name="vinculo" value="<?=hr($vk)?>"<?=$vk==='aliados'?' checked':''?>><span><?=hr($vl)?></span></label><?php endforeach;?></div></div>
+    <label class="field"><span>Cómo lo describirías</span><input name="type" maxlength="80" value="Unidos" placeholder="Hermanos, compañeros de armas, rivales…"></label>
     <label class="field"><span>Nota</span><textarea name="note" maxlength="500" placeholder="Contexto opcional"></textarea></label>
     <button class="button primary" id="saveRelation" type="submit" disabled>Guardar unión</button>
    </form>
   </section><?php endif;?>
 
+  <section class="panel legend"><strong>Colores de los vínculos:</strong><div class="vinculo-legend"><?php foreach(REL_VINCULOS as [$vl,$vc]):?><span class="vinculo-chip" style="--vc:<?=hr($vc)?>"><?=hr($vl)?></span><?php endforeach;?></div></section>
   <section class="panel legend"><strong>Permisos:</strong> un jugador modifica únicamente las relaciones de sus propios personajes. Puede relacionarlos con cualquier personaje o NPC disponible. El administrador puede editar todos los expedientes.</section>
  </section>
 </main>
@@ -197,17 +231,18 @@ const rels=<?=json_encode($graphRels,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASH
 const focus=<?=json_encode($focusId)?>;
 const centralChoices=<?=json_encode($centralChoices,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_HEX_TAG)?>;
 const relationChoices=<?=json_encode($relationChoices,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_HEX_TAG)?>;
+const VINCULOS=<?=json_encode(REL_VINCULOS,JSON_UNESCAPED_UNICODE|JSON_HEX_TAG)?>;
 const graph=document.getElementById('graph'),nodesEl=document.getElementById('nodes'),svg=document.getElementById('edges');
 function esc(v){return String(v??'').replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]))}
 function norm(v){return String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim()}
 function imgHtml(c){return c.image?'<img src="'+esc(c.image)+'" alt="">':'<span class="choice-fallback">✦</span>'}
 function draw(){if(!graph)return;nodesEl.innerHTML='';svg.innerHTML='';const W=graph.clientWidth,H=graph.clientHeight,cx=W/2,cy=H/2,pos={};const focusChar=chars.find(c=>c.id===focus);const first=new Set();rels.forEach(r=>{if(r.PersonajeA===focus)first.add(r.PersonajeB);if(r.PersonajeB===focus)first.add(r.PersonajeA)});const ring1=chars.filter(c=>c.id!==focus&&first.has(c.id)),ring2=chars.filter(c=>c.id!==focus&&!first.has(c.id));if(focusChar)pos[focus]={x:cx,y:cy};const putRing=(arr,rad)=>arr.forEach((c,i)=>{const a=(Math.PI*2*i/Math.max(1,arr.length))-Math.PI/2;pos[c.id]={x:cx+Math.cos(a)*Math.min(rad,W*.39),y:cy+Math.sin(a)*Math.min(rad,H*.39)}});putRing(ring1,Math.min(W,H)*.30);putRing(ring2,Math.min(W,H)*.44);if(!focusChar)putRing(chars,Math.min(W,H)*.38);
- rels.forEach(r=>{const a=pos[r.PersonajeA],b=pos[r.PersonajeB];if(!a||!b)return;const ns='http://www.w3.org/2000/svg';const line=document.createElementNS(ns,'line');line.setAttribute('x1',a.x);line.setAttribute('y1',a.y);line.setAttribute('x2',b.x);line.setAttribute('y2',b.y);line.setAttribute('class','edge '+((r.PersonajeA===focus||r.PersonajeB===focus)?'focus':''));svg.appendChild(line);const t=document.createElementNS(ns,'text');t.setAttribute('x',(a.x+b.x)/2);t.setAttribute('y',(a.y+b.y)/2-5);t.setAttribute('class','edge-label');t.textContent=r.Tipo||'Unidos';svg.appendChild(t)});
- chars.forEach(c=>{const p=pos[c.id];if(!p)return;const a=document.createElement('a');a.className='node '+(c.id===focus?'focus':'');a.href='?character='+encodeURIComponent(c.id);a.style.left=p.x+'px';a.style.top=p.y+'px';a.innerHTML='<div class="node-img">'+(c.image?'<img src="'+esc(c.image)+'" alt="">':'✦')+'</div><strong>'+esc(c.name)+'</strong><small>'+esc(c.player||'')+'</small>'+((c.category||'Personaje')==='NPC'?'<span class="npcmark">NPC</span>':'');nodesEl.appendChild(a)});
+ rels.forEach(r=>{const a=pos[r.PersonajeA],b=pos[r.PersonajeB];if(!a||!b)return;const ns='http://www.w3.org/2000/svg';const line=document.createElementNS(ns,'line');line.setAttribute('x1',a.x);line.setAttribute('y1',a.y);line.setAttribute('x2',b.x);line.setAttribute('y2',b.y);line.setAttribute('class','edge '+((r.PersonajeA===focus||r.PersonajeB===focus)?'focus':''));line.style.stroke=(VINCULOS[r.Vinculo]||VINCULOS.otro)[1];svg.appendChild(line);const t=document.createElementNS(ns,'text');t.setAttribute('x',(a.x+b.x)/2);t.setAttribute('y',(a.y+b.y)/2-5);t.setAttribute('class','edge-label');t.textContent=r.Tipo||'Unidos';t.style.fill=(VINCULOS[r.Vinculo]||VINCULOS.otro)[1];svg.appendChild(t)});
+ chars.forEach(c=>{const p=pos[c.id];if(!p)return;const a=document.createElement('a');a.className='node '+(c.id===focus?'focus':'')+(c.estado&&c.estado.label!=='Activo'?' gone':'');a.href='?character='+encodeURIComponent(c.id);a.style.left=p.x+'px';a.style.top=p.y+'px';a.innerHTML='<div class="node-img">'+(c.image?'<img src="'+esc(c.image)+'" alt="">':'✦')+'</div><strong>'+esc(c.name)+'</strong><small>'+esc(c.player||'')+'</small>'+(c.estado&&c.estado.label!=='Activo'?'<span class="estado-mark" style="--ec:'+esc(c.estado.color)+'">'+esc(c.estado.icon+' '+c.estado.label)+'</span>':'')+((c.category||'Personaje')==='NPC'?'<span class="npcmark">NPC</span>':'');nodesEl.appendChild(a)});
 }
-function renderCentral(){const host=document.getElementById('centralList');if(!host)return;const q=norm(document.getElementById('centralSearch').value),cat=document.getElementById('centralCategory').value,act=document.getElementById('centralActive').value,pl=document.getElementById('centralPlayer')?.value||'';let list=centralChoices.filter(c=>(!q||norm(c.name+' '+c.player).includes(q))&&(!cat||c.category===cat)&&(!act||String(c.active)===act)&&(!pl||c.player===pl));const total=list.length;list=list.slice(0,24);host.innerHTML=list.length?list.map(c=>'<button type="button" class="choice-card '+(c.id===focus?'active':'')+'" data-id="'+esc(c.id)+'">'+imgHtml(c)+'<span><strong>'+esc(c.name)+'</strong><small>'+esc(c.player||'Sin jugador')+'</small></span><span class="tag '+(c.category==='NPC'?'npc':'')+'">'+esc(c.category||'Personaje')+'</span></button>').join(''):'<span class="empty">No hay coincidencias.</span>';host.querySelectorAll('.choice-card').forEach(b=>b.onclick=()=>location.href='?character='+encodeURIComponent(b.dataset.id));document.getElementById('centralCount').innerHTML=total>24?'Mostrando <b>24</b> de <b>'+total+'</b>. Usa los filtros para acotar.':'<b>'+total+'</b> resultado'+(total===1?'':'s')+'.'}
+function renderCentral(){const host=document.getElementById('centralList');if(!host)return;const q=norm(document.getElementById('centralSearch').value),cat=document.getElementById('centralCategory').value,act=document.getElementById('centralActive').value,pl=document.getElementById('centralPlayer')?.value||'';let list=centralChoices.filter(c=>(!q||norm(c.name+' '+c.player).includes(q))&&(!cat||c.category===cat)&&(!act||(c.estado&&c.estado.label)===act)&&(!pl||c.player===pl));const total=list.length;list=list.slice(0,24);host.innerHTML=list.length?list.map(c=>'<button type="button" class="choice-card '+(c.id===focus?'active':'')+'" data-id="'+esc(c.id)+'">'+imgHtml(c)+'<span><strong>'+esc(c.name)+'</strong><small>'+esc(c.player||'Sin jugador')+'</small></span><span class="tag '+(c.category==='NPC'?'npc':'')+'">'+esc(c.category||'Personaje')+'</span></button>').join(''):'<span class="empty">No hay coincidencias.</span>';host.querySelectorAll('.choice-card').forEach(b=>b.onclick=()=>location.href='?character='+encodeURIComponent(b.dataset.id));document.getElementById('centralCount').innerHTML=total>24?'Mostrando <b>24</b> de <b>'+total+'</b>. Usa los filtros para acotar.':'<b>'+total+'</b> resultado'+(total===1?'':'s')+'.'}
 ['centralSearch','centralCategory','centralActive','centralPlayer'].forEach(id=>document.getElementById(id)?.addEventListener(id==='centralSearch'?'input':'change',renderCentral));
-function renderRelationChoices(){const host=document.getElementById('relationChoices');if(!host)return;const q=norm(document.getElementById('relationSearch').value),cat=document.getElementById('relationCategory').value,act=document.getElementById('relationActive').value,pl=document.getElementById('relationPlayer').value;let list=relationChoices.filter(c=>c.id!==focus&&(!q||norm(c.name+' '+c.player).includes(q))&&(!cat||c.category===cat)&&(!act||String(c.active)===act)&&(!pl||c.player===pl));const total=list.length;list=list.slice(0,20);host.innerHTML=list.length?list.map(c=>'<button type="button" class="compact-choice" data-id="'+esc(c.id)+'"><span><strong>'+esc(c.name)+'</strong><small>'+esc(c.player||'Sin jugador')+'</small></span><span class="meta"><i class="status-dot '+(c.active?'':'inactive')+'"></i><span class="tag '+(c.category==='NPC'?'npc':'')+'">'+esc(c.category||'Personaje')+'</span></span></button>').join(''):'<span class="empty">No hay coincidencias.</span>';host.querySelectorAll('.compact-choice').forEach(b=>b.onclick=()=>selectRelation(b.dataset.id));document.getElementById('relationCount').innerHTML=total>20?'Mostrando <b>20</b> de <b>'+total+'</b>. Escribe un nombre o usa los filtros.':'<b>'+total+'</b> resultado'+(total===1?'':'s')+'.'}
+function renderRelationChoices(){const host=document.getElementById('relationChoices');if(!host)return;const q=norm(document.getElementById('relationSearch').value),cat=document.getElementById('relationCategory').value,act=document.getElementById('relationActive').value,pl=document.getElementById('relationPlayer').value;let list=relationChoices.filter(c=>c.id!==focus&&(!q||norm(c.name+' '+c.player).includes(q))&&(!cat||c.category===cat)&&(!act||(c.estado&&c.estado.label)===act)&&(!pl||c.player===pl));const total=list.length;list=list.slice(0,20);host.innerHTML=list.length?list.map(c=>'<button type="button" class="compact-choice" data-id="'+esc(c.id)+'"><span><strong>'+esc(c.name)+'</strong><small>'+esc(c.player||'Sin jugador')+'</small></span><span class="meta"><i class="status-dot" title="'+esc(c.estado?c.estado.label:'')+'" style="background:'+esc(c.estado?c.estado.color:'')+'"></i><span class="tag '+(c.category==='NPC'?'npc':'')+'">'+esc(c.category||'Personaje')+'</span></span></button>').join(''):'<span class="empty">No hay coincidencias.</span>';host.querySelectorAll('.compact-choice').forEach(b=>b.onclick=()=>selectRelation(b.dataset.id));document.getElementById('relationCount').innerHTML=total>20?'Mostrando <b>20</b> de <b>'+total+'</b>. Escribe un nombre o usa los filtros.':'<b>'+total+'</b> resultado'+(total===1?'':'s')+'.'}
 function selectRelation(id){const c=relationChoices.find(x=>x.id===id);if(!c)return;document.getElementById('otherInput').value=id;document.getElementById('selectedName').textContent=c.name;document.getElementById('selectedMeta').textContent=(c.player||'Sin jugador')+' · '+(c.category||'Personaje');document.getElementById('selectedPerson').classList.add('show');document.getElementById('saveRelation').disabled=false;document.getElementById('relationChoices').style.display='none';document.getElementById('relationCount').style.display='none'}
 function clearRelation(){document.getElementById('otherInput').value='';document.getElementById('selectedPerson').classList.remove('show');document.getElementById('saveRelation').disabled=true;document.getElementById('relationChoices').style.display='grid';document.getElementById('relationCount').style.display='block';renderRelationChoices()}
 ['relationSearch','relationCategory','relationActive','relationPlayer'].forEach(id=>document.getElementById(id)?.addEventListener(id==='relationSearch'?'input':'change',renderRelationChoices));document.getElementById('clearSelected')?.addEventListener('click',clearRelation);document.getElementById('relationForm')?.addEventListener('submit',e=>{if(!document.getElementById('otherInput').value){e.preventDefault();alert('Selecciona un personaje para crear la relación.')}});
