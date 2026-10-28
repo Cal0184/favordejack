@@ -89,8 +89,10 @@ function tablon_discord(string $title, string $text, array $fields): void
 
 try {
     favor_session_start();
-    $data = json_decode((string)file_get_contents('php://input'), true);
-    if (!is_array($data)) throw new RuntimeException('Pedido no válido.');
+    // Las imágenes de las cazas llegan como formulario; lo demás, como JSON.
+    $multipart = str_starts_with((string)($_SERVER['CONTENT_TYPE'] ?? ''), 'multipart/form-data');
+    $data = $multipart ? $_POST : json_decode((string)file_get_contents('php://input'), true);
+    if (!is_array($data)) throw new RuntimeException('Pedido no válido. Si subías una imagen, puede que pese demasiado.');
     favor_verify_csrf((string)($data['csrf'] ?? ''));
     $admin = favor_require_admin();
     favor_session_close();
@@ -101,36 +103,55 @@ try {
     favor_ensure_schema($db);
     tablon_ensure_schema($db);
 
+    // Subir la imagen de una caza (antes de guardarla).
+    if ($action === 'image') {
+        tablon_respond(true, tablon_guardar_imagen($_FILES['image'] ?? [], tablon_str($data, 'name', 80)));
+    }
+
     // Crear o editar el papel.
     if ($action === 'save') {
         $name = tablon_str($data, 'name', 160);
         $text = tablon_str($data, 'text', 1200);
-        if ($name === '') throw new RuntimeException('La misión necesita un título.');
-        if ($text === '') throw new RuntimeException('Escribe el texto que va en el papel.');
+        $hunt = ($data['kind'] ?? '') === 'caza';
+        $image = $hunt ? tablon_imagen_valida((string)($data['image'] ?? '')) : '';
+        $stars = $hunt ? max(1, min(TABLON_MAX_ESTRELLAS, (int)($data['stars'] ?? 1))) : 0;
+        if ($name === '') throw new RuntimeException($hunt ? 'Escribe el nombre de la criatura.' : 'La misión necesita un título.');
+        if ($hunt && $image === '') throw new RuntimeException('Sube la imagen de la criatura.');
+        if (!$hunt && $text === '') throw new RuntimeException('Escribe el texto que va en el papel.');
         $reward = tablon_str($data, 'reward', 255);
         $details = tablon_str($data, 'details', 20000);
         $type = tablon_str($data, 'type', 80);
-        $paper = isset(TABLON_PAPELES[(int)($data['paper'] ?? 0)]) ? (int)$data['paper'] : 1;
+        if ($hunt && $type === '') $type = 'Caza de cabezas';
+        $paper = (int)($data['paper'] ?? 1);
+        // Papel 0 = la imagen ya es el cartel completo (solo en cazas).
+        if (!isset(TABLON_PAPELES[$paper]) && !($hunt && $paper === 0)) $paper = 1;
+        $imageRatio = 1.0;
+        if ($image !== '') {
+            $info = @getimagesize(dirname(__DIR__) . '/' . $image);
+            if ($info) $imageRatio = round($info[0] / max(1, $info[1]), 4);
+        }
+        $kind = $hunt ? 'caza' : 'aviso';
         $size = isset(TABLON_TAMANOS[(int)($data['size'] ?? 0)]) ? (int)$data['size'] : 2;
         $font = isset(TABLON_LETRAS[(string)($data['font'] ?? '')]) ? (string)$data['font'] : 'pluma';
         $ink = isset(TABLON_TINTAS[(string)($data['ink'] ?? '')]) ? (string)$data['ink'] : 'negra';
 
         if ($id > 0) {
             tablon_mision($db, $id);
-            tablon_exec($db, 'UPDATE Mision SET Nombre=?,Descripcion=?,RecompensaGeneral=?,Detalles=?,Tipo=?,Papel=?,Tamano=?,Letra=?,Tinta=? WHERE ID=?',
-                [$name, $text, $reward, $details, $type, $paper, $size, $font, $ink, $id])->close();
+            tablon_exec($db, 'UPDATE Mision SET Nombre=?,Descripcion=?,RecompensaGeneral=?,Detalles=?,Tipo=?,Papel=?,Tamano=?,Letra=?,Tinta=?,Clase=?,Imagen=?,ImagenRatio=?,Estrellas=? WHERE ID=?',
+                [$name, $text, $reward, $details, $type, $paper, $size, $font, $ink, $kind, $image, $imageRatio, $stars, $id])->close();
             tablon_respond(true, ['message' => 'Misión actualizada.', 'id' => $id]);
         }
 
         // Papel nuevo: en el hueco más libre del tablón, algo torcido.
         // Medio alto del papel en % del tablón (3:2), para que no quede cortado abajo.
-        $half = TABLON_TAMANOS[$size][1] * TABLON_PAPELES[$paper]['escala'] / TABLON_PAPELES[$paper]['ratio'] * 1.5 / 2;
+        $ratio = $paper === 0 ? $imageRatio : TABLON_PAPELES[$paper]['ratio'];
+        $half = TABLON_TAMANOS[$size][1] * ($paper === 0 ? 1 : TABLON_PAPELES[$paper]['escala']) / $ratio * 1.5 / 2;
         [$x, $y] = tablon_free_spot($db, $half);
         $rot = random_int(-40, 40) / 10;
-        tablon_exec($db, "INSERT INTO Mision (Nombre,Tipo,Estado,Descripcion,RecompensaGeneral,CreadoPor,EnTablon,Papel,Tamano,Letra,Tinta,PosX,PosY,Giro,Capa,Detalles) VALUES (?,?,'Publicada',?,?,?,1,?,?,?,?,?,?,?,?,?)",
-            [$name, $type, $text, $reward, (string)$admin['username'], $paper, $size, $font, $ink, $x, $y, $rot, tablon_next_layer($db), $details])->close();
+        tablon_exec($db, "INSERT INTO Mision (Nombre,Tipo,Estado,Descripcion,RecompensaGeneral,CreadoPor,EnTablon,Papel,Tamano,Letra,Tinta,PosX,PosY,Giro,Capa,Detalles,Clase,Imagen,ImagenRatio,Estrellas) VALUES (?,?,'Publicada',?,?,?,1,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            [$name, $type, $text, $reward, (string)$admin['username'], $paper, $size, $font, $ink, $x, $y, $rot, tablon_next_layer($db), $details, $kind, $image, $imageRatio, $stars])->close();
         $id = (int)$db->insert_id;
-        tablon_discord('📜 Nueva misión en el tablón: ' . $name, $text, [['Recompensa', $reward], ['Tipo', $type]]);
+        tablon_discord(($hunt ? '🎯 Nueva caza de cabezas: ' : '📜 Nueva misión en el tablón: ') . $name, $text, [['Recompensa', $reward], ['Tipo', $type], ['Dificultad', $hunt ? str_repeat('★', $stars) : '']]);
         tablon_respond(true, ['message' => 'Misión clavada en el tablón.', 'id' => $id]);
     }
 
@@ -212,6 +233,16 @@ try {
         $count->close();
         tablon_exec($db, "UPDATE Mision SET Estado=?,MotivoFin='' WHERE ID=?", [$hasParty ? 'En curso' : 'Publicada', $id])->close();
         tablon_respond(true, ['message' => 'El papel volvió a quedar entero.']);
+    }
+
+    // Volver a colgar en el tablón una misión descolgada (desde la Historia).
+    if ($action === 'pin') {
+        $stmt = tablon_exec($db, 'SELECT ID FROM Mision WHERE ID=? LIMIT 1', [$id]);
+        $exists = (bool)$stmt->get_result()->fetch_row();
+        $stmt->close();
+        if (!$exists) throw new RuntimeException('Esa misión ya no existe.');
+        tablon_exec($db, 'UPDATE Mision SET EnTablon=1,Capa=? WHERE ID=?', [tablon_next_layer($db), $id])->close();
+        tablon_respond(true, ['message' => 'La misión volvió al tablón.']);
     }
 
     // Descolgar: sale del tablón pero sigue en el Registro de Misiones de Archivos.

@@ -53,7 +53,12 @@
 
     // Un papel con su texto. opts.width en % del contenedor (tablón) o null (ocupa su caja).
     function paperHTML(m, {onBoard = false} = {}) {
-        const p = papers[m.paper] || S.papers[0];
+        // Caza de cabezas: imagen de la criatura + estrellas. Con papel 0 la imagen ya es el cartel.
+        const hunt = m.kind === 'caza' && !!m.image;
+        const own = hunt && m.paper === 0;
+        const p = own
+            ? {img: m.image, broken: m.image, ratio: m.imageRatio, brokenRatio: m.imageRatio, box: [5, 8, 7, 8], brokenBox: [5, 8, 7, 8], scale: 1}
+            : (papers[m.paper] || S.papers[0]);
         const broken = m.state === 'Cancelada';
         const [t, r, b, l] = broken ? p.brokenBox : p.box;
         const ratio = broken ? p.brokenRatio : p.ratio;
@@ -65,9 +70,10 @@
         const style = onBoard
             ? `--x:${m.x};--y:${m.y};--w:${((sizes[m.size] || sizes[2]).width * (p.scale || 1)).toFixed(2)};--rot:${m.rot}deg;--ratio:${ratio};z-index:${10 + m.layer}`
             : `--ratio:${ratio}`;
-        return `<div class="paper${broken ? ' is-broken' : ''} state-${esc(m.state).replace(/\s+/g, '-').toLowerCase()}${onBoard ? ' on-board' : ''}" data-id="${m.id}" style="${style}"${onBoard ? ` role="button" tabindex="0" aria-label="${esc(m.name)} · ${esc(m.state)}"` : ''}>
-            <img class="paper-img" src="${esc(broken ? p.broken : p.img)}" alt="" draggable="false">
-            <div class="paper-ink">
+        const stars = hunt ? `<div class="hunt-stars" aria-label="Dificultad ${m.stars} de ${S.maxStars}">${`<img src="${esc(S.star)}" alt="" draggable="false">`.repeat(Math.max(1, m.stars || 1))}</div>` : '';
+        const content = hunt
+            ? `<div class="paper-hunt" style="top:${t}%;right:${r}%;bottom:${b}%;left:${l}%">${own ? '' : `<img class="hunt-img" src="${esc(m.image)}" alt="" draggable="false">`}${stars}</div>`
+            : `<div class="paper-ink">
                 <div class="paper-text" style="top:${t}%;right:${r}%;bottom:${b}%;left:${l}%;font-family:${esc(font.family)};color:${esc(ink.color)}">
                     <div class="paper-fit">
                         <h3>${esc(m.name)}</h3>
@@ -75,7 +81,10 @@
                         ${m.reward ? `<p class="paper-reward">Paga: ${esc(m.reward)}</p>` : ''}
                     </div>
                 </div>
-            </div>
+            </div>`;
+        return `<div class="paper${broken ? ' is-broken' : ''}${own && broken ? ' is-torn' : ''}${hunt ? ' is-hunt' : ''} state-${esc(m.state).replace(/\s+/g, '-').toLowerCase()}${onBoard ? ' on-board' : ''}" data-id="${m.id}" style="${style}"${onBoard ? ` role="button" tabindex="0" aria-label="${esc(m.name)} · ${esc(m.state)}"` : ''}>
+            <img class="paper-img" src="${esc(broken ? p.broken : p.img)}" alt="" draggable="false">
+            ${content}
             ${shown.length ? `<div class="paper-party">${shown.map(c => `<span class="paper-face" title="${esc(c.name)}">${c.portrait ? `<img src="${esc(c.portrait)}" alt="" draggable="false" loading="lazy">` : `<b>${esc((c.short || c.name).charAt(0))}</b>`}</span>`).join('')}${party.length > shown.length ? `<span class="paper-face more">+${party.length - shown.length}</span>` : ''}</div>` : ''}
             ${stamp ? `<span class="paper-stamp ${stamp[1]}">${stamp[0]}</span>` : ''}
             ${m.state === 'En curso' ? '<span class="paper-ribbon">En curso</span>' : ''}
@@ -199,27 +208,31 @@
         return isNaN(d) ? v : d.toLocaleDateString('es-CL', {day: 'numeric', month: 'long', year: 'numeric'});
     };
 
-    function openView(id) {
-        const m = byId(id);
+    let viewing = null;   // misión abierta (puede venir de la Historia y no estar en el tablón)
+
+    function openView(idOrMission) {
+        const m = typeof idOrMission === 'object' ? idOrMission : byId(idOrMission);
         if (!m) return;
+        viewing = m;
         const dlg = $('#dlg-view');
         $('#view-paper').innerHTML = paperHTML(m);
         $('#view-state').innerHTML = `<span class="chip chip-${esc(m.state).replace(/\s+/g, '-').toLowerCase()}">${m.state === 'Cancelada' ? 'Eliminada' : esc(m.state)}</span>${m.type ? ` <span class="chip">${esc(m.type)}</span>` : ''}`;
         $('#view-title').textContent = m.name;
         $('#view-reward').innerHTML = m.reward ? `<b>Recompensa:</b> ${esc(m.reward)}` : '';
-        $('#view-details').innerHTML = `<p class="view-text">${esc(m.text)}</p>${m.details ? `<p class="view-more">${esc(m.details)}</p>` : ''}`;
+        $('#view-details').innerHTML = `${m.kind === 'caza' ? `<p class="view-stars">Dificultad: ${'★'.repeat(m.stars || 1)}${'☆'.repeat(Math.max(0, S.maxStars - (m.stars || 1)))}</p>` : ''}<p class="view-text">${esc(m.text)}</p>${m.details ? `<p class="view-more">${esc(m.details)}</p>` : ''}`;
         $('#view-party').innerHTML = m.party.length
             ? `<h3>Grupo</h3><ul>${m.party.map(c => `<li>${c.portrait ? `<img src="${esc(c.portrait)}" alt="">` : `<span class="face-fallback">${esc((c.short || c.name).charAt(0))}</span>`}<span>${esc(c.name)}${c.player ? `<small>${esc(c.player)}</small>` : ''}</span></li>`).join('')}</ul>`
             : '';
         const reasonLabel = m.state === 'Cancelada' ? 'Motivo' : 'Nota del DM';
         $('#view-reason').innerHTML = m.reason ? `<b>${reasonLabel}:</b> ${esc(m.reason)}` : '';
-        $('#view-meta').textContent = [m.createdBy ? 'Clavada por ' + m.createdBy : '', fmtDate(m.created)].filter(Boolean).join(' · ');
+        $('#view-meta').textContent = [m.createdBy ? 'Clavada por ' + m.createdBy : '', fmtDate(m.date || m.created), m.onBoard === false ? 'Ya no está en el tablón' : ''].filter(Boolean).join(' · ');
         $('#view-actions').innerHTML = S.admin ? actionsFor(m) : '';
         openDialog(dlg);
     }
 
     function actionsFor(m) {
         const b = (act, label, cls = '') => `<button type="button" class="tablon-btn ${cls}" data-act="${act}" data-id="${m.id}">${label}</button>`;
+        if (m.onBoard === false) return b('pin', '📌 Volver a colgar en el tablón', 'tablon-btn-main');
         const list = {
             'Publicada': [b('start', '⚔ Iniciar misión', 'tablon-btn-main'), b('edit', 'Editar'), b('break', 'Eliminar', 'danger')],
             'En curso': [b('finish-ok', '✔ Completada', 'tablon-btn-main'), b('finish-bad', '✘ Fallida'), b('start', 'Cambiar grupo'), b('edit', 'Editar'), b('break', 'Eliminar', 'danger')],
@@ -230,6 +243,62 @@
         return (list[m.state] || [b('edit', 'Editar'), b('unpin', 'Descolgar del tablón')]).join('');
     }
 
+    /* ---------- Historia ---------- */
+
+    let history = [];
+    let historyFilter = '';
+
+    async function loadHistory() {
+        const grid = $('#history-grid');
+        try {
+            const res = await fetch(S.historyUrl, {credentials: 'same-origin', cache: 'no-store'});
+            const data = await res.json();
+            if (!data.ok) throw new Error(data.error || 'No pude leer la historia.');
+            history = data.history || [];
+            drawHistory();
+        } catch (err) {
+            grid.innerHTML = `<p class="history-empty">${esc(err.message)}</p>`;
+        }
+    }
+
+    function drawHistory() {
+        const q = $('#history-search').value.trim().toLowerCase();
+        const list = history.filter(m => (!historyFilter || m.state === historyFilter)
+            && (!q || [m.name, m.text, m.type, ...m.party.map(c => c.name)].join(' ').toLowerCase().includes(q)));
+        const grid = $('#history-grid');
+        grid.innerHTML = list.length ? list.map(m => `<button type="button" class="history-card" data-hid="${m.id}">
+                <span class="history-paper">${paperHTML(m)}</span>
+                <span class="history-info">
+                    <strong>${esc(m.name)}</strong>
+                    <span class="chip chip-${esc(m.state).replace(/\s+/g, '-').toLowerCase()}">${m.state === 'Cancelada' ? 'Eliminada' : esc(m.state)}</span>
+                    <small>${esc(fmtDate(m.date || m.updated))}${m.party.length ? ' · ' + esc(m.party.map(c => c.short || c.name).join(', ')) : ''}</small>
+                </span>
+            </button>`).join('')
+            : `<p class="history-empty">${history.length ? 'Ninguna misión coincide con la búsqueda.' : 'Todavía no hay misiones terminadas.'}</p>`;
+        requestAnimationFrame(() => fitAll(grid));
+    }
+
+    function setupHistory() {
+        $('#tablon-history').addEventListener('click', () => {
+            $('#history-grid').innerHTML = '<p class="history-empty">Cargando…</p>';
+            $('#dlg-history').showModal();
+            loadHistory();
+        });
+        $('#history-filter').addEventListener('click', e => {
+            const btn = e.target.closest('[data-filter]');
+            if (!btn) return;
+            historyFilter = btn.dataset.filter;
+            document.querySelectorAll('#history-filter [data-filter]').forEach(b => b.setAttribute('aria-pressed', String(b === btn)));
+            drawHistory();
+        });
+        $('#history-search').addEventListener('input', drawHistory);
+        $('#history-grid').addEventListener('click', e => {
+            const card = e.target.closest('[data-hid]');
+            const m = card && history.find(x => x.id === +card.dataset.hid);
+            if (m) openView(m);
+        });
+    }
+
     /* ---------- Acciones del DM ---------- */
 
     function setupAdmin() {
@@ -238,9 +307,10 @@
         $('#view-actions').addEventListener('click', e => {
             const btn = e.target.closest('[data-act]');
             if (!btn) return;
-            const m = byId(+btn.dataset.id);
+            const m = byId(+btn.dataset.id) || (viewing && viewing.id === +btn.dataset.id ? viewing : null);
             if (!m) return;
             const act = btn.dataset.act;
+            if (act === 'pin') run(() => api('pin', {id: m.id}), [m.id, 'pin']);
             if (act === 'edit') { $('#dlg-view').close(); openEdit(m); }
             if (act === 'start') { $('#dlg-view').close(); openStart(m); }
             if (act === 'break') ask({
@@ -279,6 +349,7 @@
                 $('#dlg-view').close();
                 if (a.anim) animate[a.anim[0]] = a.anim[1];
                 await reload();
+                if ($('#dlg-history').open) loadHistory();
                 toast(r.message || 'Listo.');
             } catch (err) {
                 showError($('#ask-error'), err.message);
@@ -308,6 +379,7 @@
             $('#dlg-view').close();
             if (anim) animate[anim[0]] = anim[1];
             await reload();
+            if ($('#dlg-history').open) loadHistory();
             toast(r.message || 'Listo.');
         } catch (err) {
             toast(err.message);
@@ -315,6 +387,26 @@
     }
 
     /* Ingresar / editar */
+
+    // Achica la imagen en el navegador antes de subirla (máx. 1000 × 1500, WebP con
+    // transparencia): así una ilustración pesada no choca con el límite de subida del hosting.
+    async function shrinkImage(file) {
+        try {
+            const bmp = await createImageBitmap(file);
+            const scale = Math.min(1, 1000 / bmp.width, 1500 / bmp.height);
+            const canvas = document.createElement('canvas');
+            canvas.width = Math.round(bmp.width * scale);
+            canvas.height = Math.round(bmp.height * scale);
+            canvas.getContext('2d').drawImage(bmp, 0, 0, canvas.width, canvas.height);
+            let blob = await new Promise(ok => canvas.toBlob(ok, 'image/webp', 0.88));
+            // Navegadores sin WebP devuelven PNG.
+            if (!blob) blob = await new Promise(ok => canvas.toBlob(ok, 'image/png'));
+            if (!blob || blob.size >= file.size) return file;
+            return new File([blob], 'caza.' + (blob.type === 'image/webp' ? 'webp' : 'png'), {type: blob.type});
+        } catch (e) {
+            return file;   // si el navegador no puede, se sube tal cual
+        }
+    }
 
     let draft = null;
 
@@ -326,11 +418,45 @@
                 const btn = e.target.closest(`[data-${key}]`);
                 if (!btn) return;
                 const v = btn.dataset[key];
-                draft[key] = key === 'size' || key === 'paper' ? +v : v;
+                draft[key] = key === 'size' || key === 'paper' || key === 'stars' ? +v : v;
                 syncEdit();
             });
         };
-        seg($('#paper-choices'), S.papers, 'paper', p => `<img src="${esc(p.img)}" alt=""><span>${esc(p.name)}</span>`);
+        // Papel 0 = «Cartel propio»: solo en cazas, la imagen subida es el cartel completo.
+        seg($('#paper-choices'), [...S.papers, {id: 0, name: 'Cartel propio'}], 'paper', p => p.id === 0
+            ? `<span class="own-poster" aria-hidden="true">🖼</span><span>${esc(p.name)}</span>`
+            : `<img src="${esc(p.img)}" alt=""><span>${esc(p.name)}</span>`);
+        seg($('#kind-choices'), [{id: 'aviso', label: '📜 Aviso'}, {id: 'caza', label: '🎯 Caza de cabezas'}], 'kind', k => k.label);
+        const starItems = Array.from({length: S.maxStars}, (_, i) => ({id: i + 1}));
+        seg($('#star-choices'), starItems, 'stars', s => `${'★'.repeat(s.id)}`);
+
+        // Subir la imagen de la criatura apenas se elige.
+        form.image.addEventListener('change', async () => {
+            const file = form.image.files[0];
+            if (!file) return;
+            const status = $('#hunt-upload');
+            status.hidden = false;
+            status.textContent = 'Subiendo imagen…';
+            const fd = new FormData();
+            fd.set('action', 'image');
+            fd.set('csrf', S.csrf);
+            fd.set('name', draft.name || file.name.replace(/\.[^.]+$/, ''));
+            fd.set('image', await shrinkImage(file));
+            try {
+                const res = await fetch(S.api, {method: 'POST', body: fd, credentials: 'same-origin'});
+                let data = null;
+                try { data = await res.json(); } catch (e) { /* respuesta vacía */ }
+                if (!data || !data.ok) throw new Error(data && data.error ? data.error : 'No se pudo subir la imagen. Puede que pese demasiado.');
+                draft.imagePath = data.path;
+                draft.image = data.url;
+                draft.imageRatio = data.ratio;
+                status.textContent = 'Imagen lista ✔';
+                drawPreview();
+            } catch (ex) {
+                status.textContent = ex.message;
+            }
+            form.image.value = '';
+        });
         seg($('#size-choices'), S.sizes, 'size', s => esc(s.name));
         seg($('#font-choices'), S.fonts, 'font', f => `<span style="font-family:${esc(f.family)}">${esc(f.name)}</span>`);
         seg($('#ink-choices'), S.inks, 'ink', i => `<i style="background:${esc(i.color)}"></i>${esc(i.name)}`);
@@ -345,11 +471,13 @@
         form.addEventListener('submit', async e => {
             e.preventDefault();
             const err = $('#edit-error');
-            if (!draft.name.trim() || !draft.text.trim()) return showError(err, 'Falta el título o el texto del papel.');
+            const hunt = draft.kind === 'caza';
+            if (hunt && !draft.imagePath) return showError(err, 'Sube la imagen de la criatura.');
+            if (!draft.name.trim() || (!hunt && !draft.text.trim())) return showError(err, hunt ? 'Falta el nombre de la criatura.' : 'Falta el título o el texto del papel.');
             const btn = $('#edit-submit');
             btn.disabled = true;
             try {
-                const r = await api('save', {id: draft.id, name: draft.name, text: draft.text, reward: draft.reward, type: draft.type, details: draft.details, paper: draft.paper, size: draft.size, font: draft.font, ink: draft.ink});
+                const r = await api('save', {id: draft.id, name: draft.name, text: draft.text, reward: draft.reward, type: draft.type, details: draft.details, paper: draft.paper, size: draft.size, font: draft.font, ink: draft.ink, kind: draft.kind, image: draft.imagePath || '', stars: draft.stars});
                 $('#dlg-edit').close();
                 animate[r.id] = draft.id ? '' : 'pin';
                 await reload();
@@ -363,7 +491,9 @@
     }
 
     function openEdit(m) {
-        draft = m ? {...m} : {id: 0, name: '', text: '', reward: '', type: '', details: '', paper: 1, size: 2, font: 'pluma', ink: 'negra', state: 'Publicada', party: []};
+        draft = m ? {...m} : {id: 0, kind: 'aviso', name: '', text: '', reward: '', type: '', details: '', paper: 1, size: 2, font: 'pluma', ink: 'negra', image: '', imagePath: '', imageRatio: 1, stars: 1, state: 'Publicada', party: []};
+        if (!draft.stars) draft.stars = 1;
+        $('#hunt-upload').hidden = true;
         const form = $('#edit-form');
         for (const k of ['name', 'text', 'reward', 'type', 'details']) form[k].value = draft[k] || '';
         $('#edit-title').textContent = m ? 'Editar misión' : 'Ingresar misión';
@@ -376,7 +506,16 @@
     }
 
     function syncEdit() {
-        for (const key of ['paper', 'size', 'font', 'ink']) {
+        const hunt = draft.kind === 'caza';
+        // «Cartel propio» solo existe en las cazas.
+        if (!hunt && draft.paper === 0) draft.paper = 1;
+        $('#hunt-fields').hidden = !hunt;
+        document.querySelectorAll('#dlg-edit .text-only').forEach(el => { el.hidden = hunt; });
+        $('#paper-choices [data-paper="0"]').hidden = !hunt;
+        $('#name-label').textContent = hunt ? 'Nombre de la criatura' : 'Título';
+        $('#text-label').textContent = hunt ? 'Descripción (se ve al abrir la misión)' : 'Texto del papel';
+        $('#text-req').hidden = hunt;
+        for (const key of ['paper', 'size', 'font', 'ink', 'kind', 'stars']) {
             document.querySelectorAll(`[data-${key}]`).forEach(b => b.setAttribute('aria-pressed', String(b.dataset[key] === String(draft[key]))));
         }
         drawPreview();
@@ -384,13 +523,17 @@
 
     function drawPreview() {
         const stage = $('#edit-preview');
-        const preview = {...draft, name: draft.name || 'Título de la misión', text: draft.text || 'Aquí va el texto del papel…', state: draft.id ? draft.state : 'Publicada'};
+        const hunt = draft.kind === 'caza';
+        const preview = {...draft, name: draft.name || (hunt ? 'Nombre de la criatura' : 'Título de la misión'), text: draft.text || (hunt ? 'Sube la imagen de la criatura para verla aquí.' : 'Aquí va el texto del papel…'), state: draft.id ? draft.state : 'Publicada'};
+        // Sin imagen todavía, «Cartel propio» se muestra con el primer papel.
+        if (hunt && !draft.image && preview.paper === 0) preview.paper = 1;
         stage.innerHTML = paperHTML(preview);
         // La vista previa respeta el tamaño elegido: más chico = menos espacio para el texto.
         const el = stage.querySelector('.paper');
-        el.style.width = Math.min(100, sizes[draft.size].width * (papers[draft.paper].scale || 1) / sizes[3].width * 100) + '%';
+        const scale = preview.paper === 0 ? 1 : (papers[preview.paper].scale || 1);
+        el.style.width = Math.min(100, sizes[draft.size].width * scale / sizes[3].width * 100) + '%';
         const ratio = fit(el);
-        $('#edit-warn').hidden = ratio === null || ratio > 0.045 || !draft.text;
+        $('#edit-warn').hidden = hunt || ratio === null || ratio > 0.045 || !draft.text;
     }
 
     /* Iniciar misión: arrastrar personajes */
@@ -545,6 +688,7 @@
 
     drawBoard();
     setupBoardPointer();
+    setupHistory();
     if (S.admin) setupAdmin();
     // Las letras de Google llegan después: se vuelve a ajustar el texto.
     if (document.fonts) {

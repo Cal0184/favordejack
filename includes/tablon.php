@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/assets.php';
+require_once __DIR__ . '/imagenes.php';
 
 /*
  * Tablón de misiones.
@@ -15,6 +16,10 @@ require_once __DIR__ . '/assets.php';
  *   Giro, Capa      inclinación en grados y cuál va encima
  *   Detalles        texto largo que se ve al abrir la misión (no va en el papel)
  *   MotivoFin       por qué se rompió (o nota al terminarla)
+ *   Clase           'aviso' (texto) o 'caza' (caza de cabezas: imagen + estrellas)
+ *   Imagen          la criatura (media/cazas/…); con Papel 0 es el cartel completo
+ *   ImagenRatio     ancho/alto de esa imagen
+ *   Estrellas       dificultad de la caza, 1 a 5
  *
  * Estados: Publicada (recién clavada) → En curso (al iniciarla) → Completada o
  * Fallida. Cancelada = papel roto.
@@ -45,6 +50,11 @@ const TABLON_LETRAS = [
 ];
 const TABLON_TINTAS = ['negra' => ['Negra', '#24160c'], 'roja' => ['Roja', '#8e1d16'], 'sepia' => ['Sepia', '#5b3416']];
 const TABLON_ESTADOS = ['Publicada', 'En curso', 'Completada', 'Fallida', 'Cancelada'];
+/** Estados que ya pasaron (van a la Historia). */
+const TABLON_TERMINADAS = ['Completada', 'Fallida', 'Cancelada'];
+const TABLON_MAX_ESTRELLAS = 5;
+/** Carpeta de las imágenes de las cazas (viaja en el respaldo con el resto de media/). */
+const TABLON_CAZAS_DIR = 'media/cazas';
 /** Jugadores que no son personas (contenedores de la Banca). */
 const TABLON_JUGADORES_OCULTOS = ['J011', 'J012', 'J013'];
 
@@ -74,7 +84,7 @@ function tablon_papeles(): array
 /** Agrega las columnas del tablón a Mision (una sola vez). */
 function tablon_ensure_schema(mysqli $db): void
 {
-    $flag = $db->query("SELECT Valor FROM FavorMeta WHERE Clave='tablon_v1' LIMIT 1");
+    $flag = $db->query("SELECT Valor FROM FavorMeta WHERE Clave='tablon_v2' LIMIT 1");
     $done = $flag && $flag->fetch_assoc();
     if ($flag) $flag->free();
     if ($done) return;
@@ -91,6 +101,10 @@ function tablon_ensure_schema(mysqli $db): void
         'Capa' => "int unsigned NOT NULL DEFAULT 0",
         'Detalles' => "text NULL",
         'MotivoFin' => "varchar(500) NOT NULL DEFAULT ''",
+        'Clase' => "varchar(10) NOT NULL DEFAULT 'aviso'",
+        'Imagen' => "varchar(300) NOT NULL DEFAULT ''",
+        'ImagenRatio' => "decimal(6,4) NOT NULL DEFAULT 1",
+        'Estrellas' => "tinyint unsigned NOT NULL DEFAULT 0",
     ];
     $existing = [];
     $res = $db->query('SHOW COLUMNS FROM Mision');
@@ -100,19 +114,35 @@ function tablon_ensure_schema(mysqli $db): void
         if (!isset($existing[$name])) $db->query("ALTER TABLE Mision ADD COLUMN `$name` $definition");
     }
     if (!isset($existing['EnTablon'])) $db->query('ALTER TABLE Mision ADD INDEX idx_mision_tablon (EnTablon)');
-    $db->query("INSERT INTO FavorMeta (Clave,Valor) VALUES ('tablon_v1','ok') ON DUPLICATE KEY UPDATE Valor='ok'");
+    $db->query("INSERT INTO FavorMeta (Clave,Valor) VALUES ('tablon_v2','ok') ON DUPLICATE KEY UPDATE Valor='ok'");
 }
 
 /** Misiones clavadas en el tablón, con su grupo. */
 function tablon_misiones(mysqli $db): array
 {
+    return tablon_cargar($db, 'EnTablon=1', 'Capa, ID');
+}
+
+/** Misiones que ya pasaron (terminadas o eliminadas), estén o no en el tablón. */
+function tablon_historia(mysqli $db): array
+{
+    $states = "'" . implode("','", TABLON_TERMINADAS) . "'";
+    return tablon_cargar($db, "Estado IN ($states)", 'COALESCE(Fecha, DATE(Actualizado)) DESC, ID DESC LIMIT 400');
+}
+
+/** $where y $order son texto fijo del código, nunca del navegador. */
+function tablon_cargar(mysqli $db, string $where, string $order): array
+{
     $missions = [];
     $res = $db->query(
-        'SELECT ID,Nombre,Fecha,Tipo,Estado,Descripcion,RecompensaGeneral,CreadoPor,Creado,Papel,Tamano,Letra,Tinta,PosX,PosY,Giro,Capa,Detalles,MotivoFin '
-        . 'FROM Mision WHERE EnTablon=1 ORDER BY Capa, ID'
+        'SELECT ID,Nombre,Fecha,Tipo,Estado,Descripcion,RecompensaGeneral,CreadoPor,Creado,Actualizado,EnTablon,Papel,Tamano,Letra,Tinta,PosX,PosY,Giro,Capa,Detalles,MotivoFin,Clase,Imagen,ImagenRatio,Estrellas '
+        . "FROM Mision WHERE $where ORDER BY $order"
     );
     while ($r = $res->fetch_assoc()) {
         $id = (int)$r['ID'];
+        $hunt = $r['Clase'] === 'caza' && $r['Imagen'] !== '';
+        $paper = (int)$r['Papel'];
+        if (!isset(TABLON_PAPELES[$paper]) && !($hunt && $paper === 0)) $paper = 1;
         $missions[$id] = [
             'id' => $id,
             'name' => (string)$r['Nombre'],
@@ -125,7 +155,14 @@ function tablon_misiones(mysqli $db): array
             'reason' => (string)$r['MotivoFin'],
             'createdBy' => (string)$r['CreadoPor'],
             'created' => (string)$r['Creado'],
-            'paper' => isset(TABLON_PAPELES[(int)$r['Papel']]) ? (int)$r['Papel'] : 1,
+            'updated' => (string)$r['Actualizado'],
+            'onBoard' => (bool)$r['EnTablon'],
+            'kind' => $hunt ? 'caza' : 'aviso',
+            'image' => $hunt ? favor_asset_url((string)$r['Imagen']) : '',
+            'imagePath' => $hunt ? (string)$r['Imagen'] : '',
+            'imageRatio' => (float)$r['ImagenRatio'] ?: 1.0,
+            'stars' => max(0, min(TABLON_MAX_ESTRELLAS, (int)$r['Estrellas'])),
+            'paper' => $paper,
             'size' => isset(TABLON_TAMANOS[(int)$r['Tamano']]) ? (int)$r['Tamano'] : 2,
             'font' => isset(TABLON_LETRAS[(string)$r['Letra']]) ? (string)$r['Letra'] : 'pluma',
             'ink' => isset(TABLON_TINTAS[(string)$r['Tinta']]) ? (string)$r['Tinta'] : 'negra',
@@ -156,6 +193,53 @@ function tablon_misiones(mysqli $db): array
     }
     $res->free();
     return array_values($missions);
+}
+
+/** Guarda la imagen subida de una caza en media/cazas/ (WebP, con transparencia). */
+function tablon_guardar_imagen(array $file, string $name): array
+{
+    $error = (int)($file['error'] ?? UPLOAD_ERR_NO_FILE);
+    if ($error === UPLOAD_ERR_NO_FILE) throw new RuntimeException('Elige una imagen.');
+    if ($error === UPLOAD_ERR_INI_SIZE || $error === UPLOAD_ERR_FORM_SIZE) throw new RuntimeException('La imagen pesa demasiado para el servidor. Prueba con una más liviana.');
+    if ($error !== UPLOAD_ERR_OK) throw new RuntimeException('No se pudo subir la imagen (código ' . $error . ').');
+    $tmp = (string)($file['tmp_name'] ?? '');
+    if ($tmp === '' || !is_uploaded_file($tmp)) throw new RuntimeException('La imagen no es válida.');
+    if ((int)($file['size'] ?? 0) > 15 * 1024 * 1024) throw new RuntimeException('La imagen debe pesar menos de 15 MB.');
+    $info = @getimagesize($tmp);
+    $types = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp'];
+    if ($info === false || !isset($types[(string)$info['mime']])) throw new RuntimeException('Usa una imagen JPG, PNG o WebP.');
+
+    $dir = dirname(__DIR__) . '/' . TABLON_CAZAS_DIR;
+    if (!is_dir($dir) && !@mkdir($dir, 0755, true) && !is_dir($dir)) throw new RuntimeException('No pude crear la carpeta ' . TABLON_CAZAS_DIR . '/.');
+    if (!is_writable($dir)) throw new RuntimeException('La carpeta ' . TABLON_CAZAS_DIR . '/ no tiene permiso de escritura.');
+
+    $slug = strtolower((string)(function_exists('iconv') ? @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $name) : $name));
+    $slug = trim((string)preg_replace('/[^a-z0-9]+/', '-', $slug), '-') ?: 'caza';
+    $slug = substr($slug, 0, 40) . '-' . bin2hex(random_bytes(3));
+
+    if (favor_image_gd_ready() && ($img = favor_image_open($tmp)) !== null) {
+        $img = favor_image_fit($img, 1000, 1500);
+        $w = imagesx($img);
+        $h = imagesy($img);
+        $rel = TABLON_CAZAS_DIR . '/' . $slug . '.webp';
+        if (!favor_image_save($img, dirname(__DIR__) . '/' . $rel, 86)) throw new RuntimeException('No pude guardar la imagen.');
+        imagedestroy($img);
+    } else {
+        // Sin GD se guarda tal cual.
+        [$w, $h] = [(int)$info[0], (int)$info[1]];
+        $rel = TABLON_CAZAS_DIR . '/' . $slug . '.' . $types[(string)$info['mime']];
+        if (!@move_uploaded_file($tmp, dirname(__DIR__) . '/' . $rel)) throw new RuntimeException('No pude guardar la imagen.');
+        @chmod(dirname(__DIR__) . '/' . $rel, 0644);
+    }
+    return ['path' => $rel, 'url' => favor_asset_url($rel), 'ratio' => round($w / max(1, $h), 4)];
+}
+
+/** Ruta de imagen de caza que viene del navegador: solo archivos de media/cazas/ que existen. */
+function tablon_imagen_valida(string $path): string
+{
+    $path = trim($path);
+    if (!preg_match('#^media/cazas/[a-z0-9\-]+\.(?:webp|png|jpg)$#', $path)) return '';
+    return is_file(dirname(__DIR__) . '/' . $path) ? $path : '';
 }
 
 /** Jugadores con sus personajes, para armar el grupo al iniciar una misión. */

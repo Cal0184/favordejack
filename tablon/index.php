@@ -29,10 +29,20 @@ if ($user) {
     }
 }
 
-// Solo los datos del tablón, para refrescarlo sin recargar la página.
-if ($user && isset($_GET['datos'])) {
+// Solo los datos del tablón (o de la Historia), para refrescar sin recargar la página.
+if ($user && (isset($_GET['datos']) || isset($_GET['historia']))) {
     header('Content-Type: application/json; charset=utf-8');
-    echo json_encode(['ok' => $error === '', 'missions' => $missions, 'error' => $error], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    $out = ['ok' => $error === '', 'missions' => $missions, 'error' => $error];
+    if (isset($_GET['historia']) && $error === '') {
+        try {
+            $db = favor_db();
+            $out['history'] = tablon_historia($db);
+            $db->close();
+        } catch (Throwable $e) {
+            $out = ['ok' => false, 'error' => 'No pude leer la historia: ' . $e->getMessage()];
+        }
+    }
+    echo json_encode($out, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     exit;
 }
 
@@ -53,6 +63,9 @@ $boot = [
     'csrf' => $csrf,
     'api' => favor_url('tablon/api.php'),
     'data' => favor_url('tablon/?datos=1'),
+    'historyUrl' => favor_url('tablon/?historia=1'),
+    'star' => favor_static('tablon/papeles/estrella.webp'),
+    'maxStars' => TABLON_MAX_ESTRELLAS,
     'papers' => tablon_papeles(),
     'sizes' => $sizes,
     'fonts' => $fonts,
@@ -87,6 +100,7 @@ $boot = [
         <?php if ($user): ?>
         <div class="tablon-tools">
             <p class="tablon-counts" id="tablon-counts" aria-live="polite"></p>
+            <button type="button" class="tablon-btn" id="tablon-history">📜 Historia</button>
             <?php if ($isAdmin): ?>
                 <button type="button" class="tablon-btn tablon-btn-main" id="tablon-new">＋ Ingresar misión</button>
             <?php endif; ?>
@@ -134,18 +148,52 @@ $boot = [
     <button type="button" class="dlg-close" data-close aria-label="Cerrar">×</button>
 </dialog>
 
+<!-- Historia: misiones que ya pasaron -->
+<dialog class="tablon-dialog dlg-wide" id="dlg-history" aria-labelledby="history-title">
+    <div class="dlg-body">
+        <h2 id="history-title">Historia del tablón</h2>
+        <p class="history-hint">Misiones completadas, fallidas y eliminadas, aunque ya no estén clavadas. Toca una para verla en grande.</p>
+        <div class="history-tools">
+            <div class="seg" id="history-filter" role="group" aria-label="Filtrar por estado">
+                <button type="button" data-filter="" aria-pressed="true">Todas</button>
+                <button type="button" data-filter="Completada" aria-pressed="false">Completadas</button>
+                <button type="button" data-filter="Fallida" aria-pressed="false">Fallidas</button>
+                <button type="button" data-filter="Cancelada" aria-pressed="false">Eliminadas</button>
+            </div>
+            <input type="search" id="history-search" placeholder="Buscar misión o personaje…" aria-label="Buscar en la historia">
+        </div>
+        <div class="history-grid" id="history-grid" aria-live="polite"></div>
+    </div>
+    <button type="button" class="dlg-close" data-close aria-label="Cerrar">×</button>
+</dialog>
+
 <?php if ($isAdmin): ?>
 <!-- Ingresar / editar misión -->
 <dialog class="tablon-dialog dlg-wide" id="dlg-edit" aria-labelledby="edit-title">
     <form class="dlg-body dlg-edit" id="edit-form" novalidate>
         <div class="edit-fields">
             <h2 id="edit-title">Ingresar misión</h2>
+            <fieldset>
+                <legend>Tipo de misión</legend>
+                <div class="seg" id="kind-choices">
+                    <button type="button" data-kind="aviso" aria-pressed="true">📜 Aviso</button>
+                    <button type="button" data-kind="caza" aria-pressed="false">🎯 Caza de cabezas</button>
+                </div>
+            </fieldset>
+            <div class="hunt-fields" id="hunt-fields" hidden>
+                <label>Imagen de la criatura <span class="req">*</span>
+                    <input type="file" name="image" accept="image/png,image/jpeg,image/webp">
+                    <small>PNG con fondo transparente o una ilustración. También puedes subir un cartel completo y elegir el papel «Cartel propio».</small>
+                </label>
+                <p class="hunt-upload" id="hunt-upload" role="status" hidden></p>
+                <fieldset><legend>Dificultad</legend><div class="seg stars-seg" id="star-choices"></div></fieldset>
+            </div>
             <fieldset class="edit-papers">
                 <legend>Papel</legend>
                 <div class="paper-choices" id="paper-choices"></div>
             </fieldset>
-            <label>Título <span class="req">*</span><input name="name" maxlength="160" required placeholder="Ej.: Lobos en el camino de Bruschk"></label>
-            <label>Texto del papel <span class="req">*</span><textarea name="text" rows="5" maxlength="1200" required placeholder="Lo que se lee en el papel clavado."></textarea></label>
+            <label><span id="name-label">Título</span> <span class="req">*</span><input name="name" maxlength="160" required placeholder="Ej.: Lobos en el camino de Bruschk"></label>
+            <label><span id="text-label">Texto del papel</span> <span class="req" id="text-req">*</span><textarea name="text" rows="5" maxlength="1200" required placeholder="Lo que se lee en el papel clavado."></textarea></label>
             <p class="edit-warn" id="edit-warn" hidden>El texto es largo para este papel y quedará muy chico. Prueba un papel o tamaño más grande, o acórtalo.</p>
             <div class="edit-row">
                 <label>Recompensa<input name="reward" maxlength="255" placeholder="Ej.: 200 monedas de oro"></label>
@@ -154,8 +202,8 @@ $boot = [
             <label>Más detalles <small>(no va en el papel; se ve al abrir la misión)</small><textarea name="details" rows="3" maxlength="20000" placeholder="Quién la encarga, pistas, condiciones…"></textarea></label>
             <div class="edit-row edit-looks">
                 <fieldset><legend>Tamaño</legend><div class="seg" id="size-choices"></div></fieldset>
-                <fieldset><legend>Letra</legend><div class="seg" id="font-choices"></div></fieldset>
-                <fieldset><legend>Tinta</legend><div class="seg" id="ink-choices"></div></fieldset>
+                <fieldset class="text-only"><legend>Letra</legend><div class="seg" id="font-choices"></div></fieldset>
+                <fieldset class="text-only"><legend>Tinta</legend><div class="seg" id="ink-choices"></div></fieldset>
             </div>
             <p class="dlg-error" id="edit-error" role="alert" hidden></p>
             <div class="dlg-actions">
