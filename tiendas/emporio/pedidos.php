@@ -3,10 +3,10 @@ declare(strict_types=1);
 require_once __DIR__ . '/lib.php';
 
 /*
- * Pedidos a Ecix's (JSON). Crear y cancelar: cualquier jugador con sesión.
- * Cambiar el estado y responder: solo admin (desde admin.php).
- * Los pedidos viven en data/pedidos.json. Al aprobarlos se cobra en la Banca
- * y los objetos entran al Inventario (includes/compras.php).
+ * Compras en el Emporio de Ecix's (JSON). Comprar: cualquier jugador con
+ * sesión; se cobra al instante en la Banca y las cartas entran al Inventario
+ * (includes/compras.php). Cambiar el estado (anular = devolver): solo admin.
+ * Las compras viven en data/pedidos.json.
  */
 
 header('Content-Type: application/json; charset=utf-8');
@@ -71,7 +71,8 @@ try {
             else $total += $item['pricePo'] * $qty;
             $items[] = $item;
         }
-        if (!$items) throw new RuntimeException('El pedido está vacío.');
+        if (!$items) throw new RuntimeException('El carrito está vacío.');
+        if ($unknown) throw new RuntimeException('Algo del carrito no tiene precio: quítalo y pregúntale a Ecix\'s por Discord.');
 
         $now = date('c');
         $orderId = 'p' . date('ymd') . '-' . bin2hex(random_bytes(3));
@@ -102,33 +103,40 @@ try {
             'id' => $orderId,
             'created' => $now,
             'updated' => $now,
-            'state' => 'pendiente',
+            'state' => 'entregado',
             'userId' => (int)$user['id'],
             'username' => (string)$user['username'],
-            'playerName' => (string)$user['displayName'],
+            'playerName' => (string)$character['playerName'] ?: (string)$user['displayName'],
             'characterId' => $character['id'],
             'characterName' => $character['name'],
             'characterGold' => $character['goldExact'],
             'items' => $items,
-            'total' => $unknown && $total === 0 ? null : $total,
+            'total' => $total,
             'note' => mb_substr(trim((string)($input['note'] ?? '')), 0, 500, 'UTF-8'),
             'reply' => '',
         ] + ($discount ? ['discount' => $discount] : []);
 
+        // Compra al instante: se cobra en la Banca y entra al Inventario. Si
+        // algo falla, no queda nada a medias (ni el oro, ni el descuento).
+        $by = (string)($user['displayName'] ?? $user['username']);
         try {
-            emporio_update_json(EMPORIO_ORDERS_FILE, static function (array $orders) use ($order, $user): array {
-                $orders = array_values(array_filter($orders, 'is_array'));
-                $open = array_filter($orders, static fn(array $o): bool => (int)($o['userId'] ?? 0) === (int)$user['id'] && ($o['state'] ?? '') === 'pendiente');
-                if (count($open) >= 10) throw new RuntimeException('Tienes 10 pedidos pendientes. Espera a que Ecix\'s responda alguno.');
-                $orders[] = $order;
-                return $orders;
-            });
+            $notice = emporio_order_charge_sync($order, null, $by);
+            try {
+                emporio_update_json(EMPORIO_ORDERS_FILE, static function (array $orders) use ($order): array {
+                    $orders = array_values(array_filter($orders, 'is_array'));
+                    $orders[] = $order;
+                    return $orders;
+                });
+            } catch (Throwable $e) {
+                favor_purchase_refund($order['characterId'], $order['charge'], 'Compra deshecha (no se pudo registrar)', $by);
+                throw $e;
+            }
         } catch (Throwable $e) {
-            // El pedido no se guardó: el descuento no se gastó.
-            if ($discount) favor_discount_restore(EMPORIO_DISCOUNT_SHOP, $buyer, (string)$user['username'], $orderId, 'pedido cancelado');
+            if ($discount) favor_discount_restore(EMPORIO_DISCOUNT_SHOP, $buyer, (string)$user['username'], $orderId, 'compra fallida');
             throw $e;
         }
-        out(['ok' => true, 'order' => emporio_order_public($order)]);
+        emporio_order_announce($order);
+        out(['ok' => true, 'order' => emporio_order_public($order), 'notice' => $notice]);
     }
 
     if ($action === 'state') {

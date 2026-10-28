@@ -254,7 +254,7 @@
                     ${stats ? `<div class="detail-stats">${stats}</div>` : ''}
                     ${properties}
                     <div class="detail-description">${descriptionHtml(product)}</div>
-                    <div class="detail-note"><strong>Nota del mostrador:</strong> esta ficha es informativa. Aún no descuenta dinero de la Banca Digital ni modifica el stock compartido.</div>
+                    ${window.FavorCompra?FavorCompra.html(product):''}
                 </div>
             </article>`;
         bindImageFallbacks(modalContent);

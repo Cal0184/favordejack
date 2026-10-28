@@ -1,7 +1,9 @@
 <?php
 declare(strict_types=1);
 require_once dirname(__DIR__, 2) . '/includes/auth-widget.php';
+require_once dirname(__DIR__, 2) . '/includes/tiendas.php';
 favor_session_start();
+$compra = favor_tienda_client($GLOBALS['__favor_auth_widget_user'] ?? null, 'varita-economica');
 
 $productsPath = __DIR__ . '/productos.json';
 $products = [];
@@ -255,6 +257,8 @@ $shopData = [
 <div class="toast" id="toast" aria-live="polite"></div>
 
 <script id="shopData" type="application/json"><?= json_encode($shopData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP) ?></script>
+<script id="favorCompra" type="application/json"><?= json_encode($compra, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP) ?></script>
+<script src="../compra.js<?= favor_v(dirname(__DIR__) . '/compra.js') ?>" defer></script>
 <script src="app.js<?= favor_v(__DIR__ . '/app.js') ?>" defer></script>
 </body>
 </html>

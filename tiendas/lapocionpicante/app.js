@@ -29,14 +29,14 @@ let favorites=loadFavorites();
 
 // Descuento de la tienda (lo define el DM): cada personaje lo usa una vez.
 // Se elige con qué personaje se compra; si aún lo tiene, los precios se ven
-// rebajados y la ficha de la poción permite usarlo.
+// rebajados y al comprar en la ficha se puede usar (tiendas/compra.js).
 const discount=data.discount||{};
 const buyers=Array.isArray(discount.characters)?discount.characters:[];
 const discountBar=document.getElementById('discountBar');
 let buyerId=loadBuyer();
 
 function loadBuyer(){try{const id=localStorage.getItem('lpp:buyer')||'';return buyers.some(c=>c.id===id)?id:''}catch(_){return''}}
-function saveBuyer(){try{localStorage.setItem('lpp:buyer',buyerId)}catch(_){}}
+function saveBuyer(){try{localStorage.setItem('lpp:buyer',buyerId);localStorage.setItem('favor:comprador',buyerId)}catch(_){}}
 function buyer(){return buyers.find(c=>c.id===buyerId)||null}
 function activePercent(){const b=buyer();return discount.active&&b&&b.available?Math.max(0,Math.min(100,Number(discount.percent)||0)):0}
 function dealText(){return `${Number(discount.percent)||0} %${discount.rule?' '+discount.rule:''}`}
@@ -66,38 +66,13 @@ function renderDiscountBar(){
   :buyers.map(opt).join('');
  const b=buyer();
  const state=!b?`Descuento de Yamo-Yamo: <strong>${esc(dealText())}</strong> de cada personaje. Elige con quién compras.`
-  :b.available?`<strong>${esc(b.name)}</strong> tiene ${esc(dealText())}. Abre la poción que quiera y pulsa «Usar descuento».`
+  :b.available?`<strong>${esc(b.name)}</strong> tiene ${esc(dealText())}. Abre la poción que quiera y marca «Usar su descuento» al comprar.`
   :`${esc(b.name)} ya usó su descuento${b.usedItem?` (${esc(b.usedItem)}${b.usedAt&&shortDate(b.usedAt)?', '+esc(shortDate(b.usedAt)):''})`:''}. Solo el DM puede devolvérselo.`;
  discountBar.innerHTML=`<label class="discount-pick"><span>Comprar como</span><select id="buyerSelect"><option value="">— Sin elegir —</option>${options}</select></label>
  <p class="discount-state${activePercent()?' on':''}">${state}</p>
  ${discount.admin&&discount.manageUrl?`<a class="discount-manage" href="${esc(discount.manageUrl)}">Panel de descuentos</a>`:''}`;
  discountBar.hidden=false;
  document.getElementById('buyerSelect').addEventListener('change',e=>{buyerId=e.target.value;saveBuyer();renderDiscountBar();render();if(modal?.classList.contains('open')&&openId)openProduct(openId)})
-}
-function discountBox(p){
- if(!discount.active||!buyers.length)return'';
- const b=buyer();
- if(!b)return `<div class="discount-box">Elige arriba con qué personaje compras para usar el descuento (${esc(dealText())}).</div>`;
- if(!b.available)return '';
- const d=discounted(p,Number(discount.percent)||0);
- return `<div class="discount-box on"><p><strong>${esc(b.name)}</strong> puede usar su descuento aquí${d?`: paga <b>${esc(d)}</b> en vez de ${esc(p.price)}`:''}.</p>
- <button class="discount-use" type="button" data-use-discount="${esc(p.id)}">Usar descuento en esta poción</button>
- <small>Se usa una sola vez por personaje.</small></div>`
-}
-async function useDiscount(id,btn){
- const p=products.find(x=>x.id===id),b=buyer();if(!p||!b)return;
- if(!confirm(`¿Usar el descuento de ${b.name} en ${p.name}? Después ya no lo tendrá en esta tienda.`))return;
- btn.disabled=true;btn.textContent='Guardando…';
- try{
-  const r=await fetch(discount.useUrl,{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':discount.csrf||''},body:JSON.stringify({shop:'pocion-picante',character:b.id,item:p.id})});
-  const j=await r.json().catch(()=>({ok:false,error:'El servidor no respondió bien.'}));
-  if(!j.ok)throw new Error(j.error||'No se pudo usar el descuento.');
-  b.available=false;b.usedItem=j.item;b.usedAt=new Date().toISOString();
-  renderDiscountBar();render();
-  const box=btn.closest('.discount-box');
-  if(box)box.outerHTML=`<div class="discount-box done">✓ Listo: <strong>${esc(j.character)}</strong> compra ${esc(j.item)}${j.paid?` por <b>${esc(j.paid)}</b>`:''}. Avísale al DM para que lo cobre en la Banca.</div>`;
-  toastMsg('Descuento usado');
- }catch(err){btn.disabled=false;btn.textContent='Usar descuento en esta poción';alert(err.message)}
 }
 
 function loadFavorites(){try{const x=JSON.parse(localStorage.getItem('lpp:favorites')||'[]');return new Set(Array.isArray(x)?x:[])}catch(_){return new Set()}}
@@ -168,11 +143,10 @@ function openProduct(id){
   <span class="product-category">${esc(p.majorCategory)}</span>
   <h2 id="modalTitle">${esc(p.name)}</h2>
   <div class="detail-price">${priceHtml(p)}</div>
-  ${discountBox(p)}
   <div class="detail-sub">${esc(p.subcategory)}</div>
   ${statsHtml}
   <div class="detail-description"><p>${esc(p.effect)}</p></div>
-  <div class="detail-note">Esta ficha reproduce la información del catálogo de la tienda. Las compras todavía no modifican la Banca Digital ni un stock compartido.</div>
+  ${window.FavorCompra?FavorCompra.html(p):''}
  </div></article>`;
  bindFallbacks(modalContent);
  modal.classList.add('open');modal.setAttribute('aria-hidden','false');document.body.classList.add('modal-open')
@@ -187,10 +161,11 @@ favBtn?.addEventListener('click',()=>{favoritesOnly=!favoritesOnly;render()});
 document.addEventListener('click',e=>{
  const f=e.target.closest('[data-favorite]');if(f){e.preventDefault();e.stopPropagation();toggleFavorite(f.dataset.favorite);return}
  const o=e.target.closest('[data-open]');if(o){openProduct(o.dataset.open);return}
- const u=e.target.closest('[data-use-discount]');if(u){useDiscount(u.dataset.useDiscount,u);return}
  if(e.target.closest('[data-close-modal]'))closeModal()
 });
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal?.classList.contains('open'))closeModal()});
+// Al comprar con descuento (tiendas/compra.js) el personaje ya no lo tiene.
+document.addEventListener('favor:compra',e=>{const d=e.detail||{};if(!d.discount)return;(d.buyers||[]).forEach(nb=>{const b=buyers.find(x=>x.id===nb.id);if(b&&!nb.discount)b.available=false});renderDiscountBar();render()});
 renderDiscountBar();
 render();
 })();

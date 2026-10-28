@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 /*
  * Panel del DM: todo lo del máster en una página. Solo administradores.
- *  - Pedidos por aprobar (aprobar = cobra en la Banca y pasa al Inventario)
+ *  - Últimas compras de todas las tiendas, con «Anular y devolver»
  *  - Dar o quitar oro a varios personajes a la vez
  *  - Actividad reciente de la Banca y avisos enviados a Discord
  *  - Configuración de los avisos en Discord
@@ -12,6 +12,7 @@ require_once dirname(__DIR__) . '/tiendas/emporio/lib.php';
 require_once dirname(__DIR__) . '/includes/auth-widget.php';
 require_once dirname(__DIR__) . '/includes/estado.php';
 require_once dirname(__DIR__) . '/includes/clave.php';
+require_once dirname(__DIR__) . '/includes/tiendas.php';
 
 favor_session_start();
 header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
@@ -44,6 +45,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $reply = mb_substr(trim((string)($_POST['reply'] ?? '')), 0, 500, 'UTF-8');
             [$order, $note] = emporio_order_set_state((string)($_POST['id'] ?? ''), $state, $reply, emporio_final_price($_POST['final'] ?? ''), $user);
             $notice = 'Pedido de ' . ($order['characterName'] ?? '') . ' ' . $state . '. ' . $note;
+        } elseif ($action === 'undo') {
+            $id = (string)($_POST['id'] ?? '');
+            if (($_POST['kind'] ?? '') === 'emporio') {
+                [$order, $note] = emporio_order_set_state($id, 'cancelado', null, null, $user);
+                $notice = 'Compra de ' . ($order['characterName'] ?? '') . ' en el Emporio anulada. ' . $note;
+            } else {
+                $notice = 'Compra anulada. ' . favor_tienda_undo($id, $user);
+            }
         } elseif ($action === 'gold') {
             $ids = array_values(array_filter(array_map('strval', (array)($_POST['chars'] ?? [])), 'strlen'));
             if (!$ids) throw new RuntimeException('Marca al menos un personaje.');
@@ -105,6 +114,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Datos para la página.
+// Últimas compras de todas las tiendas (Emporio + temáticas), recientes primero.
+$purchases = [];
+foreach (emporio_orders() as $o) {
+    $state = (string)($o['state'] ?? '');
+    if ($state === 'pendiente' || (!is_array($o['charge'] ?? null) && empty($o['charges']))) continue;
+    $purchases[] = [
+        'kind' => 'emporio',
+        'id' => (string)$o['id'],
+        'at' => (string)($o['created'] ?? ''),
+        'shop' => 'Emporio de Ecix\'s',
+        'character' => (string)($o['characterName'] ?? ''),
+        'player' => (string)($o['playerName'] ?? ''),
+        'items' => implode(', ', array_map(static fn($i): string => ((int)($i['qty'] ?? 1) > 1 ? (int)$i['qty'] . ' × ' : '') . (string)($i['name'] ?? ''), (array)($o['items'] ?? []))),
+        'copper' => (int)($o['charge']['copper'] ?? end($o['charges'])['copper'] ?? 0),
+        'discount' => is_array($o['discount'] ?? null) ? (int)$o['discount']['percent'] : 0,
+        'live' => is_array($o['charge'] ?? null),
+    ];
+}
+foreach (favor_compras_all() as $c) {
+    $purchases[] = [
+        'kind' => 'tienda',
+        'id' => (string)($c['id'] ?? ''),
+        'at' => (string)($c['at'] ?? ''),
+        'shop' => (string)($c['shopName'] ?? ''),
+        'character' => (string)($c['characterName'] ?? ''),
+        'player' => (string)($c['playerName'] ?? ''),
+        'items' => ((int)($c['qty'] ?? 1) > 1 ? (int)$c['qty'] . ' × ' : '') . (string)($c['item'] ?? ''),
+        'copper' => (int)($c['copper'] ?? 0),
+        'discount' => (int)($c['discount']['percent'] ?? 0),
+        'live' => ($c['state'] ?? '') === 'hecha',
+    ];
+}
+usort($purchases, static fn(array $a, array $b): int => strcmp($b['at'], $a['at']));
+$purchases = array_slice($purchases, 0, 40);
 $orders = array_values(array_filter(emporio_orders(), static fn(array $o): bool => ($o['state'] ?? '') === 'pendiente'));
 usort($orders, static fn(array $a, array $b): int => strcmp((string)($a['created'] ?? ''), (string)($b['created'] ?? '')));
 $gold = [];
@@ -240,9 +283,9 @@ ol{padding-left:22px}
 <?php favor_site_bar(); ?><div class="favor-pad">
 <main>
     <h1>Panel del DM</h1>
-    <p class="sub">Aprueba compras, reparte oro y controla los avisos de Discord desde un solo sitio.</p>
+    <p class="sub">Revisa y anula compras, reparte oro y controla los avisos de Discord desde un solo sitio.</p>
     <nav class="shortcuts" aria-label="Atajos del DM">
-        <a href="<?= e(favor_url('tiendas/emporio/admin.php?vista=pedidos')) ?>">Todos los pedidos</a>
+        <a href="#compras">Últimas compras</a>
         <a href="<?= e(favor_url('tiendas/emporio/admin.php')) ?>">Cartas del Emporio</a>
         <a href="<?= e(favor_url('tiendas/descuentos.php')) ?>">Descuentos</a>
         <a href="<?= e(favor_url('bancadigital/')) ?>">Banca</a>
@@ -256,10 +299,33 @@ ol{padding-left:22px}
     <?php if ($notice): ?><div class="msg ok" role="status"><?= e($notice) ?></div><?php endif; ?>
     <?php if ($error): ?><div class="msg err" role="alert"><?= e($error) ?></div><?php endif; ?>
 
+    <section class="card" id="compras">
+        <h2>Últimas compras</h2>
+        <p class="note">En todas las tiendas, al pulsar Comprar se cobra en la Banca y el objeto entra al Inventario. Si alguien se equivocó, pulsa <b>Anular y devolver</b>: el oro vuelve, el objeto sale del Inventario y, si usó el descuento de la tienda, lo recupera.</p>
+        <?php if (!$purchases): ?><div class="empty">Todavía no hay compras.</div><?php else: ?>
+        <div style="overflow-x:auto"><table>
+            <?php foreach ($purchases as $c): ?>
+                <tr<?= $c['live'] ? '' : ' style="opacity:.55"' ?>>
+                    <td><?= e(date('d-m H:i', strtotime($c['at']) ?: time())) ?></td>
+                    <td><b><?= e($c['character']) ?></b><br><span class="muted"><?= e($c['player']) ?></span></td>
+                    <td><?= e($c['items']) ?><br><span class="muted"><?= e($c['shop']) ?><?= $c['discount'] ? ' · ✦ ' . $c['discount'] . ' %' : '' ?></span></td>
+                    <td><?= e(favor_copper_label($c['copper'])) ?></td>
+                    <td><?php if ($c['live']): ?>
+                        <form method="post" action="#compras" onsubmit="return confirm('¿Anular esta compra? Se devuelve el oro y el objeto sale del Inventario.')">
+                            <input type="hidden" name="csrf" value="<?= e($csrf) ?>"><input type="hidden" name="action" value="undo"><input type="hidden" name="kind" value="<?= e($c['kind']) ?>"><input type="hidden" name="id" value="<?= e($c['id']) ?>">
+                            <button class="danger" type="submit">Anular y devolver</button>
+                        </form>
+                    <?php else: ?><span class="muted">Anulada</span><?php endif; ?></td>
+                </tr>
+            <?php endforeach; ?>
+        </table></div>
+        <?php endif; ?>
+    </section>
+
+    <?php if ($orders): ?>
     <section class="card" id="pedidos">
-        <h2>Pedidos por aprobar <?php if ($orders): ?><span class="badge"><?= count($orders) ?></span><?php endif; ?></h2>
-        <p class="note">Al <b>aprobar</b>, el precio se cobra solo en la Banca y los objetos entran al Inventario del personaje. Si no le alcanza, el pedido no se aprueba y te lo digo.</p>
-        <?php if (!$orders): ?><div class="empty">No hay pedidos pendientes. 🎉</div><?php endif; ?>
+        <h2>Pedidos antiguos por aprobar <?php if ($orders): ?><span class="badge"><?= count($orders) ?></span><?php endif; ?></h2>
+        <p class="note">Pedidos del Emporio que se hicieron antes de las compras al instante. Al <b>aprobar</b>, se cobra en la Banca y los objetos entran al Inventario.</p>
         <?php foreach ($orders as $o): $p = emporio_order_public($o); $has = $gold[(string)($o['characterId'] ?? '')] ?? null; ?>
             <article class="order">
                 <div>
@@ -285,6 +351,7 @@ ol{padding-left:22px}
             </article>
         <?php endforeach; ?>
     </section>
+    <?php endif; ?>
 
     <section class="card" id="oro">
         <h2>Dar o quitar oro</h2>

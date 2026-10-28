@@ -34,9 +34,9 @@ const EMPORIO_SAME_ART = 1.0;
 const EMPORIO_ORDER_STATES = [
     'pendiente' => 'Pendiente',
     'aprobado' => 'Aprobado',
-    'entregado' => 'Entregado',
+    'entregado' => 'Comprado',
     'rechazado' => 'Rechazado',
-    'cancelado' => 'Cancelado',
+    'cancelado' => 'Anulado',
 ];
 
 function e(string $value): string

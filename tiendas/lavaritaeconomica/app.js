@@ -106,7 +106,7 @@ function openProduct(id){
    ${stats}${tagHtml}
    <div class="detail-description"><p>${esc(p.description||'Sin descripción disponible.')}</p>${detailSections(p)}</div>
    ${p.sellerNote?`<div class="detail-note">${esc(p.sellerNote)}</div>`:''}
-   <div class="detail-note">Catálogo informativo. Las compras aún no descuentan dinero de la Banca Digital ni alteran stock compartido.</div>
+   ${window.FavorCompra?FavorCompra.html(p):''}
  </div></article>`;
  bindFallbacks(modalContent);
  modal.classList.add('open');modal.setAttribute('aria-hidden','false');document.body.classList.add('modal-open')
