@@ -70,8 +70,9 @@
         return path.startsWith('media/') ? FAVOR_BASE + path : value;
     }
 
-    function imageHtml(character, extra = '') {
-        const src = resolveAssetSrc(character?.portrait || character?.icon || '');
+    // Tarjetas y listas usan la miniatura (thumb); el expediente abierto, el retrato entero.
+    function imageHtml(character, extra = '', full = false) {
+        const src = resolveAssetSrc((full ? '' : character?.thumb) || character?.portrait || character?.icon || '');
         if (!src) return `<div class="placeholder-art ${extra}" aria-hidden="true">✦</div>`;
         return `<img class="${extra}" src="${esc(src)}" alt="${esc(character.name || '')}" loading="lazy" onerror="this.outerHTML='<div class=&quot;placeholder-art&quot; aria-hidden=&quot;true&quot;>✦</div>'">`;
     }
@@ -263,7 +264,7 @@
         const text = c.biography || c.description;
         characterModalContent.innerHTML = `
             <div class="folio-grid">
-                <div class="folio-art${isActiveCharacter(c) ? '' : ' is-inactive'}">${imageHtml(c)}</div>
+                <div class="folio-art${isActiveCharacter(c) ? '' : ' is-inactive'}">${imageHtml(c, '', true)}</div>
                 <div class="folio-content">
                     <p class="folio-kicker">Archivo de ${esc(c.player || 'miembro desconocido')}</p>
                     <h2 class="folio-name" id="characterModalName">${esc(c.name)}</h2>
@@ -755,7 +756,7 @@
         const completeness = adminCompleteness(c);
         const missingImage = !hasCharacterImage(c);
         const status = c.state || 'Sin estado';
-        const thumb = c.portrait || c.icon;
+        const thumb = c.thumb || c.portrait || c.icon;
         return `
             <div class="admin-row admin-character-row${isActiveCharacter(c) ? '' : ' is-inactive'}">
                 ${thumb ? `<img src="${esc(thumb)}" alt="" loading="lazy">` : '<div class="admin-thumb admin-thumb-empty" aria-hidden="true">✦</div>'}
@@ -1238,7 +1239,7 @@
                 const chosen = selected.has(c.id);
                 return `
                     <button type="button" class="participant-pick-card ${chosen ? 'chosen' : ''}" data-pick-participant="${esc(c.id)}">
-                        <span class="participant-pick-portrait">${c.portrait ? `<img src="${esc(c.portrait)}" alt="">` : '✦'}</span>
+                        <span class="participant-pick-portrait">${(c.thumb || c.portrait) ? `<img src="${esc(c.thumb || c.portrait)}" alt="" loading="lazy">` : '✦'}</span>
                         <span><strong>${esc(c.name)}</strong><small>${esc(c.class || 'Sin clase')}</small></span>
                         <b>${chosen ? 'Quitar' : 'Añadir'}</b>
                     </button>`;
@@ -1253,7 +1254,7 @@
             selectedBox.innerHTML = items.length ? items.map(({id, reward, notes, character: c}) => `
                 <div class="participant-selected-row" data-selected-participant="${esc(id)}">
                     <div class="participant-selected-person">
-                        <span class="participant-pick-portrait">${c.portrait ? `<img src="${esc(c.portrait)}" alt="">` : '✦'}</span>
+                        <span class="participant-pick-portrait">${(c.thumb || c.portrait) ? `<img src="${esc(c.thumb || c.portrait)}" alt="" loading="lazy">` : '✦'}</span>
                         <span><strong>${esc(c.name)}</strong><small>${esc(c.player)} · ${esc(c.class || 'Sin clase')}</small></span>
                     </div>
                     <input type="text" data-selected-reward placeholder="Recompensa individual" value="${esc(reward)}">

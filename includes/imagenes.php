@@ -9,6 +9,8 @@ declare(strict_types=1);
  * - admin/imagenes.php usa lo mismo para ordenar media/ (ver ese archivo).
  */
 
+require_once __DIR__ . '/assets.php';
+
 /** Tamaños máximos por carpeta de media/ (ancho, alto). */
 const FAVOR_IMAGE_LIMITS = [
     'icons' => [256, 256],
@@ -94,4 +96,54 @@ function favor_image_limits_for(string $relative): ?array
 {
     if (!preg_match('#^media/(icons|characters|profiles)/#', $relative, $m)) return null;
     return FAVOR_IMAGE_LIMITS[$m[1]];
+}
+
+/*
+ * Miniaturas de retratos e iconos para listas y círculos (Archivos, Relaciones,
+ * Inventario, tablón). Viven en media/mini/ con la misma ruta que el original:
+ *   media/characters/lis/Arella.webp → media/mini/characters/lis/Arella.webp
+ * Se crean solas la primera vez que se piden y se rehacen si cambia el original.
+ * Se pueden borrar cuando quieras: la web las vuelve a crear.
+ */
+const FAVOR_THUMB_W = 320;
+const FAVOR_THUMB_H = 400;
+/** Segundos por visita que se pueden gastar creando miniaturas (el resto, en la siguiente). */
+const FAVOR_THUMB_BUDGET = 2.5;
+
+/** Ruta (de base de datos) de la miniatura de $dbPath; si no hay, el original. */
+function favor_thumb(string $dbPath): string
+{
+    static $spent = 0.0;
+    if (!preg_match('#^media/((?:characters|icons|profiles)/.+)\.(?:webp|png|jpe?g)$#i', $dbPath, $m)) return $dbPath;
+    $root = dirname(__DIR__);
+    $orig = $root . '/' . $dbPath;
+    if (!is_file($orig)) return $dbPath;
+    $mini = 'media/mini/' . $m[1] . '.webp';
+    $abs = $root . '/' . $mini;
+    if (is_file($abs) && filemtime($abs) >= filemtime($orig)) return $mini;
+
+    // Si el original ya es pequeño no hace falta miniatura.
+    $size = @getimagesize($orig);
+    if ($size && $size[0] <= FAVOR_THUMB_W && $size[1] <= FAVOR_THUMB_H && filesize($orig) < 60000) return $dbPath;
+    if ($spent > FAVOR_THUMB_BUDGET || !favor_image_gd_ready()) return $dbPath;
+
+    $start = microtime(true);
+    $ok = false;
+    $img = favor_image_open($orig);
+    if ($img) {
+        $img = favor_image_fit($img, FAVOR_THUMB_W, FAVOR_THUMB_H);
+        $dir = dirname($abs);
+        if (is_dir($dir) || @mkdir($dir, 0775, true)) $ok = favor_image_save($img, $abs, 78);
+        imagedestroy($img);
+    }
+    $spent += microtime(true) - $start;
+    return $ok ? $mini : $dbPath;
+}
+
+/** URL lista para <img> de la miniatura de una ruta guardada en la base de datos. */
+function favor_thumb_url(?string $value): string
+{
+    $path = favor_asset_db_path($value);
+    if ($path === '' || preg_match('#^(?:https?://|data:)#i', $path)) return favor_asset_url($path);
+    return favor_asset_url(favor_thumb(rawurldecode($path)));
 }

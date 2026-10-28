@@ -188,7 +188,7 @@ function tablon_cargar(mysqli $db, string $where, string $order): array
             'name' => (string)$r['Nombre'],
             'short' => (string)($r['Corto'] ?? $r['Nombre']),
             'player' => (string)($r['Jugador'] ?? ''),
-            'portrait' => favor_asset_url((string)($r['PortraitUrl'] ?? '')) ?: favor_asset_url((string)($r['IconUrl'] ?? '')),
+            'portrait' => favor_thumb_url((string)(($r['PortraitUrl'] ?? '') ?: ($r['IconUrl'] ?? ''))),
         ];
     }
     $res->free();
@@ -254,7 +254,7 @@ function tablon_jugadores(mysqli $db): array
             'name' => (string)$r['Nombre'],
             'emoji' => (string)$r['Emoji'],
             'bg' => (string)$r['IconBg'],
-            'icon' => favor_asset_url((string)$r['IconUrl']),
+            'icon' => favor_asset_url(favor_asset_existing((string)$r['IconUrl'])),
             'characters' => [],
         ];
     }
@@ -274,7 +274,7 @@ function tablon_jugadores(mysqli $db): array
             'short' => (string)$r['Nombre'],
             'class' => trim((string)($r['Clase'] ?? '') . ($r['Nivel'] !== null ? ' · Nv ' . $r['Nivel'] : ''), ' ·'),
             'state' => (string)$r['Estado'],
-            'portrait' => favor_asset_url((string)($r['PortraitUrl'] ?? '')) ?: favor_asset_url((string)($r['IconUrl'] ?? '')),
+            'portrait' => favor_thumb_url((string)(($r['PortraitUrl'] ?? '') ?: ($r['IconUrl'] ?? ''))),
         ];
     }
     $res->free();

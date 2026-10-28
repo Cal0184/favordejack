@@ -119,7 +119,7 @@ css.textContent = `.fbuy{margin:16px 0 4px;padding:14px;border:1px solid color-m
 .fbuy-row{display:flex;gap:10px;flex-wrap:wrap}.fbuy-field{display:flex;flex-direction:column;gap:4px;flex:1 1 180px;font-size:.82rem;opacity:.95}
 .fbuy-qty{flex:0 0 90px}.fbuy select,.fbuy input[type=number]{font:inherit;font-size:.95rem;padding:8px 10px;border-radius:8px;border:1px solid color-mix(in srgb,currentColor 30%,transparent);background:rgba(0,0,0,.25);color:inherit;width:100%;box-sizing:border-box}
 .fbuy select option{color:#222;background:#fff}
-.fbuy-discount{display:flex;gap:8px;align-items:flex-start;margin:10px 0 0;font-size:.88rem;cursor:pointer}.fbuy-discount input{margin-top:3px}
+.fbuy-discount[hidden]{display:none}.fbuy-discount{display:flex;gap:8px;align-items:flex-start;margin:10px 0 0;font-size:.88rem;cursor:pointer}.fbuy-discount input{margin-top:3px}
 .fbuy-sum{margin:10px 0;font-size:.9rem}.fbuy-sum s{opacity:.6}.fbuy-sum.short em{color:#e0705f;font-style:normal;font-weight:700}
 .fbuy-btn{font:inherit;font-weight:700;width:100%;padding:11px 14px;border-radius:10px;border:0;cursor:pointer;background:#c49251;color:#1b130b;transition:transform .15s,filter .15s}
 .fbuy-btn:hover:not(:disabled){filter:brightness(1.1);transform:translateY(-1px)}.fbuy-btn:disabled{opacity:.5;cursor:not-allowed}

@@ -138,7 +138,7 @@ $shopData = [
         </div>
 
         <div class="torn-note small">
-            <b>ORDENAR:</b>
+            <label for="sortSelect"><b>ORDENAR:</b></label>
             <select id="sortSelect">
                 <option value="default">Como cayó de la caja</option>
                 <option value="name-asc">A–Z</option>
@@ -259,6 +259,7 @@ $shopData = [
 <script id="shopData" type="application/json"><?= json_encode($shopData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP) ?></script>
 <script id="favorCompra" type="application/json"><?= json_encode($compra, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP) ?></script>
 <script src="../compra.js<?= favor_v(dirname(__DIR__) . '/compra.js') ?>" defer></script>
+<script src="../tienda.js<?= favor_v(dirname(__DIR__) . '/tienda.js') ?>" defer></script>
 <script src="app.js<?= favor_v(__DIR__ . '/app.js') ?>" defer></script>
 </body>
 </html>

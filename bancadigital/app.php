@@ -1323,7 +1323,7 @@ function characterIconImgAttrs(character, eager=false){
 }
 
 function characterPortraitImgAttrs(character){
-  const src = resolveAssetSrc(character?.portraitUrl) || characterImagePath(character, 'characters');
+  const src = resolveAssetSrc(character?.thumbUrl || character?.portraitUrl) || characterImagePath(character, 'characters');
 
   return `src="${escapeHtml(src)}" decoding="async" fetchpriority="high"
           onerror="imageFallback(this)"`;

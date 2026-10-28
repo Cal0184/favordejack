@@ -210,7 +210,7 @@ function markerClass(array $shop): string {
 
 <div class="coordinate-panel" id="coordinatePanel" hidden>
     <strong>EDITOR DE POSICIONES</strong>
-    <span id="editorHelp">Selecciona una tienda y luego haz click en el edificio.</span>
+    <span id="editorHelp">Selecciona una tienda y luego haz clic en el edificio.</span>
     <select id="editorShop">
         <?php foreach ($shops as $shop): ?>
             <option value="<?= h((string)$shop['id']) ?>"><?= h((string)$shop['name']) ?></option>
