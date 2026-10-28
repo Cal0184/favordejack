@@ -1168,7 +1168,7 @@
                     <div class="form-field"><label>Nombre de la misión</label><input name="name" value="${esc(mission.name)}" required></div>
                     <div class="form-field"><label>Fecha</label><input name="date" type="date" value="${esc(mission.date)}"></div>
                     <div class="form-field"><label>Tipo</label><input name="type" value="${esc(mission.type)}" placeholder="Investigación, combate, rescate…"></div>
-                    <div class="form-field"><label>Estado</label><select name="state">${['Completada','Fallida','En curso','Cancelada'].map(v => `<option ${mission.state === v ? 'selected' : ''}>${v}</option>`).join('')}</select></div>
+                    <div class="form-field"><label>Estado</label><select name="state">${['Publicada','En curso','Completada','Fallida','Cancelada'].map(v => `<option ${mission.state === v ? 'selected' : ''}>${v}</option>`).join('')}</select></div>
                     <div class="form-field full"><label>Recompensa general</label><input name="generalReward" value="${esc(mission.generalReward)}" placeholder="200 po por aventurero, objeto mágico…"></div>
                     <div class="form-field full"><label>Descripción</label><textarea name="description">${esc(mission.description)}</textarea></div>
                 </div>

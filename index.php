@@ -15,6 +15,7 @@ $routes = [
     'inventory'   => favor_base_path() . 'inventario/',
     'dice'        => favor_base_path() . 'rolldice/',
     'files'       => favor_base_path() . 'archivosdelgremio/',
+    'missions'    => favor_base_path() . 'tablon/',
     'map'         => favor_base_path() . 'mapa/',
     'regulations' => favor_base_path() . 'regulaciones/',
 ];
@@ -482,6 +483,12 @@ button,summary{font:inherit}
         <a class="nav-card" href="<?= route('files', $routes) ?>">
             <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M8 18h18l5 6h25v26H8V18Z"/><path d="M8 24h48"/></svg></span>
             <span><span class="nav-title">Archivos</span><span class="nav-sub">Archivos del Gremio.</span></span>
+            <span class="nav-arrow" aria-hidden="true">›</span>
+        </a>
+
+        <a class="nav-card" href="<?= route('missions', $routes) ?>">
+            <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="6" y="9" width="52" height="46" rx="2"/><path d="M14 17h16v20l-3 3H14z"/><path d="M35 19h15v26H35z"/><circle cx="22" cy="17" r="1.6"/><circle cx="42.5" cy="19" r="1.6"/></svg></span>
+            <span><span class="nav-title">Tablón de Misiones</span><span class="nav-sub">Encargos y trabajos del gremio.</span></span>
             <span class="nav-arrow" aria-hidden="true">›</span>
         </a>
 

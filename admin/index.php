@@ -183,6 +183,7 @@ ol{padding-left:22px}
         <a href="<?= e(favor_url('tiendas/emporio/admin.php')) ?>">Cartas del Emporio</a>
         <a href="<?= e(favor_url('tiendas/descuentos.php')) ?>">Descuentos</a>
         <a href="<?= e(favor_url('bancadigital/')) ?>">Banca</a>
+        <a href="<?= e(favor_url('tablon/')) ?>">Tablón de misiones</a>
         <a href="<?= e(favor_url('archivosdelgremio/')) ?>">Misiones (Archivos)</a>
         <a href="<?= e(favor_url('timetoplay/')) ?>">Wiki del DM</a>
         <a href="<?= e(favor_url('admin/respaldo.php')) ?>">Respaldo</a>
