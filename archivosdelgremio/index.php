@@ -245,11 +245,6 @@ SQL;
             </div>
             <span class="brand-ornament mirror" aria-hidden="true">❦</span>
         </div>
-
-        <button class="admin-seal <?= $isLogged ? 'logged' : '' ?>" id="adminOpen" type="button" aria-label="<?= $isAdmin ? 'Administración' : ($isLogged ? 'Mi cuenta' : 'Iniciar sesión') ?>">
-            <span aria-hidden="true">✦</span>
-            <span><?= $isAdmin ? 'Administración' : ($isLogged ? 'Mi cuenta' : 'Iniciar sesión') ?></span>
-        </button>
     </div>
 
     <nav class="book-tabs" aria-label="Secciones de los archivos">

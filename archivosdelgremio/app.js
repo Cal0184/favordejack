@@ -610,18 +610,6 @@
     }
     $$('[data-close-admin]').forEach(el => el.addEventListener('click', closeAdminModal));
 
-    $('#adminOpen')?.addEventListener('click', () => {
-        if (isAdmin) {
-            switchView('admin');
-            return;
-        }
-        if (isLogged) {
-            window.location.href = FAVOR_BASE + 'cuenta.php';
-            return;
-        }
-        window.location.href = FAVOR_BASE + 'login.php?next=' + encodeURIComponent(FAVOR_BASE + 'archivosdelgremio/');
-    });
-
     $('#adminLogout')?.addEventListener('click', () => {
         // Cierra sesión con el formulario de la barra común (POST con token).
         if (window.favorLogout) window.favorLogout();

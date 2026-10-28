@@ -1269,3 +1269,29 @@ html.keep-gutter{scrollbar-gutter:stable}
 
 /* Categoría NPC */
 .admin-status-chip.npc{background:#4d3f67;color:#f2e8ff;border-color:#76649a}
+
+/* ============================================================
+   V3.9 · Cartel compacto y centrado
+   Sin botón de cuenta (la cuenta vive en la barra común y la
+   Mesa del Archivero en los marcadores). El cartel es una placa
+   centrada sobre el libro y deja libre la columna de marcadores.
+   ============================================================ */
+.header-beam{
+    grid-template-columns:1fr;
+    justify-items:center;
+    width:100%;
+    max-width:880px;
+    min-height:0;
+    padding:12px 44px;
+}
+.guild-brand h1{white-space:nowrap}
+@media(min-width:1181px){
+    .guild-header{padding-right:236px}
+}
+@media(max-width:1180px){
+    .header-beam{grid-template-columns:1fr}
+}
+@media(max-width:560px){
+    .header-beam{padding:10px 26px}
+    .guild-brand h1{white-space:normal}
+}
