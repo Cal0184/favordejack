@@ -18,7 +18,7 @@ declare(strict_types=1);
 const FAVOR_DISCORD_FILE = __DIR__ . '/../admin/data/discord.json';
 const FAVOR_DISCORD_EVENTS = [
     'compras' => 'Compras aprobadas en las tiendas',
-    'misiones' => 'Misiones nuevas o que cambian de estado',
+    'misiones' => 'Misiones: nuevas, iniciadas, terminadas o eliminadas (tablón y Archivos)',
     'tiradas' => 'Tiradas críticas (20 o 1 natural en un d20)',
 ];
 const FAVOR_DISCORD_COLORS = ['compras' => 0xC49251, 'misiones' => 0x5A7A3D, 'tiradas' => 0xB0413E, 'prueba' => 0x4F6F8F];
