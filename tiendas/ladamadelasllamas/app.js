@@ -135,7 +135,7 @@ function openProduct(id){
             ${p.appliesTo?`<div class="detail-properties"><span>Aplicable a: ${esc(p.appliesTo)}</span></div>`:''}
             ${props}${variants}
             <div class="detail-description"><p>${esc(p.description).replaceAll('\n','<br>')}</p></div>
-            <div class="detail-note"><strong>Nota del taller:</strong> la ficha es informativa. La compra todavía no descuenta oro de la Banca Digital ni cambia el stock.</div>
+            ${window.FavorCompra?FavorCompra.html(p):''}
         </div>
     </article>`;
     bindFallbacks(modalContent);

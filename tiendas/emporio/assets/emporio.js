@@ -108,7 +108,7 @@ function sync() {
         if (orderBtn) {
             const line = order.find(l => l.id === id);
             orderBtn.classList.toggle('in-order', !!line);
-            orderBtn.textContent = line ? `En pedido (${line.qty})` : '+ Pedido';
+            orderBtn.textContent = line ? `En el carrito (${line.qty})` : '+ Carrito';
         }
 
         const afford = el.querySelector('.afford');
@@ -214,11 +214,11 @@ const hasDiscount = id => !!(DISCOUNT.active && DISCOUNT.available && DISCOUNT.a
 const dealText = () => `${DISCOUNT.percent} %${DISCOUNT.rule ? ' ' + DISCOUNT.rule : ''}`;
 function discountNote(id) {
     if (!DISCOUNT.active) return '';
-    if (hasDiscount(id)) return ` <span class="deal-on">✦ Tiene ${esc(dealText())}: se aplica al enviar el pedido.</span>`;
+    if (hasDiscount(id)) return ` <span class="deal-on">✦ Tiene ${esc(dealText())}: se aplica al comprar.</span>`;
     if (DISCOUNT.used && id in DISCOUNT.used) return ` <span class="deal-off">Ya usó su descuento${DISCOUNT.used[id] ? ' (' + esc(DISCOUNT.used[id]) + ')' : ''}.</span>`;
     return '';
 }
-/** Objetos mágicos del pedido que pueden llevar el descuento, el más caro primero. */
+/** Objetos mágicos del carrito que pueden llevar el descuento, el más caro primero. */
 function discountCandidates() {
     return order.map(l => ({id: l.id, ...ORDER_ITEMS[l.id]}))
         .filter(i => !i.id.startsWith('servicio:') && i.pricePo !== null)
@@ -229,14 +229,14 @@ function discountBlock(characterId, chosen) {
     const name = characters[characterId]?.name || 'Este personaje';
     if (!hasDiscount(characterId)) return discountNote(characterId) ? `<p class="order-deal off">${discountNote(characterId)}</p>` : '';
     const list = discountCandidates();
-    if (!list.length) return `<p class="order-deal">✦ ${esc(name)} tiene ${esc(dealText())}, pero este pedido no tiene objetos mágicos con precio.</p>`;
+    if (!list.length) return `<p class="order-deal">✦ ${esc(name)} tiene ${esc(dealText())}, pero el carrito no tiene objetos mágicos con precio.</p>`;
     const pick = list.find(i => i.id === chosen) || list[0];
     const save = Math.round(pick.pricePo * DISCOUNT.percent) / 100;
     return `<div class="order-deal on">
         <label class="deal-check"><input type="checkbox" name="useDiscount" checked> Usar el descuento de ${esc(name)}: <b>${esc(dealText())}</b></label>
         <label class="field"><span class="field-label">Objeto con descuento</span>
             <select name="discountItem">${list.map(i => `<option value="${esc(i.id)}" ${i.id === pick.id ? 'selected' : ''}>${esc(i.name)} · ${esc(i.price)}</option>`).join('')}</select></label>
-        <p class="muted">Ahorra ${esc(po(save))}. Se usa una sola vez; si el pedido se cancela o Ecix's lo rechaza, lo recupera.</p>
+        <p class="muted">Ahorra ${esc(po(save))}. Se usa una sola vez; si el DM anula la compra, lo recupera.</p>
     </div>`;
 }
 function orderDiscountAmount(form) {
@@ -250,8 +250,8 @@ function refreshOrderDeal(form) {
     const {total, unknown} = orderTotal();
     const save = orderDiscountAmount(form);
     form.querySelector('#orderTotalValue').innerHTML = save
-        ? `<s class="muted">${esc(po(total))}</s> ${esc(po(total - save))}${unknown ? ' + precios a consultar' : ''}`
-        : `${esc(po(total))}${unknown ? ' + precios a consultar' : ''}`;
+        ? `<s class="muted">${esc(po(total))}</s> ${esc(po(total - save))}${unknown ? ' · hay objetos sin precio: quítalos para comprar' : ''}`
+        : `${esc(po(total))}${unknown ? ' · hay objetos sin precio: quítalos para comprar' : ''}`;
 }
 
 function orderTotal() {
@@ -268,7 +268,7 @@ function addToOrder(id) {
     const line = order.find(l => l.id === id);
     if (line) line.qty = Math.min(line.qty + 1, 20); else order.push({id, qty: 1});
     saveOrder();
-    toast(`${ORDER_ITEMS[id].name} quedó en tu pedido.`);
+    toast(`${ORDER_ITEMS[id].name} quedó en tu carrito.`);
 }
 function syncOrderBar() {
     if (!els.orderBar) return;
@@ -329,7 +329,7 @@ function openCard(id) {
                 <div class="detail-section-title">Descripción y propiedades</div>
                 <div class="detail-description">${descriptionHtml(c.description)}</div>
                 <div class="detail-actions">
-                    ${DATA.user ? `<button type="button" class="primary" data-act="order" ${c.soldOut ? 'disabled' : ''}>${inOrder ? `En el pedido (${inOrder.qty}) · añadir otro` : '+ Añadir al pedido'}</button>` : ''}
+                    ${DATA.user ? `<button type="button" class="primary" data-act="order" ${c.soldOut ? 'disabled' : ''}>${inOrder ? `En el carrito (${inOrder.qty}) · añadir otro` : '+ Añadir al carrito'}</button>` : ''}
                     <button type="button" data-act="fav">${favorites.includes(id) ? '♥ Quitar favorito' : '♡ Añadir favorito'}</button>
                     <button type="button" data-act="cmp">${compare.includes(id) ? 'Quitar del comparador' : 'Añadir al comparador'}</button>
                     <button type="button" data-act="link">🔗 Copiar enlace</button>
@@ -361,15 +361,15 @@ function compareNow() {
 }
 
 function orderForm() {
-    if (!order.length) { toast('Tu pedido está vacío.'); return; }
+    if (!order.length) { toast('Tu carrito está vacío.'); return; }
     const {total, unknown} = orderTotal();
     const options = (DATA.characters || []).map(c => `<option value="${esc(c.id)}" ${els.buyer?.value === c.id ? 'selected' : ''}>${esc(c.name)}${DATA.user.admin ? ' (' + esc(c.playerName) + ')' : ''} · ${esc(po(c.goldExact))}</option>`).join('');
     const who = characters[els.buyer?.value || ''];
     const warning = who && !unknown && total > who.goldExact
-        ? `<p class="order-warning">A ${esc(who.name)} le faltan ${esc(po(total - who.goldExact))} para todo el pedido. Puedes enviarlo igual; Ecix's decide.</p>` : '';
+        ? `<p class="order-warning">A ${esc(who.name)} le faltan ${esc(po(total - who.goldExact))} para todo el carrito: quita algo o elige otro personaje.</p>` : '';
     openModal(`
         <form class="order-form" id="orderForm">
-            <h2 id="modalTitle">Tu pedido a Ecix's</h2>
+            <h2 id="modalTitle">Tu carrito en el Emporio</h2>
             <ul class="order-lines">${order.map(l => {
                 const item = ORDER_ITEMS[l.id];
                 return `<li>
@@ -379,16 +379,17 @@ function orderForm() {
                     <button class="remove" type="button" data-remove="${esc(l.id)}" aria-label="Quitar ${esc(item.name)}">×</button>
                 </li>`;
             }).join('')}</ul>
-            <div class="order-total"><span>Total estimado</span><span id="orderTotalValue">${esc(po(total))}${unknown ? ' + precios a consultar' : ''}</span></div>
+            <div class="order-total"><span>Total</span><span id="orderTotalValue">${esc(po(total))}${unknown ? ' · hay objetos sin precio: quítalos para comprar' : ''}</span></div>
             ${warning}
             <label class="field"><span class="field-label">Personaje que compra</span>
                 <select name="character" required data-autofocus><option value="">— Elige personaje —</option>${options}</select></label>
             <div id="orderDeal"></div>
-            <label class="field"><span class="field-label">Mensaje para Ecix's (opcional)</span>
-                <textarea name="note" maxlength="500" placeholder="Para cuándo lo necesitas, si quieres regatear…"></textarea></label>
+            <label class="field"><span class="field-label">Nota para Ecix's (opcional)</span>
+                <textarea name="note" maxlength="500" placeholder="Algo que Ecix's deba saber de esta compra…"></textarea></label>
             <div class="detail-actions">
-                <button type="submit" class="primary">Enviar pedido</button>
-                <button type="button" data-act="empty">Vaciar pedido</button>
+                <p class="muted">Al pulsar Comprar se descuenta el oro en la Banca y las cartas entran al Inventario del personaje.</p>
+                <button type="submit" class="primary">Comprar ahora</button>
+                <button type="button" data-act="empty">Vaciar carrito</button>
             </div>
         </form>`, 'order');
     const form = $('#orderForm');
@@ -409,7 +410,7 @@ async function sendOrder(form) {
                 discountItem: form.useDiscount?.checked && form.discountItem ? form.discountItem.value : ''}),
         });
         const out = await res.json().catch(() => ({ok: false, error: 'El servidor no respondió bien.'}));
-        if (!out.ok) throw new Error(out.error || 'No se pudo enviar el pedido.');
+        if (!out.ok) throw new Error(out.error || 'No se pudo comprar.');
         if (out.order.discount && DISCOUNT.available) {
             delete DISCOUNT.available[form.character.value];
             (DISCOUNT.used ||= {})[form.character.value] = out.order.discount.item;
@@ -420,7 +421,9 @@ async function sendOrder(form) {
         closeModal();
         renderOrders();
         showView('orders');
-        toast('Pedido enviado. Ecix\'s lo revisará pronto.');
+        const who = characters[form.character.value];
+        if (who && out.order.charged !== null) { who.goldExact = Math.round((who.goldExact - out.order.charged) * 100) / 100; who.gold = Math.floor(who.goldExact); sync(); }
+        toast(out.notice || '¡Comprado! Ya está en tu Inventario.');
     } catch (err) {
         toast(err.message);
         button.disabled = false;
@@ -447,7 +450,7 @@ function renderOrders() {
     const list = $('#ordersList');
     if (!list) return;
     if (!DATA.orders.length) {
-        list.innerHTML = '<div class="empty">Todavía no hay pedidos. Usa «+ Pedido» en las cartas para armar uno.</div>';
+        list.innerHTML = '<div class="empty">Todavía no hay compras. Usa «+ Carrito» en las cartas y luego Comprar.</div>';
         return;
     }
     const date = s => { const d = new Date(s); return isNaN(d) ? '' : d.toLocaleString('es-CL', {dateStyle: 'medium', timeStyle: 'short'}); };
@@ -457,13 +460,13 @@ function renderOrders() {
                 <h3>${esc(o.character)}${DATA.user.admin ? ` <span class="muted">· ${esc(o.player)}</span>` : ''}</h3>
                 <span class="state state-${esc(o.state)}">${esc(o.stateLabel)}</span>
             </header>
-            <p class="muted">${esc(date(o.created))}${o.total !== null ? ' · Total estimado ' + esc(po(o.total)) : ''}</p>
+            <p class="muted">${esc(date(o.created))}${o.charged !== null ? ' · Pagó ' + esc(po(o.charged)) : o.total !== null ? ' · Total ' + esc(po(o.total)) : ''}</p>
             <ul>${o.items.map(i => `<li>${Number(i.qty) > 1 ? Number(i.qty) + ' × ' : ''}${esc(i.name)} <span class="muted">${esc(i.price)}</span></li>`).join('')}</ul>
             ${o.discount ? `<p class="order-deal-line">✦ Descuento ${esc(o.discount.percent)} % en ${esc(o.discount.item)}: −${esc(po(o.discount.amount))}${['cancelado', 'rechazado'].includes(o.state) ? ' · devuelto al personaje' : ''}</p>` : ''}
-            ${o.note ? `<p class="muted">Tu mensaje: ${esc(o.note)}</p>` : ''}
+            ${o.note ? `<p class="muted">Tu nota: ${esc(o.note)}</p>` : ''}
             ${o.reply ? `<p class="reply">Ecix's: ${esc(o.reply)}</p>` : ''}
             ${o.state === 'pendiente' && !DATA.user.admin ? `<button class="tool-btn secondary" type="button" data-cancel="${esc(o.id)}">Cancelar pedido</button>` : ''}
-            ${DATA.user.admin ? '<a class="tool-btn" href="admin.php?vista=pedidos">Gestionar en el admin</a>' : ''}
+            ${DATA.user.admin ? `<a class="tool-btn" href="${esc(DATA.panelUrl || '../../admin/')}#compras">Anular en el Panel del DM</a>` : ''}
         </article>`).join('');
 }
 
@@ -542,7 +545,7 @@ els.modal.addEventListener('click', e => {
     const act = e.target.closest('[data-act]')?.dataset.act;
     const id = els.modal.dataset.card;
     if (!act) return;
-    if (act === 'empty') { order = []; saveOrder(); closeModal(); toast('Pedido vaciado.'); return; }
+    if (act === 'empty') { order = []; saveOrder(); closeModal(); toast('Carrito vaciado.'); return; }
     const c = CARDS[id];
     if (!c) return;
     if (act === 'order') { addToOrder(id); openCard(id); }

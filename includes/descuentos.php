@@ -327,7 +327,6 @@ function favor_discount_shop_data(?array $user, string $shop): array
         'characters' => $list,
         'admin' => $isAdmin,
         'manageUrl' => $isAdmin ? favor_base_path() . 'tiendas/descuentos.php?tienda=' . rawurlencode($shop) : '',
-        'useUrl' => favor_base_path() . 'tiendas/descuento-usar.php',
         'csrf' => favor_csrf(),
     ];
 }
