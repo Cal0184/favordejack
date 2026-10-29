@@ -43,3 +43,4 @@ tiendas/emporio/data/retirados/
 # --- Crónicas: eventos y archivos subidos (van en el respaldo) ---
 cronicas/data/cronicas.json
 media/cronicas/
+instalar/clave.php
