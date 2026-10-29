@@ -35,6 +35,7 @@ function favor_backup_paths(): array
         'tiendas/compras.json',
         'tiendas/lavaritaeconomica/productos.json',
         'regulaciones/data/regulations.json',
+        'cronicas/data/cronicas.json',
         'mapa/tiendas.json',
         'admin/data/',
     ];

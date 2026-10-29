@@ -39,3 +39,7 @@ admin/data/
 tiendas/emporio/data/pedidos.json
 tiendas/emporio/data/duplicados.json
 tiendas/emporio/data/retirados/
+
+# --- Crónicas: eventos y archivos subidos (van en el respaldo) ---
+cronicas/data/cronicas.json
+media/cronicas/
