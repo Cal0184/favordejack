@@ -15,6 +15,7 @@ archivosdelgremio/fichas/*
 media/characters/
 media/icons/
 media/profiles/
+media/mini/
 
 # --- Copias duplicadas que se limpian en la fase 2 ---
 emporio/Cartas/
@@ -31,8 +32,15 @@ Thumbs.db
 respaldos/*
 !respaldos/.htaccess
 tiendas/descuentos.json
+tiendas/compras.json
+admin/data/
 
 # --- Emporio de Ecix's: pedidos y decisiones del admin (van en el respaldo) ---
 tiendas/emporio/data/pedidos.json
 tiendas/emporio/data/duplicados.json
 tiendas/emporio/data/retirados/
+
+# --- Crónicas: eventos y archivos subidos (van en el respaldo) ---
+cronicas/data/cronicas.json
+media/cronicas/
+instalar/clave.php

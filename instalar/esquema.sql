@@ -27,7 +27,8 @@ CREATE TABLE IF NOT EXISTS `InventarioItem` (
   `Actualizado` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`ID`),
   KEY `idx_inventario_personaje` (`PersonajeID`),
-  KEY `idx_inventario_nombre` (`Nombre`)
+  KEY `idx_inventario_nombre` (`Nombre`),
+  CONSTRAINT `fk_inventario_personaje` FOREIGN KEY (`PersonajeID`) REFERENCES `Personaje` (`ID`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `Jugador` (
@@ -124,7 +125,8 @@ CREATE TABLE IF NOT EXISTS `PersonajeFicha` (
   `Archivo` varchar(255) DEFAULT NULL,
   `ImportadoPor` varchar(100) DEFAULT NULL,
   `Importado` datetime NOT NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`PersonajeID`)
+  PRIMARY KEY (`PersonajeID`),
+  CONSTRAINT `fk_ficha_personaje` FOREIGN KEY (`PersonajeID`) REFERENCES `Personaje` (`ID`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `PersonajePerfil` (
@@ -166,7 +168,9 @@ CREATE TABLE IF NOT EXISTS `PersonajeRelacion` (
   PRIMARY KEY (`ID`),
   UNIQUE KEY `uq_relacion_par` (`PersonajeA`,`PersonajeB`),
   KEY `idx_relacion_a` (`PersonajeA`),
-  KEY `idx_relacion_b` (`PersonajeB`)
+  KEY `idx_relacion_b` (`PersonajeB`),
+  CONSTRAINT `fk_relacion_personaje_a` FOREIGN KEY (`PersonajeA`) REFERENCES `Personaje` (`ID`) ON UPDATE CASCADE,
+  CONSTRAINT `fk_relacion_personaje_b` FOREIGN KEY (`PersonajeB`) REFERENCES `Personaje` (`ID`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- «Olvidé mi contraseña»: avisos al DM y contraseñas temporales (includes/clave.php).

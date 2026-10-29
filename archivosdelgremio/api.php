@@ -8,6 +8,8 @@ require_once __DIR__ . '/auth.php';
 require_once dirname(__DIR__) . '/includes/assets.php';
 require_once dirname(__DIR__) . '/includes/imagenes.php';
 require_once dirname(__DIR__) . '/includes/migrations.php';
+require_once dirname(__DIR__) . '/includes/discord.php';
+require_once dirname(__DIR__) . '/includes/estado.php';
 guild_session_start();
 
 function respond(bool $ok, array $data = [], int $status = 200): never
@@ -185,6 +187,7 @@ try {
 
     guild_verify_csrf(strv($data, 'csrf', 100));
     $admin = guild_require_admin();
+    favor_session_close();
 
     if ($action === 'save_character') {
         $id = strv($data, 'id', 100);
@@ -288,21 +291,20 @@ try {
                 bind_execute($stmt, [$shortName, $description, $portrait, $portrait, $id]);
                 $stmt->close();
 
+                // Un personaje creado en la Banca puede no tener expediente todavía:
+                // se crea con el mismo ID (una sola identidad), o se actualiza si ya está.
                 $stmt = $db->prepare(
-                    'UPDATE PersonajePerfil SET NombreCompleto=?,Altura=?,Edad=?,Sexo=?,Raza=?,TipoRaza=?,Clase=?,Nivel=?,Fuerza=?,Destreza=?,Constitucion=?,Inteligencia=?,Sabiduria=?,Carisma=?,Dotes=?,NivelAmenaza=?,Estado=?,Categoria=?,Biografia=? WHERE ID=?'
+                    'INSERT INTO PersonajePerfil (ID,NombreCompleto,Altura,Edad,Sexo,Raza,TipoRaza,Clase,Nivel,Fuerza,Destreza,Constitucion,Inteligencia,Sabiduria,Carisma,Dotes,NivelAmenaza,Estado,Categoria,Biografia) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) '
+                    . 'ON DUPLICATE KEY UPDATE NombreCompleto=VALUES(NombreCompleto),Altura=VALUES(Altura),Edad=VALUES(Edad),Sexo=VALUES(Sexo),Raza=VALUES(Raza),TipoRaza=VALUES(TipoRaza),Clase=VALUES(Clase),Nivel=VALUES(Nivel),'
+                    . 'Fuerza=VALUES(Fuerza),Destreza=VALUES(Destreza),Constitucion=VALUES(Constitucion),Inteligencia=VALUES(Inteligencia),Sabiduria=VALUES(Sabiduria),Carisma=VALUES(Carisma),Dotes=VALUES(Dotes),'
+                    . 'NivelAmenaza=VALUES(NivelAmenaza),Estado=VALUES(Estado),Categoria=VALUES(Categoria),Biografia=VALUES(Biografia)'
                 );
                 bind_execute($stmt, [
-                    $name, $height, $age, $sex, $race, $raceType, $class, $level,
-                    $str, $dex, $con, $int, $wis, $cha, $feats, $threat, $state, $category, $biography, $id
+                    $id, $name, $height, $age, $sex, $race, $raceType, $class, $level,
+                    $str, $dex, $con, $int, $wis, $cha, $feats, $threat, $state, $category, $biography
                 ]);
-                if ($stmt->affected_rows === 0) {
-                    $check = $db->prepare('SELECT ID FROM PersonajePerfil WHERE ID=?');
-                    bind_execute($check, [$id]);
-                    $exists = (bool)$check->get_result()->fetch_assoc();
-                    $check->close();
-                    if (!$exists) throw new RuntimeException('El perfil ya no existe.');
-                }
                 $stmt->close();
+                guild_mark_removed_profile($db, $id, false);
             }
 
             $db->commit();
@@ -314,8 +316,15 @@ try {
             $db->close();
         }
 
+        // El estado de Archivos manda: la Banca se coloca igual (Muertos, Personajes Fuera o su jugador).
+        $statusNote = '';
+        if (!$isNew) {
+            $sync = db();
+            try { $statusNote = favor_estado_aplicar($sync, $id, $state); } catch (Throwable) {} finally { $sync->close(); }
+        }
+
         respond(true, [
-            'message' => $isNew ? ($category === 'NPC' ? 'NPC creado y archivado.' : 'Personaje creado y archivado.') : 'Expediente actualizado.',
+            'message' => $isNew ? ($category === 'NPC' ? 'NPC creado y archivado.' : 'Personaje creado y archivado.') : trim('Expediente actualizado. ' . $statusNote),
             'id' => $id,
             'portrait' => $portrait,
         ]);
@@ -330,6 +339,7 @@ try {
         bind_execute($stmt, [$id]);
         $deleted = $stmt->affected_rows;
         $stmt->close();
+        if ($deleted > 0) guild_mark_removed_profile($db, $id);
         $db->close();
         if ($deleted < 1) throw new RuntimeException('El perfil ya no existe.');
         respond(true, ['message' => 'El personaje fue retirado de Archivos del Gremio. La Banca no fue modificada.']);
@@ -348,9 +358,15 @@ try {
         if (!is_array($participants)) $participants = [];
 
         $db = db();
+        $oldMissionState = null;
+        $missionNames = [];
         $db->begin_transaction();
         try {
             if ($missionId > 0) {
+                $stmt = $db->prepare('SELECT Estado FROM Mision WHERE ID=? LIMIT 1');
+                bind_execute($stmt, [(string)$missionId]);
+                $oldMissionState = (string)($stmt->get_result()->fetch_assoc()['Estado'] ?? '');
+                $stmt->close();
                 $stmt = $db->prepare('UPDATE Mision SET Nombre=?,Fecha=?,Tipo=?,Estado=?,Descripcion=?,RecompensaGeneral=? WHERE ID=?');
                 bind_execute($stmt, [$name, $date !== '' ? $date : null, $type, $state, $description, $generalReward, (string)$missionId]);
                 $stmt->close();
@@ -379,6 +395,7 @@ try {
                 $char = $lookup->get_result()->fetch_assoc();
                 $lookup->close();
                 if (!$char) continue;
+                $missionNames[] = (string)$char['Nombre'];
 
                 $reward = mb_substr(trim((string)($part['reward'] ?? '')), 0, 255, 'UTF-8');
                 $notes = mb_substr(trim((string)($part['notes'] ?? '')), 0, 65535, 'UTF-8');
@@ -405,6 +422,22 @@ try {
             throw $e;
         } finally {
             $db->close();
+        }
+
+        // Aviso en Discord: misión nueva o que cambia de estado.
+        if ($oldMissionState === null || mb_strtolower($oldMissionState, 'UTF-8') !== mb_strtolower($state, 'UTF-8')) {
+            favor_discord_send(
+                'misiones',
+                ($oldMissionState === null ? '📜 Nueva misión: ' : '📜 Misión ' . mb_strtolower($state, 'UTF-8') . ': ') . $name,
+                mb_substr($description, 0, 600, 'UTF-8'),
+                [
+                    ['Estado', $state],
+                    ['Tipo', $type],
+                    ['Fecha', $date !== '' ? date('d-m-Y', strtotime($date) ?: time()) : ''],
+                    ['Participantes', implode(', ', $missionNames)],
+                    ['Recompensa', $generalReward],
+                ]
+            );
         }
 
         respond(true, ['message' => 'Misión guardada.', 'id' => $missionId]);

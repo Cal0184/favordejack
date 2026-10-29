@@ -7,6 +7,8 @@ require_once dirname(__DIR__) . '/includes/ficha-import.php';
 require_once dirname(__DIR__) . '/includes/auth-widget.php';
 
 favor_session_start();
+$user = favor_current_user();
+favor_session_close();
 $id = (string)($_GET['id'] ?? '');
 $GLOBALS['favor_back'] = ['archivosdelgremio/?character=' . rawurlencode($id), 'a su archivo'];
 
@@ -26,7 +28,6 @@ try {
     $row = $stmt->get_result()->fetch_assoc();
     $stmt->close();
     $db->close();
-    $user = favor_session_user();
     $canEdit = $row && $user && ficha_can_edit($user, $row);
     if ($row) $data = json_decode((string)$row['Datos'], true) ?: [];
 } catch (Throwable $e) {
@@ -34,8 +35,8 @@ try {
 }
 
 if ($row && $canEdit && isset($_GET['pdf'])) {
-    $path = ficha_pdf_path((string)$row['PersonajeID']);
-    if (is_file($path)) {
+    $path = ficha_pdf_find((string)$row['PersonajeID']);
+    if ($path !== null && is_file($path)) {
         header('Content-Type: application/pdf');
         header('Content-Disposition: inline; filename="' . preg_replace('~[^A-Za-z0-9_ -]~', '', (string)$row['Nombre']) . '.pdf"');
         header('X-Content-Type-Options: nosniff');

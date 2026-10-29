@@ -3,9 +3,10 @@ declare(strict_types=1);
 require_once __DIR__ . '/lib.php';
 
 /*
- * Pedidos a Ecix's (JSON). Crear y cancelar: cualquier jugador con sesión.
- * Cambiar el estado y responder: solo admin (desde admin.php).
- * Los pedidos viven en data/pedidos.json; el oro no se toca aquí.
+ * Compras en el Emporio de Ecix's (JSON). Comprar: cualquier jugador con
+ * sesión; se cobra al instante en la Banca y las cartas entran al Inventario
+ * (includes/compras.php). Cambiar el estado (anular = devolver): solo admin.
+ * Las compras viven en data/pedidos.json.
  */
 
 header('Content-Type: application/json; charset=utf-8');
@@ -20,7 +21,13 @@ function out(array $data, int $code = 200): never
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') out(['ok' => false, 'error' => 'Método no permitido.'], 405);
 
-$user = favor_current_user();
+try {
+    // Cuenta releída de la base de datos: una cuenta desactivada o un rol
+    // retirado no compran ni gestionan con los permisos viejos.
+    $user = favor_current_user(true);
+} catch (Throwable $e) {
+    out(['ok' => false, 'error' => 'No se pudo comprobar tu cuenta. Inténtalo otra vez.'], 503);
+}
 if (!$user) out(['ok' => false, 'error' => 'Inicia sesión para hacer pedidos.'], 401);
 try {
     favor_verify_csrf((string)($_SERVER['HTTP_X_CSRF_TOKEN'] ?? ''));
@@ -59,6 +66,8 @@ try {
             if (isset($cards[$id])) {
                 $card = $cards[$id];
                 if ($card['soldOut']) throw new RuntimeException($card['name'] . ' está agotado.');
+                // Aviso rápido; el cobro vuelve a mirarlo con candado.
+                if ($qty > $card['stock']) throw new RuntimeException('De ' . $card['name'] . ' solo ' . ($card['stock'] === 1 ? 'queda 1 unidad.' : 'quedan ' . $card['stock'] . ' unidades.'));
                 $item = ['id' => $id, 'name' => $card['name'], 'price' => $card['priceLabel'], 'pricePo' => $card['pricePo'], 'qty' => $qty];
             } elseif (isset($services[$id])) {
                 $price = (string)($services[$id]['price'] ?? '');
@@ -70,7 +79,8 @@ try {
             else $total += $item['pricePo'] * $qty;
             $items[] = $item;
         }
-        if (!$items) throw new RuntimeException('El pedido está vacío.');
+        if (!$items) throw new RuntimeException('El carrito está vacío.');
+        if ($unknown) throw new RuntimeException('Algo del carrito no tiene precio: quítalo y pregúntale a Ecix\'s por Discord.');
 
         $now = date('c');
         $orderId = 'p' . date('ymd') . '-' . bin2hex(random_bytes(3));
@@ -101,36 +111,53 @@ try {
             'id' => $orderId,
             'created' => $now,
             'updated' => $now,
-            'state' => 'pendiente',
+            'state' => 'entregado',
             'userId' => (int)$user['id'],
             'username' => (string)$user['username'],
-            'playerName' => (string)$user['displayName'],
+            'playerName' => (string)$character['playerName'] ?: (string)$user['displayName'],
             'characterId' => $character['id'],
             'characterName' => $character['name'],
             'characterGold' => $character['goldExact'],
             'items' => $items,
-            'total' => $unknown && $total === 0 ? null : $total,
+            'total' => $total,
             'note' => mb_substr(trim((string)($input['note'] ?? '')), 0, 500, 'UTF-8'),
             'reply' => '',
         ] + ($discount ? ['discount' => $discount] : []);
 
+        // Compra al instante: se cobra en la Banca y entra al Inventario. Si
+        // algo falla, no queda nada a medias (ni el oro, ni el descuento).
+        $by = (string)($user['displayName'] ?? $user['username']);
         try {
-            emporio_update_json(EMPORIO_ORDERS_FILE, static function (array $orders) use ($order, $user): array {
-                $orders = array_values(array_filter($orders, 'is_array'));
-                $open = array_filter($orders, static fn(array $o): bool => (int)($o['userId'] ?? 0) === (int)$user['id'] && ($o['state'] ?? '') === 'pendiente');
-                if (count($open) >= 10) throw new RuntimeException('Tienes 10 pedidos pendientes. Espera a que Ecix\'s responda alguno.');
-                $orders[] = $order;
-                return $orders;
-            });
+            $notice = emporio_order_charge_sync($order, null, $by);
+            try {
+                emporio_update_json(EMPORIO_ORDERS_FILE, static function (array $orders) use ($order): array {
+                    $orders = array_values(array_filter($orders, 'is_array'));
+                    $orders[] = $order;
+                    return $orders;
+                });
+            } catch (Throwable $e) {
+                favor_purchase_refund($order['characterId'], $order['charge'], 'Compra deshecha (no se pudo registrar)', $by);
+                if (is_array($order['stock'] ?? null)) {
+                    try { emporio_stock_move($order['stock'], 1, emporio_all_cards()); } catch (Throwable) {}
+                }
+                throw $e;
+            }
         } catch (Throwable $e) {
-            // El pedido no se guardó: el descuento no se gastó.
-            if ($discount) favor_discount_restore(EMPORIO_DISCOUNT_SHOP, $buyer, (string)$user['username'], $orderId, 'pedido cancelado');
+            if ($discount) favor_discount_restore(EMPORIO_DISCOUNT_SHOP, $buyer, (string)$user['username'], $orderId, 'compra fallida');
             throw $e;
         }
-        out(['ok' => true, 'order' => emporio_order_public($order)]);
+        emporio_order_announce($order);
+        out(['ok' => true, 'order' => emporio_order_public($order), 'notice' => $notice]);
     }
 
-    if ($action === 'cancel' || $action === 'state') {
+    if ($action === 'state') {
+        if (!$isAdmin) throw new RuntimeException('Solo el admin cambia el estado de un pedido.');
+        $reply = mb_substr(trim((string)($input['reply'] ?? '')), 0, 500, 'UTF-8');
+        [$updated, $note] = emporio_order_set_state((string)($input['id'] ?? ''), (string)($input['state'] ?? ''), $reply, emporio_final_price($input['final'] ?? ''), $user);
+        out(['ok' => true, 'order' => emporio_order_public($updated), 'notice' => $note]);
+    }
+
+    if ($action === 'cancel') {
         $id = (string)($input['id'] ?? '');
         $state = $action === 'cancel' ? 'cancelado' : (string)($input['state'] ?? '');
         if (!isset(EMPORIO_ORDER_STATES[$state])) throw new RuntimeException('Estado no válido.');
@@ -138,7 +165,8 @@ try {
         $reply = $action === 'state' ? mb_substr(trim((string)($input['reply'] ?? '')), 0, 500, 'UTF-8') : null;
 
         $oldState = '';
-        $updated = emporio_update_json(EMPORIO_ORDERS_FILE, static function (array $orders, &$result) use ($id, $state, $reply, $user, $isAdmin, $action, &$oldState): array {
+        $chargeNote = '';
+        $updated = emporio_update_json(EMPORIO_ORDERS_FILE, static function (array $orders, &$result) use ($id, $state, $reply, $user, $isAdmin, $action, &$oldState, &$chargeNote): array {
             foreach ($orders as &$o) {
                 if (!is_array($o) || ($o['id'] ?? '') !== $id) continue;
                 $oldState = (string)($o['state'] ?? '');
@@ -149,6 +177,7 @@ try {
                 $o['state'] = $state;
                 if ($reply !== null) $o['reply'] = $reply;
                 $o['updated'] = date('c');
+                $chargeNote = emporio_order_charge_sync($o, null, (string)($user['displayName'] ?? $user['username']));
                 $result = $o;
             }
             unset($o);
@@ -156,7 +185,7 @@ try {
             return $orders;
         });
         $note = emporio_order_discount_sync($updated, $oldState, (string)$user['username']);
-        out(['ok' => true, 'order' => emporio_order_public($updated), 'notice' => $note]);
+        out(['ok' => true, 'order' => emporio_order_public($updated), 'notice' => trim($chargeNote . ' ' . $note)]);
     }
 
     out(['ok' => false, 'error' => 'Acción desconocida.'], 400);

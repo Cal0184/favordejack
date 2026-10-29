@@ -2,6 +2,8 @@
 declare(strict_types=1);
 require_once dirname(__DIR__) . '/includes/auth-widget.php';
 favor_session_start();
+$diceUser = favor_current_user();
+$diceCsrf = $diceUser ? favor_csrf() : '';
 favor_session_close();
 
 header('Content-Type: text/html; charset=UTF-8');
@@ -173,7 +175,7 @@ function asset(string $path): string
 <span class="jack-control-eyebrow">Atajos de Jack</span>
 <h2>Tiradas guardadas</h2>
 </div>
-<p>Guarda tiradas simples o fórmulas completas y lánzalas con un clic.</p>
+<p>Guarda tiradas simples o fórmulas completas y lánzalas con un clic.<?= $diceUser ? " Se guardan en tu cuenta: las verás en cualquier navegador o móvil." : " Entra con tu cuenta para guardarlas en ella y no solo en este navegador." ?></p>
 </div>
 <div class="jack-save-composer">
 <input aria-label="Nombre de la tirada guardada" autocomplete="off" id="jack_saved_roll_name" maxlength="36" placeholder="Nombre de la tirada (ej. Percepción)"/>
@@ -474,6 +476,7 @@ function asset(string $path): string
 </main>
 
 </div>
+<?php if ($diceUser): ?><script>window.FAVOR_DADOS = <?= json_encode(['csrf' => $diceCsrf, 'aviso' => 'aviso.php', 'tiradas' => 'guardadas.php'], JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) ?>;</script><?php endif; ?>
 <script src="<?= asset('dice.js') ?>"></script>
 <script src="<?= asset('jack-features.js') ?>"></script></body>
 </html>

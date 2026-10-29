@@ -787,7 +787,7 @@ body{
   background-color:#050505!important;
   background-image:
     linear-gradient(rgba(4,4,4,.70),rgba(4,4,4,.86)),
-    url('images/jack-dice-pattern.png')!important;
+    url('images/jack-dice-pattern.webp')!important;
   background-size:auto,520px 520px!important;
   background-repeat:repeat,repeat!important;
   background-attachment:fixed,fixed!important;

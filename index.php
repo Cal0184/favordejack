@@ -15,8 +15,10 @@ $routes = [
     'inventory'   => favor_base_path() . 'inventario/',
     'dice'        => favor_base_path() . 'rolldice/',
     'files'       => favor_base_path() . 'archivosdelgremio/',
+    'missions'    => favor_base_path() . 'tablon/',
     'map'         => favor_base_path() . 'mapa/',
     'regulations' => favor_base_path() . 'regulaciones/',
+    'timeline'    => favor_base_path() . 'cronicas/',
 ];
 
 function route(string $key, array $routes): string
@@ -485,17 +487,23 @@ button,summary{font:inherit}
             <span class="nav-arrow" aria-hidden="true">›</span>
         </a>
 
+        <a class="nav-card" href="<?= route('missions', $routes) ?>">
+            <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="6" y="9" width="52" height="46" rx="2"/><path d="M14 17h16v20l-3 3H14z"/><path d="M35 19h15v26H35z"/><circle cx="22" cy="17" r="1.6"/><circle cx="42.5" cy="19" r="1.6"/></svg></span>
+            <span><span class="nav-title">Tablón de Misiones</span><span class="nav-sub">Encargos y trabajos del gremio.</span></span>
+            <span class="nav-arrow" aria-hidden="true">›</span>
+        </a>
+
         <a class="nav-card" href="<?= route('regulations', $routes) ?>">
             <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M32 9v45M20 14h24M14 24h12l-6 13-6-13Zm24 0h12l-6 13-6-13Z"/><path d="M12 39h16M36 39h16M22 54h20"/></svg></span>
             <span><span class="nav-title">Regulaciones</span><span class="nav-sub">Subclases baneadas · Buffeos · Nerfeos.</span></span>
             <span class="nav-arrow" aria-hidden="true">›</span>
         </a>
 
-        <div class="nav-card coming-soon" aria-disabled="true" title="Línea de Tiempo — Próximamente">
+        <a class="nav-card" href="<?= route('timeline', $routes) ?>">
             <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 8h24M20 56h24M23 8c0 12 5 17 9 20-4 3-9 8-9 20M41 8c0 12-5 17-9 20 4 3 9 8 9 20"/></svg></span>
             <span><span class="nav-title">Línea de Tiempo</span><span class="nav-sub">Historia del gremio y sus personajes.</span></span>
             <span class="nav-arrow" aria-hidden="true">›</span>
-        </div>
+        </a>
 
         <div class="nav-card coming-soon" aria-disabled="true" title="Funciones Beta — Próximamente">
             <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M24 8h16M28 8v15L14 48a6 6 0 0 0 5 9h26a6 6 0 0 0 5-9L36 23V8"/><path d="M21 43h22"/><circle cx="27" cy="47" r="2"/><circle cx="38" cy="38" r="2"/></svg></span>

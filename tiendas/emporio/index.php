@@ -39,6 +39,7 @@ $shopData = [
     'characters' => emporio_characters($user),
     'orders' => array_map('emporio_order_public', emporio_orders_for($user, 20)),
     'csrf' => $csrf,
+    'panelUrl' => favor_url('admin/'),
     'discount' => [
         'active' => $discount['active'],
         'percent' => $discount['percent'],
@@ -77,7 +78,7 @@ $shopData = [
     <nav class="header-actions" aria-label="Secciones del Emporio">
         <button id="catalogTab" class="tab active" type="button" aria-pressed="true">Catálogo</button>
         <button id="servicesTab" class="tab" type="button" aria-pressed="false">Servicios</button>
-        <?php if ($user): ?><button id="ordersTab" class="tab" type="button" aria-pressed="false">Mis pedidos</button><?php endif; ?>
+        <?php if ($user): ?><button id="ordersTab" class="tab" type="button" aria-pressed="false">Mis compras</button><?php endif; ?>
         <?php if ($isAdmin): ?><a href="admin.php">Admin</a><?php endif; ?>
     </nav>
 </header>
@@ -86,7 +87,7 @@ $shopData = [
     <div class="hero-inner">
         <p class="eyebrow">El archivo arcano ha vuelto a abrirse</p>
         <h1>Todo tiene<br>un precio.</h1>
-        <p class="hero-text">Reliquias, curiosidades y errores de la magia reunidos bajo un mismo techo. Elige, compara y deja tu pedido: Ecix's lo revisará en persona.</p>
+        <p class="hero-text">Reliquias, curiosidades y errores de la magia reunidos bajo un mismo techo. Elige, compara y compra: el oro sale de tu Banca y las cartas van directo a tu Inventario.</p>
         <div class="hero-stats" aria-label="Resumen">
             <span><b><?= count($cards) ?></b> objetos</span>
             <span><b><?= count($categories) ?></b> categorías</span>
@@ -161,7 +162,7 @@ $shopData = [
                 <?php elseif ($user): ?>
                     <span class="budget-info">No encontré personajes activos en tu cuenta para calcular el saldo.</span>
                 <?php else: ?>
-                    <span class="budget-info"><a href="<?= e($shopData['loginUrl']) ?>">Inicia sesión</a> para ver qué puede pagar tu personaje y dejarle pedidos a Ecix's.</span>
+                    <span class="budget-info"><a href="<?= e($shopData['loginUrl']) ?>">Inicia sesión</a> para ver qué puede pagar tu personaje y comprar.</span>
                 <?php endif; ?>
             </div>
         </div>
@@ -197,7 +198,7 @@ $shopData = [
                         <div class="card-actions">
                             <button class="favorite-btn" type="button" aria-label="Añadir a favoritos" aria-pressed="false">♥</button>
                             <button class="select-btn" type="button" aria-pressed="false">Comparar</button>
-                            <?php if ($user): ?><button class="order-btn" type="button"<?= $card['soldOut'] ? ' disabled title="Agotado"' : '' ?>>+ Pedido</button><?php endif; ?>
+                            <?php if ($user): ?><button class="order-btn" type="button"<?= $card['soldOut'] ? ' disabled title="Agotado"' : '' ?>>+ Carrito</button><?php endif; ?>
                         </div>
                     </div>
                 </article>
@@ -218,7 +219,7 @@ $shopData = [
                     <h3><?= e($service['name']) ?></h3>
                     <p class="price"><?= e($service['price']) ?></p>
                     <p><?= e($service['description']) ?></p>
-                    <?php if ($user): ?><button class="tool-btn service-order" type="button">+ Añadir al pedido</button><?php endif; ?>
+                    <?php if ($user): ?><button class="tool-btn service-order" type="button">+ Añadir al carrito</button><?php endif; ?>
                 </article>
             <?php endforeach; ?>
             <?php if (!$services): ?><div class="empty">Ecix's no tiene servicios publicados por ahora.</div><?php endif; ?>
@@ -228,8 +229,8 @@ $shopData = [
     <?php if ($user): ?>
     <section id="ordersView" class="view" hidden>
         <div class="catalog-head">
-            <div><p class="eyebrow">Tus tratos con Ecix's</p><h2><?= $isAdmin ? 'Pedidos recientes' : 'Mis pedidos' ?></h2></div>
-            <p class="catalog-note">Ecix's (el DM) revisa cada pedido. El oro no se descuenta solo: lo hace el DM en la Banca cuando lo aprueba.</p>
+            <div><p class="eyebrow">Tus tratos con Ecix's</p><h2><?= $isAdmin ? 'Compras recientes' : 'Mis compras' ?></h2></div>
+            <p class="catalog-note">Cada compra se cobra al instante en la Banca y entra al Inventario. Si hubo un error, el DM puede anularla y devolver el oro desde su panel.</p>
         </div>
         <div id="ordersList" class="orders-list"></div>
     </section>
@@ -238,8 +239,8 @@ $shopData = [
 
 <?php if ($user): ?>
 <div id="orderBar" class="order-bar" hidden>
-    <span><b id="orderCount">0</b> en el pedido · <span id="orderTotal">0 po</span></span>
-    <button id="orderOpen" class="tool-btn active" type="button">Revisar y enviar</button>
+    <span><b id="orderCount">0</b> en el carrito · <span id="orderTotal">0 po</span></span>
+    <button id="orderOpen" class="tool-btn active" type="button">Ver carrito y comprar</button>
 </div>
 <?php endif; ?>
 

@@ -105,7 +105,27 @@ window.rollDice = function(selectedDiceNumber) {
         const label = historyItem.querySelector('.roll_history_element_name_left_text');
         if (label) label.textContent = jackRollLabel();
     }
+    jackAnnounceCritical();
 };
+
+// Un 20 o un 1 natural en un solo d20 se avisa en Discord (si el DM lo activó),
+// cuando termina la animación para no adelantar el resultado.
+function jackAnnounceCritical() {
+    const cfg = window.FAVOR_DADOS;
+    if (!cfg || Number(diceNumber) !== 20 || Number(diceAmount) !== 1) return;
+    const die = rollResult[1];
+    if (die !== 20 && die !== 1) return;
+    const payload = { die, total: rollResult[0], label: jackRollLabel(), mode: jackRollMode };
+    const delay = rollMode === 'animation' ? animationDuration : 0;
+    setTimeout(() => {
+        fetch(cfg.aviso, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': cfg.csrf },
+            body: JSON.stringify(payload),
+            credentials: 'same-origin'
+        }).catch(() => {});
+    }, delay);
+}
 
 // El historial extendido incluye también el modo de tirada y, cuando corresponde, los dos dados comparados.
 window.logFunction = function() {
@@ -182,7 +202,12 @@ window.toggleAnimationHistory = function() {
     updateJackRollModeDetail(true);
 };
 
-function jackStorageRead() {
+// Con sesión iniciada las tiradas se guardan en la cuenta (rolldice/guardadas.php);
+// sin sesión, solo en este navegador como antes.
+const jackAccount = window.FAVOR_DADOS && window.FAVOR_DADOS.tiradas ? window.FAVOR_DADOS : null;
+let jackAccountReady = false;
+
+function jackLocalRead() {
     try {
         const raw = localStorage.getItem(JACK_SAVED_KEY);
         return raw ? JSON.parse(raw) : [];
@@ -191,10 +216,45 @@ function jackStorageRead() {
     }
 }
 
+function jackStorageRead() {
+    return jackAccount && jackAccountReady ? jackSavedRollsMemory.slice() : jackLocalRead();
+}
+
+function jackAccountSave(value) {
+    fetch(jackAccount.tiradas, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': jackAccount.csrf },
+        body: JSON.stringify({ rolls: value }),
+        credentials: 'same-origin'
+    }).catch(() => {});
+}
+
 function jackStorageWrite(value) {
     jackSavedRollsMemory = value;
     try { localStorage.setItem(JACK_SAVED_KEY, JSON.stringify(value)); } catch (error) {}
+    if (jackAccount && jackAccountReady) jackAccountSave(value);
 }
+
+// Al entrar: trae las de la cuenta; la primera vez sube las que había en este navegador.
+function jackAccountLoad() {
+    if (!jackAccount) return;
+    fetch(jackAccount.tiradas, { credentials: 'same-origin' })
+        .then(r => r.json())
+        .then(data => {
+            if (!data || !data.ok) return;
+            let rolls = Array.isArray(data.rolls) ? data.rolls : [];
+            const local = jackLocalRead();
+            jackAccountReady = true;
+            if (!data.saved && local.length) {
+                rolls = local;
+                jackAccountSave(rolls);
+            }
+            jackSavedRollsMemory = rolls;
+            renderSavedRolls();
+        })
+        .catch(() => {});
+}
+document.addEventListener('DOMContentLoaded', jackAccountLoad);
 
 function saveCurrentRoll() {
     const input = document.getElementById('jack_saved_roll_name');
@@ -1076,6 +1136,9 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('[onclick]').forEach(el => {
         if (el.matches('a, button, input, select, textarea, label')) return;
         if (el.classList.contains('dice_element')) return; // el dado 3D ya tiene «Lanzar de nuevo»
+        // Recuadros que solo envuelven un campo (cantidad, modificador): el campo ya es
+        // accesible; como «botón» el Espacio escrito en el campo pulsaba el recuadro.
+        if (el.querySelector('input, select, textarea, button, a')) return;
         el.setAttribute('role', 'button');
         el.tabIndex = 0;
         if (!el.hasAttribute('aria-label') && el.title) el.setAttribute('aria-label', el.title);

@@ -44,6 +44,19 @@ function favor_asset_url(?string $value): string
     return favor_base_path() . ltrim($value, '/');
 }
 
+/**
+ * Igual que favor_asset_db_path(), pero devuelve '' si la imagen es local y el
+ * archivo no existe. Así la página muestra el emoji en vez de pedir una imagen
+ * que da 404 (pasaba con los iconos de jugador media/icons/<Nombre>.webp).
+ */
+function favor_asset_existing(?string $value): string
+{
+    $value = favor_asset_db_path($value);
+    if ($value === '' || preg_match('#^(?:https?://|data:)#i', $value)) return $value;
+    $path = strtok($value, '?#');
+    return is_file(dirname(__DIR__) . '/' . $path) ? $value : '';
+}
+
 function favor_safe_asset_input(?string $value): string
 {
     $value = trim((string)$value);
@@ -51,7 +64,7 @@ function favor_safe_asset_input(?string $value): string
     if (preg_match('#^https?://#i', $value)) return mb_substr($value, 0, 500, 'UTF-8');
 
     $path = favor_asset_db_path($value);
-    if (preg_match('#^media/(?:icons|characters|profiles|shops)/[A-Za-z0-9_\-./%()\x{00C0}-\x{024F} ]+$#u', $path)) {
+    if (preg_match('#^(?:media/(?:icons|characters|profiles|shops)|tiendas/emporio/Cartas|tiendas/(?:balas-y-sangre|ladamadelasllamas|lapocionpicante|lavaritaeconomica)/assets)/[A-Za-z0-9_\-./%()\x{00C0}-\x{024F} ]+$#u', $path)) {
         return $path;
     }
     return '';

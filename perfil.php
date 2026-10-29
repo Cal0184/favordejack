@@ -82,7 +82,7 @@ if ($user) {
 }
 
 $iconUrl = $player
-    ? favor_asset_url((string)($player['IconUrl'] ?? ''))
+    ? favor_asset_url(favor_asset_existing((string)($player['IconUrl'] ?? '')))
     : '';
 
 $bg = (

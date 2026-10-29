@@ -70,8 +70,9 @@
         return path.startsWith('media/') ? FAVOR_BASE + path : value;
     }
 
-    function imageHtml(character, extra = '') {
-        const src = resolveAssetSrc(character?.portrait || character?.icon || '');
+    // Tarjetas y listas usan la miniatura (thumb); el expediente abierto, el retrato entero.
+    function imageHtml(character, extra = '', full = false) {
+        const src = resolveAssetSrc((full ? '' : character?.thumb) || character?.portrait || character?.icon || '');
         if (!src) return `<div class="placeholder-art ${extra}" aria-hidden="true">✦</div>`;
         return `<img class="${extra}" src="${esc(src)}" alt="${esc(character.name || '')}" loading="lazy" onerror="this.outerHTML='<div class=&quot;placeholder-art&quot; aria-hidden=&quot;true&quot;>✦</div>'">`;
     }
@@ -263,7 +264,7 @@
         const text = c.biography || c.description;
         characterModalContent.innerHTML = `
             <div class="folio-grid">
-                <div class="folio-art${isActiveCharacter(c) ? '' : ' is-inactive'}">${imageHtml(c)}</div>
+                <div class="folio-art${isActiveCharacter(c) ? '' : ' is-inactive'}">${imageHtml(c, '', true)}</div>
                 <div class="folio-content">
                     <p class="folio-kicker">Archivo de ${esc(c.player || 'miembro desconocido')}</p>
                     <h2 class="folio-name" id="characterModalName">${esc(c.name)}</h2>
@@ -467,34 +468,19 @@
         person.classList.add('height-image-ready');
     }
 
-    function resizeHeightStage() {
-        const stage = $('#heightChart');
-        const people = $('.height-people', stage || document);
-        const scroll = $('#heightScroll');
-        if (!stage || !people) return;
-        const needed = Math.ceil(people.scrollWidth + 92);
-        const viewport = Math.max(900, (scroll?.clientWidth || 0));
-        stage.style.width = `${Math.max(viewport, needed)}px`;
-    }
-
     function bindHeightPhotos() {
         const stage = $('#heightChart');
         if (!stage) return;
         $$('[data-height-photo]', stage).forEach(img => {
-            const fit = () => {
-                fitHeightPhoto(img);
-                requestAnimationFrame(resizeHeightStage);
-            };
+            const fit = () => fitHeightPhoto(img);
             if (img.complete && img.naturalWidth) fit();
             else img.addEventListener('load', fit, {once: true});
             img.addEventListener('error', () => {
                 img.hidden = true;
                 const fallback = img.nextElementSibling;
                 if (fallback) fallback.hidden = false;
-                requestAnimationFrame(resizeHeightStage);
             }, {once: true});
         });
-        requestAnimationFrame(resizeHeightStage);
     }
 
     function renderHeightChart() {
@@ -512,17 +498,24 @@
         }
 
         const maxCm = Math.max(200, Math.ceil(Math.max(...rows.map(c => c._h * 100)) / 10) * 10 + 10);
-        const plotHeight = Math.max(560, Math.round(maxCm * 3));
+        // Escala más compacta: se ven más personajes a la vez sin perder detalle.
+        const plotHeight = Math.min(540, Math.max(420, Math.round(maxCm * 2.2)));
         const pxPerCm = plotHeight / maxCm;
         el.style.setProperty('--height-plot-px', `${plotHeight}px`);
         el.style.setProperty('--height-max-cm', String(maxCm));
 
-        const ticks = [];
+        // La regla (cm) queda fija a la izquierda al desplazar; la cuadrícula
+        // va dentro del área de personajes y se estira con ellos, sean cuantos sean.
+        const lines = [];
+        const labels = [];
         for (let cm = 0; cm <= maxCm; cm += 10) {
-            ticks.push(`<div class="height-grid-line" style="bottom:${cm * pxPerCm}px"><span>${cm} cm</span></div>`);
+            const bottom = cm * pxPerCm;
+            lines.push(`<div class="height-grid-line${cm % 50 === 0 ? ' major' : ''}" style="bottom:${bottom}px"></div>`);
+            if (cm % 20 === 0) labels.push(`<span style="bottom:${bottom}px">${cm} cm</span>`);
         }
         const people = rows.map(c => heightPersonHtml(c, Math.round(c._h * 100 * pxPerCm))).join('');
-        el.innerHTML = `<div class="height-grid">${ticks.join('')}</div><div class="height-people">${people}</div>`;
+        el.innerHTML = `<div class="height-axis" aria-hidden="true">${labels.join('')}</div>
+            <div class="height-plot"><div class="height-grid">${lines.join('')}</div><div class="height-people">${people}</div></div>`;
         bindHeightPhotos();
     }
 
@@ -608,18 +601,6 @@
         setModalOpen(false);
     }
     $$('[data-close-admin]').forEach(el => el.addEventListener('click', closeAdminModal));
-
-    $('#adminOpen')?.addEventListener('click', () => {
-        if (isAdmin) {
-            switchView('admin');
-            return;
-        }
-        if (isLogged) {
-            window.location.href = FAVOR_BASE + 'cuenta.php';
-            return;
-        }
-        window.location.href = FAVOR_BASE + 'login.php?next=' + encodeURIComponent(FAVOR_BASE + 'archivosdelgremio/');
-    });
 
     $('#adminLogout')?.addEventListener('click', () => {
         // Cierra sesión con el formulario de la barra común (POST con token).
@@ -755,7 +736,7 @@
         const completeness = adminCompleteness(c);
         const missingImage = !hasCharacterImage(c);
         const status = c.state || 'Sin estado';
-        const thumb = c.portrait || c.icon;
+        const thumb = c.thumb || c.portrait || c.icon;
         return `
             <div class="admin-row admin-character-row${isActiveCharacter(c) ? '' : ' is-inactive'}">
                 ${thumb ? `<img src="${esc(thumb)}" alt="" loading="lazy">` : '<div class="admin-thumb admin-thumb-empty" aria-hidden="true">✦</div>'}
@@ -1168,7 +1149,7 @@
                     <div class="form-field"><label>Nombre de la misión</label><input name="name" value="${esc(mission.name)}" required></div>
                     <div class="form-field"><label>Fecha</label><input name="date" type="date" value="${esc(mission.date)}"></div>
                     <div class="form-field"><label>Tipo</label><input name="type" value="${esc(mission.type)}" placeholder="Investigación, combate, rescate…"></div>
-                    <div class="form-field"><label>Estado</label><select name="state">${['Completada','Fallida','En curso','Cancelada'].map(v => `<option ${mission.state === v ? 'selected' : ''}>${v}</option>`).join('')}</select></div>
+                    <div class="form-field"><label>Estado</label><select name="state">${['Publicada','En curso','Completada','Fallida','Cancelada'].map(v => `<option ${mission.state === v ? 'selected' : ''}>${v}</option>`).join('')}</select></div>
                     <div class="form-field full"><label>Recompensa general</label><input name="generalReward" value="${esc(mission.generalReward)}" placeholder="200 po por aventurero, objeto mágico…"></div>
                     <div class="form-field full"><label>Descripción</label><textarea name="description">${esc(mission.description)}</textarea></div>
                 </div>
@@ -1238,7 +1219,7 @@
                 const chosen = selected.has(c.id);
                 return `
                     <button type="button" class="participant-pick-card ${chosen ? 'chosen' : ''}" data-pick-participant="${esc(c.id)}">
-                        <span class="participant-pick-portrait">${c.portrait ? `<img src="${esc(c.portrait)}" alt="">` : '✦'}</span>
+                        <span class="participant-pick-portrait">${(c.thumb || c.portrait) ? `<img src="${esc(c.thumb || c.portrait)}" alt="" loading="lazy">` : '✦'}</span>
                         <span><strong>${esc(c.name)}</strong><small>${esc(c.class || 'Sin clase')}</small></span>
                         <b>${chosen ? 'Quitar' : 'Añadir'}</b>
                     </button>`;
@@ -1253,7 +1234,7 @@
             selectedBox.innerHTML = items.length ? items.map(({id, reward, notes, character: c}) => `
                 <div class="participant-selected-row" data-selected-participant="${esc(id)}">
                     <div class="participant-selected-person">
-                        <span class="participant-pick-portrait">${c.portrait ? `<img src="${esc(c.portrait)}" alt="">` : '✦'}</span>
+                        <span class="participant-pick-portrait">${(c.thumb || c.portrait) ? `<img src="${esc(c.thumb || c.portrait)}" alt="" loading="lazy">` : '✦'}</span>
                         <span><strong>${esc(c.name)}</strong><small>${esc(c.player)} · ${esc(c.class || 'Sin clase')}</small></span>
                     </div>
                     <input type="text" data-selected-reward placeholder="Recompensa individual" value="${esc(reward)}">

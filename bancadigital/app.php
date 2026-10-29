@@ -1142,7 +1142,8 @@ body{display:flex;flex-direction:column;min-height:100vh}
 
 <footer class="site-footer">
   <p>¿Se rompió algo, desapareció una moneda o la bóveda decidió odiarte?</p>
-  <a class="discord-link" href="https://discord.com/app" target="_blank" rel="noopener noreferrer" aria-label="Contactar por Discord">◈ Háblame por Discord, pelotudo</a>
+  <?php require_once dirname(__DIR__) . '/includes/discord.php'; $discordInvite = favor_discord_config()['invite']; ?>
+  <a class="discord-link" href="<?= htmlspecialchars($discordInvite !== '' ? $discordInvite : 'https://discord.com/app', ENT_QUOTES, 'UTF-8') ?>" target="_blank" rel="noopener noreferrer" aria-label="Contactar por Discord">◈ Háblame por Discord, pelotudo</a>
 </footer>
 
 <div id="modal-overlay" role="dialog" aria-modal="true"></div>
@@ -1322,7 +1323,7 @@ function characterIconImgAttrs(character, eager=false){
 }
 
 function characterPortraitImgAttrs(character){
-  const src = resolveAssetSrc(character?.portraitUrl) || characterImagePath(character, 'characters');
+  const src = resolveAssetSrc(character?.thumbUrl || character?.portraitUrl) || characterImagePath(character, 'characters');
 
   return `src="${escapeHtml(src)}" decoding="async" fetchpriority="high"
           onerror="imageFallback(this)"`;

@@ -8,6 +8,7 @@ declare(strict_types=1);
  */
 require_once dirname(__DIR__) . '/includes/auth.php';
 require_once dirname(__DIR__) . '/includes/respaldo.php';
+require_once dirname(__DIR__) . '/includes/integridad.php';
 require_once dirname(__DIR__) . '/includes/auth-widget.php';
 
 favor_session_start();
@@ -70,6 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             $name = basename((string)$upload['name']);
             if (!favor_backup_valid_name($name)) $name = 'subido-' . gmdate('Ymd-His') . '.zip';
+            $name = favor_backup_secret_name($name);
             $target = favor_backup_dir() . '/' . $name;
             if (is_file($target)) throw new RuntimeException('Ya existe un paquete con ese nombre.');
             if (!move_uploaded_file((string)$upload['tmp_name'], $target)) throw new RuntimeException('No pude guardar el paquete.');
@@ -80,9 +82,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (trim((string)($_POST['confirm'] ?? '')) !== 'RESTAURAR') throw new RuntimeException('Escribe RESTAURAR para confirmar.');
             $db = favor_db();
             try { $summary = favor_backup_restore($db, favor_backup_dir() . '/' . $name); } finally { $db->close(); }
+            // Un paquete antiguo trae las fichas con el nombre sin clave: se les pone.
+            require_once dirname(__DIR__) . '/includes/ficha-import.php';
+            try { ficha_pdf_secure_all(); } catch (Throwable $e) { error_log('fichas: ' . $e->getMessage()); }
             $notice = 'Restaurado ' . $name . ': ' . array_sum(array_map('intval', $summary['tables'])) . ' filas en '
                 . count($summary['tables']) . ' tablas y ' . $summary['files'] . ' archivos. '
-                . 'Antes se guardó el estado anterior en ' . $summary['safety'] . '.';
+                . 'Antes se guardó el estado anterior en ' . $summary['safety'] . '.'
+                . ($summary['failed'] ? ' Ojo: no pude colocar ' . count($summary['failed']) . ' archivo(s): ' . implode(', ', array_slice($summary['failed'], 0, 5)) . '.' : '');
+        } elseif ($action === 'integrity') {
+            $db = favor_db();
+            try { [$added, $blocked] = favor_integrity_apply($db); } finally { $db->close(); }
+            $notice = ($added ? 'Protección añadida: ' . implode(', ', $added) . '.' : 'No había nada que añadir.')
+                . ($blocked ? ' Quedan sin proteger por datos que apuntan a personajes que no existen: ' . implode(', ', $blocked) . '. Avísale al desarrollador.' : '');
         } elseif ($action === 'delete') {
             $name = (string)($_POST['name'] ?? '');
             $file = favor_backup_dir() . '/' . $name;
@@ -95,6 +106,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 favor_session_close();
+
+$integrity = [];
+try { $idb = favor_db(); try { $integrity = favor_integrity_report($idb); } finally { $idb->close(); } } catch (Throwable $e) { error_log('integridad: ' . $e->getMessage()); }
+$integrityMissing = array_filter($integrity, static fn(array $r): bool => !$r['exists']);
 
 $packages = [];
 try { $packages = favor_backup_list(); } catch (Throwable $e) { $error = $error ?: $e->getMessage(); }
@@ -157,6 +172,23 @@ summary{cursor:pointer;color:#e0b26a}
     </section>
 
     <section class="card">
+        <h2>Proteger la base de datos</h2>
+        <?php if (!$integrity): ?>
+            <p class="note">No se pudo revisar la base de datos.</p>
+        <?php elseif (!$integrityMissing): ?>
+            <p>✓ Inventario, Relaciones y Fichas ya están protegidos: la base no deja guardar datos de un personaje que no existe.</p>
+        <?php else: ?>
+            <p>Inventario, Relaciones y Fichas todavía no tienen la protección que impide guardar datos de un personaje que no existe. Añadirla no borra ni cambia nada; haz antes un paquete por si acaso.</p>
+            <ul class="note"><?php foreach ($integrityMissing as $r): ?><li><?= h($r['table'] . '.' . $r['column']) ?>: <?= $r['orphans'] ? h($r['orphans'] . ' datos huérfanos (no se puede añadir)') : 'lista para añadir' ?></li><?php endforeach; ?></ul>
+            <form method="post">
+                <input type="hidden" name="csrf" value="<?= h($csrf) ?>">
+                <input type="hidden" name="action" value="integrity">
+                <button type="submit">Añadir la protección</button>
+            </form>
+        <?php endif; ?>
+    </section>
+
+    <section class="card">
         <h2>Paquetes guardados</h2>
         <?php if (!$packages): ?>
             <p class="note">Todavía no hay paquetes.</p>
@@ -194,7 +226,8 @@ summary{cursor:pointer;color:#e0b26a}
         <form method="post" enctype="multipart/form-data" class="restore">
             <input type="hidden" name="csrf" value="<?= h($csrf) ?>">
             <input type="hidden" name="action" value="upload">
-            <input type="file" name="paquete" accept=".zip" required>
+            <label for="paquete-zip">Paquete .zip</label>
+            <input type="file" id="paquete-zip" name="paquete" accept=".zip" required>
             <button type="submit">Subir paquete</button>
         </form>
     </section>

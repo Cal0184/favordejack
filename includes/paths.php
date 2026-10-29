@@ -4,6 +4,23 @@ declare(strict_types=1);
 require_once __DIR__ . '/config.php';
 
 /*
+ * 'force_https' => true en config.local.php (lo pone el instalador): toda
+ * página pedida por http:// se redirige a https://.
+ */
+if (PHP_SAPI !== 'cli' && !empty(favor_config()['force_https']) && !headers_sent()) {
+    $favorHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || strtolower((string)($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '')) === 'https'
+        || (string)($_SERVER['SERVER_PORT'] ?? '') === '443';
+    $favorHost = preg_replace('/[^A-Za-z0-9.\-:\[\]]/', '', (string)($_SERVER['HTTP_HOST'] ?? ''));
+    if (!$favorHttps && $favorHost !== '') {
+        header('Location: https://' . $favorHost . (string)($_SERVER['REQUEST_URI'] ?? '/'), true, 301);
+        exit;
+    }
+    // El navegador recuerda usar HTTPS durante un año.
+    if ($favorHttps) header('Strict-Transport-Security: max-age=31536000');
+}
+
+/*
  * Ruta base de la web («/favordejack/», «/» u otra carpeta).
  *
  * Se calcula sola comparando la carpeta de la web con la raíz del servidor,

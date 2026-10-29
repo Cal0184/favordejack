@@ -1269,3 +1269,95 @@ html.keep-gutter{scrollbar-gutter:stable}
 
 /* Categoría NPC */
 .admin-status-chip.npc{background:#4d3f67;color:#f2e8ff;border-color:#76649a}
+
+/* ============================================================
+   V3.9 · Cartel compacto y centrado
+   Sin botón de cuenta (la cuenta vive en la barra común y la
+   Mesa del Archivero en los marcadores). El cartel es una placa
+   centrada sobre el libro y deja libre la columna de marcadores.
+   ============================================================ */
+.header-beam{
+    grid-template-columns:1fr;
+    justify-items:center;
+    width:100%;
+    max-width:880px;
+    min-height:0;
+    padding:12px 44px;
+}
+.guild-brand h1{white-space:nowrap}
+/* Centrado respecto de la pantalla: el mismo margen a ambos lados,
+   así queda en el medio y tampoco toca los marcadores. */
+@media(min-width:1181px){
+    .guild-header{padding-left:236px;padding-right:236px}
+}
+@media(max-width:1180px){
+    .header-beam{grid-template-columns:1fr}
+}
+@media(max-width:560px){
+    .header-beam{padding:10px 26px}
+    .guild-brand h1{white-space:normal}
+}
+
+/* ============================================================
+   V3.10 · Cabecera que se queda arriba + comparador de alturas
+   La cabecera ya no persigue al lector al bajar. En el comparador
+   la cuadrícula se estira con los personajes (sin cálculo en JS)
+   y la regla de centímetros queda fija a la izquierda.
+   ============================================================ */
+.guild-header{position:relative}
+.height-scroll{padding-bottom:14px;scrollbar-width:thin}
+.height-stage{
+    display:flex;
+    align-items:flex-start;
+    width:max-content;
+    min-width:100%;
+    height:auto;
+    padding:14px 0 0;
+}
+.height-axis{
+    position:sticky;
+    left:0;
+    z-index:6;
+    flex:0 0 60px;
+    height:var(--height-plot-px);
+    border-right:2px solid #76552f;
+    background:linear-gradient(90deg,#ead9b0 82%,#ead9b000);
+}
+.height-axis span{
+    position:absolute;
+    right:8px;
+    transform:translateY(50%);
+    font-family:'Cinzel',serif;
+    font-size:.64rem;
+    color:#78613f;
+    white-space:nowrap;
+}
+.height-plot{
+    position:relative;
+    flex:1 0 auto;
+    height:calc(var(--height-plot-px) + 58px);
+}
+.height-grid,
+.height-stage .height-grid{
+    left:0;
+    right:0;
+    border-left:0;
+}
+.height-grid-line.major{background:#6f583299}
+.height-grid-line span{display:none}
+.height-people,
+.height-stage .height-people{
+    position:relative;
+    left:auto;
+    width:auto;
+    min-width:100%;
+    justify-content:space-around;
+    gap:14px;
+    padding:0 26px;
+}
+/* En móvil la barra de navegación del sitio ocupa el borde inferior:
+   los marcadores se apoyan encima de ella en vez de quedar tapados. */
+@media(max-width:819px){
+    .book-tabs{bottom:calc(var(--favor-tab-h,58px) + 6px + env(safe-area-inset-bottom))}
+    .library-shell{padding-bottom:64px}
+}

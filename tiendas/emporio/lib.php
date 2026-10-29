@@ -16,6 +16,8 @@ declare(strict_types=1);
 require_once dirname(__DIR__, 2) . '/includes/auth.php';
 require_once __DIR__ . '/miniaturas.php';
 require_once dirname(__DIR__, 2) . '/includes/descuentos.php';
+require_once dirname(__DIR__, 2) . '/includes/compras.php';
+require_once dirname(__DIR__, 2) . '/includes/discord.php';
 
 const EMPORIO_CARTAS_DIR = __DIR__ . '/Cartas';
 const EMPORIO_DATA_DIR = __DIR__ . '/data';
@@ -32,9 +34,9 @@ const EMPORIO_SAME_ART = 1.0;
 const EMPORIO_ORDER_STATES = [
     'pendiente' => 'Pendiente',
     'aprobado' => 'Aprobado',
-    'entregado' => 'Entregado',
+    'entregado' => 'Comprado',
     'rechazado' => 'Rechazado',
-    'cancelado' => 'Cancelado',
+    'cancelado' => 'Anulado',
 ];
 
 function e(string $value): string
@@ -538,7 +540,9 @@ function emporio_characters(?array $user): array
         $stmt->execute();
         $result = $stmt->get_result();
         $out = [];
+        $npc = favor_npc_ids($db);
         while ($row = $result->fetch_assoc()) {
+            if (isset($npc[(string)$row['ID']])) continue; // los NPC no compran
             $copper = (int)$row['Platino'] * 1000 + (int)$row['Oro'] * 100 + (int)$row['Plata'] * 10 + (int)$row['Cobre'];
             $out[] = [
                 'id' => (string)$row['ID'],
@@ -594,6 +598,7 @@ function emporio_order_public(array $o): array
         'note' => (string)($o['note'] ?? ''),
         'reply' => (string)($o['reply'] ?? ''),
         'discount' => is_array($o['discount'] ?? null) ? $o['discount'] : null,
+        'charged' => is_array($o['charge'] ?? null) ? round((int)$o['charge']['copper'] / 100, 2) : null,
     ];
 }
 
@@ -631,3 +636,189 @@ function emporio_order_discount_sync(array $order, string $oldState, string $by)
     }
     return '';
 }
+
+/** Unidades de cartas (objetos con stock) de un pedido: [id => cantidad]. Los servicios no tienen stock. */
+function emporio_order_stock_lines(array $order, array $cards): array
+{
+    $lines = [];
+    foreach ((array)($order['items'] ?? []) as $line) {
+        $id = (string)($line['id'] ?? '');
+        if (!isset($cards[$id])) continue;
+        $lines[$id] = ($lines[$id] ?? 0) + max(1, (int)($line['qty'] ?? 1));
+    }
+    return $lines;
+}
+
+/**
+ * Mueve el stock del catálogo: $sign -1 aparta unidades (falla, sin tocar
+ * nada, si alguna no alcanza o no está disponible) y +1 las devuelve. Todo con
+ * el candado del catálogo: dos compras a la vez no se llevan la misma unidad.
+ */
+function emporio_stock_move(array $lines, int $sign, array $cards): void
+{
+    if (!$lines) return;
+    emporio_update_json(EMPORIO_CATALOG_FILE, static function (array $raw) use ($lines, $sign, $cards): array {
+        $catalog = normalize_catalog($raw);
+        foreach ($lines as $id => $qty) {
+            $card = $cards[$id] ?? null;
+            if (!$card) continue;
+            // La misma ficha que lee emporio_all_cards().
+            $key = $id;
+            if (!isset($catalog[$id])) {
+                $alt = canonical_slug(pretty_name((string)$card['file']));
+                if (isset($catalog[$alt])) $key = $alt;
+            }
+            $row = is_array($catalog[$key] ?? null) ? $catalog[$key] : ['id' => $key];
+            $stock = max(0, (int)saved_value($row, 'stock', 1));
+            if ($sign < 0) {
+                if (!(bool)saved_value($row, 'available', true) || $stock <= 0) throw new RuntimeException($card['name'] . ' está agotado.');
+                if ($stock < $qty) throw new RuntimeException('De ' . $card['name'] . ' solo ' . ($stock === 1 ? 'queda 1 unidad.' : 'quedan ' . $stock . ' unidades.'));
+                $row['stock'] = $stock - $qty;
+            } else {
+                $row['stock'] = $stock + $qty;
+            }
+            $catalog[$key] = $row;
+        }
+        return $catalog;
+    });
+}
+
+/**
+ * Cobro del pedido según su nuevo estado. Al pasar a aprobado o entregado se
+ * cobra en la Banca y los objetos entran al Inventario; al volver a pendiente,
+ * rechazado o cancelado se devuelve. Cambia $order (charge/charges) y devuelve
+ * un aviso para el admin. Si no se puede cobrar, lanza y el estado no cambia.
+ * $finalPo: precio final que pone el DM (si no, el total estimado del pedido).
+ */
+function emporio_order_charge_sync(array &$order, ?float $finalPo, string $by): string
+{
+    $charId = (string)($order['characterId'] ?? '');
+    $charged = is_array($order['charge'] ?? null);
+    $shouldCharge = in_array((string)$order['state'], FAVOR_ORDER_CHARGED_STATES, true);
+    $label = 'pedido ' . (string)($order['id'] ?? '');
+
+    if ($shouldCharge && !$charged) {
+        $po = $finalPo ?? (isset($order['total']) ? (float)$order['total'] : null);
+        if ($po === null) throw new RuntimeException('Este pedido tiene objetos sin precio: escribe el precio final antes de aprobarlo.');
+        $copper = max(0, (int)round($po * 100));
+
+        $cards = emporio_all_cards();
+        // Primero el stock: si no alcanza, no se cobra nada. order['stock']
+        // recuerda lo apartado para devolverlo una sola vez al anular.
+        $stockLines = isset($order['stock']) ? [] : emporio_order_stock_lines($order, $cards);
+        emporio_stock_move($stockLines, -1, $cards);
+        $items = [];
+        foreach ((array)($order['items'] ?? []) as $line) {
+            $card = $cards[(string)($line['id'] ?? '')] ?? null;
+            if (!$card) continue; // los servicios no van al Inventario
+            $image = is_file(emporio_mini_path($card['id'])) ? 'tiendas/emporio/Cartas/mini/' . $card['id'] . '.webp' : 'tiendas/emporio/Cartas/' . $card['file'];
+            $items[] = [
+                'name' => $card['name'],
+                'category' => $card['category'],
+                'qty' => (int)($line['qty'] ?? 1),
+                'description' => $card['description'],
+                'image' => $image,
+            ];
+        }
+        try {
+            $charge = favor_purchase_charge(
+                $charId,
+                $copper,
+                $items,
+                'Compra en el Emporio de Ecix\'s (' . $label . ')',
+                $by,
+                'Comprado en el Emporio de Ecix\'s el ' . date('d-m-Y') . ' (' . $label . ').'
+            );
+        } catch (Throwable $e) {
+            emporio_stock_move($stockLines, 1, $cards);
+            throw $e;
+        }
+        if ($stockLines) $order['stock'] = $stockLines;
+        $order['charge'] = $charge;
+        $order['finalTotal'] = $copper / 100;
+        $n = count($charge['items']);
+        return 'Cobrado ' . favor_copper_label($copper) . ' a ' . ($order['characterName'] ?? '') . ' en la Banca' . ($n ? ' y ' . $n . ($n === 1 ? ' objeto entró' : ' objetos entraron') . ' a su Inventario.' : '.');
+    }
+
+    if (!$shouldCharge && $charged) {
+        $charge = $order['charge'];
+        $removed = favor_purchase_refund($charId, $charge, 'Devolución del Emporio de Ecix\'s (' . $label . ' ' . $order['state'] . ')', $by);
+        $charge['refunded'] = date('c');
+        $order['charges'][] = $charge;
+        unset($order['charge']);
+        if (is_array($order['stock'] ?? null)) {
+            // Las unidades vuelven a la tienda (si la carta sigue existiendo).
+            try { emporio_stock_move(array_map('intval', $order['stock']), 1, emporio_all_cards()); } catch (Throwable $e) { error_log('emporio stock: ' . $e->getMessage()); }
+            unset($order['stock']);
+        }
+        $kept = count((array)($charge['items'] ?? [])) - $removed;
+        return 'Devuelto ' . favor_copper_label((int)$charge['copper']) . ' a ' . ($order['characterName'] ?? '') . ($removed ? ' y ' . ($removed === 1 ? 'quitado 1 objeto' : 'quitados ' . $removed . ' objetos') . ' del Inventario.' : '.') . ($kept > 0 ? ' Ojo: ' . $kept . ' ya no estaban (los borraron a mano).' : '');
+    }
+    return '';
+}
+
+/** Aviso en Discord de una compra recién cobrada. Devuelve '' o el motivo del fallo. */
+function emporio_order_announce(array $order): string
+{
+    $lines = [];
+    foreach ((array)($order['items'] ?? []) as $it) {
+        $qty = (int)($it['qty'] ?? 1);
+        $lines[] = '• ' . ($qty > 1 ? $qty . ' × ' : '') . (string)($it['name'] ?? '');
+    }
+    $copper = (int)($order['charge']['copper'] ?? 0);
+    return favor_discord_send(
+        'compras',
+        '🛒 ' . ($order['characterName'] ?? 'Alguien') . ' compró en el Emporio de Ecix\'s',
+        implode("\n", $lines),
+        [
+            ['Jugador', (string)($order['playerName'] ?? '')],
+            ['Pagó', favor_copper_label($copper)],
+            ['Descuento', is_array($order['discount'] ?? null) ? (int)$order['discount']['percent'] . ' % en ' . $order['discount']['item'] : ''],
+            ['Ecix\'s dice', (string)($order['reply'] ?? '')],
+        ]
+    );
+}
+
+/** «12,5» o «12.5» del formulario a po; '' = sin precio final. */
+function emporio_final_price(mixed $raw): ?float
+{
+    $raw = str_replace(',', '.', trim((string)$raw));
+    return $raw !== '' && is_numeric($raw) ? max(0.0, (float)$raw) : null;
+}
+
+/**
+ * El DM cambia el estado de un pedido (admin del Emporio y Panel del DM):
+ * cobra o devuelve en la Banca, ajusta el descuento y avisa en Discord.
+ * Devuelve [pedido, aviso para el admin]. Si no se puede cobrar, lanza y el
+ * pedido queda como estaba.
+ */
+function emporio_order_set_state(string $id, string $state, ?string $reply, ?float $final, array $user): array
+{
+    if (!isset(EMPORIO_ORDER_STATES[$state])) throw new RuntimeException('Estado no válido.');
+    $by = (string)($user['displayName'] ?? $user['username'] ?? 'DM');
+    $chargeNote = '';
+    $oldState = '';
+    $updated = emporio_update_json(EMPORIO_ORDERS_FILE, static function (array $orders, &$found) use ($id, $state, $reply, $final, $by, &$chargeNote, &$oldState): array {
+        foreach ($orders as &$o) {
+            if (is_array($o) && ($o['id'] ?? '') === $id) {
+                $oldState = (string)($o['state'] ?? '');
+                $o['state'] = $state;
+                if ($reply !== null) $o['reply'] = $reply;
+                $o['updated'] = date('c');
+                // Cobra o devuelve en la Banca; si falla, el pedido no cambia.
+                $chargeNote = emporio_order_charge_sync($o, $final, $by);
+                $found = $o;
+            }
+        }
+        unset($o);
+        if (!$found) throw new RuntimeException('No encontré ese pedido.');
+        return $orders;
+    });
+    if ($chargeNote !== '' && is_array($updated['charge'] ?? null)) {
+        $fail = emporio_order_announce($updated);
+        if ($fail !== '' && !str_starts_with($fail, 'Sin webhook')) $chargeNote .= ' (El aviso a Discord falló: ' . $fail . ')';
+    }
+    $note = trim($chargeNote . ' ' . emporio_order_discount_sync($updated, $oldState, (string)($user['username'] ?? $by)));
+    return [$updated, $note];
+}
+

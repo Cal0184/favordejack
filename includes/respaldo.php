@@ -32,9 +32,12 @@ function favor_backup_paths(): array
         'tiendas/lapocionpicante/productos.json',
         'tiendas/lapocionpicante/registro-descuentos.json',
         'tiendas/descuentos.json',
+        'tiendas/compras.json',
         'tiendas/lavaritaeconomica/productos.json',
         'regulaciones/data/regulations.json',
+        'cronicas/data/cronicas.json',
         'mapa/tiendas.json',
+        'admin/data/',
     ];
 }
 
@@ -56,10 +59,21 @@ function favor_backup_dir(): string
     return $dir;
 }
 
-/** Nombre de paquete seguro (sin rutas): favordejack-AAAAMMDD-HHMMSS.zip */
+/** Nombre de paquete seguro (sin rutas): favordejack-AAAAMMDD-HHMMSS-<clave>.zip */
 function favor_backup_valid_name(string $name): bool
 {
-    return (bool)preg_match('/^[A-Za-z0-9][A-Za-z0-9._-]{0,120}\.zip$/', $name);
+    return (bool)preg_match('/^[A-Za-z0-9][A-Za-z0-9._-]{0,160}\.zip$/', $name);
+}
+
+/**
+ * Añade una clave al azar al nombre. En Hestia, Nginx entrega por su cuenta los
+ * .zip y .pdf sin pasar por Apache, así que el .htaccess de respaldos/ podría no
+ * aplicarse: con la clave, nadie puede adivinar la dirección de un paquete.
+ */
+function favor_backup_secret_name(string $name): string
+{
+    if (preg_match('/-[a-f0-9]{16}\.zip$/', $name)) return $name;
+    return substr($name, 0, -4) . '-' . bin2hex(random_bytes(8)) . '.zip';
 }
 
 /** Paquetes guardados en respaldos/, el más reciente primero. */
@@ -70,6 +84,12 @@ function favor_backup_list(): array
     foreach (glob($dir . '/*.zip') ?: [] as $file) {
         $name = basename($file);
         if (!favor_backup_valid_name($name)) continue;
+        // Paquetes de antes (o subidos por FTP) sin clave: se les pone.
+        $secret = favor_backup_secret_name($name);
+        if ($secret !== $name && !is_file($dir . '/' . $secret) && @rename($file, $dir . '/' . $secret)) {
+            $file = $dir . '/' . $secret;
+            $name = $secret;
+        }
         $items[] = ['name' => $name, 'size' => filesize($file) ?: 0, 'time' => filemtime($file) ?: 0];
     }
     usort($items, static fn(array $a, array $b): int => $b['time'] <=> $a['time']);
@@ -137,7 +157,7 @@ function favor_backup_export(mysqli $db, string $label = ''): string
 
     $dir = favor_backup_dir();
     $suffix = $label !== '' ? '-' . preg_replace('/[^a-z0-9-]/', '', strtolower($label)) : '';
-    $name = 'favordejack-' . gmdate('Ymd-His') . $suffix . '.zip';
+    $name = favor_backup_secret_name('favordejack-' . gmdate('Ymd-His') . $suffix . '.zip');
     $zipPath = $dir . '/' . $name;
     $sqlPath = $dir . '/.volcado-' . bin2hex(random_bytes(6)) . '.sql';
 
@@ -249,8 +269,16 @@ function favor_backup_run_sql(mysqli $db, $stream): int
 }
 
 /**
- * Restaura un paquete: primero guarda un respaldo automático del estado actual,
- * luego reemplaza la base de datos y escribe los archivos.
+ * Restaura un paquete, sin dejar la web a medias:
+ *  1. Revisa el paquete entero: manifiesto, rutas permitidas, y lo descomprime
+ *     en una carpeta temporal (respaldos/.restaurando-…) comprobando el tamaño
+ *     de cada archivo y que el volcado SQL llegue completo hasta el final.
+ *  2. Comprueba que se pueda escribir en cada carpeta de destino.
+ *  3. Guarda un respaldo automático del estado actual.
+ *  4. Reemplaza la base de datos. Si falla a mitad, vuelve a cargar sola la
+ *     base del respaldo automático.
+ *  5. Coloca los archivos ya revisados (mover dentro del mismo disco: rápido).
+ * Hasta el paso 4 no se toca nada: un paquete roto se rechaza sin cambios.
  */
 function favor_backup_restore(mysqli $db, string $zipPath, bool $safetyBackup = true): array
 {
@@ -260,6 +288,7 @@ function favor_backup_restore(mysqli $db, string $zipPath, bool $safetyBackup = 
     $zip = new ZipArchive();
     if ($zip->open($zipPath, ZipArchive::RDONLY) !== true) throw new RuntimeException('No pude abrir el paquete .zip.');
 
+    $stage = favor_backup_dir() . '/.restaurando-' . bin2hex(random_bytes(6));
     try {
         $manifest = json_decode((string)$zip->getFromName('paquete.json'), true);
         if (!is_array($manifest) || ($manifest['app'] ?? '') !== 'favordejack') {
@@ -270,7 +299,7 @@ function favor_backup_restore(mysqli $db, string $zipPath, bool $safetyBackup = 
         }
         if ($zip->locateName('base-de-datos.sql') === false) throw new RuntimeException('Al paquete le falta base-de-datos.sql.');
 
-        // Revisa todas las rutas ANTES de tocar nada.
+        // 1. Rutas y contenido, ANTES de tocar nada.
         $entries = [];
         for ($i = 0; $i < $zip->numFiles; $i++) {
             $name = (string)$zip->getNameIndex($i);
@@ -279,32 +308,59 @@ function favor_backup_restore(mysqli $db, string $zipPath, bool $safetyBackup = 
             if (!favor_backup_allowed_path($relative)) throw new RuntimeException("El paquete contiene una ruta no permitida: $relative");
             $entries[$i] = $relative;
         }
+        if (!@mkdir($stage, 0775, true)) throw new RuntimeException('No pude crear la carpeta temporal en respaldos/. Revisa los permisos.');
 
-        $safety = $safetyBackup ? basename(favor_backup_export($db, 'antes-de-restaurar')) : null;
-
-        $sql = $zip->getStream('base-de-datos.sql');
-        if (!$sql) throw new RuntimeException('No pude leer base-de-datos.sql.');
-        $statements = favor_backup_run_sql($db, $sql);
-        fclose($sql);
-
-        $root = favor_backup_root();
-        $written = 0;
+        $sqlPath = $stage . '/base-de-datos.sql';
+        favor_backup_extract($zip, (int)$zip->locateName('base-de-datos.sql'), $sqlPath);
+        if (!favor_backup_sql_complete($sqlPath)) throw new RuntimeException('El volcado de la base de datos del paquete está incompleto. No se cambió nada.');
         foreach ($entries as $index => $relative) {
-            $target = $root . '/' . $relative;
-            $folder = dirname($target);
-            if (!is_dir($folder) && !mkdir($folder, 0775, true) && !is_dir($folder)) {
-                throw new RuntimeException("No pude crear la carpeta de $relative.");
+            favor_backup_extract($zip, $index, $stage . '/archivos/' . $relative);
+        }
+
+        // 2. ¿Se puede escribir en cada destino?
+        $root = favor_backup_root();
+        foreach (array_unique(array_map(static fn(string $r): string => dirname($root . '/' . $r), $entries)) as $folder) {
+            if (!is_dir($folder) && !@mkdir($folder, 0775, true) && !is_dir($folder)) throw new RuntimeException('No pude crear la carpeta ' . substr($folder, strlen($root) + 1) . '. No se cambió nada.');
+            if (!is_writable($folder)) throw new RuntimeException('La carpeta ' . substr($folder, strlen($root) + 1) . ' no deja escribir. No se cambió nada.');
+        }
+
+        // 3. Respaldo del estado actual.
+        $safetyPath = $safetyBackup ? favor_backup_export($db, 'antes-de-restaurar') : null;
+        $safety = $safetyPath ? basename($safetyPath) : null;
+
+        // 4. Base de datos (si falla, vuelve la de antes).
+        try {
+            $sql = fopen($sqlPath, 'rb');
+            if (!$sql) throw new RuntimeException('No pude leer base-de-datos.sql.');
+            try { $statements = favor_backup_run_sql($db, $sql); } finally { fclose($sql); }
+        } catch (Throwable $e) {
+            $back = '';
+            if ($safetyPath) {
+                try {
+                    $old = new ZipArchive();
+                    if ($old->open($safetyPath, ZipArchive::RDONLY) === true) {
+                        $oldSql = $old->getStream('base-de-datos.sql');
+                        if ($oldSql) { favor_backup_run_sql($db, $oldSql); fclose($oldSql); $back = ' Se volvió a cargar la base de datos de antes (' . $safety . ').'; }
+                        $old->close();
+                    }
+                } catch (Throwable $e2) {
+                    $back = ' Tampoco pude volver a cargar la de antes: restaura a mano el paquete ' . $safety . '.';
+                }
             }
-            $in = $zip->getStream((string)$zip->getNameIndex($index));
-            $out = fopen($target, 'wb');
-            if (!$in || !$out) throw new RuntimeException("No pude escribir $relative.");
-            stream_copy_to_stream($in, $out);
-            fclose($in);
-            fclose($out);
-            $written++;
+            throw new RuntimeException('Falló la restauración de la base de datos: ' . $e->getMessage() . '.' . $back . ' Los archivos no se tocaron.', 0, $e);
+        }
+
+        // 5. Archivos.
+        $written = 0;
+        $failed = [];
+        foreach ($entries as $relative) {
+            $target = $root . '/' . $relative;
+            if (@rename($stage . '/archivos/' . $relative, $target) || @copy($stage . '/archivos/' . $relative, $target)) $written++;
+            else $failed[] = $relative;
         }
     } finally {
         $zip->close();
+        favor_backup_rmdir($stage);
     }
 
     return [
@@ -312,6 +368,44 @@ function favor_backup_restore(mysqli $db, string $zipPath, bool $safetyBackup = 
         'tables' => $manifest['tables'] ?? [],
         'statements' => $statements,
         'files' => $written,
+        'failed' => $failed,
         'safety' => $safety,
     ];
+}
+
+/** Saca una entrada del zip a $target y comprueba que salió entera. */
+function favor_backup_extract(ZipArchive $zip, int $index, string $target): void
+{
+    $stat = $zip->statIndex($index);
+    $name = (string)($stat['name'] ?? '?');
+    $folder = dirname($target);
+    if (!is_dir($folder) && !@mkdir($folder, 0775, true) && !is_dir($folder)) throw new RuntimeException("No pude preparar $name. No se cambió nada.");
+    $in = $zip->getStream($name);
+    $out = @fopen($target, 'wb');
+    if (!$in || !$out) throw new RuntimeException("No pude leer $name del paquete. No se cambió nada.");
+    $bytes = stream_copy_to_stream($in, $out);
+    fclose($in);
+    fclose($out);
+    if ($bytes === false || $bytes !== (int)($stat['size'] ?? -1)) throw new RuntimeException("El archivo $name del paquete está dañado. No se cambió nada.");
+}
+
+/** El volcado termina con «SET FOREIGN_KEY_CHECKS = 1;»: si no, está cortado. */
+function favor_backup_sql_complete(string $path): bool
+{
+    $size = (int)@filesize($path);
+    if ($size <= 0) return false;
+    $fh = fopen($path, 'rb');
+    fseek($fh, max(0, $size - 200));
+    $tail = (string)fread($fh, 200);
+    fclose($fh);
+    return str_ends_with(rtrim($tail), 'SET FOREIGN_KEY_CHECKS = 1;');
+}
+
+/** Borra la carpeta temporal de una restauración. */
+function favor_backup_rmdir(string $dir): void
+{
+    if (!is_dir($dir)) return;
+    $items = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST);
+    foreach ($items as $item) $item->isDir() ? @rmdir($item->getPathname()) : @unlink($item->getPathname());
+    @rmdir($dir);
 }
