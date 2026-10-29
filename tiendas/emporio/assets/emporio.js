@@ -262,11 +262,16 @@ function orderTotal() {
     });
     return {total, unknown};
 }
+/** Tope del carrito: el stock de la carta (los servicios, hasta 20). */
+function maxQty(id) {
+    const stock = CARDS[id] ? Number(CARDS[id].stock) : NaN;
+    return Number.isFinite(stock) ? Math.max(0, Math.min(20, stock)) : 20;
+}
 function saveOrder() { store.set('ecixs_order_v1', order); sync(); }
 function addToOrder(id) {
     if (!DATA.user) { location.href = DATA.loginUrl; return; }
     const line = order.find(l => l.id === id);
-    if (line) line.qty = Math.min(line.qty + 1, 20); else order.push({id, qty: 1});
+    if (line) line.qty = Math.min(line.qty + 1, maxQty(id)); else order.push({id, qty: 1});
     saveOrder();
     toast(`${ORDER_ITEMS[id].name} quedó en tu carrito.`);
 }
@@ -534,7 +539,7 @@ els.modal.addEventListener('click', e => {
     const qty = e.target.closest('[data-qty]');
     if (qty) {
         const line = order.find(l => l.id === qty.dataset.line);
-        if (line) line.qty = Math.max(0, Math.min(20, line.qty + Number(qty.dataset.qty)));
+        if (line) line.qty = Math.max(0, Math.min(maxQty(line.id), line.qty + Number(qty.dataset.qty)));
         order = order.filter(l => l.qty > 0);
         saveOrder();
         order.length ? orderForm() : closeModal();

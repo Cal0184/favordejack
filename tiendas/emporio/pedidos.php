@@ -66,6 +66,8 @@ try {
             if (isset($cards[$id])) {
                 $card = $cards[$id];
                 if ($card['soldOut']) throw new RuntimeException($card['name'] . ' está agotado.');
+                // Aviso rápido; el cobro vuelve a mirarlo con candado.
+                if ($qty > $card['stock']) throw new RuntimeException('De ' . $card['name'] . ' solo ' . ($card['stock'] === 1 ? 'queda 1 unidad.' : 'quedan ' . $card['stock'] . ' unidades.'));
                 $item = ['id' => $id, 'name' => $card['name'], 'price' => $card['priceLabel'], 'pricePo' => $card['pricePo'], 'qty' => $qty];
             } elseif (isset($services[$id])) {
                 $price = (string)($services[$id]['price'] ?? '');
@@ -135,6 +137,9 @@ try {
                 });
             } catch (Throwable $e) {
                 favor_purchase_refund($order['characterId'], $order['charge'], 'Compra deshecha (no se pudo registrar)', $by);
+                if (is_array($order['stock'] ?? null)) {
+                    try { emporio_stock_move($order['stock'], 1, emporio_all_cards()); } catch (Throwable) {}
+                }
                 throw $e;
             }
         } catch (Throwable $e) {

@@ -17,6 +17,9 @@ const REL_VINCULOS=[
  'familia'=>['Familia','#d1a531'],'amistad'=>['Amistad','#5fa65a'],'amor'=>['Amor','#d0609a'],'aliados'=>['Aliados','#4f8fc6'],
  'mentor'=>['Mentor y alumno','#9474cc'],'rivalidad'=>['Rivalidad','#de8a3c'],'enemistad'=>['Enemistad','#c4463e'],'otro'=>['Otro','#9a8a74'],
 ];
+// Categorías extra (además de Personaje y NPC) para los grupos de la Banca.
+const REL_FUERA='Personajes Fuera';
+const REL_MUERTOS='Muertos';
 /** Adivina el vínculo por el texto («Hermano» → familia) para las relaciones viejas. */
 function rel_guess_vinculo(string $tipo):string{
  $t=mb_strtolower($tipo,'UTF-8');
@@ -36,14 +39,25 @@ function rel_ensure_vinculo(mysqli $db):void{
 }
 function rel_can_edit(?array $u,array $c):bool{return $u && (($u['role']??'')==='admin'||(string)($u['playerId']??'')===(string)$c['Jugador']);}
 $db=favor_db();$error=$userError??'';$message='';$characters=[];$relations=[];
-// TEMPORAL 2.2: J013 ('Personajes Fuera') es un contenedor legado de la migracion de Banca.
-// Relaciones trabaja solo con las identidades reales de Archivos hasta rehacer/unificar la BD.
+// Los grupos especiales de la Banca (Muertos, Personajes Fuera) también salen,
+// con su propia categoría. Si un personaje de esos grupos tiene su ficha
+// «gemela» en Archivos (mismo nombre), se muestra solo la de Archivos para no
+// duplicarlo, salvo que la copia de la Banca ya tenga relaciones.
 try{
  favor_ensure_schema($db);
  rel_ensure_vinculo($db);
  $estados=favor_estado_todos($db);
- $sql="SELECT p.ID,p.Jugador,p.Nombre,p.IconUrl,p.PortraitUrl,p.Activo,j.Nombre AS JugadorNombre,COALESCE(NULLIF(pp.NombreCompleto,''),p.Nombre) AS NombreCompleto,pp.Estado,COALESCE(NULLIF(pp.Categoria,''),'Personaje') AS Categoria FROM Personaje p LEFT JOIN Jugador j ON j.ID=p.Jugador LEFT JOIN PersonajePerfil pp ON pp.ID=p.ID WHERE p.Jugador <> 'J013' ORDER BY COALESCE(j.Orden,9999),COALESCE(p.Orden,9999),p.Nombre";
- $res=$db->query($sql);while($r=$res->fetch_assoc()){$r['displayName']=(string)($r['NombreCompleto']?:$r['Nombre']);$r['Estado']=$estados[(string)$r['ID']]['estado']??'Activo';$r['Categoria']=(string)($r['Categoria']?:'Personaje');$characters[(string)$r['ID']]=$r;}$res->free();
+ $sql="SELECT p.ID,p.Jugador,p.Nombre,p.IconUrl,p.PortraitUrl,p.Activo,j.Nombre AS JugadorNombre,COALESCE(NULLIF(pp.NombreCompleto,''),p.Nombre) AS NombreCompleto,pp.Estado,COALESCE(NULLIF(pp.Categoria,''),'Personaje') AS Categoria FROM Personaje p LEFT JOIN Jugador j ON j.ID=p.Jugador LEFT JOIN PersonajePerfil pp ON pp.ID=p.ID ORDER BY COALESCE(j.Orden,9999),COALESCE(p.Orden,9999),p.Nombre";
+ $related=[];$rr=$db->query('SELECT PersonajeA,PersonajeB FROM PersonajeRelacion');while($x=$rr->fetch_row()){$related[(string)$x[0]]=true;$related[(string)$x[1]]=true;}$rr->free();
+ // Nombres (corto y completo) de las fichas de Archivos que no son de un grupo especial.
+ $archNames=[];$rr=$db->query('SELECT p.ID,p.Nombre,pp.NombreCompleto FROM Personaje p JOIN PersonajePerfil pp ON pp.ID=p.ID');while($x=$rr->fetch_row()){if(!empty($estados[(string)$x[0]]['especial']))continue;foreach([$x[1],$x[2]] as $nm){$k=favor_estado_clave((string)$nm);if($k!=='')$archNames[$k]=true;}}$rr->free();
+ $res=$db->query($sql);while($r=$res->fetch_assoc()){$cid=(string)$r['ID'];$est=$estados[$cid]??[];
+  $grupo=favor_estado_clave((string)$r['JugadorNombre']);
+  if(!empty($est['especial'])&&empty($est['npc'])&&!isset($related[$cid])&&(!empty($est['gemelos'])||isset($archNames[favor_estado_clave((string)$r['Nombre'])])))continue;
+  $r['displayName']=(string)($r['NombreCompleto']?:$r['Nombre']);$r['Estado']=$est['estado']??'Activo';$r['Categoria']=(string)($r['Categoria']?:'Personaje');
+  if($r['Categoria']!=='NPC'&&in_array($grupo,FAVOR_ESTADO_GRUPOS_FUERA,true))$r['Categoria']=REL_FUERA;
+  elseif($r['Categoria']!=='NPC'&&$grupo===FAVOR_ESTADO_GRUPO_MUERTOS)$r['Categoria']=REL_MUERTOS;
+  $characters[$cid]=$r;}$res->free();
  $isAdmin=$user && (($user['role']??'')==='admin');
  $playerId=(string)($user['playerId']??'');
  $editableCharacters=array_filter($characters,fn($c)=>$isAdmin||($playerId!==''&&(string)$c['Jugador']===$playerId));
@@ -184,7 +198,7 @@ a{color:inherit;text-decoration:none}button,input,select,textarea{font:inherit}
    <p class="sub"><?= $isAdmin?'Busca y filtra cualquier expediente para centrar la red.':'Aquí solo aparecen los personajes que puedes modificar.' ?></p>
    <div class="filter-grid">
     <div class="wide"><label class="mini-label" for="centralSearch">Buscar</label><input class="control" id="centralSearch" placeholder="Nombre del personaje…"></div>
-    <div><label class="mini-label" for="centralCategory">Tipo</label><select class="control" id="centralCategory"><option value="">Todos</option><option value="Personaje">Personajes</option><option value="NPC">NPC</option></select></div>
+    <div><label class="mini-label" for="centralCategory">Tipo</label><select class="control" id="centralCategory"><option value="">Todos</option><option value="Personaje">Personajes</option><option value="NPC">NPC</option><option value="<?=hr(REL_MUERTOS)?>">Muertos</option><option value="<?=hr(REL_FUERA)?>">Personajes Fuera</option></select></div>
     <div><label class="mini-label" for="centralActive">Estado</label><select class="control" id="centralActive"><option value="">Todos</option><?php foreach(array_keys(FAVOR_ESTADOS) as $en):?><option value="<?=hr($en)?>"><?=hr($en)?></option><?php endforeach;?></select></div>
     <?php if($isAdmin):?><div class="wide"><label class="mini-label" for="centralPlayer">Jugador</label><select class="control" id="centralPlayer"><option value="">Todos los jugadores</option><?php foreach($playerNames as $pn):?><option value="<?=hr($pn)?>"><?=hr($pn)?></option><?php endforeach;?></select></div><?php endif;?>
    </div>
@@ -209,7 +223,7 @@ a{color:inherit;text-decoration:none}button,input,select,textarea{font:inherit}
    <form method="post" id="relationForm"><input type="hidden" name="csrf" value="<?=hr(favor_csrf())?>"><input type="hidden" name="character" value="<?=hr($focusId)?>"><input type="hidden" name="action" value="add"><input type="hidden" name="other" id="otherInput" value="">
     <div class="filter-grid three">
      <div class="wide"><label class="mini-label" for="relationSearch">Buscar</label><input class="control" id="relationSearch" placeholder="Nombre del personaje…"></div>
-     <div><label class="mini-label" for="relationCategory">Tipo</label><select class="control" id="relationCategory"><option value="">Todos</option><option value="Personaje">Personajes</option><option value="NPC">NPC</option></select></div>
+     <div><label class="mini-label" for="relationCategory">Tipo</label><select class="control" id="relationCategory"><option value="">Todos</option><option value="Personaje">Personajes</option><option value="NPC">NPC</option><option value="<?=hr(REL_MUERTOS)?>">Muertos</option><option value="<?=hr(REL_FUERA)?>">Personajes Fuera</option></select></div>
      <div><label class="mini-label" for="relationActive">Estado</label><select class="control" id="relationActive"><option value="">Todos</option><?php foreach(array_keys(FAVOR_ESTADOS) as $en):?><option value="<?=hr($en)?>"><?=hr($en)?></option><?php endforeach;?></select></div>
      <div><label class="mini-label" for="relationPlayer">Jugador</label><select class="control" id="relationPlayer"><option value="">Todos</option><?php foreach($playerNames as $pn):?><option value="<?=hr($pn)?>"><?=hr($pn)?></option><?php endforeach;?></select></div>
     </div>

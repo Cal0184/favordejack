@@ -252,3 +252,29 @@ function favor_estado_de(string $id): string
     }
     return $mapa[$id]['estado'] ?? 'Activo';
 }
+
+/**
+ * NPC: no usan la Banca ni compran (Cal, 29-10-2026); solo viven en Archivos y
+ * Relaciones. Son NPC los personajes del grupo «NPC» de la Banca y los que
+ * Archivos marca con la categoría NPC. Sus datos (y el oro que tuvieran)
+ * siguen en la base: solo no se muestran. Devuelve [id => true].
+ */
+function favor_npc_ids(mysqli $db): array
+{
+    static $ids = null;
+    if ($ids !== null) return $ids;
+    $ids = [];
+    $result = $db->query('SELECT p.ID, j.Nombre FROM Personaje p INNER JOIN Jugador j ON j.ID = p.Jugador');
+    while ($row = $result->fetch_assoc()) {
+        if (in_array(favor_estado_clave((string)$row['Nombre']), ['npc', 'npcs'], true)) $ids[(string)$row['ID']] = true;
+    }
+    $result->free();
+    try {
+        $result = $db->query("SELECT ID FROM PersonajePerfil WHERE Categoria = 'NPC'");
+        while ($row = $result->fetch_row()) $ids[(string)$row[0]] = true;
+        $result->free();
+    } catch (mysqli_sql_exception) {
+        // Instalación sin la columna Categoria todavía: solo cuenta el grupo NPC.
+    }
+    return $ids;
+}

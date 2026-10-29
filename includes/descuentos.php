@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/auth.php';
+require_once __DIR__ . '/estado.php';
 
 /*
  * Descuentos de las tiendas, definidos por el DM.
@@ -73,8 +74,10 @@ function favor_discount_characters(?string $onlyPlayer = null, bool $includeInac
         $stmt->execute();
         $result = $stmt->get_result();
         $out = [];
+        $npc = favor_npc_ids($db);
         while ($row = $result->fetch_assoc()) {
             if (in_array(favor_discount_name_key((string)$row['JugadorNombre']), FAVOR_DISCOUNT_SKIP_PLAYERS, true)) continue;
+            if (isset($npc[(string)$row['ID']])) continue;
             $out[(string)$row['ID']] = [
                 'id' => (string)$row['ID'],
                 'name' => (string)$row['Nombre'],
