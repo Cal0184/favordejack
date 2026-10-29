@@ -1,81 +1,214 @@
 (() => {
     'use strict';
 
-    const search = document.getElementById('ruleSearch');
-    const cards = [...document.querySelectorAll('.rule-card')];
-    const typeTabs = [...document.querySelectorAll('.type-tab')];
-    const categoryChips = [...document.querySelectorAll('.category-chip')];
-    const visibleCount = document.getElementById('visibleCount');
-    const emptyState = document.getElementById('emptyState');
-    const emptyText = document.getElementById('emptyText');
+    const $ = sel => document.querySelector(sel);
+    const book = $('#regBook');
+    const search = $('#ruleSearch');
+    const items = [...document.querySelectorAll('.rule-item')];
+    const filters = [...document.querySelectorAll('[data-filter]')];
+    const visibleCount = $('#visibleCount');
+    const emptyState = $('#emptyState');
+    const emptyText = $('#emptyText');
+    const detail = $('#ruleDetail');
+    const detailContent = $('#detailContent');
+    const detailAdmin = $('#detailAdmin');
+    const mobile = window.matchMedia('(max-width: 900px)');
 
-    let activeType = typeTabs.find(btn => btn.classList.contains('active'))?.dataset.type || 'regla';
-    let activeCategory = '';
+    // Enlaces viejos (#monje, #miss-fire…) siguen llevando a su regla.
+    const OLD_IDS = {
+        'agarre-presa': 'agarrar', 'estado-agarrado': 'agarrado', 'salir-agarre': 'escapar-agarre',
+        'miss-fire': 'fallo-disparo', 'monje': 'monje-desarmado', 'percepcion-expertise': 'percepcion-pericia',
+    };
 
-    const normalize = value => String(value || '')
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .toLowerCase()
-        .trim();
+    let filter = 'all';
+    let current = null;
 
-    function updateTypeCounts() {
-        document.querySelectorAll('[data-count-type]').forEach(el => {
-            const type = el.dataset.countType;
-            el.textContent = cards.filter(card => card.dataset.type === type).length;
-        });
+    const normalize = value => String(value || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+    items.forEach(item => { item.dataset.haystack = normalize(item.dataset.search); });
+
+    function matchesFilter(item) {
+        if (filter === 'all') return true;
+        if (filter.startsWith('cat:')) return item.dataset.category === filter.slice(4);
+        if (filter.startsWith('type:')) return item.dataset.type === filter.slice(5);
+        return true;
     }
 
     function applyFilters() {
-        const q = normalize(search?.value || '');
+        const words = normalize(search?.value).split(/\s+/).filter(Boolean);
         let shown = 0;
-
-        for (const card of cards) {
-            const matchesType = card.dataset.type === activeType;
-            const matchesCategory = !activeCategory || card.dataset.category === activeCategory;
-            const haystack = normalize(card.dataset.search || '');
-            const matchesSearch = !q || haystack.includes(q);
-            const show = matchesType && matchesCategory && matchesSearch;
-
-            card.classList.toggle('hidden', !show);
+        for (const item of items) {
+            const show = matchesFilter(item) && words.every(w => item.dataset.haystack.includes(w));
+            item.hidden = !show;
             if (show) shown += 1;
         }
-
-        if (visibleCount) visibleCount.textContent = String(shown);
-        if (emptyState) emptyState.classList.toggle('hidden', shown !== 0);
-
-        if (emptyText && shown === 0) {
-            if (!cards.some(card => card.dataset.type === activeType)) {
-                emptyText.textContent = 'Todavía no hay entradas registradas en esta sección.';
-            } else {
-                emptyText.textContent = 'Prueba con otro filtro o término de búsqueda.';
-            }
+        visibleCount.textContent = String(shown);
+        emptyState.hidden = shown !== 0;
+        if (shown === 0) {
+            emptyText.textContent = words.length
+                ? 'Prueba con otro filtro o término de búsqueda.'
+                : 'Todavía no hay entradas registradas en esta sección.';
         }
     }
 
-    typeTabs.forEach(btn => {
-        btn.addEventListener('click', () => {
-            activeType = btn.dataset.type || 'regla';
-            typeTabs.forEach(item => {
-                const active = item === btn;
-                item.classList.toggle('active', active);
-                item.setAttribute('aria-selected', active ? 'true' : 'false');
-            });
-            activeCategory = '';
-            categoryChips.forEach(chip => chip.classList.toggle('active', !chip.dataset.category));
-            applyFilters();
+    function setFilter(value) {
+        filter = value;
+        filters.forEach(btn => {
+            const on = btn.dataset.filter === value;
+            btn.classList.toggle('active', on);
+            btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+        });
+        applyFilters();
+    }
+
+    function show(item, { focus = false } = {}) {
+        if (!item) return;
+        current = item;
+        items.forEach(i => i.classList.toggle('selected', i === item));
+        const tpl = item.querySelector('template');
+        detailContent.replaceChildren(tpl.content.cloneNode(true));
+        if (detailAdmin) detailAdmin.hidden = false;
+        detail.scrollTop = 0;
+        if (mobile.matches) {
+            book.classList.add('reading');
+            document.body.classList.add('reg-reading');
+            window.scrollTo({ top: 0 });
+        }
+        if (focus) detail.focus({ preventScroll: !mobile.matches });
+    }
+
+    function closeDetail() {
+        book.classList.remove('reading');
+        document.body.classList.remove('reg-reading');
+        const back = current?.querySelector('.rule-open');
+        if (location.hash) history.pushState(null, '', location.pathname + location.search);
+        back?.focus({ preventScroll: false });
+        back?.scrollIntoView({ block: 'center' });
+    }
+
+    function fromHash() {
+        let id = decodeURIComponent(location.hash.slice(1));
+        id = OLD_IDS[id] || id;
+        const item = id && document.getElementById(id);
+        if (item && item.classList.contains('rule-item')) {
+            if (item.hidden) setFilter('all');
+            show(item);
+            if (!mobile.matches) item.scrollIntoView({ block: 'nearest' });
+        } else if (mobile.matches) {
+            book.classList.remove('reading');
+            document.body.classList.remove('reg-reading');
+        }
+    }
+
+    items.forEach(item => {
+        item.querySelector('.rule-open').addEventListener('click', () => {
+            if (location.hash.slice(1) !== item.id) history.pushState(null, '', '#' + item.id);
+            show(item, { focus: true });
         });
     });
-
-    categoryChips.forEach(btn => {
-        btn.addEventListener('click', () => {
-            activeCategory = btn.dataset.category || '';
-            categoryChips.forEach(item => item.classList.toggle('active', item === btn));
-            applyFilters();
-        });
-    });
-
+    filters.forEach(btn => btn.addEventListener('click', () => setFilter(btn.dataset.filter)));
     search?.addEventListener('input', applyFilters);
+    $('#detailClose')?.addEventListener('click', closeDetail);
+    window.addEventListener('popstate', fromHash);
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && book.classList.contains('reading') && !document.querySelector('dialog[open]')) closeDetail();
+    });
 
-    updateTypeCounts();
     applyFilters();
+    if (location.hash) fromHash();
+    else if (!mobile.matches) show(items.find(i => !i.hidden));
+
+    // ───────────── Admin: crear, editar y borrar ─────────────
+    const admin = window.REG_ADMIN;
+    if (!admin) return;
+
+    const dialog = $('#ruleEditor');
+    const form = $('#ruleForm');
+    const errorBox = $('#editorError');
+    const saveBtn = $('#editorSave');
+    const iconGrid = $('#iconGrid');
+    let editingId = '';
+
+    iconGrid.innerHTML = admin.icons.map(name =>
+        `<label class="icon-choice" title="${name}"><input type="radio" name="icon" value="${name}">` +
+        `<svg class="reg-icon" aria-hidden="true"><use href="${admin.sprite}#${name}"/></svg><span class="sr-only">${name}</span></label>`
+    ).join('');
+
+    async function call(payload) {
+        const res = await fetch('api.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify({ ...payload, csrf: admin.csrf }),
+        });
+        let data = null;
+        try { data = await res.json(); } catch { /* respuesta no JSON */ }
+        if (!data?.ok) throw new Error(data?.error || 'No se pudo guardar. Revisa tu conexión e inténtalo otra vez.');
+        return data;
+    }
+
+    function openEditor(rule) {
+        editingId = rule?.id || '';
+        $('#editorTitle').textContent = editingId ? 'Editar regulación' : 'Nueva regulación';
+        form.reset();
+        const f = form.elements;
+        const presetCategory = filter.startsWith('cat:') ? filter.slice(4) : '';
+        const presetType = filter.startsWith('type:') ? filter.slice(5) : 'regla';
+        f.title.value = rule?.title || '';
+        f.category.value = rule?.category || presetCategory;
+        f.type.value = rule?.type || presetType;
+        f.summary.value = rule?.summary || '';
+        f.body.value = rule?.body || '## Descripción\n';
+        f.source.value = rule?.source || '';
+        f.mesa.checked = !!rule?.mesa;
+        f.draft.checked = !!rule?.draft;
+        const icon = rule?.icon || 'scroll-unfurled';
+        const radio = iconGrid.querySelector(`input[value="${CSS.escape(icon)}"]`);
+        if (radio) { radio.checked = true; radio.closest('label').scrollIntoView({ block: 'nearest' }); }
+        errorBox.hidden = true;
+        dialog.showModal();
+        f.title.focus();
+    }
+
+    $('#newRule').addEventListener('click', () => openEditor(null));
+    $('#editorCancel').addEventListener('click', () => dialog.close());
+    $('#editRule')?.addEventListener('click', () => current && openEditor(admin.rules[current.id]));
+
+    $('#deleteRule')?.addEventListener('click', async () => {
+        if (!current) return;
+        const rule = admin.rules[current.id];
+        if (!confirm(`¿Borrar «${rule?.title || current.id}»? No se puede deshacer (salvo con un respaldo).`)) return;
+        try {
+            await call({ action: 'delete', id: current.id });
+            location.href = location.pathname;
+        } catch (err) {
+            alert(err.message);
+        }
+    });
+
+    form.addEventListener('submit', async e => {
+        e.preventDefault();
+        const f = form.elements;
+        const rule = {
+            title: f.title.value, category: f.category.value, type: f.type.value,
+            summary: f.summary.value, body: f.body.value, source: f.source.value,
+            icon: form.querySelector('input[name="icon"]:checked')?.value || '',
+            mesa: f.mesa.checked, draft: f.draft.checked,
+        };
+        const missing = !rule.title.trim() ? 'Ponle un título a la regulación.'
+            : !rule.category.trim() ? 'Elige o escribe una categoría.'
+            : !rule.body.trim() ? 'Escribe el texto de la regulación.' : '';
+        if (missing) { errorBox.textContent = missing; errorBox.hidden = false; return; }
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Guardando…';
+        try {
+            const data = await call({ action: 'save', id: editingId, rule });
+            location.href = location.pathname + '#' + encodeURIComponent(data.id);
+            location.reload();
+        } catch (err) {
+            errorBox.textContent = err.message;
+            errorBox.hidden = false;
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'Guardar';
+        }
+    });
 })();
