@@ -1,9 +1,19 @@
 Options -Indexes
 
 # Archivos de soporte/backup nunca deben servirse directamente.
-<FilesMatch "\.(?:sql|bak|log|ini|env)$">
+<FilesMatch "\.(?:sql|bak|log|ini|env|tmp|swp|orig|old|dist)$|~$">
   Require all denied
 </FilesMatch>
+
+# Archivos ocultos (.git, .env, volcados temporales «.volcado-…»). Hestia ya los
+# bloquea en Nginx; esto cubre el caso de que la petición llegue a Apache.
+<FilesMatch "^\.(?!well-known)">
+  Require all denied
+</FilesMatch>
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule (?:^|/)\.(?!well-known/) - [F,L]
+</IfModule>
 
 # Datos internos (JSON), notas (README) y bloqueos: la web los lee desde PHP,
 # el navegador nunca los necesita.

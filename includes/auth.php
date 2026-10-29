@@ -10,7 +10,18 @@ require_once __DIR__ . '/paths.php';
 
 function favor_session_start(): void
 {
-    if (session_status() === PHP_SESSION_ACTIVE) return;
+    // Ya abierta, o ya leída y liberada en esta petición: $_SESSION sigue a mano
+    // para leer y no se vuelve a bloquear (eso pondría en fila al resto de
+    // peticiones del mismo jugador).
+    if (session_status() === PHP_SESSION_ACTIVE || !empty($GLOBALS['__favor_session_read'])) return;
+    favor_session_open();
+}
+
+/** Abre (o reabre) la sesión con su bloqueo. false si ya no se puede: hubo salida. */
+function favor_session_open(): bool
+{
+    if (session_status() === PHP_SESSION_ACTIVE) return true;
+    if (headers_sent()) return false;
 
     session_name('FAVOR_DE_JACK');
     session_set_cookie_params([
@@ -22,12 +33,28 @@ function favor_session_start(): void
         'samesite' => 'Lax',
     ]);
     session_start();
+    $GLOBALS['__favor_session_read'] = true;
+    return true;
 }
 
 /** Libera el bloqueo de la sesión antes de consultas, imágenes o respuestas largas. */
 function favor_session_close(): void
 {
     if (session_status() === PHP_SESSION_ACTIVE) session_write_close();
+}
+
+/**
+ * Guarda algo en la sesión aunque ya se haya liberado: la reabre un instante,
+ * $change modifica $_SESSION (ya releída, con lo que hayan guardado otras
+ * peticiones) y la vuelve a soltar. false si ya no se podía (hubo salida).
+ */
+function favor_session_write(callable $change): bool
+{
+    $wasOpen = session_status() === PHP_SESSION_ACTIVE;
+    if (!$wasOpen && !favor_session_open()) return false;
+    $change();
+    if (!$wasOpen) session_write_close();
+    return true;
 }
 
 function favor_db(): mysqli
@@ -42,10 +69,18 @@ function favor_db(): mysqli
 function favor_csrf(): string
 {
     favor_session_start();
-    if (empty($_SESSION['favor_csrf']) || !is_string($_SESSION['favor_csrf'])) {
-        $_SESSION['favor_csrf'] = bin2hex(random_bytes(24));
-    }
-    return $_SESSION['favor_csrf'];
+    $token = $_SESSION['favor_csrf'] ?? '';
+    if (is_string($token) && $token !== '') return $token;
+
+    $token = bin2hex(random_bytes(24));
+    favor_session_write(static function () use (&$token): void {
+        // Otra pestaña pudo crearlo mientras tanto: se usa ese.
+        $saved = $_SESSION['favor_csrf'] ?? '';
+        if (is_string($saved) && $saved !== '') $token = $saved;
+        else $_SESSION['favor_csrf'] = $token;
+    });
+    $_SESSION['favor_csrf'] = $token;
+    return $token;
 }
 
 function favor_verify_csrf(?string $token): void
@@ -74,25 +109,55 @@ function favor_session_user(): ?array
     return is_array($user) && !empty($user['active']) && !empty($user['id']) ? $user : null;
 }
 
+/** Cada cuánto se vuelve a mirar la cuenta en la base de datos al solo leer páginas. */
+const FAVOR_IDENTITY_TTL = 300;
+
+/** POST y compañía: peticiones que pueden cambiar algo. */
+function favor_request_writes(): bool
+{
+    return !in_array(strtoupper((string)($_SERVER['REQUEST_METHOD'] ?? 'GET')), ['GET', 'HEAD', 'OPTIONS'], true);
+}
+
+/**
+ * Usuario con sesión. La copia guardada en la sesión se relee de la base de
+ * datos en toda petición que escribe (POST), cuando se pide $refresh y, como
+ * mucho cada 5 minutos, al navegar: una cuenta desactivada, un jugador
+ * desactivado o un admin que pasó a jugador pierden sus permisos enseguida.
+ */
 function favor_current_user(bool $refresh = false): ?array
 {
     $cached = favor_session_user();
     if (!$cached) return null;
-    if (!$refresh) return $cached;
 
-    $db = favor_db();
+    // Una sola lectura por petición, aunque varias partes la pidan.
+    $fresh = $GLOBALS['__favor_user_fresh'] ?? null;
+    if (is_array($fresh) && $fresh['id'] === (int)$cached['id']) return $fresh;
+
+    $checked = (int)($_SESSION['favor_user_checked'] ?? 0);
+    $must = $refresh || favor_request_writes();
+    if (!$must && $checked > time() - FAVOR_IDENTITY_TTL) return $cached;
+
     try {
-        $id = (int)$cached['id'];
-        $stmt = $db->prepare(
-            'SELECT u.ID,u.Username,u.Jugador,u.Rol,u.Activo,j.Nombre AS JugadorNombre,j.Activo AS JugadorActivo,j.IconUrl,j.IconBg,j.Emoji '
-            . 'FROM Usuario u LEFT JOIN Jugador j ON j.ID=u.Jugador WHERE u.ID=? LIMIT 1'
-        );
-        $stmt->bind_param('i', $id);
-        $stmt->execute();
-        $row = $stmt->get_result()->fetch_assoc();
-        $stmt->close();
-    } finally {
-        $db->close();
+        $db = favor_db();
+        try {
+            $id = (int)$cached['id'];
+            $stmt = $db->prepare(
+                'SELECT u.ID,u.Username,u.Jugador,u.Rol,u.Activo,j.Nombre AS JugadorNombre,j.Activo AS JugadorActivo,j.IconUrl,j.IconBg,j.Emoji '
+                . 'FROM Usuario u LEFT JOIN Jugador j ON j.ID=u.Jugador WHERE u.ID=? LIMIT 1'
+            );
+            $stmt->bind_param('i', $id);
+            $stmt->execute();
+            $row = $stmt->get_result()->fetch_assoc();
+            $stmt->close();
+        } finally {
+            $db->close();
+        }
+    } catch (Throwable $e) {
+        // Solo leyendo: si la base de datos falla un momento, la página sigue con
+        // la copia de la sesión. Para escribir no se arriesga: error.
+        if ($must) throw $e;
+        error_log('favor_current_user: ' . $e->getMessage());
+        return $cached;
     }
 
     if (!$row || (int)$row['Activo'] !== 1 || $row['JugadorNombre'] === null || (int)$row['JugadorActivo'] !== 1) {
@@ -108,7 +173,16 @@ function favor_current_user(bool $refresh = false): ?array
         'active' => true,
         'displayName' => (string)$row['JugadorNombre'],
     ] + favor_user_visual($row);
+    $now = time();
+    favor_session_write(static function () use ($user, $now): void {
+        // Si mientras tanto esta sesión cerró o cambió de cuenta, no se pisa.
+        if ((int)($_SESSION['favor_user']['id'] ?? 0) !== $user['id']) return;
+        $_SESSION['favor_user'] = $user;
+        $_SESSION['favor_user_checked'] = $now;
+    });
     $_SESSION['favor_user'] = $user;
+    $_SESSION['favor_user_checked'] = $now;
+    $GLOBALS['__favor_user_fresh'] = $user;
     return $user;
 }
 
@@ -125,12 +199,12 @@ function favor_user_visual(array $row): array
 
 function favor_is_logged_in(): bool
 {
-    return favor_session_user() !== null;
+    return favor_current_user() !== null;
 }
 
 function favor_is_admin(): bool
 {
-    $user = favor_session_user();
+    $user = favor_current_user();
     return $user !== null && ($user['role'] ?? '') === 'admin';
 }
 
@@ -150,7 +224,7 @@ function favor_require_admin(): array
 
 function favor_login(string $username, string $password): array
 {
-    favor_session_start();
+    if (!favor_session_open()) throw new RuntimeException('No se pudo iniciar la sesión. Recarga la página.');
     $username = mb_strtolower(trim($username), 'UTF-8');
     if ($username === '' || $password === '') throw new RuntimeException('Escribe tu usuario y contraseña.');
 
@@ -196,7 +270,9 @@ function favor_login(string $username, string $password): array
         'displayName' => (string)$row['JugadorNombre'],
     ] + favor_user_visual($row);
     $_SESSION['favor_user'] = $user;
+    $_SESSION['favor_user_checked'] = time();
     $_SESSION['favor_csrf'] = bin2hex(random_bytes(24));
+    $GLOBALS['__favor_user_fresh'] = $user;
     return $user;
 }
 
@@ -303,7 +379,12 @@ function favor_login_wait_message(int $seconds): string
 
 function favor_logout(): void
 {
-    favor_session_start();
+    $GLOBALS['__favor_user_fresh'] = null;
+    if (!favor_session_open()) {
+        // Ya hubo salida: al menos esta petición deja de tratarlo como conectado.
+        $_SESSION = [];
+        return;
+    }
     $_SESSION = [];
     if (ini_get('session.use_cookies')) {
         $p = session_get_cookie_params();

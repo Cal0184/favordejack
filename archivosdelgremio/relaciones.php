@@ -7,7 +7,10 @@ require_once dirname(__DIR__) . '/includes/migrations.php';
 require_once dirname(__DIR__) . '/includes/auth-widget.php';
 require_once dirname(__DIR__) . '/includes/estado.php';
 favor_session_start();
-$user=favor_current_user();
+// En POST favor_current_user() relee la cuenta de la base de datos (permisos al día).
+try{$user=favor_current_user();}catch(Throwable $e){$user=null;$userError='No se pudo comprobar tu cuenta. Inténtalo otra vez.';}
+if($user)favor_csrf();
+favor_session_close();
 function hr(string $v):string{return htmlspecialchars($v,ENT_QUOTES|ENT_SUBSTITUTE,'UTF-8');}
 // Tipos de vínculo con su color (el texto de la relación sigue siendo libre).
 const REL_VINCULOS=[
@@ -32,7 +35,7 @@ function rel_ensure_vinculo(mysqli $db):void{
  $db->query("INSERT INTO FavorMeta (Clave,Valor) VALUES ('relacion_vinculo_v1','ok') ON DUPLICATE KEY UPDATE Valor='ok'");
 }
 function rel_can_edit(?array $u,array $c):bool{return $u && (($u['role']??'')==='admin'||(string)($u['playerId']??'')===(string)$c['Jugador']);}
-$db=favor_db();$error='';$message='';$characters=[];$relations=[];
+$db=favor_db();$error=$userError??'';$message='';$characters=[];$relations=[];
 // TEMPORAL 2.2: J013 ('Personajes Fuera') es un contenedor legado de la migracion de Banca.
 // Relaciones trabaja solo con las identidades reales de Archivos hasta rehacer/unificar la BD.
 try{

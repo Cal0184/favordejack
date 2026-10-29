@@ -17,6 +17,7 @@ $isAdmin = guild_is_admin();
 $isLogged = guild_is_logged_in();
 $sessionUser = guild_user();
 $adminUser = guild_admin_user();
+favor_session_close();
 
 function h(?string $value): string {
     return htmlspecialchars((string)$value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
@@ -143,6 +144,7 @@ SQL;
 
     // Personajes con ficha PDF importada (botón "Hoja" en el folio).
     ficha_ensure_schema($db);
+    try { ficha_pdf_secure_all(); } catch (Throwable $e) { error_log('fichas: ' . $e->getMessage()); }
     $sheetIds = [];
     $sheetResult = $db->query('SELECT PersonajeID FROM PersonajeFicha');
     while ($sheetRow = $sheetResult->fetch_row()) $sheetIds[(string)$sheetRow[0]] = true;

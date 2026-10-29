@@ -187,6 +187,7 @@ try {
 
     guild_verify_csrf(strv($data, 'csrf', 100));
     $admin = guild_require_admin();
+    favor_session_close();
 
     if ($action === 'save_character') {
         $id = strv($data, 'id', 100);

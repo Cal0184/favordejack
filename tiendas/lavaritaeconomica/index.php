@@ -4,6 +4,7 @@ require_once dirname(__DIR__, 2) . '/includes/auth-widget.php';
 require_once dirname(__DIR__, 2) . '/includes/tiendas.php';
 favor_session_start();
 $compra = favor_tienda_client($GLOBALS['__favor_auth_widget_user'] ?? null, 'varita-economica');
+favor_session_close();
 
 $productsPath = __DIR__ . '/productos.json';
 $products = [];

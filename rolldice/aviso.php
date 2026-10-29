@@ -21,7 +21,11 @@ function aviso_out(array $data, int $code = 200): never
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') aviso_out(['ok' => false], 405);
 favor_session_start();
-$user = favor_current_user();
+try {
+    $user = favor_current_user();
+} catch (Throwable $e) {
+    aviso_out(['ok' => false, 'error' => 'No se pudo comprobar tu cuenta.'], 503);
+}
 if (!$user) aviso_out(['ok' => false, 'error' => 'Sin sesión.'], 401);
 try {
     favor_verify_csrf((string)($_SERVER['HTTP_X_CSRF_TOKEN'] ?? ''));

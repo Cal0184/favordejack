@@ -7,7 +7,9 @@ require_once __DIR__ . '/site.php';
 // pueden liberar la sesión inmediatamente después y la barra no la reabre al
 // final del HTML (eso volvería a bloquear requests y puede fallar si ya hubo output).
 if (!array_key_exists('__favor_auth_widget_user', $GLOBALS)) {
-    $widgetUser = favor_current_user();
+    // La barra nunca tumba la página: si la base de datos falla al releer la
+    // cuenta, muestra la copia de la sesión (la acción en sí sí se comprueba).
+    try { $widgetUser = favor_current_user(); } catch (Throwable $e) { $widgetUser = favor_session_user(); }
     // Sesiones abiertas antes de esta versión no traen el icono: se lee una vez.
     if ($widgetUser && !array_key_exists('iconUrl', $widgetUser)) {
         try { $widgetUser = favor_current_user(true); } catch (Throwable $e) {}

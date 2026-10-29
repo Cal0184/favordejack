@@ -58,10 +58,21 @@ function favor_backup_dir(): string
     return $dir;
 }
 
-/** Nombre de paquete seguro (sin rutas): favordejack-AAAAMMDD-HHMMSS.zip */
+/** Nombre de paquete seguro (sin rutas): favordejack-AAAAMMDD-HHMMSS-<clave>.zip */
 function favor_backup_valid_name(string $name): bool
 {
-    return (bool)preg_match('/^[A-Za-z0-9][A-Za-z0-9._-]{0,120}\.zip$/', $name);
+    return (bool)preg_match('/^[A-Za-z0-9][A-Za-z0-9._-]{0,160}\.zip$/', $name);
+}
+
+/**
+ * Añade una clave al azar al nombre. En Hestia, Nginx entrega por su cuenta los
+ * .zip y .pdf sin pasar por Apache, así que el .htaccess de respaldos/ podría no
+ * aplicarse: con la clave, nadie puede adivinar la dirección de un paquete.
+ */
+function favor_backup_secret_name(string $name): string
+{
+    if (preg_match('/-[a-f0-9]{16}\.zip$/', $name)) return $name;
+    return substr($name, 0, -4) . '-' . bin2hex(random_bytes(8)) . '.zip';
 }
 
 /** Paquetes guardados en respaldos/, el más reciente primero. */
@@ -72,6 +83,12 @@ function favor_backup_list(): array
     foreach (glob($dir . '/*.zip') ?: [] as $file) {
         $name = basename($file);
         if (!favor_backup_valid_name($name)) continue;
+        // Paquetes de antes (o subidos por FTP) sin clave: se les pone.
+        $secret = favor_backup_secret_name($name);
+        if ($secret !== $name && !is_file($dir . '/' . $secret) && @rename($file, $dir . '/' . $secret)) {
+            $file = $dir . '/' . $secret;
+            $name = $secret;
+        }
         $items[] = ['name' => $name, 'size' => filesize($file) ?: 0, 'time' => filemtime($file) ?: 0];
     }
     usort($items, static fn(array $a, array $b): int => $b['time'] <=> $a['time']);
@@ -139,7 +156,7 @@ function favor_backup_export(mysqli $db, string $label = ''): string
 
     $dir = favor_backup_dir();
     $suffix = $label !== '' ? '-' . preg_replace('/[^a-z0-9-]/', '', strtolower($label)) : '';
-    $name = 'favordejack-' . gmdate('Ymd-His') . $suffix . '.zip';
+    $name = favor_backup_secret_name('favordejack-' . gmdate('Ymd-His') . $suffix . '.zip');
     $zipPath = $dir . '/' . $name;
     $sqlPath = $dir . '/.volcado-' . bin2hex(random_bytes(6)) . '.sql';
 

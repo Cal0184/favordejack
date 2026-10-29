@@ -70,6 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             $name = basename((string)$upload['name']);
             if (!favor_backup_valid_name($name)) $name = 'subido-' . gmdate('Ymd-His') . '.zip';
+            $name = favor_backup_secret_name($name);
             $target = favor_backup_dir() . '/' . $name;
             if (is_file($target)) throw new RuntimeException('Ya existe un paquete con ese nombre.');
             if (!move_uploaded_file((string)$upload['tmp_name'], $target)) throw new RuntimeException('No pude guardar el paquete.');
@@ -80,6 +81,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (trim((string)($_POST['confirm'] ?? '')) !== 'RESTAURAR') throw new RuntimeException('Escribe RESTAURAR para confirmar.');
             $db = favor_db();
             try { $summary = favor_backup_restore($db, favor_backup_dir() . '/' . $name); } finally { $db->close(); }
+            // Un paquete antiguo trae las fichas con el nombre sin clave: se les pone.
+            require_once dirname(__DIR__) . '/includes/ficha-import.php';
+            try { ficha_pdf_secure_all(); } catch (Throwable $e) { error_log('fichas: ' . $e->getMessage()); }
             $notice = 'Restaurado ' . $name . ': ' . array_sum(array_map('intval', $summary['tables'])) . ' filas en '
                 . count($summary['tables']) . ' tablas y ' . $summary['files'] . ' archivos. '
                 . 'Antes se guardó el estado anterior en ' . $summary['safety'] . '.';

@@ -238,17 +238,14 @@ function fetch_movements(mysqli $db, string $charId): array {
     return $items;
 }
 
-function close_session_lock(): void {
-    if (session_status() === PHP_SESSION_ACTIVE) {
-        session_write_close();
-    }
-}
-
 try {
     /** @var mysqli $db */
     $db = require __DIR__ . '/db.php';
-    favor_ensure_schema($db);
     $user = current_user($db);
+    // Con la identidad y el token ya en memoria, la sesión se suelta: las demás
+    // peticiones del mismo jugador no esperan a estas consultas.
+    favor_session_close();
+    favor_ensure_schema($db);
     $action = (string)($_GET['action'] ?? 'state');
 
     if ($action === 'state') {
