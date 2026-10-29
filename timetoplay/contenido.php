@@ -1,3 +1,8 @@
+<?php
+// Notas privadas del DM. Solo se muestran a través de index.php (admin):
+// un .php nunca se entrega como texto, así que Nginx no puede saltarse el permiso.
+if (!defined('FAVOR_TIMETOPLAY')) { http_response_code(404); exit; }
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>

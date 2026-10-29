@@ -1,6 +1,6 @@
 # El contenido solo se sirve a través de index.php (admin).
 DirectoryIndex index.php
-<FilesMatch "^(index\.html|README\.txt)$">
+<FilesMatch "^(index\.html|contenido\.php|README\.txt)$">
   Require all denied
 </FilesMatch>
 <IfModule mod_headers.c>
