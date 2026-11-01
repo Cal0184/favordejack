@@ -32,6 +32,36 @@ foreach ($rules as $rule) {
 // Una sección sin nada que leer no se ofrece a los jugadores; el admin la ve igual.
 if (!$isAdmin) $categories = array_values(array_filter($categories, static fn(string $c): bool => ($byCategory[$c] ?? 0) > 0));
 
+// Patch Notes: historial de versiones (el más nuevo primero).
+$patches = [];
+foreach ((array)(require __DIR__ . '/parches.php') as $patch) {
+    $version = (string)($patch['version'] ?? '');
+    if ($version === '') continue;
+    $date = (string)($patch['date'] ?? '');
+    $time = strtotime($date) ?: 0;
+    preg_match_all('/^## (.+)$/mu', (string)($patch['body'] ?? ''), $heads);
+    $patches[] = [
+        'id' => 'parche-' . str_replace('.', '-', $version),
+        'version' => $version,
+        'date' => $date,
+        'dateLabel' => $time ? date('d/m/Y', $time) : $date,
+        'name' => (string)($patch['name'] ?? ''),
+        'summary' => implode(' · ', $heads[1] ?? []),
+        'body' => (string)($patch['body'] ?? ''),
+    ];
+}
+usort($patches, static fn(array $a, array $b): int => strcmp($b['date'], $a['date']) ?: version_compare($b['version'], $a['version']));
+
+// Tarjetas de la portada móvil: secciones y tipos con su icono.
+$homeCards = [];
+foreach (REG_TYPE_ICONS as $type => $icon) {
+    if (!$isAdmin && ($byType[$type] ?? 0) === 0) continue;
+    $homeCards[] = ['filter' => 'type:' . $type, 'label' => REG_TYPES[$type] . 's', 'icon' => $icon, 'count' => (int)$byType[$type], 'unit' => 'cambios', 'tone' => $type];
+}
+foreach ($categories as $category) {
+    $homeCards[] = ['filter' => 'cat:' . $category, 'label' => $category, 'icon' => reg_category_icon($category), 'count' => (int)($byCategory[$category] ?? 0), 'unit' => 'reglas', 'tone' => 'cat'];
+}
+
 $config = $isAdmin ? [
     'csrf' => $csrf,
     'categories' => $categories,
@@ -74,6 +104,7 @@ $config = $isAdmin ? [
         <div class="seal" aria-hidden="true"><?= reg_icon('scales') ?></div>
         <p class="eyebrow">Archivo oficial del gremio</p>
         <h1>Regulaciones</h1>
+        <p class="lead-short">Normas, buffs, nerfeos y cambios oficiales</p>
         <p class="lead">Consulta rápida de reglas, ajustes y restricciones registradas para las partidas de Favor de Jack.</p>
         <?php if ($updated !== ''): ?><p class="updated">Actualizado: <?= reg_h($updated) ?></p><?php endif; ?>
     </div>
@@ -85,6 +116,11 @@ $config = $isAdmin ? [
         <button class="index-item active" type="button" data-filter="all">
             <?= reg_icon('open-book') ?><span>Todas</span><b><?= count($rules) ?></b>
         </button>
+        <?php if ($patches): ?>
+            <button class="index-item index-item-patch" type="button" data-filter="cat:Patch Notes">
+                <?= reg_icon('scroll-quill') ?><span>Patch Notes</span><b><?= count($patches) ?></b>
+            </button>
+        <?php endif; ?>
         <?php foreach ($categories as $category): ?>
             <button class="index-item" type="button" data-filter="cat:<?= reg_h($category) ?>">
                 <?= reg_icon(reg_category_icon($category)) ?><span><?= reg_h($category) ?></span><b><?= (int)($byCategory[$category] ?? 0) ?></b>
@@ -108,8 +144,13 @@ $config = $isAdmin ? [
             </label>
             <p class="count"><strong id="visibleCount"><?= count($rules) ?></strong><span>regulaciones</span></p>
         </div>
+        <div class="list-crumb" id="listCrumb">
+            <button type="button" class="crumb-back" id="crumbBack"><span aria-hidden="true">‹</span> Secciones</button>
+            <span class="crumb-title" id="crumbTitle">Todas</span>
+        </div>
         <div class="chips" role="group" aria-label="Filtrar por sección">
             <button class="chip active" type="button" data-filter="all">Todas</button>
+            <?php if ($patches): ?><button class="chip chip-patch" type="button" data-filter="cat:Patch Notes">Patch Notes</button><?php endif; ?>
             <?php foreach ($categories as $category): ?>
                 <button class="chip" type="button" data-filter="cat:<?= reg_h($category) ?>"><?= reg_h($category) ?></button>
             <?php endforeach; ?>
@@ -117,6 +158,45 @@ $config = $isAdmin ? [
                 <button class="chip chip-type" type="button" data-filter="type:<?= reg_h($type) ?>"><?= reg_h(REG_TYPES[$type] . 's') ?></button>
             <?php endforeach; ?>
         </div>
+        </div>
+        <div class="reg-home" id="regHome">
+            <div class="home-grid">
+                <button class="home-card home-card-all" type="button" data-filter="all" data-home-open>
+                    <span class="home-medal"><?= reg_icon('open-book') ?></span>
+                    <span class="home-name">Todas las reglas</span>
+                    <span class="home-count"><?= count($rules) ?> reglas</span>
+                </button>
+                <?php if ($patches): ?>
+                <button class="home-card home-card-patch" type="button" data-filter="cat:Patch Notes">
+                    <span class="home-medal"><?= reg_icon('scroll-quill') ?></span>
+                    <span class="home-name">Patch Notes</span>
+                    <span class="home-count"><?= count($patches) ?> versiones</span>
+                </button>
+                <?php endif; ?>
+                <?php foreach ($homeCards as $card): ?>
+                <button class="home-card home-card-<?= reg_h($card['tone']) ?>" type="button" data-filter="<?= reg_h($card['filter']) ?>">
+                    <span class="home-medal"><?= reg_icon($card['icon']) ?></span>
+                    <span class="home-name"><?= reg_h($card['label']) ?></span>
+                    <span class="home-count"><?= $card['count'] ?> <?= $card['count'] === 1 ? rtrim($card['unit'], 's') : $card['unit'] ?></span>
+                </button>
+                <?php endforeach; ?>
+            </div>
+            <?php if ($patches): ?>
+            <h2 class="home-heading"><span>Cambios recientes</span></h2>
+            <div class="home-recent">
+                <?php foreach (array_slice($patches, 0, 3) as $patch): ?>
+                <a class="recent-card" href="#<?= reg_h($patch['id']) ?>">
+                    <span class="recent-version">v<?= reg_h($patch['version']) ?></span>
+                    <span class="recent-text">
+                        <span class="recent-date"><?= reg_h($patch['dateLabel']) ?></span>
+                        <strong><?= reg_h($patch['name'] !== '' ? $patch['name'] : 'Versión ' . $patch['version']) ?></strong>
+                        <small><?= reg_h($patch['summary']) ?></small>
+                    </span>
+                    <span class="chev" aria-hidden="true">›</span>
+                </a>
+                <?php endforeach; ?>
+            </div>
+            <?php endif; ?>
         </div>
         <?php if ($isAdmin): ?>
             <button class="new-rule" type="button" id="newRule"><span aria-hidden="true">+</span> Nueva regulación</button>
@@ -164,6 +244,37 @@ $config = $isAdmin ? [
                     <?php if ($summary !== ''): ?><p class="detail-summary"><?= reg_h($summary) ?></p><?php endif; ?>
                     <div class="detail-body"><?= reg_render((string)($rule['body'] ?? '')) ?></div>
                     <?php if (($rule['source'] ?? '') !== ''): ?><p class="detail-source">Fuente: <?= reg_h((string)$rule['source']) ?></p><?php endif; ?>
+                </template>
+            </li>
+            <?php endforeach; ?>
+            <?php foreach ($patches as $patch):
+                $search = mb_strtolower('patch notes parche version ' . $patch['version'] . ' ' . $patch['name'] . ' ' . $patch['dateLabel'] . ' ' . $patch['body'], 'UTF-8');
+            ?>
+            <li class="rule-item rule-patch" id="<?= reg_h($patch['id']) ?>"
+                data-type="parche" data-category="Patch Notes" data-search="<?= reg_h($search) ?>">
+                <button class="rule-open" type="button" aria-controls="ruleDetail">
+                    <span class="medal medal-version"><small>v</small><?= reg_h($patch['version']) ?></span>
+                    <span class="rule-text">
+                        <span class="rule-line">
+                            <span class="rule-title"><?= reg_h($patch['name'] !== '' ? $patch['name'] : 'Versión ' . $patch['version']) ?></span>
+                            <span class="pill pill-patch pill-date"><?= reg_h($patch['dateLabel']) ?></span>
+                        </span>
+                        <span class="rule-summary"><?= reg_h($patch['summary']) ?></span>
+                    </span>
+                    <span class="rule-date"><?= reg_h($patch['dateLabel']) ?></span>
+                    <span class="chev" aria-hidden="true">›</span>
+                </button>
+                <template class="rule-tpl">
+                    <div class="detail-head">
+                        <span class="medal medal-big medal-version"><small>versión</small><?= reg_h($patch['version']) ?></span>
+                        <div class="detail-titles">
+                            <p class="detail-tags"><span class="pill pill-patch">Patch Notes</span><span class="pill">Versión <?= reg_h($patch['version']) ?></span></p>
+                            <h2 id="detailTitle"><?= reg_h($patch['name'] !== '' ? '«' . $patch['name'] . '»' : 'Versión ' . $patch['version']) ?></h2>
+                            <p class="detail-date">Publicado<br><strong><?= reg_h($patch['dateLabel']) ?></strong></p>
+                        </div>
+                    </div>
+                    <p class="detail-summary detail-history">Nota histórica: una versión posterior puede cambiar lo que dice esta.</p>
+                    <div class="detail-body"><?= reg_render($patch['body']) ?></div>
                 </template>
             </li>
             <?php endforeach; ?>
