@@ -1,0 +1,142 @@
+/* =========================================================
+   V6 — Versión móvil (≤819px, misma medida que la barra
+   inferior del sitio). Controles compactos arriba y el
+   resultado se abre como hoja inferior con su animación.
+   ========================================================= */
+.jack-sheet-head,.jack-sheet-backdrop,.jack-last-roll{display:none}
+
+@media (max-width:819px){
+  .jack-page-shell{padding:10px 10px calc(var(--favor-tab-h,64px) + 74px)!important}
+
+  /* Encabezado compacto */
+  .jack-hero-v2{padding:10px 12px!important;margin:0 0 10px!important;gap:10px!important;grid-template-columns:44px minmax(0,1fr)!important;min-height:0!important}
+  .jack-hero-v2 .jack-brand-icon{width:44px!important;height:44px!important;flex-basis:44px!important}
+  .jack-hero-v2 .jack-kicker,.jack-hero-v2 .jack-subtitle{display:none!important}
+  .jack-hero-v2 h1{font-size:1.45rem!important;line-height:1.05!important;margin:0!important}
+
+  #fast_dice_roller_block{gap:10px!important;row-gap:10px!important;width:100%!important;max-width:none!important}
+  .jack-left-column{gap:10px!important}
+
+  /* Cantidad y modificador lado a lado */
+  .dice_attribute_container{padding:10px!important;gap:8px!important}
+  .dice_attribute_container_element{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important}
+  .dice_attribute_button{height:46px!important;max-width:none!important;width:100%!important}
+  .dice_attribute_button::before{font-size:.56rem!important}
+  .left_right_dice_attribute_button{width:34px!important}
+  .left_right_dice_attribute_button_text{font-size:2.1em!important;line-height:44px!important}
+  .diceAmountInput,.diceAdvantageAmountInput{font-size:1.25rem!important}
+  .option_dice_attribute_button_span_d{font-size:1.25rem!important}
+
+  /* Modo: solo el selector, el texto de ayuda va dentro */
+  .jack-roll-mode-panel{padding:8px!important;gap:6px!important;grid-template-columns:1fr!important}
+  .jack-mode-copy{flex-direction:row!important;align-items:baseline;gap:8px!important;flex-wrap:wrap}
+  .jack-mode-copy .jack-control-eyebrow{display:none}
+  .jack-mode-copy strong{font-size:.8rem!important}
+  .jack-mode-copy small{font-size:.72rem!important}
+  .jack-mode-switch{grid-template-columns:repeat(3,1fr)!important}
+  .jack-mode-btn{min-height:40px!important;font-size:.7rem!important;padding:0 4px!important}
+
+  /* Fórmula en una fila */
+  .jack-expression-panel{padding:10px!important;gap:6px!important}
+  .jack-expression-copy small{display:none}
+  .jack-expression-copy .jack-control-eyebrow{display:none}
+  .jack-expression-controls{grid-template-columns:minmax(0,1fr) auto!important;gap:6px!important}
+  #jack_expression_input{min-height:42px!important;font-size:16px!important}
+  #jack_expression_roll{width:auto!important;min-height:42px!important;padding:0 12px!important;font-size:.7rem!important;white-space:nowrap}
+
+  /* «Reiniciar» ya no se monta sobre la barra */
+  .dice_reset_button{position:static!important;margin:-4px 0 -6px auto!important;height:30px!important;max-width:96px!important}
+  .dice_reset_button_text{top:0!important;line-height:30px!important;font-size:.78rem!important}
+  .dice_roll_button_container_title{margin:0!important;font-size:.8rem!important}
+
+  /* Dados: 4 por fila, a dedo */
+  .dice_roll_button_container{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:7px!important;padding:8px!important;width:100%!important;max-width:none!important}
+  .dice_roll_button{width:auto!important;height:auto!important;aspect-ratio:1/1.08;min-height:74px;padding:4px 2px!important}
+  .dice_roll_button_text{font-size:.95rem!important;margin:2px 0 0!important}
+  .dice_roll_button_img{width:46px!important;height:46px!important;padding:2px 0 0!important;object-fit:contain}
+  .dice_roll_button_roll_text{display:none!important}
+  .dice_roll_button_custom_block{grid-column:1 / -1!important;display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:7px}
+  .dice_roll_button_custom_block .dice_roll_button{aspect-ratio:auto;min-height:62px}
+  .dice_roll_other_option_container{padding:8px 10px!important}
+  #dnd_dice_roller_toggle_text{display:none}
+
+  .jack-saved-rolls{padding:12px!important}
+  .jack-saved-rolls .jack-section-heading p{font-size:.78rem!important}
+
+  /* -------- Resultado como hoja inferior -------- */
+  .jack-right-column{
+    position:fixed!important;
+    left:0;right:0;
+    bottom:var(--favor-tab-h,64px);
+    z-index:9300;
+    max-height:calc(100dvh - var(--favor-tab-h,64px) - 24px);
+    overflow-y:auto;
+    overscroll-behavior:contain;
+    margin:0!important;
+    padding:0 10px 12px!important;
+    border-radius:18px 18px 0 0!important;
+    border-bottom:0!important;
+    transform:translateY(110%);
+    visibility:hidden;
+    transition:transform .32s cubic-bezier(.2,.8,.2,1),visibility 0s linear .32s;
+    box-shadow:0 -18px 40px rgba(0,0,0,.6)!important;
+  }
+  body.jack-roll-open .jack-right-column{transform:none;visibility:visible;transition:transform .32s cubic-bezier(.2,.8,.2,1)}
+  body.jack-roll-open{overflow:hidden}
+
+  .jack-sheet-head{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    position:sticky;top:0;z-index:3;
+    margin:0 -10px;padding:8px 12px 8px;
+    background:linear-gradient(180deg,#14100d 70%,rgba(20,16,13,0));
+  }
+  .jack-sheet-head::before{content:"";position:absolute;left:50%;top:5px;width:42px;height:4px;margin-left:-21px;border-radius:4px;background:rgba(240,207,117,.35)}
+  .jack-sheet-title{margin:8px 0 0;font:700 .78rem/1 Cinzel,serif;letter-spacing:.12em;color:#c9ae72;text-transform:uppercase}
+  .jack-sheet-close{
+    margin-top:6px;width:40px;height:40px;border-radius:10px;
+    border:1px solid rgba(232,209,155,.35);background:#1d140f;color:#ead39a;
+    font:600 1.4rem/1 Inter,system-ui,sans-serif;cursor:pointer
+  }
+  .jack-sheet-backdrop{
+    display:block;position:fixed;inset:0;z-index:9250;
+    background:rgba(5,3,2,.62);opacity:0;pointer-events:none;transition:opacity .25s ease
+  }
+  body.jack-roll-open .jack-sheet-backdrop{opacity:1;pointer-events:auto}
+
+  .jack-right-column .dice_log_container{height:min(400px,56dvh)!important}
+  .jack-right-column .dnd_roll_again_element_1,.jack-right-column .dnd_roll_again_element_2{min-height:50px;display:flex;align-items:center;justify-content:center}
+  .jack-right-column .dnd_roll_again_text{font-size:1rem!important;line-height:1.1!important;margin:0!important;top:0!important}
+  .jack-right-column .e_dice_log_container{height:220px!important}
+  .roll_dice_info_history_text{font-size:1.1rem!important}
+
+  /* Botón flotante con la última tirada */
+  .jack-last-roll{
+    display:flex;align-items:center;gap:10px;
+    position:fixed;right:12px;bottom:calc(var(--favor-tab-h,64px) + 12px);z-index:9200;white-space:nowrap;
+    min-height:46px;padding:0 18px 0 8px;border-radius:999px;
+    border:1px solid rgba(240,207,117,.55);
+    background:linear-gradient(145deg,#2b1e15,#120c08);
+    color:#f3e2b5;font:700 .8rem/1 Cinzel,serif;letter-spacing:.06em;
+    box-shadow:0 8px 22px rgba(0,0,0,.55);cursor:pointer;
+    animation:jackLastIn .35s ease both
+  }
+  .jack-last-roll[hidden]{display:none}
+  .jack-last-roll b{
+    display:grid;place-items:center;min-width:32px;height:32px;padding:0 6px;border-radius:999px;
+    background:linear-gradient(135deg,#53181d,#8d2c31);color:#fff;font-size:.95rem
+  }
+  body.jack-roll-open .jack-last-roll{display:none}
+}
+@keyframes jackLastIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+@media (max-width:819px) and (prefers-reduced-motion:reduce){
+  .jack-right-column,body.jack-roll-open .jack-right-column{transition:none}
+}
+/* En pantallas táctiles el «hover» queda pegado tras tocar: el dado no debe desaparecer */
+@media (hover:none){
+  .dice_roll_button:hover .dice_roll_button_img{display:block!important}
+  .dice_roll_button:hover .dice_roll_button_text{margin-top:2px!important}
+}
+@media (max-width:360px){
+  .dice_roll_button_container{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+}

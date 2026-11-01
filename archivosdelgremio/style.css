@@ -1361,3 +1361,80 @@ html.keep-gutter{scrollbar-gutter:stable}
     .book-tabs{bottom:calc(var(--favor-tab-h,58px) + 6px + env(safe-area-inset-bottom))}
     .library-shell{padding-bottom:64px}
 }
+
+/* ============================================================
+   V4 · Registro de misiones: borradores, cierre seguro y
+   filtro Activos / No activos al añadir participantes
+   ============================================================ */
+.admin-modal-card.nudge{animation:modalNudge .38s ease}
+@keyframes modalNudge{
+    0%,100%{transform:none}
+    20%{transform:translateX(-7px)}
+    40%{transform:translateX(6px)}
+    60%{transform:translateX(-4px)}
+    80%{transform:translateX(2px)}
+}
+@media (prefers-reduced-motion:reduce){.admin-modal-card.nudge{animation:none}}
+
+.draft-banner{
+    margin:8px 0 12px;padding:8px 12px;
+    border:1px dashed #8f6d3d;background:#f3e3bb;color:#5a3d22;font-style:italic;
+}
+.mission-form-actions{flex-wrap:wrap;align-items:center}
+.draft-status{margin-right:auto;font-size:.8rem;font-style:italic;color:#7a6343}
+.draft-status.bad{color:var(--danger);font-style:normal;font-weight:600}
+.ink-button.draft-discard{background:transparent;color:var(--danger);border-color:#b58a7b}
+
+.mission-drafts{
+    margin:0 0 16px;padding:12px 14px;
+    border:1px dashed #8f6d3d;background:#f1e1b8b0;
+}
+.mission-drafts h3{margin:0;font-family:'Cinzel',serif;font-size:1rem;color:#4a301b;display:flex;align-items:center;gap:8px}
+.mission-drafts h3 span{display:inline-grid;place-items:center;min-width:22px;height:22px;padding:0 6px;border-radius:999px;background:var(--red);color:#fff;font:700 .72rem/1 system-ui,sans-serif}
+.mission-drafts>p{margin:3px 0 10px;font-size:.8rem;font-style:italic;color:#806947}
+.mission-drafts-list{display:grid;gap:7px}
+.mission-draft-row{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding:8px 10px;border:1px solid #b39466;background:#efdcae;
+}
+.mission-draft-text{min-width:0}
+.mission-draft-text strong{display:block;color:#3e2817}
+.mission-draft-text small{display:block;margin-top:2px;color:#7a6343;font-size:.76rem}
+.mission-draft-actions{display:flex;gap:6px;flex:none}
+
+.participant-filters{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 10px}
+.participant-state-filter{display:inline-flex;border:1px solid #8f6d3d;background:#efdcae}
+.participant-state-filter button{
+    display:inline-flex;align-items:center;gap:6px;
+    min-height:36px;padding:0 12px;border:0;border-left:1px solid #b39466;
+    background:transparent;color:#5a3d22;font:600 .82rem/1 inherit;cursor:pointer;
+}
+.participant-state-filter button:first-child{border-left:0}
+.participant-state-filter button b{
+    display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 5px;border-radius:999px;
+    background:#d6bc82;color:#4a301b;font-size:.7rem
+}
+.participant-state-filter button.active{background:var(--forest);color:#f3e7c8}
+.participant-state-filter button.active b{background:#f3e7c8;color:var(--forest-dark)}
+.participant-search{
+    flex:1 1 180px;display:flex;align-items:center;gap:6px;min-height:36px;padding:0 10px;
+    border:1px solid #a48659;background:#f6ead0;color:#7a6343
+}
+.participant-search input{flex:1;min-width:0;border:0;background:transparent;outline:0;padding:6px 0;color:var(--ink)}
+.participant-pick-card.is-inactive{opacity:.82;background:#e2d3b3}
+.participant-pick-card.is-inactive .participant-pick-portrait img{filter:grayscale(.7)}
+.participant-pick-card small em{font-style:normal;color:var(--danger)}
+
+@media (max-width:700px){
+    .mission-draft-row{flex-direction:column;align-items:stretch}
+    .mission-draft-actions .ink-button{flex:1}
+    .participant-state-filter{width:100%}
+    .participant-state-filter button{flex:1;justify-content:center;padding:0 6px;min-height:40px}
+    .participant-search input{font-size:16px}
+    .draft-status{flex:1 0 100%;margin:0 0 4px}
+    .mission-form-actions .ink-button{flex:1}
+}
+/* Las ventanas (expediente, editor de misión) van por encima de la barra común:
+   en el móvil la barra inferior tapaba «Guardar misión». */
+.modal{z-index:9500}
+.toast{z-index:9700}

@@ -100,6 +100,7 @@ $config = $isAdmin ? [
     </nav>
 
     <section class="page page-list" aria-label="Lista de regulaciones">
+        <div class="list-tools">
         <div class="list-head">
             <label class="searchbox">
                 <svg class="reg-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m15.5 15.5 5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
@@ -115,6 +116,7 @@ $config = $isAdmin ? [
             <?php foreach (REG_TYPE_ICONS as $type => $icon): ?>
                 <button class="chip chip-type" type="button" data-filter="type:<?= reg_h($type) ?>"><?= reg_h(REG_TYPES[$type] . 's') ?></button>
             <?php endforeach; ?>
+        </div>
         </div>
         <?php if ($isAdmin): ?>
             <button class="new-rule" type="button" id="newRule"><span aria-hidden="true">+</span> Nueva regulación</button>
