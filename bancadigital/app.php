@@ -1421,7 +1421,9 @@ async function init(){
 init();
 async function persistPlayer(player){
   try{
-    const data=await apiRequest('save_player',{player},'POST');
+    // El icono, el orden y el estado del jugador solo los cambia el admin.
+    const sent=isAdminUser()?player:Object.fromEntries(Object.entries(player).filter(([k])=>!['iconUrl','active','order'].includes(k)));
+    const data=await apiRequest('save_player',{player:sent},'POST');
     if(data.player){
       const index=state.players.findIndex(item=>item.id===data.player.id);
       if(index===-1) state.players.push(data.player);
@@ -1432,7 +1434,10 @@ async function persistPlayer(player){
 }
 async function persistCharacter(character, initialCoins=null){
   try{
-    const payload={character};
+    // Las imágenes globales y el estado (activo/desactivado) son cosa del admin:
+    // un jugador no los envía y el servidor rechaza cualquier intento de cambiarlos.
+    const sent=isAdminUser()?character:Object.fromEntries(Object.entries(character).filter(([k])=>!['iconUrl','portraitUrl','thumbUrl','active'].includes(k)));
+    const payload={character:sent};
     if(initialCoins) payload.initialCoins=initialCoins;
     const data=await apiRequest('save_character',payload,'POST');
     if(data.character){
@@ -1860,7 +1865,7 @@ function renderCharacters(){
       <div class="character-card-footer">
         <button class="btn btn-primary" type="button" data-open-bank>Abrir banca</button>
         ${canEditCharacter(c)||moveAction ? `<div class="card-actions">
-          ${canEditCharacter(c)?`<button class="mini-btn" type="button" data-edit>Editar</button><button class="mini-btn danger" type="button" data-deactivate>Desactivar</button>`:''}
+          ${canEditCharacter(c)?`<button class="mini-btn" type="button" data-edit>Editar</button>${isAdminUser()?'<button class="mini-btn danger" type="button" data-deactivate>Desactivar</button>':''}`:''}
           ${moveAction}
         </div>`:''}
       </div>`;
@@ -1957,7 +1962,7 @@ async function renderBank(){
             </div>` : ''}
             <div class="coin-pouch-row coins-${pouchKeys.length}">${pouches}</div>
             ${canEditCharacter(c) ? `<div class="action-row">
-              ${isAdminUser() ? `<button class="btn btn-primary" onclick="showAddMoneyModal('${c.id}')">Añadir dinero</button>` : ''}
+              <button class="btn btn-primary" onclick="showAddMoneyModal('${c.id}')">Añadir dinero</button>
               <button class="btn btn-primary" onclick="showSpendMoneyModal('${c.id}')">Gastar dinero</button>
               <button class="btn btn-secondary" onclick="showExchangeModal('${c.id}')">Cambiar monedas</button>
               <button class="btn btn-secondary" onclick="showTransferModal('${c.id}')">Transferir</button>
@@ -2154,6 +2159,7 @@ function showEditPlayerModal(playerId){
 }
 
 function showDeactivatePlayerModal(playerId){
+  if(!isAdminUser()) return; // Desactivar y reactivar: solo el admin.
   const p = state.players.find(x=>x.id===playerId);
   if(!p) return;
   const count = state.characters.filter(c=>c.playerId===p.id && c.active!==false).length;
@@ -2219,6 +2225,7 @@ function showEditCharacterModal(charId){
 }
 
 function showDeactivateCharacterModal(charId){
+  if(!isAdminUser()) return; // Desactivar y reactivar: solo el admin.
   const c = state.characters.find(x=>x.id===charId);
   if(!c) return;
   openModal(`
@@ -2240,6 +2247,7 @@ function showDeactivateCharacterModal(charId){
 }
 
 function showInactiveModal(){
+  if(!isAdminUser()) return; // Desactivar y reactivar: solo el admin.
   const inactivePlayers=state.players.filter(p=>p.active===false);
   const inactiveChars=state.characters.filter(c=>c.active===false);
   const playerItems = inactivePlayers.map(p=>`
@@ -2261,12 +2269,14 @@ function showInactiveModal(){
 }
 
 async function reactivatePlayer(playerId){
+  if(!isAdminUser()) return; // Desactivar y reactivar: solo el admin.
   const p=state.players.find(x=>x.id===playerId); if(!p) return;
   p.active=true;
   if(await persistPlayer(p)){ toast('success','Jugador reactivado.'); showInactiveModal(); render(); }
   else{ p.active=false; toast('error','No se pudo guardar.'); }
 }
 async function reactivateCharacter(charId){
+  if(!isAdminUser()) return; // Desactivar y reactivar: solo el admin.
   const c=state.characters.find(x=>x.id===charId); if(!c) return;
   c.active=true;
   if(await persistCharacter(c)){ toast('success','Personaje reactivado.'); showInactiveModal(); render(); }
