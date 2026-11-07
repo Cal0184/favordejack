@@ -11,6 +11,7 @@ require_once dirname(__DIR__) . '/includes/imagenes.php';
 require_once dirname(__DIR__) . '/includes/migrations.php';
 require_once dirname(__DIR__) . '/includes/ficha-import.php';
 require_once dirname(__DIR__) . '/includes/estado.php';
+require_once dirname(__DIR__) . '/includes/recompensas.php';
 require_once dirname(__DIR__) . '/includes/auth-widget.php';
 guild_session_start();
 $csrf = guild_csrf();
@@ -177,9 +178,10 @@ SQL;
     $missionsInstalled = $hasMission && $hasMissionPerson;
 
     if ($missionsInstalled) {
+        favor_recompensas_schema($db);
         $missionRows = [];
         $res = $db->query(
-            'SELECT ID, Nombre, Fecha, Tipo, Estado, Descripcion, RecompensaGeneral, CreadoPor, Creado, Actualizado ' .
+            'SELECT ID, Nombre, Fecha, Tipo, Estado, Descripcion, RecompensaGeneral, RecompensaCantidad, RecompensaMoneda, RecompensaModo, CreadoPor, Creado, Actualizado ' .
             'FROM Mision ORDER BY COALESCE(Fecha, DATE(Creado)) DESC, ID DESC'
         );
         while ($row = $res->fetch_assoc()) {
@@ -192,6 +194,9 @@ SQL;
                 'state' => (string)$row['Estado'],
                 'description' => (string)($row['Descripcion'] ?? ''),
                 'generalReward' => (string)$row['RecompensaGeneral'],
+                'rewardAmount' => $row['RecompensaCantidad'] !== null ? (int)$row['RecompensaCantidad'] : null,
+                'rewardCoin' => (string)$row['RecompensaMoneda'],
+                'rewardMode' => (string)$row['RecompensaModo'],
                 'createdBy' => (string)$row['CreadoPor'],
                 'created' => (string)$row['Creado'],
                 'updated' => (string)$row['Actualizado'],
