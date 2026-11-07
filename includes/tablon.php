@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/assets.php';
 require_once __DIR__ . '/imagenes.php';
+require_once __DIR__ . '/recompensas.php';
 
 /*
  * Tablón de misiones.
@@ -84,6 +85,8 @@ function tablon_papeles(): array
 /** Agrega las columnas del tablón a Mision (una sola vez). */
 function tablon_ensure_schema(mysqli $db): void
 {
+    // Recompensa en monedas (Banca): columnas propias, compartidas con Archivos.
+    favor_recompensas_schema($db);
     $flag = $db->query("SELECT Valor FROM FavorMeta WHERE Clave='tablon_v2' LIMIT 1");
     $done = $flag && $flag->fetch_assoc();
     if ($flag) $flag->free();
@@ -135,7 +138,7 @@ function tablon_cargar(mysqli $db, string $where, string $order): array
 {
     $missions = [];
     $res = $db->query(
-        'SELECT ID,Nombre,Fecha,Tipo,Estado,Descripcion,RecompensaGeneral,CreadoPor,Creado,Actualizado,EnTablon,Papel,Tamano,Letra,Tinta,PosX,PosY,Giro,Capa,Detalles,MotivoFin,Clase,Imagen,ImagenRatio,Estrellas '
+        'SELECT ID,Nombre,Fecha,Tipo,Estado,Descripcion,RecompensaGeneral,RecompensaCantidad,RecompensaMoneda,RecompensaModo,CreadoPor,Creado,Actualizado,EnTablon,Papel,Tamano,Letra,Tinta,PosX,PosY,Giro,Capa,Detalles,MotivoFin,Clase,Imagen,ImagenRatio,Estrellas '
         . "FROM Mision WHERE $where ORDER BY $order"
     );
     while ($r = $res->fetch_assoc()) {
@@ -151,6 +154,9 @@ function tablon_cargar(mysqli $db, string $where, string $order): array
             'state' => (string)$r['Estado'],
             'text' => (string)($r['Descripcion'] ?? ''),
             'reward' => (string)$r['RecompensaGeneral'],
+            'rewardAmount' => $r['RecompensaCantidad'] !== null ? (int)$r['RecompensaCantidad'] : null,
+            'rewardCoin' => (string)$r['RecompensaMoneda'],
+            'rewardMode' => (string)$r['RecompensaModo'],
             'details' => (string)($r['Detalles'] ?? ''),
             'reason' => (string)$r['MotivoFin'],
             'createdBy' => (string)$r['CreadoPor'],

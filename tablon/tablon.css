@@ -311,3 +311,9 @@ body:not(.is-admin) .paper.on-board{touch-action:manipulation}
 }
 .paper.is-broken .paper-party{display:none}
 .tablon-dialog [hidden]{display:none!important}
+
+/* Pago en la Banca (recompensa en monedas) */
+.edit-row.edit-coins{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) minmax(0,1fr)}
+.edit-coins select{display:block;width:100%;box-sizing:border-box;margin-top:4px;padding:9px 11px;border:1px solid #a87a45;border-radius:8px;background:#fffaf0;color:#24160c;font:1.02rem var(--favor-font,'EB Garamond',serif)}
+.edit-hint{margin:-4px 0 0;font-size:.85rem;opacity:.8}
+@media (max-width:640px){.edit-row.edit-coins{grid-template-columns:1fr 1fr}.edit-row.edit-coins label:first-child{grid-column:1/-1}}

@@ -46,7 +46,7 @@
         void el.offsetWidth;
         el.classList.add('show');
         clearTimeout(toast.t);
-        toast.t = setTimeout(() => { el.hidden = true; }, 3800);
+        toast.t = setTimeout(() => { el.hidden = true; }, Math.max(3800, String(text).length * 60));
     }
 
     /* ---------- Papel ---------- */
@@ -218,7 +218,8 @@
         $('#view-paper').innerHTML = paperHTML(m);
         $('#view-state').innerHTML = `<span class="chip chip-${esc(m.state).replace(/\s+/g, '-').toLowerCase()}">${m.state === 'Cancelada' ? 'Eliminada' : esc(m.state)}</span>${m.type ? ` <span class="chip">${esc(m.type)}</span>` : ''}`;
         $('#view-title').textContent = m.name;
-        $('#view-reward').innerHTML = m.reward ? `<b>Recompensa:</b> ${esc(m.reward)}` : '';
+        const coinPay = m.rewardAmount ? `${Number(m.rewardAmount).toLocaleString('es-CL')} ${esc(String(m.rewardCoin || 'po').toUpperCase())} ${m.rewardMode === 'total' ? 'en total, a repartir' : 'por personaje'}` : '';
+        $('#view-reward').innerHTML = [m.reward ? `<b>Recompensa:</b> ${esc(m.reward)}` : '', coinPay ? `<b>Pago en la Banca:</b> ${coinPay}` : ''].filter(Boolean).join('<br>');
         $('#view-details').innerHTML = `${m.kind === 'caza' ? `<p class="view-stars">Dificultad: ${'★'.repeat(m.stars || 1)}${'☆'.repeat(Math.max(0, S.maxStars - (m.stars || 1)))}</p>` : ''}<p class="view-text">${esc(m.text)}</p>${m.details ? `<p class="view-more">${esc(m.details)}</p>` : ''}`;
         $('#view-party').innerHTML = m.party.length
             ? `<h3>Grupo</h3><ul>${m.party.map(c => `<li>${c.portrait ? `<img src="${esc(c.portrait)}" alt="">` : `<span class="face-fallback">${esc((c.short || c.name).charAt(0))}</span>`}<span>${esc(c.name)}${c.player ? `<small>${esc(c.player)}</small>` : ''}</span></li>`).join('')}</ul>`
@@ -463,7 +464,7 @@
 
         let raf = 0;
         form.addEventListener('input', () => {
-            for (const k of ['name', 'text', 'reward', 'type', 'details']) draft[k] = form[k].value;
+            for (const k of ['name', 'text', 'reward', 'type', 'details', 'rewardAmount', 'rewardCoin', 'rewardMode']) draft[k] = form[k].value;
             cancelAnimationFrame(raf);
             raf = requestAnimationFrame(drawPreview);
         });
@@ -477,7 +478,7 @@
             const btn = $('#edit-submit');
             btn.disabled = true;
             try {
-                const r = await api('save', {id: draft.id, name: draft.name, text: draft.text, reward: draft.reward, type: draft.type, details: draft.details, paper: draft.paper, size: draft.size, font: draft.font, ink: draft.ink, kind: draft.kind, image: draft.imagePath || '', stars: draft.stars});
+                const r = await api('save', {id: draft.id, name: draft.name, text: draft.text, reward: draft.reward, rewardAmount: draft.rewardAmount ?? '', rewardCoin: draft.rewardCoin || 'po', rewardMode: draft.rewardMode || 'personaje', type: draft.type, details: draft.details, paper: draft.paper, size: draft.size, font: draft.font, ink: draft.ink, kind: draft.kind, image: draft.imagePath || '', stars: draft.stars});
                 $('#dlg-edit').close();
                 animate[r.id] = draft.id ? '' : 'pin';
                 await reload();
@@ -496,6 +497,9 @@
         $('#hunt-upload').hidden = true;
         const form = $('#edit-form');
         for (const k of ['name', 'text', 'reward', 'type', 'details']) form[k].value = draft[k] || '';
+        form.rewardAmount.value = draft.rewardAmount ? String(draft.rewardAmount) : '';
+        form.rewardCoin.value = draft.rewardCoin || 'po';
+        form.rewardMode.value = draft.rewardMode || 'personaje';
         $('#edit-title').textContent = m ? 'Editar misión' : 'Ingresar misión';
         $('#edit-submit').textContent = m ? 'Guardar cambios' : 'Clavar en el tablón';
         showError($('#edit-error'), '');

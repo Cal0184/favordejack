@@ -119,6 +119,7 @@ try {
         if ($hunt && $image === '') throw new RuntimeException('Sube la imagen de la criatura.');
         if (!$hunt && $text === '') throw new RuntimeException('Escribe el texto que va en el papel.');
         $reward = tablon_str($data, 'reward', 255);
+        $coinReward = favor_recompensa_desde($data);
         $details = tablon_str($data, 'details', 20000);
         $type = tablon_str($data, 'type', 80);
         if ($hunt && $type === '') $type = 'Caza de cabezas';
@@ -139,6 +140,7 @@ try {
             tablon_mision($db, $id);
             tablon_exec($db, 'UPDATE Mision SET Nombre=?,Descripcion=?,RecompensaGeneral=?,Detalles=?,Tipo=?,Papel=?,Tamano=?,Letra=?,Tinta=?,Clase=?,Imagen=?,ImagenRatio=?,Estrellas=? WHERE ID=?',
                 [$name, $text, $reward, $details, $type, $paper, $size, $font, $ink, $kind, $image, $imageRatio, $stars, $id])->close();
+            favor_recompensa_guardar($db, $id, $coinReward);
             tablon_respond(true, ['message' => 'Misión actualizada.', 'id' => $id]);
         }
 
@@ -151,6 +153,7 @@ try {
         tablon_exec($db, "INSERT INTO Mision (Nombre,Tipo,Estado,Descripcion,RecompensaGeneral,CreadoPor,EnTablon,Papel,Tamano,Letra,Tinta,PosX,PosY,Giro,Capa,Detalles,Clase,Imagen,ImagenRatio,Estrellas) VALUES (?,?,'Publicada',?,?,?,1,?,?,?,?,?,?,?,?,?,?,?,?,?)",
             [$name, $type, $text, $reward, (string)$admin['username'], $paper, $size, $font, $ink, $x, $y, $rot, tablon_next_layer($db), $details, $kind, $image, $imageRatio, $stars])->close();
         $id = (int)$db->insert_id;
+        favor_recompensa_guardar($db, $id, $coinReward);
         tablon_discord(($hunt ? '🎯 Nueva caza de cabezas: ' : '📜 Nueva misión en el tablón: ') . $name, $text, [['Recompensa', $reward], ['Tipo', $type], ['Dificultad', $hunt ? str_repeat('★', $stars) : '']]);
         tablon_respond(true, ['message' => 'Misión clavada en el tablón.', 'id' => $id]);
     }
@@ -212,7 +215,12 @@ try {
         if ($state !== 'En curso' && $state !== $m['Estado']) {
             tablon_discord(($state === 'Completada' ? '🏆 Misión completada: ' : '💀 Misión fallida: ') . $m['Nombre'], $note, [['Grupo', tablon_party_names($db, $id)], ['Recompensa', (string)$m['RecompensaGeneral']]]);
         }
-        tablon_respond(true, ['message' => $state === 'En curso' ? 'La misión vuelve a estar en curso.' : 'Misión marcada como ' . mb_strtolower($state, 'UTF-8') . '.']);
+        // Completada por primera vez: se paga la recompensa en monedas (una sola vez por personaje).
+        $payNote = '';
+        if ($state === 'Completada' && $m['Estado'] !== 'Completada') {
+            $payNote = favor_recompensa_pagar_seguro($db, $id, (string)($admin['displayName'] ?? $admin['username']));
+        }
+        tablon_respond(true, ['message' => trim(($state === 'En curso' ? 'La misión vuelve a estar en curso.' : 'Misión marcada como ' . mb_strtolower($state, 'UTF-8') . '.') . ' ' . $payNote), 'rewardNote' => $payNote]);
     }
 
     // Eliminar: el papel queda roto en el tablón, con su motivo.
