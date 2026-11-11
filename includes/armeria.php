@@ -115,8 +115,16 @@ function armeria_ensure_schema(mysqli $db): void
         CreadoPor varchar(50) NULL,
         Creado timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
         Actualizado timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        AtaqueAtributo varchar(10) NULL,
+        AtaqueBase varchar(10) NULL,
+        AtaqueMotivo text NULL,
+        AtaqueExcepcion text NULL,
+        AtaqueDuda text NULL,
+        ClasifEditada tinyint(1) NOT NULL DEFAULT 0,
+        Descripcion text NULL,
         UNIQUE KEY uq_armaobjeto_clave (Clave),
         KEY idx_armaobjeto_categoria (Categoria, Activo),
+        KEY idx_armaobjeto_ataque (AtaqueAtributo),
         KEY idx_armaobjeto_nombre (Nombre),
         KEY idx_armaobjeto_regla (ReglaID),
         CONSTRAINT fk_armaobjeto_regla FOREIGN KEY (ReglaID) REFERENCES ArmaRegla (ID) ON DELETE SET NULL
@@ -133,6 +141,53 @@ function armeria_ensure_schema(mysqli $db): void
         CONSTRAINT fk_aop_propiedad FOREIGN KEY (PropiedadID) REFERENCES ArmaPropiedad (ID) ON DELETE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 
+    // Instalaciones con la primera versión del módulo: añade las columnas nuevas.
+    foreach ([
+        'AtaqueAtributo' => 'varchar(10) NULL', 'AtaqueBase' => 'varchar(10) NULL', 'AtaqueMotivo' => 'text NULL',
+        'AtaqueExcepcion' => 'text NULL', 'AtaqueDuda' => 'text NULL', 'ClasifEditada' => 'tinyint(1) NOT NULL DEFAULT 0', 'Descripcion' => 'text NULL',
+    ] as $col => $ddl) armeria_columna($db, 'ArmaObjeto', $col, $ddl);
+
+    // Atributo de ataque: uno o varios modos por objeto (cuerpo a cuerpo, arrojadiza, disparo…).
+    $db->query("CREATE TABLE IF NOT EXISTS ArmaAtaqueModo (
+        ObjetoID int unsigned NOT NULL,
+        Orden tinyint unsigned NOT NULL,
+        Modo varchar(80) NOT NULL,
+        Atributo varchar(10) NOT NULL,
+        Dano varchar(60) NOT NULL DEFAULT '',
+        Nota varchar(300) NOT NULL DEFAULT '',
+        PRIMARY KEY (ObjetoID, Orden),
+        KEY idx_aam_atributo (Atributo),
+        CONSTRAINT fk_aam_objeto FOREIGN KEY (ObjetoID) REFERENCES ArmaObjeto (ID) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
+    // Requisitos (Fuerza 20, tamaño…) y condiciones de uso; no son el atributo de ataque.
+    $db->query("CREATE TABLE IF NOT EXISTS ArmaRequisito (
+        ObjetoID int unsigned NOT NULL,
+        Orden tinyint unsigned NOT NULL,
+        Tipo varchar(12) NOT NULL DEFAULT 'requisito',
+        Atributo varchar(10) NULL,
+        Minimo tinyint unsigned NULL,
+        Texto varchar(300) NOT NULL,
+        PRIMARY KEY (ObjetoID, Orden),
+        KEY idx_areq_atributo (Atributo),
+        CONSTRAINT fk_areq_objeto FOREIGN KEY (ObjetoID) REFERENCES ArmaObjeto (ID) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
+    // Aclaraciones, excepciones y notas de la administración (nunca se mezclan con el texto del Word).
+    $db->query("CREATE TABLE IF NOT EXISTS ArmaNota (
+        ID int unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        ObjetoID int unsigned NULL,
+        Tipo varchar(12) NOT NULL DEFAULT 'aclaracion',
+        Titulo varchar(160) NOT NULL,
+        Texto mediumtext NOT NULL,
+        Visible tinyint(1) NOT NULL DEFAULT 1,
+        Autor varchar(50) NULL,
+        Creado timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        Actualizado timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        KEY idx_armanota_objeto (ObjetoID),
+        CONSTRAINT fk_armanota_objeto FOREIGN KEY (ObjetoID) REFERENCES ArmaObjeto (ID) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
     // Importa (o reimporta) cuando cambia el archivo del documento.
     if (is_file(ARMERIA_DATA)) {
         $hash = sha1_file(ARMERIA_DATA) ?: '';
@@ -142,6 +197,12 @@ function armeria_ensure_schema(mysqli $db): void
             armeria_q($db, "INSERT INTO FavorMeta (Clave,Valor) VALUES ('armeria_import',?) ON DUPLICATE KEY UPDATE Valor=VALUES(Valor)", [$hash])->close();
         }
     }
+}
+
+function armeria_columna(mysqli $db, string $tabla, string $col, string $ddl): void
+{
+    $rows = armeria_all($db, 'SELECT 1 FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=? AND COLUMN_NAME=? LIMIT 1', [$tabla, $col]);
+    if (!$rows) $db->query("ALTER TABLE `$tabla` ADD COLUMN `$col` $ddl");
 }
 
 /**
@@ -182,11 +243,13 @@ function armeria_importar(mysqli $db): array
         $reglaIds = [];
         foreach (armeria_all($db, 'SELECT ID,Clave FROM ArmaRegla') as $r) $reglaIds[$r['Clave']] = (int)$r['ID'];
         $existing = [];
-        foreach (armeria_all($db, 'SELECT ID,Clave,Editado,Activo FROM ArmaObjeto') as $r) $existing[$r['Clave']] = $r;
+        foreach (armeria_all($db, 'SELECT ID,Clave,Editado,Activo,ClasifEditada FROM ArmaObjeto') as $r) $existing[$r['Clave']] = $r;
 
         foreach ($data['objetos'] as $o) {
             $row = armeria_fila_desde_json($o, $reglaIds);
             $prev = $existing[$o['clave']] ?? null;
+            // La clasificación (atributo y requisitos) se guarda aparte: solo la protege ClasifEditada.
+            if ($prev && (int)$prev['ClasifEditada'] === 0) armeria_guardar_clasificacion($db, (int)$prev['ID'], $o);
             if ($prev && ((int)$prev['Editado'] === 1 || (int)$prev['Activo'] === 0)) {
                 $sum['respetados']++;
                 continue;
@@ -205,6 +268,7 @@ function armeria_importar(mysqli $db): array
                 $sum['creados']++;
             }
             armeria_guardar_propiedades($db, $id, array_map(static fn(array $p): array => ['clave' => $p['clave'], 'detalle' => $p['detalle']], $o['propiedades']), $propIds);
+            if (!$prev) armeria_guardar_clasificacion($db, $id, $o);
         }
         $db->commit();
     } catch (Throwable $e) {
@@ -244,6 +308,92 @@ function armeria_fila_desde_json(array $o, array $reglaIds): array
     ];
 }
 
+const ARMERIA_ATRIBUTOS = ['FUE', 'DES', 'FUE/DES', 'REVISAR'];
+const ARMERIA_RESUMENES = ['FUE', 'DES', 'FUE/DES', 'MODOS', 'REVISAR'];
+const ARMERIA_NOTA_TIPOS = ['aclaracion', 'excepcion', 'nota', 'errata'];
+
+/** Resumen de los modos: un atributo, «MODOS» si cambian según el modo, «REVISAR» si alguno está pendiente. */
+function armeria_resumen_ataque(array $modos): ?string
+{
+    $ats = array_values(array_unique(array_map(static fn(array $m): string => (string)$m['atributo'], $modos)));
+    if (!$ats) return null;
+    if (in_array('REVISAR', $ats, true)) return 'REVISAR';
+    return count($ats) === 1 ? $ats[0] : 'MODOS';
+}
+
+/**
+ * Guarda el atributo de ataque y los requisitos de un objeto desde el JSON del documento
+ * ($o['ataque'], $o['requisitos']). AtaqueBase conserva la clasificación por reglas generales.
+ */
+function armeria_guardar_clasificacion(mysqli $db, int $id, array $o): void
+{
+    $a = is_array($o['ataque'] ?? null) ? $o['ataque'] : null;
+    armeria_guardar_ataque($db, $id, $a ? $a['modos'] : [], [
+        'base' => $a['base'] ?? null,
+        'motivo' => $a['motivo'] ?? '',
+        'excepcion' => $a['excepcion'] ?? '',
+        'duda' => $a['duda'] ?? '',
+    ], false);
+    armeria_guardar_requisitos($db, $id, $o['requisitos'] ?? []);
+}
+
+/** $modos = [['modo'=>…, 'atributo'=>'FUE'|'DES'|'FUE/DES'|'REVISAR', 'dano'=>…, 'nota'=>…], …] */
+function armeria_guardar_ataque(mysqli $db, int $id, array $modos, array $info, bool $porAdmin, bool $tocarBase = true): void
+{
+    $limpios = [];
+    foreach ($modos as $m) {
+        if (!is_array($m) || !in_array((string)($m['atributo'] ?? ''), ARMERIA_ATRIBUTOS, true)) continue;
+        $limpios[] = [
+            'modo' => mb_substr(trim((string)($m['modo'] ?? '')), 0, 80, 'UTF-8') ?: 'Ataque',
+            'atributo' => (string)$m['atributo'],
+            'dano' => mb_substr(trim((string)($m['dano'] ?? '')), 0, 60, 'UTF-8'),
+            'nota' => mb_substr(trim((string)($m['nota'] ?? '')), 0, 300, 'UTF-8'),
+        ];
+    }
+    $resumen = armeria_resumen_ataque($limpios);
+    if (!empty($info['revisar']) && $limpios) $resumen = 'REVISAR';
+    armeria_q($db, 'DELETE FROM ArmaAtaqueModo WHERE ObjetoID=?', [$id])->close();
+    foreach (array_slice($limpios, 0, 8) as $i => $m) {
+        armeria_q($db, 'INSERT INTO ArmaAtaqueModo (ObjetoID,Orden,Modo,Atributo,Dano,Nota) VALUES (?,?,?,?,?,?)', [$id, $i + 1, $m['modo'], $m['atributo'], $m['dano'], $m['nota']])->close();
+    }
+    $sql = 'UPDATE ArmaObjeto SET AtaqueAtributo=?,AtaqueMotivo=?,AtaqueExcepcion=?,AtaqueDuda=?' . ($tocarBase ? ',AtaqueBase=?' : '') . ($porAdmin ? ',ClasifEditada=1' : '') . ' WHERE ID=?';
+    $params = [$resumen, (string)($info['motivo'] ?? ''), (string)($info['excepcion'] ?? ''), (string)($info['duda'] ?? '')];
+    if ($tocarBase) $params[] = $info['base'] ?? null;
+    $params[] = $id;
+    armeria_q($db, $sql, $params)->close();
+}
+
+/** $reqs = [['tipo'=>'requisito'|'condicion', 'atributo'=>'FUE'|'DES'|'FUE/DES'|null, 'minimo'=>20|null, 'texto'=>…], …] */
+function armeria_guardar_requisitos(mysqli $db, int $id, array $reqs): void
+{
+    armeria_q($db, 'DELETE FROM ArmaRequisito WHERE ObjetoID=?', [$id])->close();
+    $n = 0;
+    foreach ($reqs as $r) {
+        if (!is_array($r)) continue;
+        $texto = mb_substr(trim((string)($r['texto'] ?? '')), 0, 300, 'UTF-8');
+        if ($texto === '' || $n >= 10) continue;
+        $tipo = ($r['tipo'] ?? '') === 'condicion' ? 'condicion' : 'requisito';
+        $at = in_array((string)($r['atributo'] ?? ''), ['FUE', 'DES', 'FUE/DES'], true) ? (string)$r['atributo'] : null;
+        $min = isset($r['minimo']) && is_numeric($r['minimo']) ? max(1, min(30, (int)$r['minimo'])) : null;
+        armeria_q($db, 'INSERT INTO ArmaRequisito (ObjetoID,Orden,Tipo,Atributo,Minimo,Texto) VALUES (?,?,?,?,?,?)', [$id, ++$n, $tipo, $at, $min, $texto])->close();
+    }
+}
+
+/** Vuelve a la clasificación del documento para un objeto (deshace la corrección del admin). */
+function armeria_restaurar_clasificacion(mysqli $db, int $id): bool
+{
+    $rows = armeria_all($db, 'SELECT Clave FROM ArmaObjeto WHERE ID=?', [$id]);
+    if (!$rows || !is_file(ARMERIA_DATA)) return false;
+    $data = json_decode((string)file_get_contents(ARMERIA_DATA), true);
+    foreach ($data['objetos'] ?? [] as $o) {
+        if ($o['clave'] !== $rows[0]['Clave']) continue;
+        armeria_guardar_clasificacion($db, $id, $o);
+        armeria_q($db, 'UPDATE ArmaObjeto SET ClasifEditada=0 WHERE ID=?', [$id])->close();
+        return true;
+    }
+    return false;
+}
+
 /** $props = [['clave' => 'versatil', 'detalle' => '1d8'], …] en el orden del documento. */
 function armeria_guardar_propiedades(mysqli $db, int $objetoId, array $props, ?array $propIds = null): void
 {
@@ -278,6 +428,19 @@ function armeria_catalogo(mysqli $db, bool $admin): array
     foreach (armeria_all($db, 'SELECT op.ObjetoID, p.Clave, op.Detalle FROM ArmaObjetoPropiedad op JOIN ArmaPropiedad p ON p.ID=op.PropiedadID ORDER BY op.ObjetoID, op.Orden') as $l) {
         $links[(int)$l['ObjetoID']][] = ['clave' => $l['Clave'], 'detalle' => $l['Detalle']];
     }
+    $modos = [];
+    foreach (armeria_all($db, 'SELECT ObjetoID,Modo,Atributo,Dano,Nota FROM ArmaAtaqueModo ORDER BY ObjetoID, Orden') as $m) {
+        $modos[(int)$m['ObjetoID']][] = ['modo' => $m['Modo'], 'atributo' => $m['Atributo'], 'dano' => $m['Dano'], 'nota' => $m['Nota']];
+    }
+    $reqs = [];
+    foreach (armeria_all($db, 'SELECT ObjetoID,Tipo,Atributo,Minimo,Texto FROM ArmaRequisito ORDER BY ObjetoID, Orden') as $r) {
+        $reqs[(int)$r['ObjetoID']][] = ['tipo' => $r['Tipo'], 'atributo' => $r['Atributo'], 'minimo' => $r['Minimo'] !== null ? (int)$r['Minimo'] : null, 'texto' => $r['Texto']];
+    }
+    $notas = [];
+    foreach (armeria_all($db, 'SELECT ID,ObjetoID,Tipo,Titulo,Texto,Visible,Autor,Actualizado FROM ArmaNota ' . ($admin ? '' : 'WHERE Visible=1 ') . 'ORDER BY Tipo, Titulo') as $n) {
+        $notas[] = ['id' => (int)$n['ID'], 'objetoId' => $n['ObjetoID'] !== null ? (int)$n['ObjetoID'] : null, 'tipo' => $n['Tipo'], 'titulo' => $n['Titulo'], 'texto' => $n['Texto'],
+            'visible' => (bool)$n['Visible'], 'fecha' => substr((string)$n['Actualizado'], 0, 10)] + ($admin ? ['autor' => (string)$n['Autor']] : []);
+    }
     $reglas = [];
     foreach (armeria_all($db, 'SELECT ID,Clave,Titulo,Texto,Editado FROM ArmaRegla ORDER BY Titulo') as $r) {
         $reglas[] = ['id' => (int)$r['ID'], 'clave' => $r['Clave'], 'titulo' => $r['Titulo'], 'texto' => $r['Texto']] + ($admin ? ['editado' => (bool)$r['Editado']] : []);
@@ -300,6 +463,19 @@ function armeria_catalogo(mysqli $db, bool $admin): array
             'costeCobre' => $o['CosteCobre'] !== null ? (int)$o['CosteCobre'] : null,
             'reglaId' => $o['ReglaID'] !== null ? (int)$o['ReglaID'] : null,
             'propiedades' => $links[$id] ?? [],
+            'requisitos' => $reqs[$id] ?? [],
+            'descripcion' => (string)($o['Descripcion'] ?? ''),
+            // Avisos de la importación (datos dudosos del Word): los ve todo el mundo en «Reglas y notas».
+            'notas' => (string)($o['Notas'] ?? ''),
+            'ataque' => $o['AtaqueAtributo'] === null ? null : [
+                'atributo' => $o['AtaqueAtributo'],
+                'base' => $o['AtaqueBase'],
+                'modos' => $modos[$id] ?? [],
+                'motivo' => (string)$o['AtaqueMotivo'],
+                'excepcion' => (string)$o['AtaqueExcepcion'],
+                'duda' => (string)$o['AtaqueDuda'],
+                'editado' => (bool)$o['ClasifEditada'],
+            ],
         ];
         if ($o['Tipo'] === 'arma') {
             $item += [
@@ -328,7 +504,6 @@ function armeria_catalogo(mysqli $db, bool $admin): array
                 'activo' => (bool)$o['Activo'],
                 'origen' => $o['Origen'],
                 'editado' => (bool)$o['Editado'],
-                'notas' => (string)($o['Notas'] ?? ''),
                 'original' => json_decode((string)($o['Original'] ?? '[]'), true) ?: [],
             ];
         }
@@ -337,7 +512,10 @@ function armeria_catalogo(mysqli $db, bool $admin): array
     $cats = [];
     foreach (armeria_all($db, 'SELECT Clave,Nombre,Tipo FROM ArmaCategoria ORDER BY Orden') as $c) $cats[] = ['clave' => $c['Clave'], 'nombre' => $c['Nombre'], 'tipo' => $c['Tipo']];
     $intro = armeria_all($db, "SELECT Valor FROM FavorMeta WHERE Clave='armeria_intro'");
+    $total = (int)armeria_all($db, 'SELECT COUNT(*) AS n FROM ArmaObjeto WHERE Activo=1')[0]['n'];
     return [
+        'total' => $total,
+        'notas' => $notas,
         'categorias' => $cats,
         'propiedades' => $props,
         'propiedadesIntro' => (string)($intro[0]['Valor'] ?? ''),
@@ -393,4 +571,39 @@ function armeria_analizar_dano(string $dano): array
         $prom = (float)$m[1];
     }
     return [$dados, $prom, $tipos];
+}
+
+/**
+ * Clasificación por reglas generales (la misma que armeria/herramientas/clasificar-ataque.py),
+ * para objetos nuevos o editados sin excepción propia. Devuelve [modos, motivo].
+ */
+function armeria_clasificar_general(string $categoria, array $propClaves): array
+{
+    $ps = array_flip($propClaves);
+    $distancia = str_ends_with($categoria, 'distancia');
+    $sutil = isset($ps['sutil']);
+    $modos = [];
+    $motivo = [];
+    if ($distancia) {
+        $at = $sutil ? 'FUE/DES' : 'DES';
+        $modos[] = ['modo' => isset($ps['arrojadiza']) && !isset($ps['municion']) ? 'Arrojadiza' : 'A distancia', 'atributo' => $at, 'dano' => '', 'nota' => ''];
+        $motivo[] = $sutil
+            ? 'Es un arma a distancia con la propiedad Sutil: puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos).'
+            : 'Es un arma a distancia: usa Destreza para las tiradas de ataque y daño.';
+    } else {
+        $at = $sutil ? 'FUE/DES' : 'FUE';
+        $modos[] = ['modo' => 'Cuerpo a cuerpo', 'atributo' => $at, 'dano' => '', 'nota' => ''];
+        $motivo[] = $sutil
+            ? 'Esta arma posee la propiedad Sutil, por lo que puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos).'
+            : 'Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.';
+        if (isset($ps['arrojadiza'])) {
+            $modos[] = ['modo' => 'Arrojadiza', 'atributo' => $at, 'dano' => '', 'nota' => ''];
+            $motivo[] = 'Si la lanzas (Arrojadiza), usas el mismo modificador que en cuerpo a cuerpo, como indica la propiedad Lanzado del documento.';
+        }
+        if (isset($ps['municion'])) {
+            $modos[] = ['modo' => 'Disparo con munición', 'atributo' => 'DES', 'dano' => '', 'nota' => ''];
+            $motivo[] = 'Su modo de disparo con munición es un ataque a distancia, que usa Destreza.';
+        }
+    }
+    return [$modos, implode(' ', $motivo)];
 }

@@ -522,7 +522,23 @@
    ],
    "orden": 1,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "daga",
@@ -561,7 +577,29 @@
    ],
    "orden": 2,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     },
+     {
+      "modo": "Arrojadiza",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Esta arma posee la propiedad Sutil, por lo que puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos). Si la lanzas (Arrojadiza), usas el mismo modificador que en cuerpo a cuerpo, como indica la propiedad Lanzado del documento.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "gran-clava",
@@ -592,7 +630,23 @@
    ],
    "orden": 3,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "hacha-de-mano",
@@ -627,7 +681,29 @@
    ],
    "orden": 4,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     },
+     {
+      "modo": "Arrojadiza",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño. Si la lanzas (Arrojadiza), usas el mismo modificador que en cuerpo a cuerpo, como indica la propiedad Lanzado del documento.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "hoz",
@@ -658,7 +734,23 @@
    ],
    "orden": 5,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "jabalina",
@@ -689,7 +781,29 @@
    ],
    "orden": 6,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     },
+     {
+      "modo": "Arrojadiza",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño. Si la lanzas (Arrojadiza), usas el mismo modificador que en cuerpo a cuerpo, como indica la propiedad Lanzado del documento.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "lanza",
@@ -724,7 +838,29 @@
    ],
    "orden": 7,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     },
+     {
+      "modo": "Arrojadiza",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño. Si la lanzas (Arrojadiza), usas el mismo modificador que en cuerpo a cuerpo, como indica la propiedad Lanzado del documento.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "lanza-corta",
@@ -763,7 +899,29 @@
    ],
    "orden": 8,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     },
+     {
+      "modo": "Arrojadiza",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Esta arma posee la propiedad Sutil, por lo que puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos). Si la lanzas (Arrojadiza), usas el mismo modificador que en cuerpo a cuerpo, como indica la propiedad Lanzado del documento.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "lanza-larga",
@@ -802,7 +960,23 @@
    "regla": null,
    "avisos": [
     "Daño dudoso en el documento: «z». Se conserva tal cual."
-   ]
+   ],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "martillo-ligero",
@@ -837,7 +1011,29 @@
    ],
    "orden": 10,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     },
+     {
+      "modo": "Arrojadiza",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño. Si la lanzas (Arrojadiza), usas el mismo modificador que en cuerpo a cuerpo, como indica la propiedad Lanzado del documento.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "maza",
@@ -863,7 +1059,23 @@
    ],
    "orden": 11,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "clava",
@@ -894,7 +1106,23 @@
    ],
    "orden": 12,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "pala",
@@ -931,7 +1159,23 @@
    "regla": null,
    "avisos": [
     "La tabla dice «Destrucción»; en el glosario la propiedad se llama «Destructora»."
-   ]
+   ],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "brandistock",
@@ -966,7 +1210,23 @@
    ],
    "orden": 14,
    "regla": "regla-brandistock",
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "guante-garra",
@@ -1001,7 +1261,23 @@
    ],
    "orden": 15,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Esta arma posee la propiedad Sutil, por lo que puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos).",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "red-atrapa-bichos",
@@ -1038,7 +1314,23 @@
    "regla": "regla-red-atrapa-bichos",
    "avisos": [
     "Revisar: la tabla da 1 de daño contundente, pero la regla especial dice que la criatura diminuta golpeada «no sufre daño»."
-   ]
+   ],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "garra",
@@ -1083,7 +1375,23 @@
    "regla": "regla-garra",
    "avisos": [
     "Las propiedades usan un punto en lugar de una coma como separador."
-   ]
+   ],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Esta arma posee la propiedad Sutil, por lo que puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos).",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "bate",
@@ -1118,7 +1426,23 @@
    ],
    "orden": 18,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Esta arma posee la propiedad Sutil, por lo que puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos).",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "manopla",
@@ -1153,7 +1477,23 @@
    ],
    "orden": 19,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "manopla-con-hoja",
@@ -1188,7 +1528,23 @@
    ],
    "orden": 20,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Esta arma posee la propiedad Sutil, por lo que puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos).",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "bokken",
@@ -1219,7 +1575,23 @@
    ],
    "orden": 21,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "cestus",
@@ -1258,7 +1630,23 @@
    ],
    "orden": 22,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "fauchard",
@@ -1299,7 +1687,23 @@
    "regla": null,
    "avisos": [
     "El nombre empieza con minúscula en el documento («fauchard»); se muestra tal cual."
-   ]
+   ],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "hoz-de-granjero",
@@ -1338,7 +1742,23 @@
    ],
    "orden": 24,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "falx",
@@ -1369,7 +1789,23 @@
    ],
    "orden": 25,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "eku",
@@ -1408,7 +1844,23 @@
    ],
    "orden": 26,
    "regla": "regla-eku",
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "ikakalaka",
@@ -1439,7 +1891,23 @@
    ],
    "orden": 27,
    "regla": "regla-ikakalaka",
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "gladius",
@@ -1470,7 +1938,23 @@
    ],
    "orden": 28,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "nunchaku",
@@ -1505,7 +1989,23 @@
    ],
    "orden": 29,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Esta arma posee la propiedad Sutil, por lo que puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos).",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "cuchillo-ritual",
@@ -1540,7 +2040,23 @@
    ],
    "orden": 30,
    "regla": "regla-cuchillo-ritual",
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "daga-de-parry",
@@ -1581,7 +2097,23 @@
    "regla": "regla-daga-de-parry",
    "avisos": [
     "Errata en la regla: «variafunciones». Se conserva el texto original."
-   ]
+   ],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Esta arma posee la propiedad Sutil, por lo que puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos).",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "picota",
@@ -1612,7 +2144,23 @@
    ],
    "orden": 32,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "langmesser",
@@ -1647,7 +2195,23 @@
    ],
    "orden": 33,
    "regla": "regla-langmesser",
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "hoopak",
@@ -1693,7 +2257,29 @@
    "regla": "regla-hoopak",
    "avisos": [
     "La regla especial del documento solo describe el arma; no explica una mecánica concreta."
-   ]
+   ],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "MODOS",
+    "base": "MODOS",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo (bastón o lanza)",
+      "atributo": "FUE",
+      "dano": "1d6 contundente / 1d6 perforante",
+      "nota": ""
+     },
+     {
+      "modo": "Honda (munición)",
+      "atributo": "DES",
+      "dano": "",
+      "nota": "Rango 20/60."
+     }
+    ],
+    "motivo": "Arma de varios usos: como bastón o lanza es cuerpo a cuerpo sin Sutil (Fuerza); como honda dispara munición (Destreza).",
+    "excepcion": "La regla dice que se usa «como honda, bastón corto y lanza». Como bastón o lanza es cuerpo a cuerpo sin Sutil (Fuerza); como honda dispara munición (Destreza).",
+    "duda": ""
+   }
   },
   {
    "clave": "karambit",
@@ -1733,7 +2319,23 @@
    ],
    "orden": 35,
    "regla": "regla-karambit",
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Esta arma posee la propiedad Sutil, por lo que puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos).",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "shotel",
@@ -1770,7 +2372,23 @@
    "regla": "regla-shotel",
    "avisos": [
     "Errata en la regla: «Cuando haces un ataque esta arma» y falta el punto final."
-   ]
+   ],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Esta arma posee la propiedad Sutil, por lo que puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos).",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "machete",
@@ -1796,7 +2414,23 @@
    ],
    "orden": 37,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "cuchillo-de-cuerno",
@@ -1835,7 +2469,23 @@
    ],
    "orden": 38,
    "regla": "regla-cuchillo-de-cuerno",
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Esta arma posee la propiedad Sutil, por lo que puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos).",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "guadana",
@@ -1870,7 +2520,23 @@
    ],
    "orden": 39,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "anillo-con-punta",
@@ -1913,7 +2579,23 @@
    ],
    "orden": 40,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Esta arma posee la propiedad Sutil, por lo que puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos).",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "palo-con-puntas",
@@ -1948,7 +2630,23 @@
    ],
    "orden": 41,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "mazo-antorcha",
@@ -1981,7 +2679,23 @@
    "regla": "regla-mazo-antorcha",
    "avisos": [
     "Comparte la regla «Mazo Antorcha / Antorcha larga» con la Antorcha Larga. Revisar: es un mazo con daño perforante."
-   ]
+   ],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "antorcha-larga",
@@ -2022,7 +2736,23 @@
    "regla": "regla-mazo-antorcha",
    "avisos": [
     "Comparte la regla «Mazo Antorcha / Antorcha larga» con el Mazo antorcha."
-   ]
+   ],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "wakizashi",
@@ -2057,7 +2787,23 @@
    ],
    "orden": 44,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Esta arma posee la propiedad Sutil, por lo que puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos).",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "yo-yo",
@@ -2096,7 +2842,23 @@
    ],
    "orden": 45,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Esta arma posee la propiedad Sutil, por lo que puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos).",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "espada-de-madera",
@@ -2135,7 +2897,23 @@
    ],
    "orden": 46,
    "regla": "regla-espada-de-madera",
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "cuchillo-de-medico",
@@ -2178,7 +2956,29 @@
    ],
    "orden": 47,
    "regla": "regla-cuchillo-de-medico",
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     },
+     {
+      "modo": "Arrojadiza",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Esta arma posee la propiedad Sutil, por lo que puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos). Si la lanzas (Arrojadiza), usas el mismo modificador que en cuerpo a cuerpo, como indica la propiedad Lanzado del documento.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "arco-corto",
@@ -2215,7 +3015,23 @@
    "regla": null,
    "avisos": [
     "El rango «(80/320)» aparece separado por una coma de «Munición»; se asoció a esa propiedad."
-   ]
+   ],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "DES",
+    "base": "DES",
+    "modos": [
+     {
+      "modo": "A distancia",
+      "atributo": "DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma a distancia: usa Destreza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "ballesta-ligera",
@@ -2254,7 +3070,23 @@
    ],
    "orden": 49,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "DES",
+    "base": "DES",
+    "modos": [
+     {
+      "modo": "A distancia",
+      "atributo": "DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma a distancia: usa Destreza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "dardo",
@@ -2285,7 +3117,23 @@
    ],
    "orden": 50,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "DES",
+    "base": "DES",
+    "modos": [
+     {
+      "modo": "Arrojadiza",
+      "atributo": "DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma a distancia: usa Destreza para las tiradas de ataque y daño. En este documento el dardo no tiene Sutil, así que sigue la regla general de las armas a distancia.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "honda",
@@ -2316,7 +3164,23 @@
    ],
    "orden": 51,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "DES",
+    "base": "DES",
+    "modos": [
+     {
+      "modo": "A distancia",
+      "atributo": "DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma a distancia: usa Destreza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "banana-explosiva",
@@ -2357,7 +3221,23 @@
    "regla": "regla-banana-explosiva",
    "avisos": [
     "Errata en la regla: «tirada brazode salvación». Se conserva el texto original."
-   ]
+   ],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "DES",
+    "base": "DES",
+    "modos": [
+     {
+      "modo": "Arrojadiza",
+      "atributo": "DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma a distancia: usa Destreza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "boomerang",
@@ -2400,7 +3280,23 @@
    ],
    "orden": 53,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "DES",
+    "base": "DES",
+    "modos": [
+     {
+      "modo": "Arrojadiza",
+      "atributo": "DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma a distancia: usa Destreza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "fuego-en-frasco",
@@ -2439,7 +3335,23 @@
    ],
    "orden": 54,
    "regla": "regla-fuego-en-frasco",
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Arrojadiza",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma a distancia con la propiedad Sutil: puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos).",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "shuriken",
@@ -2478,7 +3390,23 @@
    ],
    "orden": 55,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Arrojadiza",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma a distancia con la propiedad Sutil: puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos).",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "baston-slinga",
@@ -2517,7 +3445,23 @@
    ],
    "orden": 56,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "DES",
+    "base": "DES",
+    "modos": [
+     {
+      "modo": "A distancia",
+      "atributo": "DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma a distancia: usa Destreza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "alabarda",
@@ -2556,7 +3500,23 @@
    ],
    "orden": 57,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "atarraga",
@@ -2591,7 +3551,23 @@
    ],
    "orden": 58,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "cimitarra",
@@ -2626,7 +3602,23 @@
    ],
    "orden": 59,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Esta arma posee la propiedad Sutil, por lo que puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos).",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "espada-corta",
@@ -2661,7 +3653,23 @@
    ],
    "orden": 60,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Esta arma posee la propiedad Sutil, por lo que puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos).",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "espada-media",
@@ -2699,7 +3707,23 @@
    "regla": null,
    "avisos": [
     "La tabla escribe «Versatil» sin tilde."
-   ]
+   ],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Esta arma posee la propiedad Sutil, por lo que puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos).",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "espada-larga",
@@ -2730,7 +3754,23 @@
    ],
    "orden": 62,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "espadon",
@@ -2765,7 +3805,23 @@
    ],
    "orden": 63,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "espada-ropera",
@@ -2796,7 +3852,23 @@
    ],
    "orden": 64,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Esta arma posee la propiedad Sutil, por lo que puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos).",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "hacha-de-batalla",
@@ -2827,7 +3899,23 @@
    ],
    "orden": 65,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "gran-hacha",
@@ -2862,7 +3950,23 @@
    ],
    "orden": 66,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "guja",
@@ -2901,7 +4005,23 @@
    ],
    "orden": 67,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "lanza-de-caballeria",
@@ -2936,7 +4056,30 @@
    ],
    "orden": 68,
    "regla": "regla-lanza-de-caballeria",
-   "avisos": []
+   "avisos": [],
+   "requisitos": [
+    {
+     "tipo": "condicion",
+     "atributo": null,
+     "minimo": null,
+     "texto": "Sin montura necesitas las dos manos para empuñarla. Desventaja contra objetivos a 5 pies o menos."
+    }
+   ],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "latigo",
@@ -2971,7 +4114,23 @@
    ],
    "orden": 69,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Esta arma posee la propiedad Sutil, por lo que puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos).",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "lucero-del-alba",
@@ -2997,7 +4156,23 @@
    ],
    "orden": 70,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "martillo-de-guerra",
@@ -3028,7 +4203,23 @@
    ],
    "orden": 71,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "mayal",
@@ -3054,7 +4245,23 @@
    ],
    "orden": 72,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "pica",
@@ -3093,7 +4300,23 @@
    ],
    "orden": 73,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "pica-de-guerra",
@@ -3119,7 +4342,23 @@
    ],
    "orden": 74,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "tridente",
@@ -3156,7 +4395,29 @@
    "regla": null,
    "avisos": [
     "Tiene la propiedad Versátil sin el daño a dos manos entre paréntesis."
-   ]
+   ],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     },
+     {
+      "modo": "Arrojadiza",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño. Si la lanzas (Arrojadiza), usas el mismo modificador que en cuerpo a cuerpo, como indica la propiedad Lanzado del documento.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "maza-de-asesio",
@@ -3197,7 +4458,23 @@
    "regla": "regla-maza-de-asedio",
    "avisos": [
     "La regla especial está titulada «Maza de Asedio» en el documento, pero el objeto se llama «Maza de Asesio» en la tabla."
-   ]
+   ],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "ancla",
@@ -3236,7 +4513,23 @@
    ],
    "orden": 77,
    "regla": "regla-ancla",
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "espada-brazo",
@@ -3271,7 +4564,23 @@
    ],
    "orden": 78,
    "regla": "regla-espada-brazo",
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "armando-espada",
@@ -3306,7 +4615,23 @@
    ],
    "orden": 79,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Esta arma posee la propiedad Sutil, por lo que puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos).",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "brazaletes-blindados",
@@ -3341,7 +4666,23 @@
    ],
    "orden": 80,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "hoja-oculta",
@@ -3386,7 +4727,23 @@
    "regla": "regla-hoja-oculta",
    "avisos": [
     "Revisar redacción: «causa 1d4 de daño adicional y daño perforante» (¿1d4 de daño perforante adicional?)."
-   ]
+   ],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Esta arma posee la propiedad Sutil, por lo que puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos).",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "cadena-con-bola",
@@ -3435,7 +4792,36 @@
    "regla": "regla-bola-y-cadena",
    "avisos": [
     "La regla especial está titulada «Bola y cadena» en el documento, pero el objeto se llama «Cadena con Bola» en la tabla."
-   ]
+   ],
+   "requisitos": [
+    {
+     "tipo": "condicion",
+     "atributo": "FUE",
+     "minimo": 20,
+     "texto": "Reduce tu velocidad en 25 pies; con Fuerza 20 o más se ignora."
+    }
+   ],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     },
+     {
+      "modo": "Arrojadiza",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño. Si la lanzas (Arrojadiza), usas el mismo modificador que en cuerpo a cuerpo, como indica la propiedad Lanzado del documento.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "bangaliss",
@@ -3467,7 +4853,23 @@
    ],
    "orden": 83,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Esta arma posee la propiedad Sutil, por lo que puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos).",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "espada-bastarda",
@@ -3512,7 +4914,30 @@
    "regla": "regla-espada-bastarda",
    "avisos": [
     "Revisar: la tabla marca «Incómoda» siempre, pero la regla especial solo la aplica al empuñarla con una mano sin competencia."
-   ]
+   ],
+   "requisitos": [
+    {
+     "tipo": "condicion",
+     "atributo": null,
+     "minimo": null,
+     "texto": "Es Incómoda si la empuñas a una mano sin ser competente."
+    }
+   ],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "espada-ancha-con-empunadura-de-cesta",
@@ -3543,7 +4968,23 @@
    ],
    "orden": 85,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Esta arma posee la propiedad Sutil, por lo que puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos).",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "tanto",
@@ -3584,7 +5025,29 @@
    "regla": null,
    "avisos": [
     "La tabla dice «arrojable»; se trató como la propiedad «Arrojadiza»."
-   ]
+   ],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     },
+     {
+      "modo": "Arrojadiza",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Esta arma posee la propiedad Sutil, por lo que puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos). Si la lanzas (Arrojadiza), usas el mismo modificador que en cuerpo a cuerpo, como indica la propiedad Lanzado del documento.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "tachi",
@@ -3619,7 +5082,23 @@
    ],
    "orden": 87,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Esta arma posee la propiedad Sutil, por lo que puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos).",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "odachi",
@@ -3662,7 +5141,23 @@
    ],
    "orden": 88,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Esta arma posee la propiedad Sutil, por lo que puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos).",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "batleth",
@@ -3701,7 +5196,23 @@
    ],
    "orden": 89,
    "regla": "regla-batleth",
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño. Puede cambiar la competencia de la tirada de ataque al daño; el atributo no cambia.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "guadana-de-combate",
@@ -3744,7 +5255,29 @@
    ],
    "orden": 90,
    "regla": "regla-guadana-de-combate",
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     },
+     {
+      "modo": "Arrojadiza",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño. Si la lanzas (Arrojadiza), usas el mismo modificador que en cuerpo a cuerpo, como indica la propiedad Lanzado del documento.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "latigo-de-combate",
@@ -3781,7 +5314,23 @@
    "regla": "regla-latigo-de-combate",
    "avisos": [
     "El nombre se escribe «Latigo» sin tilde en el documento."
-   ]
+   ],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "garra-de-oso",
@@ -3816,7 +5365,23 @@
    ],
    "orden": 92,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Esta arma posee la propiedad Sutil, por lo que puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos).",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "cable-de-combate",
@@ -3851,7 +5416,23 @@
    ],
    "orden": 93,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Esta arma posee la propiedad Sutil, por lo que puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos).",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "espada-berserk",
@@ -3886,7 +5467,23 @@
    ],
    "orden": 94,
    "regla": "regla-espada-berserk",
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "pico-de-cuervo",
@@ -3927,7 +5524,23 @@
    ],
    "orden": 95,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "bident",
@@ -3962,7 +5575,29 @@
    ],
    "orden": 96,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     },
+     {
+      "modo": "Arrojadiza",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño. Si la lanzas (Arrojadiza), usas el mismo modificador que en cuerpo a cuerpo, como indica la propiedad Lanzado del documento.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "billhook",
@@ -4002,7 +5637,23 @@
    ],
    "orden": 97,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "blackjack",
@@ -4041,7 +5692,23 @@
    ],
    "orden": 98,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Esta arma posee la propiedad Sutil, por lo que puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos).",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "lanza-espada",
@@ -4076,7 +5743,23 @@
    ],
    "orden": 99,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Esta arma posee la propiedad Sutil, por lo que puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos).",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "yo-yo-con-hoja",
@@ -4125,7 +5808,36 @@
    "regla": "regla-yo-yo-con-hoja",
    "avisos": [
     "El rango «10» tiene un solo número (normal/largo esperado)."
-   ]
+   ],
+   "requisitos": [
+    {
+     "tipo": "condicion",
+     "atributo": null,
+     "minimo": null,
+     "texto": "Recogerlo exige Juego de manos CD 15, salvo competencia específica con yo-yos con cuchillas."
+    }
+   ],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     },
+     {
+      "modo": "Arrojadiza",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Esta arma posee la propiedad Sutil, por lo que puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos). Si la lanzas (Arrojadiza), usas el mismo modificador que en cuerpo a cuerpo, como indica la propiedad Lanzado del documento. Sin lanzarlo causa 1 de daño cortante; lanzado, 2d4. Los dos modos conservan Sutil.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "latigo-cortante",
@@ -4170,7 +5882,23 @@
    "regla": "regla-latigo-cortante",
    "avisos": [
     "El nombre se escribe «Latigo» sin tilde en el documento."
-   ]
+   ],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Esta arma posee la propiedad Sutil, por lo que puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos). Su característica especial (agarrar a 10 pies) solo funciona si lo usas con el modificador de Destreza y dominas las armas marciales.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "tonfa-con-cuchillas",
@@ -4209,7 +5937,23 @@
    ],
    "orden": 102,
    "regla": "regla-tonfa-con-cuchillas",
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Esta arma posee la propiedad Sutil, por lo que puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos).",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "guantelete-afilado",
@@ -4244,7 +5988,23 @@
    ],
    "orden": 103,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "bumerang-con-cuchillas",
@@ -4293,7 +6053,29 @@
    "regla": null,
    "avisos": [
     "Se escribe «Bumerang» aquí y «Boomerang» en otras entradas."
-   ]
+   ],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     },
+     {
+      "modo": "Arrojadiza",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Esta arma posee la propiedad Sutil, por lo que puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos). Si la lanzas (Arrojadiza), usas el mismo modificador que en cuerpo a cuerpo, como indica la propiedad Lanzado del documento.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "lanza-jabali",
@@ -4336,7 +6118,23 @@
    ],
    "orden": 105,
    "regla": "regla-lanza-jabali",
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "sable",
@@ -4362,7 +6160,23 @@
    ],
    "orden": 106,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "gran-latigo",
@@ -4401,7 +6215,23 @@
    ],
    "orden": 107,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Esta arma posee la propiedad Sutil, por lo que puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos).",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "claymore",
@@ -4432,7 +6262,23 @@
    ],
    "orden": 108,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "kusarigamas",
@@ -4475,7 +6321,23 @@
    ],
    "orden": 109,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Esta arma posee la propiedad Sutil, por lo que puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos).",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "hoz-de-cadena",
@@ -4511,7 +6373,23 @@
    ],
    "orden": 110,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "hacha-de-cadena",
@@ -4550,7 +6428,29 @@
    ],
    "orden": 111,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     },
+     {
+      "modo": "Arrojadiza",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño. Si la lanzas (Arrojadiza), usas el mismo modificador que en cuerpo a cuerpo, como indica la propiedad Lanzado del documento.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "mayal-de-incensario",
@@ -4589,7 +6489,23 @@
    ],
    "orden": 112,
    "regla": "regla-mayal-de-incensario",
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "baston-espada",
@@ -4624,7 +6540,23 @@
    ],
    "orden": 113,
    "regla": "regla-baston-espada",
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Esta arma posee la propiedad Sutil, por lo que puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos). Envainada causa 1d4 contundente y gana la propiedad Oculta; el documento no dice que pierda Sutil.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "cuchilla-creciente",
@@ -4651,7 +6583,23 @@
    ],
    "orden": 114,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "guadana-creciente",
@@ -4686,7 +6634,23 @@
    ],
    "orden": 115,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Esta arma posee la propiedad Sutil, por lo que puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos).",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "latigo-de-daga",
@@ -4729,7 +6693,23 @@
    ],
    "orden": 116,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Esta arma posee la propiedad Sutil, por lo que puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos).",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "daga-y-cuerda",
@@ -4770,7 +6750,29 @@
    "regla": null,
    "avisos": [
     "Revisar: rango 20/30 (el largo alcance suele ser varias veces el normal)."
-   ]
+   ],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     },
+     {
+      "modo": "Arrojadiza",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño. Si la lanzas (Arrojadiza), usas el mismo modificador que en cuerpo a cuerpo, como indica la propiedad Lanzado del documento.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "espadas-gemelas",
@@ -4809,7 +6811,23 @@
    ],
    "orden": 118,
    "regla": "regla-espadas-gemelas",
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "lanza-gemela",
@@ -4848,7 +6866,29 @@
    ],
    "orden": 119,
    "regla": "regla-lanza-gemela",
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     },
+     {
+      "modo": "Arrojadiza",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño. Si la lanzas (Arrojadiza), usas el mismo modificador que en cuerpo a cuerpo, como indica la propiedad Lanzado del documento.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "guadana-doble",
@@ -4891,7 +6931,29 @@
    ],
    "orden": 120,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     },
+     {
+      "modo": "Arrojadiza",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Esta arma posee la propiedad Sutil, por lo que puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos). Si la lanzas (Arrojadiza), usas el mismo modificador que en cuerpo a cuerpo, como indica la propiedad Lanzado del documento.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "hacha-doble",
@@ -4917,7 +6979,23 @@
    ],
    "orden": 121,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "abanico-de-guerra",
@@ -4960,7 +7038,29 @@
    ],
    "orden": 122,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     },
+     {
+      "modo": "Arrojadiza",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Esta arma posee la propiedad Sutil, por lo que puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos). Si la lanzas (Arrojadiza), usas el mismo modificador que en cuerpo a cuerpo, como indica la propiedad Lanzado del documento.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "sierra-de-guerra",
@@ -4999,7 +7099,23 @@
    ],
    "orden": 123,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "hacha-de-asta",
@@ -5040,7 +7156,23 @@
    "regla": null,
    "avisos": [
     "El nombre empieza con minúscula en el documento («hacha de asta»); se muestra tal cual."
-   ]
+   ],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "partizan",
@@ -5079,7 +7211,23 @@
    ],
    "orden": 125,
    "regla": "regla-partizan",
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "ninjato",
@@ -5122,7 +7270,23 @@
    ],
    "orden": 126,
    "regla": "regla-ninjato",
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Esta arma posee la propiedad Sutil, por lo que puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos).",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "naginata",
@@ -5169,7 +7333,23 @@
    ],
    "orden": 127,
    "regla": "regla-naginata",
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Esta arma posee la propiedad Sutil, por lo que puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos). Solo tiene Pesada y Alcance a dos manos; Sutil se mantiene en los dos casos.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "kunai",
@@ -5216,7 +7396,29 @@
    ],
    "orden": 128,
    "regla": "regla-kunai",
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     },
+     {
+      "modo": "Arrojadiza",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Esta arma posee la propiedad Sutil, por lo que puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos). Si la lanzas (Arrojadiza), usas el mismo modificador que en cuerpo a cuerpo, como indica la propiedad Lanzado del documento.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "kodachi",
@@ -5255,7 +7457,29 @@
    ],
    "orden": 129,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     },
+     {
+      "modo": "Arrojadiza",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Esta arma posee la propiedad Sutil, por lo que puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos). Si la lanzas (Arrojadiza), usas el mismo modificador que en cuerpo a cuerpo, como indica la propiedad Lanzado del documento.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "khopesh",
@@ -5286,7 +7510,23 @@
    ],
    "orden": 130,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "katana",
@@ -5317,7 +7557,23 @@
    ],
    "orden": 131,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Esta arma posee la propiedad Sutil, por lo que puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos).",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "espada-de-gancho",
@@ -5352,7 +7608,23 @@
    ],
    "orden": 132,
    "regla": "regla-espada-de-gancho",
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "gran-guadana",
@@ -5393,7 +7665,23 @@
    "regla": null,
    "avisos": [
     "Hay dos entradas parecidas: «Gran Guadaña» (1d6, versátil) y «Gran guadaña, variante» (2d4, con regla Cosechar). Se conservan separadas."
-   ]
+   ],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "gran-cadena",
@@ -5432,7 +7720,23 @@
    ],
    "orden": 134,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "hacha-divisoria",
@@ -5475,7 +7779,23 @@
    ],
    "orden": 135,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "ultra-espadon",
@@ -5522,7 +7842,36 @@
    ],
    "orden": 136,
    "regla": "regla-ultra-espadon",
-   "avisos": []
+   "avisos": [],
+   "requisitos": [
+    {
+     "tipo": "requisito",
+     "atributo": "FUE",
+     "minimo": 19,
+     "texto": "Sin Fuerza 19 o más tienes desventaja en las tiradas de ataque."
+    },
+    {
+     "tipo": "requisito",
+     "atributo": null,
+     "minimo": null,
+     "texto": "Las criaturas Pequeñas o menores no pueden empuñarla."
+    }
+   ],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "martillo-horno",
@@ -5559,7 +7908,23 @@
    "regla": "regla-martillo-horno",
    "avisos": [
     "Revisar redacción de la regla: «… de daño por fuego adicional de restablecerse al estado normal»."
-   ]
+   ],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "guadana-del-verdugo",
@@ -5604,7 +7969,23 @@
    "regla": "regla-guadana-del-verdugo",
    "avisos": [
     "Errata en la regla: «incapacitad». Se conserva el texto original."
-   ]
+   ],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "gran-guadana-variante",
@@ -5649,7 +8030,23 @@
    "regla": "regla-gran-guadana-variante",
    "avisos": [
     "Hay dos entradas parecidas: «Gran Guadaña» (1d6, versátil) y «Gran guadaña, variante» (2d4, con regla Cosechar). Se conservan separadas."
-   ]
+   ],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño. Con «Cosechar» no sumas tu modificador de Fuerza al daño del ataque.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "espada-plegable",
@@ -5688,7 +8085,23 @@
    ],
    "orden": 140,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Esta arma posee la propiedad Sutil, por lo que puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos).",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "shuriken-de-fuma",
@@ -5729,7 +8142,29 @@
    "regla": null,
    "avisos": [
     "La celda de daño termina con un carácter «|» sobrante; se quitó al importar."
-   ]
+   ],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     },
+     {
+      "modo": "Arrojadiza",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Esta arma posee la propiedad Sutil, por lo que puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos). Si la lanzas (Arrojadiza), usas el mismo modificador que en cuerpo a cuerpo, como indica la propiedad Lanzado del documento.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "boomerang-gigante",
@@ -5772,7 +8207,29 @@
    ],
    "orden": 142,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     },
+     {
+      "modo": "Arrojadiza",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño. Si la lanzas (Arrojadiza), usas el mismo modificador que en cuerpo a cuerpo, como indica la propiedad Lanzado del documento. El documento la clasifica como arma marcial cuerpo a cuerpo arrojadiza: Fuerza también al lanzarla.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "falchion",
@@ -5811,7 +8268,29 @@
    ],
    "orden": 143,
    "regla": "regla-falchion",
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "MODOS",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "A una mano",
+      "atributo": "FUE",
+      "dano": "1d8 cortante",
+      "nota": ""
+     },
+     {
+      "modo": "A dos manos (Versátil)",
+      "atributo": "FUE/DES",
+      "dano": "2d4 cortante",
+      "nota": "La regla especial la convierte en arma Sutil («delicada»)."
+     }
+    ],
+    "motivo": "Arma cuerpo a cuerpo sin Sutil (Fuerza), salvo cuando la empuñas a dos manos: entonces su regla especial le da Sutil y puedes elegir Fuerza o Destreza.",
+    "excepcion": "Regla especial: «Cuando se empuña con las dos manos, se considera un arma delicada». A una mano usa Fuerza; a dos manos puedes elegir Fuerza o Destreza.",
+    "duda": ""
+   }
   },
   {
    "clave": "espada-del-verdugo",
@@ -5854,7 +8333,23 @@
    ],
    "orden": 144,
    "regla": "regla-espada-del-verdugo",
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "gran-hacha-del-verdugo",
@@ -5897,7 +8392,23 @@
    ],
    "orden": 145,
    "regla": "regla-gran-hacha-del-verdugo",
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "FUE",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma cuerpo a cuerpo sin la propiedad Sutil: usa Fuerza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "espada-de-duelo",
@@ -5937,7 +8448,23 @@
    ],
    "orden": 146,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Cuerpo a cuerpo",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Esta arma posee la propiedad Sutil, por lo que puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos).",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "arco-largo",
@@ -5976,7 +8503,23 @@
    ],
    "orden": 147,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "DES",
+    "base": "DES",
+    "modos": [
+     {
+      "modo": "A distancia",
+      "atributo": "DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma a distancia: usa Destreza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "ballesta-de-mano",
@@ -6017,7 +8560,23 @@
    "regla": null,
    "avisos": [
     "Falta una coma entre dos propiedades («… (30/120) recarga»)."
-   ]
+   ],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "DES",
+    "base": "DES",
+    "modos": [
+     {
+      "modo": "A distancia",
+      "atributo": "DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma a distancia: usa Destreza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "ballesta-pesada",
@@ -6060,7 +8619,23 @@
    ],
    "orden": 149,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "DES",
+    "base": "DES",
+    "modos": [
+     {
+      "modo": "A distancia",
+      "atributo": "DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma a distancia: usa Destreza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "cerbatana",
@@ -6097,7 +8672,23 @@
    "regla": null,
    "avisos": [
     "Falta un espacio antes del paréntesis en las propiedades (p. ej. «Munición(25/100)»)."
-   ]
+   ],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "DES",
+    "base": "DES",
+    "modos": [
+     {
+      "modo": "A distancia",
+      "atributo": "DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma a distancia: usa Destreza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "red",
@@ -6130,7 +8721,23 @@
    ],
    "orden": 151,
    "regla": "regla-red",
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "DES",
+    "base": "DES",
+    "modos": [
+     {
+      "modo": "Arrojadiza",
+      "atributo": "DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma a distancia: usa Destreza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "ballesta-recargable",
@@ -6185,7 +8792,23 @@
    ],
    "orden": 152,
    "regla": "regla-ballesta-recargable",
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "DES",
+    "base": "DES",
+    "modos": [
+     {
+      "modo": "A distancia",
+      "atributo": "DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma a distancia: usa Destreza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "hacha-ballesta",
@@ -6240,7 +8863,29 @@
    ],
    "orden": 153,
    "regla": "regla-hacha-ballesta",
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "MODOS",
+    "base": "DES",
+    "modos": [
+     {
+      "modo": "Disparo con munición",
+      "atributo": "DES",
+      "dano": "1d8 perforante",
+      "nota": ""
+     },
+     {
+      "modo": "Cuerpo a cuerpo (hacha)",
+      "atributo": "FUE",
+      "dano": "1d8 cortante",
+      "nota": "Sin Sutil."
+     }
+    ],
+    "motivo": "Arma doble: como ballesta dispara munición (Destreza) y como hacha es un arma cuerpo a cuerpo sin Sutil (Fuerza).",
+    "excepcion": "Regla especial: se puede usar para ataques cuerpo a cuerpo con 1d8 cortante. Ese modo no tiene Sutil, así que usa Fuerza; el disparo usa Destreza.",
+    "duda": ""
+   }
   },
   {
    "clave": "slinga-de-guerra",
@@ -6275,7 +8920,23 @@
    ],
    "orden": 154,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "DES",
+    "base": "DES",
+    "modos": [
+     {
+      "modo": "A distancia",
+      "atributo": "DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma a distancia: usa Destreza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "arco-de-guerra",
@@ -6322,7 +8983,36 @@
    ],
    "orden": 155,
    "regla": "regla-arco-de-guerra",
-   "avisos": []
+   "avisos": [],
+   "requisitos": [
+    {
+     "tipo": "requisito",
+     "atributo": "FUE/DES",
+     "minimo": 20,
+     "texto": "Requiere una puntuación de Fuerza o Destreza de 20."
+    },
+    {
+     "tipo": "condicion",
+     "atributo": null,
+     "minimo": null,
+     "texto": "Desventaja al atacar a un objetivo a 15 pies o menos."
+    }
+   ],
+   "ataque": {
+    "atributo": "DES",
+    "base": "DES",
+    "modos": [
+     {
+      "modo": "A distancia",
+      "atributo": "DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma a distancia: usa Destreza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "ballesta-oculta",
@@ -6369,7 +9059,23 @@
    ],
    "orden": 156,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "DES",
+    "base": "DES",
+    "modos": [
+     {
+      "modo": "A distancia",
+      "atributo": "DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma a distancia: usa Destreza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "ballesta-de-repeticion",
@@ -6416,7 +9122,23 @@
    ],
    "orden": 157,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "DES",
+    "base": "DES",
+    "modos": [
+     {
+      "modo": "A distancia",
+      "atributo": "DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma a distancia: usa Destreza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "chakram",
@@ -6459,7 +9181,23 @@
    ],
    "orden": 158,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "FUE/DES",
+    "base": "FUE/DES",
+    "modos": [
+     {
+      "modo": "Arrojadiza",
+      "atributo": "FUE/DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma a distancia con la propiedad Sutil: puedes elegir Fuerza o Destreza para las tiradas de ataque y daño (el mismo modificador en las dos).",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "arco-espada",
@@ -6512,7 +9250,29 @@
    "regla": "regla-arco-espada",
    "avisos": [
     "Revisar: la regla menciona la propiedad «arma doble», que no está definida en el glosario del documento."
-   ]
+   ],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "MODOS",
+    "base": "DES",
+    "modos": [
+     {
+      "modo": "Disparo con munición",
+      "atributo": "DES",
+      "dano": "1d6 perforante",
+      "nota": ""
+     },
+     {
+      "modo": "Cuerpo a cuerpo (espada)",
+      "atributo": "FUE",
+      "dano": "1d4 cortante",
+      "nota": "Arma marcial a dos manos y pesada, sin Sutil."
+     }
+    ],
+    "motivo": "Arma doble: como arco dispara munición (Destreza) y como espada es un arma cuerpo a cuerpo sin Sutil (Fuerza).",
+    "excepcion": "Regla especial: se puede usar como arma marcial cuerpo a cuerpo (1d4 cortante, a dos manos, pesada). Ese modo no tiene Sutil, así que usa Fuerza; el disparo usa Destreza.",
+    "duda": ""
+   }
   },
   {
    "clave": "penasco",
@@ -6555,7 +9315,23 @@
    ],
    "orden": 160,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "DES",
+    "base": "DES",
+    "modos": [
+     {
+      "modo": "Arrojadiza",
+      "atributo": "DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma a distancia: usa Destreza para las tiradas de ataque y daño. Es pesada y a dos manos, pero el documento la pone entre las armas a distancia y no le da otra regla: Destreza.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "boleadora",
@@ -6596,7 +9372,23 @@
    "regla": "regla-boleadora",
    "avisos": [
     "Errata en la regla: «derrigolpeada». Se conserva el texto original."
-   ]
+   ],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "DES",
+    "base": "DES",
+    "modos": [
+     {
+      "modo": "Arrojadiza",
+      "atributo": "DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma a distancia: usa Destreza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "bola-con-pinchos",
@@ -6627,7 +9419,23 @@
    ],
    "orden": 162,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": {
+    "atributo": "DES",
+    "base": "DES",
+    "modos": [
+     {
+      "modo": "Arrojadiza",
+      "atributo": "DES",
+      "dano": "",
+      "nota": ""
+     }
+    ],
+    "motivo": "Es un arma a distancia: usa Destreza para las tiradas de ataque y daño.",
+    "excepcion": "",
+    "duda": ""
+   }
   },
   {
    "clave": "acolchada",
@@ -6654,7 +9462,9 @@
    ],
    "orden": 163,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": null
   },
   {
    "clave": "cuero",
@@ -6681,7 +9491,9 @@
    ],
    "orden": 164,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": null
   },
   {
    "clave": "cuero-tachonado",
@@ -6708,7 +9520,9 @@
    ],
    "orden": 165,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": null
   },
   {
    "clave": "pieles",
@@ -6735,7 +9549,9 @@
    ],
    "orden": 166,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": null
   },
   {
    "clave": "camisote-de-mallas",
@@ -6762,7 +9578,9 @@
    ],
    "orden": 167,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": null
   },
   {
    "clave": "cota-de-escamas",
@@ -6789,7 +9607,9 @@
    ],
    "orden": 168,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": null
   },
   {
    "clave": "coraza",
@@ -6816,7 +9636,9 @@
    ],
    "orden": 169,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": null
   },
   {
    "clave": "semiplacas",
@@ -6843,7 +9665,9 @@
    ],
    "orden": 170,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": null
   },
   {
    "clave": "cota-de-anillas",
@@ -6870,7 +9694,9 @@
    ],
    "orden": 171,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": null
   },
   {
    "clave": "cota-de-mallas",
@@ -6897,7 +9723,16 @@
    ],
    "orden": 172,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [
+    {
+     "tipo": "requisito",
+     "atributo": "FUE",
+     "minimo": 13,
+     "texto": "Fuerza 13 (columna «Fuerza» de la tabla)."
+    }
+   ],
+   "ataque": null
   },
   {
    "clave": "bandas",
@@ -6924,7 +9759,16 @@
    ],
    "orden": 173,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [
+    {
+     "tipo": "requisito",
+     "atributo": "FUE",
+     "minimo": 15,
+     "texto": "Fuerza 15 (columna «Fuerza» de la tabla)."
+    }
+   ],
+   "ataque": null
   },
   {
    "clave": "placas",
@@ -6951,7 +9795,16 @@
    ],
    "orden": 174,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [
+    {
+     "tipo": "requisito",
+     "atributo": "FUE",
+     "minimo": 15,
+     "texto": "Fuerza 15 (columna «Fuerza» de la tabla)."
+    }
+   ],
+   "ataque": null
   },
   {
    "clave": "escudo",
@@ -6978,7 +9831,9 @@
    ],
    "orden": 175,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": null
   },
   {
    "clave": "escudo-de-cometa",
@@ -7010,7 +9865,16 @@
    ],
    "orden": 176,
    "regla": "regla-escudo-de-cometa",
-   "avisos": []
+   "avisos": [],
+   "requisitos": [
+    {
+     "tipo": "requisito",
+     "atributo": "FUE",
+     "minimo": 13,
+     "texto": "Fuerza 13 (columna «Fuerza» de la tabla)."
+    }
+   ],
+   "ataque": null
   },
   {
    "clave": "escudo-de-tres-cuartos",
@@ -7042,7 +9906,16 @@
    ],
    "orden": 177,
    "regla": "regla-escudo-de-tres-cuartos",
-   "avisos": []
+   "avisos": [],
+   "requisitos": [
+    {
+     "tipo": "requisito",
+     "atributo": "FUE",
+     "minimo": 16,
+     "texto": "Fuerza 16 (columna «Fuerza» de la tabla)."
+    }
+   ],
+   "ataque": null
   },
   {
    "clave": "escudo-de-guantelete",
@@ -7069,7 +9942,9 @@
    ],
    "orden": 178,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": null
   },
   {
    "clave": "escudo-de-pared",
@@ -7101,7 +9976,16 @@
    ],
    "orden": 179,
    "regla": "regla-escudo-de-pared",
-   "avisos": []
+   "avisos": [],
+   "requisitos": [
+    {
+     "tipo": "requisito",
+     "atributo": "FUE",
+     "minimo": 17,
+     "texto": "Fuerza 17 (columna «Fuerza» de la tabla)."
+    }
+   ],
+   "ataque": null
   },
   {
    "clave": "escudo-de-aspis",
@@ -7133,7 +10017,30 @@
    ],
    "orden": 180,
    "regla": "regla-escudo-de-aspis",
-   "avisos": []
+   "avisos": [],
+   "requisitos": [
+    {
+     "tipo": "requisito",
+     "atributo": "FUE",
+     "minimo": 11,
+     "texto": "Fuerza 11 (columna «Fuerza» de la tabla)."
+    }
+   ],
+   "ataque": {
+    "atributo": "FUE",
+    "base": "",
+    "modos": [
+     {
+      "modo": "Golpe con el escudo (arma improvisada)",
+      "atributo": "FUE",
+      "dano": "1d6 contundente",
+      "nota": ""
+     }
+    ],
+    "motivo": "Los escudos no atacan normalmente, pero la regla «Intento» de este escudo permite golpear con él: 1d6 contundente + tu modificador de Fuerza.",
+    "excepcion": "Regla especial «Intento»: el daño es 1d6 + tu modificador de Fuerza.",
+    "duda": ""
+   }
   },
   {
    "clave": "escudo-de-ruptura",
@@ -7167,7 +10074,16 @@
    "regla": "regla-escudo-de-ruptura",
    "avisos": [
     "Bonificación de CA dudosa: «-». El documento no da un valor."
-   ]
+   ],
+   "requisitos": [
+    {
+     "tipo": "requisito",
+     "atributo": "FUE",
+     "minimo": 13,
+     "texto": "Fuerza 13 (columna «Fuerza» de la tabla)."
+    }
+   ],
+   "ataque": null
   },
   {
    "clave": "escudo-medio",
@@ -7199,7 +10115,16 @@
    ],
    "orden": 182,
    "regla": "regla-escudo-medio",
-   "avisos": []
+   "avisos": [],
+   "requisitos": [
+    {
+     "tipo": "requisito",
+     "atributo": "FUE",
+     "minimo": 11,
+     "texto": "Fuerza 11 (columna «Fuerza» de la tabla)."
+    }
+   ],
+   "ataque": null
   },
   {
    "clave": "rodela",
@@ -7226,7 +10151,9 @@
    ],
    "orden": 183,
    "regla": null,
-   "avisos": []
+   "avisos": [],
+   "requisitos": [],
+   "ataque": null
   },
   {
    "clave": "escudo-grande",
@@ -7258,7 +10185,16 @@
    ],
    "orden": 184,
    "regla": "regla-escudo-grande",
-   "avisos": []
+   "avisos": [],
+   "requisitos": [
+    {
+     "tipo": "requisito",
+     "atributo": "FUE",
+     "minimo": 13,
+     "texto": "Fuerza 13 (columna «Fuerza» de la tabla)."
+    }
+   ],
+   "ataque": null
   },
   {
    "clave": "escudo-pesado",
@@ -7292,7 +10228,16 @@
    "regla": "regla-escudo-pesado",
    "avisos": [
     "Su regla está escrita dentro de la de «Escudo de pared» y sin estilo de título en el Word."
-   ]
+   ],
+   "requisitos": [
+    {
+     "tipo": "requisito",
+     "atributo": "FUE",
+     "minimo": 15,
+     "texto": "Fuerza 15 (columna «Fuerza» de la tabla)."
+    }
+   ],
+   "ataque": null
   }
  ]
 }

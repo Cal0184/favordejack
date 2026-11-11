@@ -89,6 +89,8 @@ try {
         $coste = armeria_str($o, 'coste', 40);
 
         $row = [
+            'Descripcion' => armeria_str($o, 'descripcion', 20000),
+            'Notas' => armeria_str($o, 'notas', 5000),
             'Tipo' => $tipo, 'Categoria' => $cat, 'Nombre' => $nombre,
             'Coste' => $coste, 'CosteCobre' => armeria_coste_cobre($coste),
             'Dano' => '', 'DanoDados' => '', 'DanoPromedio' => null, 'TiposDano' => '', 'Alcance' => '',
@@ -139,6 +141,13 @@ try {
         $reglaId = $prev && $prev['ReglaID'] !== null ? (int)$prev['ReglaID'] : null;
         $oldRegla = $reglaId;
 
+        // Firma de lo que decide el atributo (categoría + propiedades) para saber si hay que reclasificar.
+        $firma = static fn(string $c, array $claves): string => $c . '|' . implode(',', array_unique(array_filter($claves, static fn($k) => in_array($k, ['sutil', 'arrojadiza', 'municion'], true))));
+        $antes = $prev ? $firma((string)$prev['Categoria'], array_column(armeria_all($db, 'SELECT p.Clave FROM ArmaObjetoPropiedad op JOIN ArmaPropiedad p ON p.ID=op.PropiedadID WHERE op.ObjetoID=? ORDER BY p.Clave', [$id]), 'Clave')) : null;
+        $clavesNuevas = array_column($props, 'clave');
+        sort($clavesNuevas);
+        $reclasificar = !$prev || $prev['Tipo'] !== $tipo || $antes !== $firma($cat, $clavesNuevas);
+
         $db->begin_transaction();
         try {
             if ($reglaTexto === '') {
@@ -170,6 +179,16 @@ try {
                 $message = 'Objeto añadido al catálogo.';
             }
             armeria_guardar_propiedades($db, $id, $props);
+            // Atributo de ataque: si nadie lo corrigió a mano ni tiene excepción propia, sigue las reglas generales.
+            $cl = armeria_all($db, 'SELECT ClasifEditada,AtaqueExcepcion FROM ArmaObjeto WHERE ID=?', [$id])[0];
+            if ($reclasificar && (int)$cl['ClasifEditada'] === 0 && trim((string)$cl['AtaqueExcepcion']) === '') {
+                if ($tipo === 'arma') {
+                    [$modos, $motivo] = armeria_clasificar_general($cat, array_column($props, 'clave'));
+                    armeria_guardar_ataque($db, $id, $modos, ['base' => armeria_resumen_ataque($modos), 'motivo' => $motivo], false);
+                } else {
+                    armeria_guardar_ataque($db, $id, [], ['base' => null], false);
+                }
+            }
             if ($oldRegla && $oldRegla !== $reglaId) armeria_regla_huerfana($db, $oldRegla);
             $db->commit();
         } catch (Throwable $e) {
@@ -225,6 +244,69 @@ try {
         if ((int)$used[0]['n'] > 0) throw new RuntimeException('Esa propiedad la usan ' . $used[0]['n'] . ' objetos. Quítasela primero.');
         armeria_q($db, 'DELETE FROM ArmaPropiedad WHERE ID=?', [$id])->close();
         $message = 'Propiedad eliminada.';
+    } elseif ($action === 'ataque') {
+        // Corrección manual del atributo de ataque y los requisitos. AtaqueBase (reglas generales) no se toca.
+        $id = (int)($data['id'] ?? 0);
+        armeria_objeto($db, $id);
+        $modos = [];
+        foreach ((array)($data['modos'] ?? []) as $m) {
+            if (!is_array($m)) continue;
+            $at = (string)($m['atributo'] ?? '');
+            if (!in_array($at, ARMERIA_ATRIBUTOS, true)) throw new RuntimeException('Cada modo necesita un atributo: Fuerza, Destreza, Fuerza o Destreza, o Por revisar.');
+            $modos[] = ['modo' => armeria_str($m, 'modo', 80), 'atributo' => $at, 'dano' => armeria_str($m, 'dano', 60), 'nota' => armeria_str($m, 'nota', 300)];
+        }
+        if (count($modos) > 8) throw new RuntimeException('Como máximo 8 modos de ataque.');
+        $reqs = [];
+        foreach ((array)($data['requisitos'] ?? []) as $r) {
+            if (!is_array($r) || armeria_str($r, 'texto', 300) === '') continue;
+            $reqs[] = ['tipo' => (string)($r['tipo'] ?? ''), 'atributo' => (string)($r['atributo'] ?? ''), 'minimo' => armeria_int($r, 'minimo', 1, 30), 'texto' => armeria_str($r, 'texto', 300)];
+        }
+        $db->begin_transaction();
+        try {
+            armeria_guardar_ataque($db, $id, $modos, [
+                'motivo' => armeria_str($data, 'motivo', 5000),
+                'excepcion' => armeria_str($data, 'excepcion', 5000),
+                'duda' => armeria_str($data, 'duda', 5000),
+                'revisar' => !empty($data['revisar']),
+            ], true, false);
+            armeria_guardar_requisitos($db, $id, $reqs);
+            $db->commit();
+        } catch (Throwable $e) {
+            $db->rollback();
+            throw $e;
+        }
+        $message = 'Atributo de ataque y requisitos guardados.';
+        $selected = $id;
+    } elseif ($action === 'ataque_restaurar') {
+        $id = (int)($data['id'] ?? 0);
+        armeria_objeto($db, $id);
+        if (!armeria_restaurar_clasificacion($db, $id)) throw new RuntimeException('Este objeto no viene del documento: no hay clasificación original que restaurar.');
+        $message = 'Se restauró la clasificación del documento.';
+        $selected = $id;
+    } elseif ($action === 'nota') {
+        $n = is_array($data['nota'] ?? null) ? $data['nota'] : [];
+        $id = (int)($n['id'] ?? 0);
+        $tipo = (string)($n['tipo'] ?? '');
+        if (!in_array($tipo, ARMERIA_NOTA_TIPOS, true)) throw new RuntimeException('Elige el tipo de nota.');
+        $titulo = armeria_str($n, 'titulo', 160);
+        $texto = armeria_str($n, 'texto', 20000);
+        if ($titulo === '' || $texto === '') throw new RuntimeException('La nota necesita un título y un texto.');
+        $obj = (int)($n['objetoId'] ?? 0);
+        $obj = $obj > 0 ? (int)armeria_objeto($db, $obj)['ID'] : null;
+        $visible = !empty($n['visible']) ? 1 : 0;
+        if ($id > 0) {
+            if (!armeria_all($db, 'SELECT ID FROM ArmaNota WHERE ID=?', [$id])) throw new RuntimeException('Esa nota ya no existe.');
+            armeria_q($db, 'UPDATE ArmaNota SET ObjetoID=?,Tipo=?,Titulo=?,Texto=?,Visible=?,Autor=? WHERE ID=?', [$obj, $tipo, $titulo, $texto, $visible, (string)$admin['username'], $id])->close();
+            $message = 'Nota actualizada.';
+        } else {
+            armeria_q($db, 'INSERT INTO ArmaNota (ObjetoID,Tipo,Titulo,Texto,Visible,Autor) VALUES (?,?,?,?,?,?)', [$obj, $tipo, $titulo, $texto, $visible, (string)$admin['username']])->close();
+            $message = 'Nota añadida.';
+        }
+        $selected = $obj;
+    } elseif ($action === 'eliminar_nota') {
+        $id = (int)($data['id'] ?? 0);
+        armeria_q($db, 'DELETE FROM ArmaNota WHERE ID=?', [$id])->close();
+        $message = 'Nota eliminada.';
     } elseif ($action === 'reimportar') {
         $s = armeria_importar($db);
         $message = "Importación lista: {$s['creados']} nuevos, {$s['actualizados']} revisados, {$s['respetados']} editados o desactivados sin tocar.";

@@ -229,7 +229,8 @@ CREATE TABLE IF NOT EXISTS `ArmaCategoria` (
   `Tipo` varchar(12) NOT NULL,
   `Orden` smallint(6) NOT NULL DEFAULT 0,
   PRIMARY KEY (`Clave`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+;
 
 CREATE TABLE IF NOT EXISTS `ArmaRegla` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -241,7 +242,8 @@ CREATE TABLE IF NOT EXISTS `ArmaRegla` (
   `Actualizado` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`ID`),
   UNIQUE KEY `uq_armaregla_clave` (`Clave`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+;
 
 CREATE TABLE IF NOT EXISTS `ArmaPropiedad` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -255,7 +257,8 @@ CREATE TABLE IF NOT EXISTS `ArmaPropiedad` (
   `Actualizado` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`ID`),
   UNIQUE KEY `uq_armapropiedad_clave` (`Clave`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+;
 
 CREATE TABLE IF NOT EXISTS `ArmaObjeto` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -290,13 +293,22 @@ CREATE TABLE IF NOT EXISTS `ArmaObjeto` (
   `CreadoPor` varchar(50) DEFAULT NULL,
   `Creado` timestamp NOT NULL DEFAULT current_timestamp(),
   `Actualizado` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `AtaqueAtributo` varchar(10) DEFAULT NULL,
+  `AtaqueBase` varchar(10) DEFAULT NULL,
+  `AtaqueMotivo` text DEFAULT NULL,
+  `AtaqueExcepcion` text DEFAULT NULL,
+  `AtaqueDuda` text DEFAULT NULL,
+  `ClasifEditada` tinyint(1) NOT NULL DEFAULT 0,
+  `Descripcion` text DEFAULT NULL,
   PRIMARY KEY (`ID`),
   UNIQUE KEY `uq_armaobjeto_clave` (`Clave`),
   KEY `idx_armaobjeto_categoria` (`Categoria`,`Activo`),
+  KEY `idx_armaobjeto_ataque` (`AtaqueAtributo`),
   KEY `idx_armaobjeto_nombre` (`Nombre`),
   KEY `idx_armaobjeto_regla` (`ReglaID`),
   CONSTRAINT `fk_armaobjeto_regla` FOREIGN KEY (`ReglaID`) REFERENCES `ArmaRegla` (`ID`) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+;
 
 CREATE TABLE IF NOT EXISTS `ArmaObjetoPropiedad` (
   `ObjetoID` int(10) unsigned NOT NULL,
@@ -307,7 +319,48 @@ CREATE TABLE IF NOT EXISTS `ArmaObjetoPropiedad` (
   KEY `idx_aop_propiedad` (`PropiedadID`),
   CONSTRAINT `fk_aop_objeto` FOREIGN KEY (`ObjetoID`) REFERENCES `ArmaObjeto` (`ID`) ON DELETE CASCADE,
   CONSTRAINT `fk_aop_propiedad` FOREIGN KEY (`PropiedadID`) REFERENCES `ArmaPropiedad` (`ID`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+;
 
+CREATE TABLE IF NOT EXISTS `ArmaAtaqueModo` (
+  `ObjetoID` int(10) unsigned NOT NULL,
+  `Orden` tinyint(3) unsigned NOT NULL,
+  `Modo` varchar(80) NOT NULL,
+  `Atributo` varchar(10) NOT NULL,
+  `Dano` varchar(60) NOT NULL DEFAULT '',
+  `Nota` varchar(300) NOT NULL DEFAULT '',
+  PRIMARY KEY (`ObjetoID`,`Orden`),
+  KEY `idx_aam_atributo` (`Atributo`),
+  CONSTRAINT `fk_aam_objeto` FOREIGN KEY (`ObjetoID`) REFERENCES `ArmaObjeto` (`ID`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+;
 
-SET FOREIGN_KEY_CHECKS = 1;
+CREATE TABLE IF NOT EXISTS `ArmaRequisito` (
+  `ObjetoID` int(10) unsigned NOT NULL,
+  `Orden` tinyint(3) unsigned NOT NULL,
+  `Tipo` varchar(12) NOT NULL DEFAULT 'requisito',
+  `Atributo` varchar(10) DEFAULT NULL,
+  `Minimo` tinyint(3) unsigned DEFAULT NULL,
+  `Texto` varchar(300) NOT NULL,
+  PRIMARY KEY (`ObjetoID`,`Orden`),
+  KEY `idx_areq_atributo` (`Atributo`),
+  CONSTRAINT `fk_areq_objeto` FOREIGN KEY (`ObjetoID`) REFERENCES `ArmaObjeto` (`ID`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+;
+
+CREATE TABLE IF NOT EXISTS `ArmaNota` (
+  `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `ObjetoID` int(10) unsigned DEFAULT NULL,
+  `Tipo` varchar(12) NOT NULL DEFAULT 'aclaracion',
+  `Titulo` varchar(160) NOT NULL,
+  `Texto` mediumtext NOT NULL,
+  `Visible` tinyint(1) NOT NULL DEFAULT 1,
+  `Autor` varchar(50) DEFAULT NULL,
+  `Creado` timestamp NOT NULL DEFAULT current_timestamp(),
+  `Actualizado` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`ID`),
+  KEY `idx_armanota_objeto` (`ObjetoID`),
+  CONSTRAINT `fk_armanota_objeto` FOREIGN KEY (`ObjetoID`) REFERENCES `ArmaObjeto` (`ID`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+;
+

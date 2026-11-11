@@ -36,7 +36,7 @@ $boot = [
     'csrf' => $csrf,
     'api' => favor_base_path() . 'armeria/api.php',
 ];
-$total = $catalogo ? count(array_filter($catalogo['objetos'], static fn(array $o): bool => $o['activo'] ?? true)) : 0;
+$total = (int)($catalogo['total'] ?? 0); // COUNT(*) en MySQL, objetos activos
 ?>
 <!doctype html>
 <html lang="es">
@@ -58,17 +58,19 @@ $total = $catalogo ? count(array_filter($catalogo['objetos'], static fn(array $o
             <span class="arm-seal" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 7l23 23M7 9l2-2M30 27l4 4-3 3-4-4M34 31l5 5M37 39l3-3"/><path d="M39 7L16 30M41 9l-2-2M18 27l-4 4 3 3 4-4M14 31l-5 5M11 39l-3-3"/></svg></span>
             <div>
                 <h1>Armas y Armaduras</h1>
-                <p>Compendio del gremio · <span id="armTotal"><?= (int)$total ?></span> entradas</p>
+                <p>Catálogo del Gremio · <span id="armTotal"><?= (int)$total ?></span> objetos registrados</p>
             </div>
         </div>
         <nav class="arm-tabs" role="tablist" aria-label="Secciones">
             <button type="button" role="tab" id="tabCatalogo" aria-controls="vistaCatalogo" aria-selected="true" data-vista="catalogo">Catálogo</button>
             <button type="button" role="tab" id="tabGlosario" aria-controls="vistaGlosario" aria-selected="false" data-vista="glosario">Propiedades</button>
+            <button type="button" role="tab" id="tabReglas" aria-controls="vistaReglas" aria-selected="false" data-vista="reglas">Reglas y notas</button>
         </nav>
         <?php if ($isAdmin): ?>
             <div class="arm-admin-bar">
                 <button type="button" class="arm-btn arm-btn-gold" id="armNuevo">+ Nuevo objeto</button>
                 <button type="button" class="arm-btn" id="armNuevaProp">+ Propiedad</button>
+                <button type="button" class="arm-btn" data-nueva-nota="0">+ Aclaración</button>
                 <button type="button" class="arm-btn" id="armReimportar" title="Vuelve a leer los datos del documento sin tocar lo que editaste">Reimportar</button>
             </div>
         <?php endif; ?>
@@ -82,7 +84,7 @@ $total = $catalogo ? count(array_filter($catalogo['objetos'], static fn(array $o
         <div class="arm-searchrow">
             <label class="arm-search">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m15.5 15.5 5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                <input id="armBuscar" type="search" autocomplete="off" spellcheck="false" placeholder="Buscar por nombre, propiedad o regla…" aria-label="Buscar armamento">
+                <input id="armBuscar" type="search" autocomplete="off" spellcheck="false" placeholder="Buscar por nombre, daño, propiedad, regla o atributo…" aria-label="Buscar armamento">
             </label>
             <button type="button" class="arm-btn arm-filtros-toggle" id="armFiltrosBtn" aria-expanded="false" aria-controls="armFiltros">Filtros <b id="armFiltrosN" hidden></b></button>
         </div>
@@ -131,7 +133,7 @@ $total = $catalogo ? count(array_filter($catalogo['objetos'], static fn(array $o
                         <thead>
                             <tr>
                                 <th scope="col"><button type="button" data-sort="nombre">Nombre</button></th>
-                                <th scope="col" class="arm-col-cat">Categoría</th>
+                                <th scope="col" class="arm-col-cat">Tipo</th>
                                 <th scope="col" class="arm-col-num"><button type="button" data-sort="valor">Daño / CA</button></th>
                                 <th scope="col" class="arm-col-num"><button type="button" data-sort="coste">Coste</button></th>
                             </tr>
@@ -157,6 +159,16 @@ $total = $catalogo ? count(array_filter($catalogo['objetos'], static fn(array $o
             </label>
         </div>
         <div class="arm-glosario" id="armGlosario"></div>
+    </section>
+
+    <section class="arm-view" id="vistaReglas" role="tabpanel" aria-labelledby="tabReglas" hidden>
+        <div class="arm-searchrow">
+            <label class="arm-search">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m15.5 15.5 5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                <input id="armBuscarRegla" type="search" autocomplete="off" spellcheck="false" placeholder="Buscar en reglas, excepciones y aclaraciones…" aria-label="Buscar en reglas y notas">
+            </label>
+        </div>
+        <div class="arm-reglas" id="armReglas"></div>
     </section>
 </main>
 

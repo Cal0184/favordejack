@@ -2,7 +2,7 @@
 
 Fuente: `Armas - Armaduras.docx`. Datos importados: `armeria/data/armamento.json` (se cargan solos en la base de datos al abrir el catálogo).
 
-**Regla seguida:** no se corrigió ninguna mecánica ni ningún texto de reglas. Las erratas se conservan tal cual y se listan aquí para que decidas. Cada aviso también aparece en la ficha del objeto (solo para el admin) y se puede filtrar con «Con avisos de revisión».
+**Regla seguida:** no se corrigió ninguna mecánica ni ningún texto de reglas. Las erratas se conservan tal cual y se listan aquí para que decidas. Cada aviso aparece en la ficha del objeto («Advertencias del documento»), en la pestaña «Reglas y notas» y en el filtro «Con advertencias del documento». El admin los borra desde «Editar» cuando corrige el dato. El atributo de ataque y los requisitos están en `INFORME-ATRIBUTOS.md`.
 
 ## 1. Recuento
 
