@@ -11,7 +11,7 @@ favor_session_close();
 
 $routes = [
     'bank'        => favor_base_path() . 'bancadigital/',
-    'profile'     => favor_base_path() . 'perfil.php',
+    'armory'      => favor_base_path() . 'armeria/',
     'inventory'   => favor_base_path() . 'inventario/',
     'dice'        => favor_base_path() . 'rolldice/',
     'files'       => favor_base_path() . 'archivosdelgremio/',
@@ -463,9 +463,9 @@ button,summary{font:inherit}
             <span class="nav-arrow" aria-hidden="true">›</span>
         </a>
 
-        <a class="nav-card" href="<?= route('profile', $routes) ?>">
-            <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="32" cy="22" r="10"/><path d="M13 54c2-13 10-20 19-20s17 7 19 20"/></svg></span>
-            <span><span class="nav-title">Mi Perfil</span><span class="nav-sub">Icono, emblema y apariencia personal.</span></span>
+        <a class="nav-card" href="<?= route('armory', $routes) ?>">
+            <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9l31 31M9 12l3-3M40 36l5 5-4 4-5-5M45 41l7 7M49 53l4-4"/><path d="M52 9 21 40M55 12l-3-3M24 36l-5 5 4 4 5-5M19 41l-7 7M15 53l-4-4"/></svg></span>
+            <span><span class="nav-title">Armas y Armaduras</span><span class="nav-sub">Catálogo de armas, armaduras y escudos.</span></span>
             <span class="nav-arrow" aria-hidden="true">›</span>
         </a>
 
