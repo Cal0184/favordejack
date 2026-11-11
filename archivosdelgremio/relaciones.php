@@ -1,5 +1,17 @@
 <?php
 declare(strict_types=1);
+/*
+ * Relaciones · la cámara de vínculos del gremio (Archivos del Gremio).
+ *
+ *   relaciones.php  → datos, permisos y guardado (este archivo).
+ *   relaciones.css  → aspecto (sala de piedra, paneles de madera, mapa de pergamino).
+ *   relaciones.js   → mapa de vínculos, buscador, filtros y el bloque «Vincular personajes».
+ *
+ * Los vínculos viven en la tabla PersonajeRelacion (un par A–B por fila, A < B).
+ * Guardar el mismo par otra vez lo actualiza (así funciona «Editar»).
+ * El JS envía los cambios con fetch (ajax=1) y recibe la lista nueva en JSON;
+ * sin JS el formulario normal sigue funcionando y vuelve a la página.
+ */
 require_once dirname(__DIR__) . '/includes/auth.php';
 require_once dirname(__DIR__) . '/includes/assets.php';
 require_once dirname(__DIR__) . '/includes/imagenes.php';
@@ -9,17 +21,29 @@ require_once dirname(__DIR__) . '/includes/estado.php';
 favor_session_start();
 // En POST favor_current_user() relee la cuenta de la base de datos (permisos al día).
 try{$user=favor_current_user();}catch(Throwable $e){$user=null;$userError='No se pudo comprobar tu cuenta. Inténtalo otra vez.';}
-if($user)favor_csrf();
+$csrf=$user?favor_csrf():'';
 favor_session_close();
 function hr(string $v):string{return htmlspecialchars($v,ENT_QUOTES|ENT_SUBSTITUTE,'UTF-8');}
 // Tipos de vínculo con su color (el texto de la relación sigue siendo libre).
 const REL_VINCULOS=[
- 'familia'=>['Familia','#d1a531'],'amistad'=>['Amistad','#5fa65a'],'amor'=>['Amor','#d0609a'],'aliados'=>['Aliados','#4f8fc6'],
- 'mentor'=>['Mentor y alumno','#9474cc'],'rivalidad'=>['Rivalidad','#de8a3c'],'enemistad'=>['Enemistad','#c4463e'],'otro'=>['Otro','#9a8a74'],
+ 'familia'=>['Familia','#c9982b'],'amistad'=>['Amistad','#4f9a4c'],'amor'=>['Amor','#c8558f'],'aliados'=>['Aliados','#4a83bd'],
+ 'mentor'=>['Mentor y alumno','#8a68c4'],'rivalidad'=>['Rivalidad','#d47b2c'],'enemistad'=>['Enemistad','#b83a33'],'otro'=>['Otro','#8c7d68'],
+];
+// Iconos de cada vínculo (trazos SVG de 24×24; el color lo pone el CSS).
+const REL_ICONOS=[
+ 'familia'=>'<circle cx="8" cy="8" r="3"/><circle cx="16.5" cy="9" r="2.5"/><path d="M2.5 20c0-3.4 2.5-6 5.5-6s5.5 2.6 5.5 6"/><path d="M13.6 14.8c.9-.5 1.9-.8 2.9-.8 2.8 0 5 2.4 5 5.5"/>',
+ 'amistad'=>'<path d="M7 11 3 7l3-3 4 2h4l4-2 3 3-4 4"/><path d="m7 11 5 5c.8.8 2 .8 2.8 0l3.2-3.2"/><path d="m10 13 2-2M12.5 15.5l2-2"/><path d="M10 6 7.5 9a1.6 1.6 0 0 0 2.3 2.3L12 9"/>',
+ 'amor'=>'<path d="M12 20s-7.5-4.6-9.2-9.4A4.9 4.9 0 0 1 12 7.3a4.9 4.9 0 0 1 9.2 3.3C19.5 15.4 12 20 12 20z"/>',
+ 'aliados'=>'<path d="M12 3 4.5 6v5.5c0 4.6 3.2 7.9 7.5 9.5 4.3-1.6 7.5-4.9 7.5-9.5V6z"/><path d="m8.8 12 2.2 2.2 4.2-4.4"/>',
+ 'mentor'=>'<path d="M2.5 5.5c3-1.2 6.6-1 9.5.9 2.9-1.9 6.5-2.1 9.5-.9v13c-3-1.2-6.6-1-9.5.9-2.9-1.9-6.5-2.1-9.5-.9z"/><path d="M12 6.4v13"/>',
+ 'rivalidad'=>'<path d="M14.5 17.5 3 6V3h3l11.5 11.5"/><path d="m13 19 6-6M16 16l4 4"/><path d="M9.5 6.5 6 3"/><path d="M14.5 9.5 21 3v0h0v3l-6.5 6.5"/><path d="m5 13 6 6M8 16l-4 4"/>',
+ 'enemistad'=>'<path d="M12 3a7.5 7.5 0 0 0-4.8 13.3V20h9.6v-3.7A7.5 7.5 0 0 0 12 3z"/><circle cx="9.2" cy="11.5" r="1.5"/><circle cx="14.8" cy="11.5" r="1.5"/><path d="M10.4 20v-2.2M13.6 20v-2.2"/>',
+ 'otro'=>'<path d="M12 3.5l1.9 6.6 6.6 1.9-6.6 1.9L12 20.5l-1.9-6.6L3.5 12l6.6-1.9z"/>',
 ];
 // Categorías extra (además de Personaje y NPC) para los grupos de la Banca.
 const REL_FUERA='Personajes Fuera';
 const REL_MUERTOS='Muertos';
+function rel_icon(string $k,string $class='rel-ico'):string{return '<svg class="'.$class.'" viewBox="0 0 24 24" aria-hidden="true" focusable="false">'.(REL_ICONOS[$k]??REL_ICONOS['otro']).'</svg>';}
 /** Adivina el vínculo por el texto («Hermano» → familia) para las relaciones viejas. */
 function rel_guess_vinculo(string $tipo):string{
  $t=mb_strtolower($tipo,'UTF-8');
@@ -38,7 +62,19 @@ function rel_ensure_vinculo(mysqli $db):void{
  $db->query("INSERT INTO FavorMeta (Clave,Valor) VALUES ('relacion_vinculo_v1','ok') ON DUPLICATE KEY UPDATE Valor='ok'");
 }
 function rel_can_edit(?array $u,array $c):bool{return $u && (($u['role']??'')==='admin'||(string)($u['playerId']??'')===(string)$c['Jugador']);}
-$db=favor_db();$error=$userError??'';$message='';$characters=[];$relations=[];
+/** Todas las relaciones, en la forma que usa el JS (sin el autor). */
+function rel_load(mysqli $db):array{
+ $out=[];$res=$db->query('SELECT ID,PersonajeA,PersonajeB,Tipo,COALESCE(Vinculo,\'otro\') AS Vinculo,Nota FROM PersonajeRelacion ORDER BY Actualizado DESC,ID DESC');
+ while($r=$res->fetch_assoc()){$v=(string)$r['Vinculo'];$out[]=['id'=>(int)$r['ID'],'a'=>(string)$r['PersonajeA'],'b'=>(string)$r['PersonajeB'],'tipo'=>(string)$r['Tipo'],'vinculo'=>isset(REL_VINCULOS[$v])?$v:'otro','nota'=>(string)($r['Nota']??'')];}
+ $res->free();return $out;
+}
+$wantsJson=($_SERVER['REQUEST_METHOD']??'')==='POST'&&(($_POST['ajax']??'')==='1');
+function rel_json(array $data,int $code=200):void{http_response_code($code);header('Content-Type: application/json; charset=utf-8');header('Cache-Control: no-store');echo json_encode($data,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);exit;}
+
+$db=favor_db();$error=$userError??'';$characters=[];$relations=[];
+$isAdmin=$user && (($user['role']??'')==='admin');
+$playerId=(string)($user['playerId']??'');
+$focusId='';
 // Los grupos especiales de la Banca (Muertos, Personajes Fuera) también salen,
 // con su propia categoría. Si un personaje de esos grupos tiene su ficha
 // «gemela» en Archivos (mismo nombre), se muestra solo la de Archivos para no
@@ -58,209 +94,170 @@ try{
   if($r['Categoria']!=='NPC'&&in_array($grupo,FAVOR_ESTADO_GRUPOS_FUERA,true))$r['Categoria']=REL_FUERA;
   elseif($r['Categoria']!=='NPC'&&$grupo===FAVOR_ESTADO_GRUPO_MUERTOS)$r['Categoria']=REL_MUERTOS;
   $characters[$cid]=$r;}$res->free();
- $isAdmin=$user && (($user['role']??'')==='admin');
- $playerId=(string)($user['playerId']??'');
- $editableCharacters=array_filter($characters,fn($c)=>$isAdmin||($playerId!==''&&(string)$c['Jugador']===$playerId));
- $focusId=trim((string)($_GET['character']??$_POST['character']??''));
- if($focusId===''||!isset($characters[$focusId])){$focusId=array_key_first($editableCharacters)??array_key_first($characters)??'';}
- $focus=$focusId!==''?($characters[$focusId]??null):null;
+ $editableCharacters=array_filter($characters,fn($c)=>rel_can_edit($user,$c));
+ $focusId=trim((string)($_GET['character']??''));
+ if($focusId===''||!isset($characters[$focusId])){$focusId=(string)(array_key_first($editableCharacters)??array_key_first($characters)??'');}
  if($_SERVER['REQUEST_METHOD']==='POST'){
   favor_verify_csrf((string)($_POST['csrf']??''));
-  if(!$focus)throw new RuntimeException('Personaje no válido.');
-  if(!rel_can_edit($user,$focus))throw new RuntimeException('No tienes permiso para modificar las relaciones de este personaje.');
+  // «character» es el personaje propio desde el que se edita (Personaje A al crear).
+  $actorId=trim((string)($_POST['character']??''));$actor=$characters[$actorId]??null;
+  if(!$actor)throw new RuntimeException('Personaje no válido.');
+  if(!rel_can_edit($user,$actor))throw new RuntimeException('No tienes permiso para modificar las relaciones de este personaje.');
   $action=(string)($_POST['action']??'');
   if($action==='add'){
-   $other=trim((string)($_POST['other']??''));if($other===''||$other===$focusId||!isset($characters[$other]))throw new RuntimeException('Selecciona otro personaje.');
-   $a=$focusId;$b=$other;if(strcmp($a,$b)>0){[$a,$b]=[$b,$a];}
-   $type=mb_substr(trim((string)($_POST['type']??'Unidos')),0,80,'UTF-8')?:'Unidos';$vinculo=(string)($_POST['vinculo']??'');if(!isset(REL_VINCULOS[$vinculo]))$vinculo=rel_guess_vinculo($type);$note=mb_substr(trim((string)($_POST['note']??'')),0,500,'UTF-8');$author=(string)($user['username']??'');
-   $st=$db->prepare('INSERT INTO PersonajeRelacion (PersonajeA,PersonajeB,Tipo,Vinculo,Nota,CreadoPor) VALUES (?,?,?,?,?,?) ON DUPLICATE KEY UPDATE Tipo=VALUES(Tipo),Vinculo=VALUES(Vinculo),Nota=VALUES(Nota),CreadoPor=VALUES(CreadoPor)');$st->bind_param('ssssss',$a,$b,$type,$vinculo,$note,$author);$st->execute();$st->close();$message='Relación guardada.';
+   $other=trim((string)($_POST['other']??''));if($other===''||$other===$actorId||!isset($characters[$other]))throw new RuntimeException('Selecciona otro personaje.');
+   $a=$actorId;$b=$other;if(strcmp($a,$b)>0){[$a,$b]=[$b,$a];}
+   $vinculo=(string)($_POST['vinculo']??'');$type=mb_substr(trim((string)($_POST['type']??'')),0,80,'UTF-8');
+   if(!isset(REL_VINCULOS[$vinculo]))$vinculo=$type!==''?rel_guess_vinculo($type):'aliados';
+   if($type==='')$type=REL_VINCULOS[$vinculo][0];
+   $note=mb_substr(trim((string)($_POST['note']??'')),0,500,'UTF-8');$author=(string)($user['username']??'');
+   $st=$db->prepare('INSERT INTO PersonajeRelacion (PersonajeA,PersonajeB,Tipo,Vinculo,Nota,CreadoPor) VALUES (?,?,?,?,?,?) ON DUPLICATE KEY UPDATE Tipo=VALUES(Tipo),Vinculo=VALUES(Vinculo),Nota=VALUES(Nota),CreadoPor=VALUES(CreadoPor)');$st->bind_param('ssssss',$a,$b,$type,$vinculo,$note,$author);$st->execute();$updated=$st->affected_rows!==1;$st->close();
+   $message=$updated?'Vínculo actualizado.':'Vínculo guardado.';$ok=$updated?'editada':'guardada';
   }elseif($action==='delete'){
    $id=max(0,(int)($_POST['id']??0));$st=$db->prepare('SELECT PersonajeA,PersonajeB FROM PersonajeRelacion WHERE ID=? LIMIT 1');$st->bind_param('i',$id);$st->execute();$rr=$st->get_result()->fetch_assoc();$st->close();if(!$rr)throw new RuntimeException('La relación ya no existe.');
-   if($focusId!==$rr['PersonajeA']&&$focusId!==$rr['PersonajeB'])throw new RuntimeException('Esa relación no pertenece al personaje seleccionado.');
-   $st=$db->prepare('DELETE FROM PersonajeRelacion WHERE ID=?');$st->bind_param('i',$id);$st->execute();$st->close();$message='Relación eliminada.';
-  }
+   if($actorId!==$rr['PersonajeA']&&$actorId!==$rr['PersonajeB'])throw new RuntimeException('Esa relación no pertenece al personaje seleccionado.');
+   $st=$db->prepare('DELETE FROM PersonajeRelacion WHERE ID=?');$st->bind_param('i',$id);$st->execute();$st->close();$message='Vínculo eliminado.';$ok='eliminada';
+  }else throw new RuntimeException('Acción no válida.');
+  if($wantsJson)rel_json(['ok'=>true,'message'=>$message,'rels'=>rel_load($db)]);
+  // Sin JS: vuelve a la página (así recargar no repite el envío).
+  $back=trim((string)($_POST['return']??''));if(!isset($characters[$back]))$back=$actorId;
+  header('Location: relaciones.php?character='.rawurlencode($back).'&ok='.$ok.'#mapa',true,303);exit;
  }
- $res=$db->query('SELECT ID,PersonajeA,PersonajeB,Tipo,COALESCE(Vinculo,\'otro\') AS Vinculo,Nota,CreadoPor,Actualizado FROM PersonajeRelacion ORDER BY Actualizado DESC,ID DESC');while($r=$res->fetch_assoc())$relations[]=$r;$res->free();
-}catch(Throwable $e){$error=$e->getMessage();}finally{$db->close();}
-$focus=$focusId!==''?($characters[$focusId]??null):null;$canEdit=$focus?rel_can_edit($user,$focus):false;
-$graphChars=[];$graphRels=[];
-if($focus){
- $ids=[$focusId=>true];foreach($relations as $r){if($r['PersonajeA']===$focusId){$ids[$r['PersonajeB']]=true;}if($r['PersonajeB']===$focusId){$ids[$r['PersonajeA']]=true;}}
- // Incluye un segundo anillo para que se entienda como árbol/red, sin saturar con todo el censo.
- foreach($relations as $r){if(isset($ids[$r['PersonajeA']])||isset($ids[$r['PersonajeB']])){$ids[$r['PersonajeA']]=true;$ids[$r['PersonajeB']]=true;}}
- foreach(array_keys($ids) as $id)if(isset($characters[$id])){$c=$characters[$id];$graphChars[]=['id'=>$id,'name'=>$c['displayName'],'player'=>$c['JugadorNombre'],'category'=>$c['Categoria']??'Personaje','active'=>($c['Estado']??'Activo')==='Activo'?1:0,'estado'=>favor_estado_publico((string)($c['Estado']??'Activo')),'image'=>favor_thumb_url((string)($c['PortraitUrl']?:$c['IconUrl']??'')),'focus'=>$id===$focusId];}
- foreach($relations as $r)if(isset($ids[$r['PersonajeA']],$ids[$r['PersonajeB']]))$graphRels[]=$r;
-}else{
- foreach($characters as $id=>$c)$graphChars[]=['id'=>$id,'name'=>$c['displayName'],'player'=>$c['JugadorNombre'],'category'=>$c['Categoria']??'Personaje','active'=>($c['Estado']??'Activo')==='Activo'?1:0,'estado'=>favor_estado_publico((string)($c['Estado']??'Activo')),'image'=>favor_thumb_url((string)($c['PortraitUrl']?:$c['IconUrl']??'')),'focus'=>false];$graphRels=$relations;
-}
-$focusRelations=array_values(array_filter($relations,fn($r)=>$focusId!==''&&($r['PersonajeA']===$focusId||$r['PersonajeB']===$focusId)));
-$centralChoices=[];
-foreach($editableCharacters as $id=>$c){$centralChoices[]=['id'=>$id,'name'=>$c['displayName'],'player'=>$c['JugadorNombre'],'category'=>$c['Categoria']??'Personaje','active'=>($c['Estado']??'Activo')==='Activo'?1:0,'estado'=>favor_estado_publico((string)($c['Estado']??'Activo')),'image'=>favor_thumb_url((string)($c['PortraitUrl']?:$c['IconUrl']??''))];}
-$relationChoices=[];
-foreach($characters as $id=>$c){$relationChoices[]=['id'=>$id,'name'=>$c['displayName'],'player'=>$c['JugadorNombre'],'category'=>$c['Categoria']??'Personaje','active'=>($c['Estado']??'Activo')==='Activo'?1:0,'estado'=>favor_estado_publico((string)($c['Estado']??'Activo'))];}
+ $relations=rel_load($db);
+}catch(Throwable $e){
+ if($wantsJson)rel_json(['ok'=>false,'error'=>$e->getMessage()],400);
+ $error=$e->getMessage();
+}finally{$db->close();}
+$okMessages=['guardada'=>'Vínculo guardado.','editada'=>'Vínculo actualizado.','eliminada'=>'Vínculo eliminado.'];
+$flash=$okMessages[(string)($_GET['ok']??'')]??'';
+$focus=$focusId!==''?($characters[$focusId]??null):null;
+// Censo para el JS: todos los personajes (para el mapa y la búsqueda) con la marca «edit».
+$chars=[];foreach($characters as $id=>$c){$chars[]=['id'=>(string)$id,'name'=>(string)$c['displayName'],'player'=>(string)($c['JugadorNombre']??''),'category'=>(string)($c['Categoria']??'Personaje'),'estado'=>favor_estado_publico((string)($c['Estado']??'Activo')),'image'=>favor_thumb_url((string)($c['PortraitUrl']?:$c['IconUrl']??'')),'edit'=>rel_can_edit($user,$c)];}
 $playerNames=array_values(array_unique(array_filter(array_map(fn($c)=>(string)($c['JugadorNombre']??''),$characters))));sort($playerNames,SORT_NATURAL|SORT_FLAG_CASE);
+// Para un jugador, la lista empieza mostrando sus propios personajes.
+$myPlayer='';if(!$isAdmin&&$playerId!==''){foreach($characters as $c){if((string)$c['Jugador']===$playerId){$myPlayer=(string)($c['JugadorNombre']??'');break;}}}
+$canLink=$user&&array_filter($chars,fn($c)=>$c['edit']);
+$vincJs=[];foreach(REL_VINCULOS as $k=>[$l,$col])$vincJs[$k]=['label'=>$l,'color'=>$col,'icon'=>REL_ICONOS[$k]];
+$data=['chars'=>$chars,'rels'=>$relations,'focus'=>$focusId,'vinculos'=>$vincJs,'canLink'=>(bool)$canLink,'isAdmin'=>(bool)$isAdmin,'myPlayer'=>$myPlayer,'loggedIn'=>(bool)$user];
+$estadoOpts='';foreach(array_keys(FAVOR_ESTADOS) as $en)$estadoOpts.='<option value="'.hr($en).'">'.hr($en).'</option>';
+$tipoOpts='<option value="">Todos</option><option value="Personaje">Personajes</option><option value="NPC">NPC</option><option value="'.hr(REL_MUERTOS).'">Muertos</option><option value="'.hr(REL_FUERA).'">Personajes Fuera</option>';
+$playerOpts='';foreach($playerNames as $pn)$playerOpts.='<option value="'.hr($pn).'">'.hr($pn).'</option>';
+$focusName=$focus?(string)$focus['displayName']:'';
 ?>
 <!doctype html>
 <html lang="es">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Relaciones 2.2 · Archivos del Gremio</title>
-<style>
-:root{
- --night:#0b0908;--night2:#15100c;--leather:#25170f;--leather2:#3a2516;
- --paper:#e7d2a4;--paper2:#cdb17b;--ink:#352617;--muted:#826c4c;
- --gold:#c69a4f;--gold2:#8d642d;--wine:#6f2d35;--wine2:#3e171d;--cream:#f3e5c4;
- --line:#9b7c4d;--green:#506b4d;
-}
-*{box-sizing:border-box}html{scroll-behavior:smooth}
-body{margin:0;min-height:100vh;color:var(--cream);font-family:Georgia,"Times New Roman",serif;background:
- radial-gradient(circle at 15% 10%,#6d492033 0 1px,transparent 2px),
- radial-gradient(circle at 82% 16%,#a47b4033 0 1px,transparent 2px),
- radial-gradient(circle at 70% 70%,#5e3b1838,transparent 28%),
- linear-gradient(120deg,#0a0807 0%,#17100b 46%,#080706 100%);background-size:54px 54px,71px 71px,100% 100%,100% 100%;}
-body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.55;background:
- linear-gradient(90deg,transparent 0 49.7%,#c79a4a0d 50%,transparent 50.3%),
- radial-gradient(ellipse at center,transparent 0 48%,#0009 100%);z-index:-1}
-a{color:inherit;text-decoration:none}button,input,select,textarea{font:inherit}
-.topbar{position:sticky;top:0;z-index:50;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:18px;padding:11px clamp(12px,3vw,44px);border-bottom:1px solid #8e672f88;background:#100c09ee;backdrop-filter:blur(12px);box-shadow:0 10px 30px #0007}
-.topbar .navlink{display:inline-flex;align-items:center;gap:8px;padding:9px 13px;border:1px solid #78562c;border-radius:999px;background:linear-gradient(#2e1e13,#1b110c);color:#e7d2a3;transition:.18s}.topbar .navlink:hover{border-color:#c3964b;transform:translateY(-1px)}
-.brand{text-align:center}.brand strong{display:block;color:#e4c57d;font-size:1.12rem;letter-spacing:.16em;text-transform:uppercase}.brand span{display:block;margin-top:2px;color:#987f5b;font-size:.7rem;letter-spacing:.08em}
-.page{width:min(1500px,96vw);margin:22px auto 64px;display:grid;grid-template-columns:1fr;gap:20px;align-items:start}
-.controls-deck{display:grid;grid-template-columns:minmax(280px,.9fr) minmax(280px,.8fr) minmax(360px,1.25fr);gap:16px;align-items:start}
-.controls-deck .panel{height:auto;min-width:0}.controls-deck .legend{grid-column:1/-1;text-align:center}
-.hero{grid-column:1/-1;position:relative;overflow:hidden;padding:26px 30px;border:1px solid #76552c;border-radius:20px;background:
- linear-gradient(100deg,#2d1b11f4,#17100cf4 68%,#351d15f4),
- radial-gradient(circle at 80% 50%,#a3723033,transparent 35%);box-shadow:0 24px 70px #0008,inset 0 0 0 1px #c7954933}
-.hero:before,.hero:after{content:"✦";position:absolute;top:50%;transform:translateY(-50%);color:#b98d46;font-size:2.5rem;opacity:.35}.hero:before{left:14px}.hero:after{right:14px}
-.hero .eyebrow{color:#cda75e;font-size:.74rem;letter-spacing:.22em;text-transform:uppercase}.hero h1{margin:5px 0 7px;font-size:clamp(1.8rem,3vw,3rem);line-height:1;color:#f0ddb1;text-shadow:0 2px 18px #000}.hero p{max-width:830px;margin:0;color:#b9a07a;line-height:1.55}
-.paper{position:relative;border:9px solid #3b2415;border-radius:19px;background:
- radial-gradient(circle at 12% 8%,#fff7 0 2%,transparent 22%),
- radial-gradient(circle at 80% 22%,#8c6a3220,transparent 28%),
- linear-gradient(140deg,var(--paper),#eedcb8 50%,var(--paper2));color:var(--ink);box-shadow:0 28px 70px #0009,inset 0 0 0 2px #8b673888}
-.paper:before,.paper:after{content:"◆";position:absolute;z-index:3;color:#795527;font-size:17px;opacity:.75}.paper:before{left:9px;top:7px}.paper:after{right:9px;bottom:7px}
-.graph-card{padding:22px;min-height:0;align-self:start}.graph-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:15px}.graph-head .titleline{display:flex;align-items:center;gap:12px}.sigil{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;border:1px solid #805c2e;background:#d6bb85;color:#6f4325;box-shadow:inset 0 0 0 4px #ead7ad}.graph-head h2{margin:0;color:#542f22;font-size:1.4rem}.graph-head p{margin:4px 0 0;color:#806847;font-size:.9rem}.focus-badge{padding:7px 11px;border:1px solid #9b743b;border-radius:999px;background:#d7bc86;color:#65421f;font-size:.76rem;white-space:nowrap}
-.graph{position:relative;height:clamp(560px,64vh,700px);min-height:0;border:1px solid #9c7947;border-radius:14px;background:
- radial-gradient(circle at center,#f5e8c8 0 2px,transparent 3px),
- radial-gradient(circle at center,transparent 0 29%,#ad895127 29.3% 29.7%,transparent 30%),
- radial-gradient(circle at center,transparent 0 46%,#ad89511f 46.3% 46.7%,transparent 47%),
- linear-gradient(#6f542715 1px,transparent 1px),linear-gradient(90deg,#6f542715 1px,transparent 1px),
- radial-gradient(circle at center,#f3e2bd,#d8bd86);background-size:auto,auto,auto,34px 34px,34px 34px,auto;overflow:hidden;box-shadow:inset 0 0 40px #6e4a2738}
-.graph:after{content:"";position:absolute;inset:18px;border:1px solid #8f6b3f44;border-radius:50%;pointer-events:none}.graph svg{position:absolute;inset:0;width:100%;height:100%;z-index:1}.edge{stroke:#735536;stroke-width:2;opacity:.57}.edge.focus{stroke:#7a2831;stroke-width:3.3;opacity:.92;filter:drop-shadow(0 0 3px #fff5)}.edge-label{font-size:12px;fill:#5d432d;text-anchor:middle;paint-order:stroke;stroke:#ead7ae;stroke-width:4px;stroke-linejoin:round}
-.node{position:absolute;z-index:2;width:116px;transform:translate(-50%,-50%);text-align:center;color:#493420;cursor:pointer;transition:.18s}.node:hover{z-index:8;transform:translate(-50%,-50%) scale(1.06)}.node-img{width:72px;height:86px;margin:auto;border:2px solid #8a6332;border-radius:50% 50% 42% 42%/42% 42% 25% 25%;overflow:hidden;background:linear-gradient(#51402c,#2d2118);box-shadow:0 8px 15px #57361f55,inset 0 0 0 3px #e6d0a044}.node img{width:100%;height:100%;object-fit:cover;object-position:center top}.node strong{display:block;margin-top:6px;font-size:.78rem;line-height:1.05;text-shadow:0 1px #f3e4c0}.node small{display:block;color:#806746;font-size:.64rem}.node .npcmark{display:inline-block;margin-top:3px;padding:2px 5px;border:1px solid #8b6230;border-radius:999px;background:#d6ba82;color:#6c4823;font-size:.55rem;letter-spacing:.08em}.node.focus .node-img{width:96px;height:114px;border:4px solid #702b33;box-shadow:0 0 0 4px #c59a4b,0 13px 28px #5f351f77}.node.focus strong{font-size:.9rem;color:#612830}
-.side{display:grid;gap:14px;height:auto}.panel{position:relative;padding:18px;border:1px solid #694a28;border-radius:16px;background:
- linear-gradient(145deg,#21150f,#100b08 78%);box-shadow:0 18px 45px #0008,inset 0 0 0 1px #c7954930;overflow:hidden}.panel:before{content:"";position:absolute;left:18px;right:18px;top:0;height:1px;background:linear-gradient(90deg,transparent,#d2a65788,transparent)}.panel h2,.panel h3{margin:0;color:#e2c27c}.panel .sub{margin:5px 0 13px;color:#8f7a5c;font-size:.78rem;line-height:1.4}
-.filter-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.filter-grid .wide{grid-column:1/-1}.filter-grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}.control{width:100%;padding:9px 10px;border:1px solid #614524;border-radius:8px;outline:none;background:#0c0806;color:#eadbb9}.control:focus{border-color:#b38443;box-shadow:0 0 0 2px #b3844326}.control::placeholder{color:#725f47}.mini-label{display:block;margin:0 0 5px;color:#aa916d;font-size:.68rem;letter-spacing:.06em;text-transform:uppercase}
-.choice-list{display:grid;gap:7px;margin-top:10px;max-height:250px;overflow:auto;padding-right:3px}.choice-list::-webkit-scrollbar{width:7px}.choice-list::-webkit-scrollbar-thumb{background:#5a3c22;border-radius:20px}.choice-card{display:grid;grid-template-columns:42px 1fr auto;gap:9px;align-items:center;width:100%;padding:7px 8px;border:1px solid #47311c;border-radius:10px;background:#120c08;color:#d9c49a;text-align:left;cursor:pointer;transition:.16s}.choice-card:hover,.choice-card.active{border-color:#a87a39;background:#22150e;transform:translateX(2px)}.choice-card.active{box-shadow:inset 3px 0 #a66a3a}.choice-card img,.choice-fallback{width:42px;height:48px;border-radius:7px;object-fit:cover;object-position:center top;background:#3d2a1d;border:1px solid #74502b}.choice-fallback{display:grid;place-items:center;color:#ae8a51}.choice-card strong{display:block;font-size:.78rem;color:#ead7aa;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.choice-card small{display:block;margin-top:2px;color:#b39a78;font-size:.64rem}.tag{padding:3px 6px;border:1px solid #6b4d28;border-radius:999px;color:#a98c62;font-size:.56rem;text-transform:uppercase;letter-spacing:.05em}.tag.npc{border-color:#704f6d;color:#bca0b9}.results-note{margin-top:8px;color:#746147;font-size:.68rem}.results-note b{color:#b79969}
-.relation-list{display:grid;gap:8px;max-height:250px;overflow:auto;padding-right:3px}.relation{padding:10px 11px;border:1px solid #50371e;border-radius:10px;background:#100b08}.relation-row{display:block}.relation strong{color:#e0c287}.relation small{display:block;margin-top:3px;color:#9f8a69;line-height:1.35}.field{display:grid;gap:5px;margin:9px 0}.field span{color:#b9a178;font-size:.76rem}.field input,.field select,.field textarea{width:100%;padding:9px;border:1px solid #6d4c2a;border-radius:7px;background:#0b0705;color:#eadbb9;outline:none}.field textarea{min-height:76px;resize:vertical}.field input:focus,.field textarea:focus{border-color:#a77a3c}.button{padding:8px 11px;border:1px solid #805b2e;border-radius:8px;background:#2c1d11;color:#ead3a1;cursor:pointer;transition:.16s}.button:hover{filter:brightness(1.12);transform:translateY(-1px)}.button.primary{width:100%;background:linear-gradient(#8b6532,#5d3f20);font-weight:bold}.button.primary:disabled{opacity:.45;cursor:not-allowed;transform:none}.button.danger{border-color:#7f4543;color:#e5aea7;background:#281110}.notice{margin-bottom:10px;padding:9px 11px;border:1px solid #557149;background:#142313;color:#c8dfb8;border-radius:8px}.notice.error{border-color:#814643;background:#261311;color:#efb6ad}.empty{color:#8f7c60;font-style:italic;font-size:.8rem}.legend{font-size:.76rem;color:#8f7a5b;line-height:1.55}.legend strong{color:#c1a06e}.selected-person{display:none;margin-top:9px;padding:9px;border:1px solid #77542c;border-radius:9px;background:#20140d}.selected-person.show{display:flex;align-items:center;justify-content:space-between;gap:8px}.selected-person b{color:#dfc083;font-size:.8rem}.selected-person span{color:#8e7857;font-size:.68rem}
-.compact-choice-list{display:grid;gap:6px;margin-top:10px;max-height:220px;overflow:auto;padding-right:3px}.compact-choice-list::-webkit-scrollbar{width:7px}.compact-choice-list::-webkit-scrollbar-thumb{background:#5a3c22;border-radius:20px}
-.compact-choice{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;width:100%;padding:9px 10px;border:1px solid #47311c;border-radius:9px;background:#120c08;color:#d9c49a;text-align:left;cursor:pointer;transition:.16s}.compact-choice:hover{border-color:#a87a39;background:#22150e;transform:translateX(2px)}.compact-choice strong{display:block;color:#ead7aa;font-size:.8rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.compact-choice small{display:block;margin-top:2px;color:#b39a78;font-size:.66rem}.compact-choice .meta{display:flex;gap:5px;align-items:center;justify-content:flex-end;flex-wrap:wrap}.status-dot{width:7px;height:7px;border-radius:50%;background:#657c52;box-shadow:0 0 0 2px #657c5228}.status-dot.inactive{background:#735e52}
-.panel-center{text-align:center}.panel-center .sub{max-width:520px;margin-left:auto;margin-right:auto}.panel-center .filter-grid{text-align:left}.panel-center .results-note{text-align:center}
-
-@media(max-width:1080px){.controls-deck{grid-template-columns:1fr 1fr}.controls-deck .panel:last-child{grid-column:1/-1}.hero{grid-column:1/-1}.graph{height:600px}}
-@media(max-width:760px){.topbar{grid-template-columns:auto 1fr}.topbar .navlink:last-child{display:none}.brand{text-align:right}.brand span{display:none}.page{width:calc(100% - 2vw);margin-top:12px}.hero{padding:21px 24px}.controls-deck{grid-template-columns:1fr}.controls-deck .panel:last-child{grid-column:auto}.graph-card{padding:10px;border-width:6px}.graph{height:560px}.graph-head{flex-direction:column}.focus-badge{display:none}.node{width:86px}.node-img{width:56px;height:68px}.node.focus .node-img{width:72px;height:88px}.edge-label{font-size:9px}.filter-grid,.filter-grid.three{grid-template-columns:1fr}}
-.vinculo-chip{display:inline-block;padding:1px 8px;border:1px solid var(--vc);border-radius:99px;background:color-mix(in srgb,var(--vc) 22%,transparent);color:#f3e6c8;font-size:.72rem;font-weight:700;letter-spacing:.02em}
-.vinculo-legend{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-.vinculo-pick{display:flex;flex-wrap:wrap;gap:6px}.vinculo-pick label{cursor:pointer}.vinculo-pick input{position:absolute;opacity:0;pointer-events:none}
-.vinculo-pick span{display:inline-block;padding:7px 12px;border:1px solid var(--vc);border-radius:99px;color:#e8d8b6;font-size:.85rem;transition:.15s}
-.vinculo-pick input:checked+span{background:var(--vc);color:#160f0a;font-weight:800;transform:translateY(-1px)}.vinculo-pick input:focus-visible+span{outline:2px solid #f0d08a;outline-offset:2px}
-.edge{transition:stroke-width .18s}.edge.focus{filter:drop-shadow(0 0 3px #0006)}
-.node.gone .node-img{filter:grayscale(.75) brightness(.85)}.estado-mark{display:inline-block;margin-top:2px;padding:0 6px;border-radius:99px;background:var(--ec);color:#fff;font-size:.62rem;font-weight:800}
-.rel-hint-touch{display:none}@media (hover:none){.rel-hint-click{display:none}.rel-hint-touch{display:inline}}
-</style>
-<?php favor_head('Relaciones · Archivos del Gremio'); ?>
+<title>Relaciones · Archivos del Gremio</title>
+<?php favor_head('Relaciones · Archivos del Gremio', 'Vínculos, alianzas y rivalidades entre los aventureros del Favor de Jack.'); ?>
+<link rel="stylesheet" href="relaciones.css<?= favor_v(__DIR__ . '/relaciones.css') ?>">
 </head>
-<body>
+<body class="rel-page">
 <?php favor_site_bar(); ?>
-<header class="topbar">
- <div class="brand"><strong>Relaciones</strong><span>Archivo de vínculos del gremio · versión 2.3</span></div>
- <a class="navlink" href="<?= favor_base_path() ?>">Favor de Jack</a>
-</header>
-
-<main class="page">
- <section class="hero">
-  <div class="eyebrow">Crónicas del gremio</div>
-  <h1>La red que une nuestras historias</h1>
-  <p>Explora amistades, rivalidades, familias y alianzas. Elige un personaje central para desplegar su círculo cercano y las conexiones que nacen a su alrededor.</p>
- </section>
-
- <section class="paper graph-card">
-  <div class="graph-head">
-   <div class="titleline"><div class="sigil">✦</div><div><h2><?= $focus?hr((string)$focus['displayName']):'Relaciones del gremio' ?></h2><p><span class="rel-hint-click">Haz clic en</span><span class="rel-hint-touch">Toca</span> un retrato del mapa para centrar la red en ese personaje.</p></div></div>
-   <?php if($focus):?><span class="focus-badge"><?=hr((string)($focus['Categoria']??'Personaje'))?> · <?=hr((string)$focus['JugadorNombre'])?></span><?php endif;?>
+<main class="rel-hall" id="relHall">
+ <header class="rel-head">
+  <a class="rel-back" href="./"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/></svg><span>Archivos del Gremio</span></a>
+  <div class="rel-title">
+   <p class="rel-eyebrow">Favor de Jack</p>
+   <h1>Relaciones</h1>
+   <p class="rel-sub">Vínculos, alianzas y rivalidades del gremio</p>
   </div>
-  <div class="graph" id="graph"><svg id="edges" aria-hidden="true"></svg><div id="nodes"></div></div>
+  <p class="rel-head-count"><b id="relTotal"><?= count($relations) ?></b> <span>lazos en el archivo</span></p>
+ </header>
+
+ <?php if($error):?><div class="rel-notice is-error" role="alert"><?=hr($error)?></div><?php endif;?>
+
+ <aside class="rel-roster rel-panel" aria-labelledby="rosterTitle">
+  <div class="rel-panel-head">
+   <h2 id="rosterTitle">Expedientes</h2>
+   <p>Elige quién ocupa el centro del mapa.</p>
+  </div>
+  <label class="rel-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><span class="sr-only">Buscar personaje</span><input id="rosterSearch" type="search" placeholder="Buscar personaje…" autocomplete="off"></label>
+  <div class="rel-filters">
+   <label><span>Tipo</span><select id="rosterCategory"><?=$tipoOpts?></select></label>
+   <label><span>Estado</span><select id="rosterEstado"><option value="">Todos</option><?=$estadoOpts?></select></label>
+   <label class="wide"><span>Jugador</span><select id="rosterPlayer"><option value="">Todos los jugadores</option><?=$playerOpts?></select></label>
+  </div>
+  <div class="rel-roster-list" id="rosterList" role="list"></div>
+  <p class="rel-roster-count" id="rosterCount" aria-live="polite"></p>
+ </aside>
+
+ <section class="rel-board" id="mapa" aria-labelledby="boardTitle">
+  <div class="rel-board-frame">
+   <div class="rel-plaque">
+    <span class="rel-plaque-face" id="plaqueFace" aria-hidden="true"></span>
+    <div><h2 id="boardTitle"><?= $focusName!==''?hr($focusName):'Relaciones del gremio' ?></h2><p id="boardSub">Red de relaciones</p></div>
+   </div>
+   <label class="rel-ring2"><input type="checkbox" id="ring2Toggle"><span>Ver también sus otros lazos</span></label>
+   <div class="rel-map" id="relMap"><svg class="rel-edges" id="relEdges" aria-hidden="true"></svg><div class="rel-nodes" id="relNodes"></div><div class="rel-map-empty" id="relEmpty" hidden></div></div>
+   <p class="rel-map-hint"><span class="hint-mouse">Haz clic en</span><span class="hint-touch">Toca</span> un retrato para centrar la red en ese personaje.</p>
+  </div>
+  <ul class="rel-legend" aria-label="Colores de los vínculos">
+   <?php foreach(REL_VINCULOS as $vk=>[$vl,$vc]):?><li style="--vc:<?=hr($vc)?>"><?=rel_icon($vk)?><?=hr($vl)?></li><?php endforeach;?>
+  </ul>
  </section>
 
- <section class="controls-deck">
-  <section class="panel panel-center">
-   <h2><?= $isAdmin?'Personaje central':'Tus personajes' ?></h2>
-   <p class="sub"><?= $isAdmin?'Busca y filtra cualquier expediente para centrar la red.':'Aquí solo aparecen los personajes que puedes modificar.' ?></p>
-   <div class="filter-grid">
-    <div class="wide"><label class="mini-label" for="centralSearch">Buscar</label><input class="control" id="centralSearch" placeholder="Nombre del personaje…"></div>
-    <div><label class="mini-label" for="centralCategory">Tipo</label><select class="control" id="centralCategory"><option value="">Todos</option><option value="Personaje">Personajes</option><option value="NPC">NPC</option><option value="<?=hr(REL_MUERTOS)?>">Muertos</option><option value="<?=hr(REL_FUERA)?>">Personajes Fuera</option></select></div>
-    <div><label class="mini-label" for="centralActive">Estado</label><select class="control" id="centralActive"><option value="">Todos</option><?php foreach(array_keys(FAVOR_ESTADOS) as $en):?><option value="<?=hr($en)?>"><?=hr($en)?></option><?php endforeach;?></select></div>
-    <?php if($isAdmin):?><div class="wide"><label class="mini-label" for="centralPlayer">Jugador</label><select class="control" id="centralPlayer"><option value="">Todos los jugadores</option><?php foreach($playerNames as $pn):?><option value="<?=hr($pn)?>"><?=hr($pn)?></option><?php endforeach;?></select></div><?php endif;?>
+ <aside class="rel-summary rel-panel is-leather" aria-labelledby="summaryTitle">
+  <div class="rel-panel-head">
+   <h2 id="summaryTitle">Vínculos<?= $focusName!==''?' de '.hr($focusName):'' ?></h2>
+   <p id="summaryCount">Lazos registrados</p>
+  </div>
+  <div class="rel-type-counts" id="typeCounts"></div>
+  <ul class="rel-bond-list" id="bondList"></ul>
+ </aside>
+
+ <section class="rel-forge rel-panel" id="vincular" aria-labelledby="forgeTitle">
+  <div class="rel-forge-intro">
+   <svg class="rel-forge-chain" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>
+   <div><h2 id="forgeTitle">Vincular personajes</h2><p id="forgeLead">Une a dos miembros del gremio con un lazo.</p></div>
+  </div>
+  <?php if($canLink):?>
+  <form method="post" id="relForm" class="rel-forge-form" novalidate>
+   <input type="hidden" name="csrf" value="<?=hr($csrf)?>">
+   <input type="hidden" name="action" value="add">
+   <input type="hidden" name="character" id="slotAInput" value="">
+   <input type="hidden" name="other" id="slotBInput" value="">
+   <input type="hidden" name="return" id="returnInput" value="<?=hr($focusId)?>">
+   <div class="rel-pair">
+    <button type="button" class="rel-slot" id="slotA" data-slot="a" aria-haspopup="dialog"><span class="rel-slot-face"></span><span class="rel-slot-text"><small>Personaje A · tuyo</small><strong>Elegir…</strong></span></button>
+    <div class="rel-bond-preview" id="bondPreview" aria-hidden="true"><svg viewBox="0 0 120 24" preserveAspectRatio="none"><path d="M2 12 C 30 2, 90 22, 118 12"/></svg><span class="rel-bond-badge"></span></div>
+    <button type="button" class="rel-slot" id="slotB" data-slot="b" aria-haspopup="dialog"><span class="rel-slot-face"></span><span class="rel-slot-text"><small>Personaje B</small><strong>Elegir…</strong></span></button>
    </div>
-   <div class="choice-list" id="centralList"></div><div class="results-note" id="centralCount"></div>
-  </section>
-
-  <section class="panel">
-   <h3>Uniones de <?= $focus?hr((string)$focus['displayName']):'personaje' ?></h3>
-   <p class="sub">Relaciones registradas actualmente.</p>
-   <?php if($error):?><div class="notice error"><?=hr($error)?></div><?php endif;?>
-   <?php if($message):?><div class="notice"><?=hr($message)?></div><?php endif;?>
-   <div class="relation-list">
-   <?php if(!$focusRelations):?><span class="empty">Todavía no hay relaciones registradas.</span>
-   <?php else:foreach($focusRelations as $r):$other=$r['PersonajeA']===$focusId?$r['PersonajeB']:$r['PersonajeA'];$oc=$characters[$other]??null;if(!$oc)continue;?>
-    <div class="relation"><div class="relation-row"><strong><?=hr((string)$oc['displayName'])?></strong><small><?php $vk=(string)$r['Vinculo'];[$vl,$vc]=REL_VINCULOS[$vk]??REL_VINCULOS['otro'];?><span class="vinculo-chip" style="--vc:<?=hr($vc)?>"><?=hr($vl)?></span> <?=hr((string)$r['Tipo'])?><?=trim((string)$r['Nota'])!==''?' · '.hr((string)$r['Nota']):''?></small></div>
-    <?php if($canEdit):?><form method="post" style="margin-top:8px" onsubmit="return confirm('¿Quitar esta unión?')"><input type="hidden" name="csrf" value="<?=hr(favor_csrf())?>"><input type="hidden" name="character" value="<?=hr($focusId)?>"><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="<?=(int)$r['ID']?>"><button class="button danger" type="submit">Quitar unión</button></form><?php endif;?></div>
-   <?php endforeach;endif;?></div>
-  </section>
-
-  <?php if($canEdit):?><section class="panel">
-   <h3>Unir personaje</h3><p class="sub">Busca primero; ya no necesitas recorrer todo el censo.</p>
-   <form method="post" id="relationForm"><input type="hidden" name="csrf" value="<?=hr(favor_csrf())?>"><input type="hidden" name="character" value="<?=hr($focusId)?>"><input type="hidden" name="action" value="add"><input type="hidden" name="other" id="otherInput" value="">
-    <div class="filter-grid three">
-     <div class="wide"><label class="mini-label" for="relationSearch">Buscar</label><input class="control" id="relationSearch" placeholder="Nombre del personaje…"></div>
-     <div><label class="mini-label" for="relationCategory">Tipo</label><select class="control" id="relationCategory"><option value="">Todos</option><option value="Personaje">Personajes</option><option value="NPC">NPC</option><option value="<?=hr(REL_MUERTOS)?>">Muertos</option><option value="<?=hr(REL_FUERA)?>">Personajes Fuera</option></select></div>
-     <div><label class="mini-label" for="relationActive">Estado</label><select class="control" id="relationActive"><option value="">Todos</option><?php foreach(array_keys(FAVOR_ESTADOS) as $en):?><option value="<?=hr($en)?>"><?=hr($en)?></option><?php endforeach;?></select></div>
-     <div><label class="mini-label" for="relationPlayer">Jugador</label><select class="control" id="relationPlayer"><option value="">Todos</option><?php foreach($playerNames as $pn):?><option value="<?=hr($pn)?>"><?=hr($pn)?></option><?php endforeach;?></select></div>
-    </div>
-    <div class="compact-choice-list" id="relationChoices"></div><div class="results-note" id="relationCount"></div>
-    <div class="selected-person" id="selectedPerson"><div><b id="selectedName"></b><span id="selectedMeta"></span></div><button class="button" type="button" id="clearSelected">Cambiar</button></div>
-    <div class="field"><span>Vínculo</span><div class="vinculo-pick"><?php foreach(REL_VINCULOS as $vk=>[$vl,$vc]):?><label style="--vc:<?=hr($vc)?>"><input type="radio" name="vinculo" value="<?=hr($vk)?>"<?=$vk==='aliados'?' checked':''?>><span><?=hr($vl)?></span></label><?php endforeach;?></div></div>
-    <label class="field"><span>Cómo lo describirías</span><input name="type" maxlength="80" value="Unidos" placeholder="Hermanos, compañeros de armas, rivales…"></label>
-    <label class="field"><span>Nota</span><textarea name="note" maxlength="500" placeholder="Contexto opcional"></textarea></label>
-    <button class="button primary" id="saveRelation" type="submit" disabled>Guardar unión</button>
-   </form>
-  </section><?php endif;?>
-
-  <section class="panel legend"><strong>Colores de los vínculos:</strong><div class="vinculo-legend"><?php foreach(REL_VINCULOS as [$vl,$vc]):?><span class="vinculo-chip" style="--vc:<?=hr($vc)?>"><?=hr($vl)?></span><?php endforeach;?></div></section>
-  <section class="panel legend"><strong>Permisos:</strong> un jugador modifica únicamente las relaciones de sus propios personajes. Puede relacionarlos con cualquier personaje o NPC disponible. El administrador puede editar todos los expedientes.</section>
+   <fieldset class="rel-kinds"><legend>Tipo de vínculo</legend>
+    <?php foreach(REL_VINCULOS as $vk=>[$vl,$vc]):?><label style="--vc:<?=hr($vc)?>"><input type="radio" name="vinculo" value="<?=hr($vk)?>"<?=$vk==='amistad'?' checked':''?>><span><?=rel_icon($vk)?><?=hr($vl)?></span></label><?php endforeach;?>
+   </fieldset>
+   <div class="rel-details">
+    <label><span>Cómo lo describirías <i>(opcional)</i></span><input name="type" id="typeInput" maxlength="80" placeholder="Hermanos, compañeros de armas…"></label>
+    <label><span>Nota o contexto <i>(opcional)</i></span><textarea name="note" id="noteInput" maxlength="500" rows="2" placeholder="Cómo se conocieron, qué los une…"></textarea></label>
+   </div>
+   <div class="rel-forge-foot">
+    <p class="rel-forge-preview" id="forgePreview" aria-live="polite"></p>
+    <button type="button" class="rel-btn is-ghost" id="cancelEdit" hidden>Cancelar edición</button>
+    <button type="submit" class="rel-btn is-gold" id="saveBond"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>Añadir relación</span></button>
+   </div>
+  </form>
+  <?php elseif($user):?>
+  <p class="rel-forge-locked">Todavía no tienes personajes propios en los Archivos. Cuando tengas uno podrás vincularlo con cualquier miembro del gremio.</p>
+  <?php else:?>
+  <p class="rel-forge-locked"><a href="<?=hr(favor_base_path().'login.php?next='.rawurlencode((string)($_SERVER['REQUEST_URI']??'')))?>">Inicia sesión</a> para vincular a tus personajes con el resto del gremio.</p>
+  <?php endif;?>
  </section>
 </main>
-<script>
-const chars=<?=json_encode($graphChars,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_HEX_TAG)?>;
-const rels=<?=json_encode($graphRels,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_HEX_TAG)?>;
-const focus=<?=json_encode($focusId)?>;
-const centralChoices=<?=json_encode($centralChoices,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_HEX_TAG)?>;
-const relationChoices=<?=json_encode($relationChoices,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_HEX_TAG)?>;
-const VINCULOS=<?=json_encode(REL_VINCULOS,JSON_UNESCAPED_UNICODE|JSON_HEX_TAG)?>;
-const graph=document.getElementById('graph'),nodesEl=document.getElementById('nodes'),svg=document.getElementById('edges');
-function esc(v){return String(v??'').replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]))}
-function norm(v){return String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim()}
-function imgHtml(c){return c.image?'<img src="'+esc(c.image)+'" alt="">':'<span class="choice-fallback">✦</span>'}
-function draw(){if(!graph)return;nodesEl.innerHTML='';svg.innerHTML='';const W=graph.clientWidth,H=graph.clientHeight,cx=W/2,cy=H/2,pos={};const focusChar=chars.find(c=>c.id===focus);const first=new Set();rels.forEach(r=>{if(r.PersonajeA===focus)first.add(r.PersonajeB);if(r.PersonajeB===focus)first.add(r.PersonajeA)});const ring1=chars.filter(c=>c.id!==focus&&first.has(c.id)),ring2=chars.filter(c=>c.id!==focus&&!first.has(c.id));if(focusChar)pos[focus]={x:cx,y:cy};const putRing=(arr,rad)=>arr.forEach((c,i)=>{const a=(Math.PI*2*i/Math.max(1,arr.length))-Math.PI/2;pos[c.id]={x:cx+Math.cos(a)*Math.min(rad,W*.39),y:cy+Math.sin(a)*Math.min(rad,H*.39)}});putRing(ring1,Math.min(W,H)*.30);putRing(ring2,Math.min(W,H)*.44);if(!focusChar)putRing(chars,Math.min(W,H)*.38);
- rels.forEach(r=>{const a=pos[r.PersonajeA],b=pos[r.PersonajeB];if(!a||!b)return;const ns='http://www.w3.org/2000/svg';const line=document.createElementNS(ns,'line');line.setAttribute('x1',a.x);line.setAttribute('y1',a.y);line.setAttribute('x2',b.x);line.setAttribute('y2',b.y);line.setAttribute('class','edge '+((r.PersonajeA===focus||r.PersonajeB===focus)?'focus':''));line.style.stroke=(VINCULOS[r.Vinculo]||VINCULOS.otro)[1];svg.appendChild(line);const t=document.createElementNS(ns,'text');t.setAttribute('x',(a.x+b.x)/2);t.setAttribute('y',(a.y+b.y)/2-5);t.setAttribute('class','edge-label');t.textContent=r.Tipo||'Unidos';t.style.fill=(VINCULOS[r.Vinculo]||VINCULOS.otro)[1];svg.appendChild(t)});
- chars.forEach(c=>{const p=pos[c.id];if(!p)return;const a=document.createElement('a');a.className='node '+(c.id===focus?'focus':'')+(c.estado&&c.estado.label!=='Activo'?' gone':'');a.href='?character='+encodeURIComponent(c.id);a.style.left=p.x+'px';a.style.top=p.y+'px';a.innerHTML='<div class="node-img">'+(c.image?'<img src="'+esc(c.image)+'" alt="">':'✦')+'</div><strong>'+esc(c.name)+'</strong><small>'+esc(c.player||'')+'</small>'+(c.estado&&c.estado.label!=='Activo'?'<span class="estado-mark" style="--ec:'+esc(c.estado.color)+'">'+esc(c.estado.icon+' '+c.estado.label)+'</span>':'')+((c.category||'Personaje')==='NPC'?'<span class="npcmark">NPC</span>':'');nodesEl.appendChild(a)});
-}
-function renderCentral(){const host=document.getElementById('centralList');if(!host)return;const q=norm(document.getElementById('centralSearch').value),cat=document.getElementById('centralCategory').value,act=document.getElementById('centralActive').value,pl=document.getElementById('centralPlayer')?.value||'';let list=centralChoices.filter(c=>(!q||norm(c.name+' '+c.player).includes(q))&&(!cat||c.category===cat)&&(!act||(c.estado&&c.estado.label)===act)&&(!pl||c.player===pl));const total=list.length;list=list.slice(0,24);host.innerHTML=list.length?list.map(c=>'<button type="button" class="choice-card '+(c.id===focus?'active':'')+'" data-id="'+esc(c.id)+'">'+imgHtml(c)+'<span><strong>'+esc(c.name)+'</strong><small>'+esc(c.player||'Sin jugador')+'</small></span><span class="tag '+(c.category==='NPC'?'npc':'')+'">'+esc(c.category||'Personaje')+'</span></button>').join(''):'<span class="empty">No hay coincidencias.</span>';host.querySelectorAll('.choice-card').forEach(b=>b.onclick=()=>location.href='?character='+encodeURIComponent(b.dataset.id));document.getElementById('centralCount').innerHTML=total>24?'Mostrando <b>24</b> de <b>'+total+'</b>. Usa los filtros para acotar.':'<b>'+total+'</b> resultado'+(total===1?'':'s')+'.'}
-['centralSearch','centralCategory','centralActive','centralPlayer'].forEach(id=>document.getElementById(id)?.addEventListener(id==='centralSearch'?'input':'change',renderCentral));
-function renderRelationChoices(){const host=document.getElementById('relationChoices');if(!host)return;const q=norm(document.getElementById('relationSearch').value),cat=document.getElementById('relationCategory').value,act=document.getElementById('relationActive').value,pl=document.getElementById('relationPlayer').value;let list=relationChoices.filter(c=>c.id!==focus&&(!q||norm(c.name+' '+c.player).includes(q))&&(!cat||c.category===cat)&&(!act||(c.estado&&c.estado.label)===act)&&(!pl||c.player===pl));const total=list.length;list=list.slice(0,20);host.innerHTML=list.length?list.map(c=>'<button type="button" class="compact-choice" data-id="'+esc(c.id)+'"><span><strong>'+esc(c.name)+'</strong><small>'+esc(c.player||'Sin jugador')+'</small></span><span class="meta"><i class="status-dot" title="'+esc(c.estado?c.estado.label:'')+'" style="background:'+esc(c.estado?c.estado.color:'')+'"></i><span class="tag '+(c.category==='NPC'?'npc':'')+'">'+esc(c.category||'Personaje')+'</span></span></button>').join(''):'<span class="empty">No hay coincidencias.</span>';host.querySelectorAll('.compact-choice').forEach(b=>b.onclick=()=>selectRelation(b.dataset.id));document.getElementById('relationCount').innerHTML=total>20?'Mostrando <b>20</b> de <b>'+total+'</b>. Escribe un nombre o usa los filtros.':'<b>'+total+'</b> resultado'+(total===1?'':'s')+'.'}
-function selectRelation(id){const c=relationChoices.find(x=>x.id===id);if(!c)return;document.getElementById('otherInput').value=id;document.getElementById('selectedName').textContent=c.name;document.getElementById('selectedMeta').textContent=(c.player||'Sin jugador')+' · '+(c.category||'Personaje');document.getElementById('selectedPerson').classList.add('show');document.getElementById('saveRelation').disabled=false;document.getElementById('relationChoices').style.display='none';document.getElementById('relationCount').style.display='none'}
-function clearRelation(){document.getElementById('otherInput').value='';document.getElementById('selectedPerson').classList.remove('show');document.getElementById('saveRelation').disabled=true;document.getElementById('relationChoices').style.display='grid';document.getElementById('relationCount').style.display='block';renderRelationChoices()}
-['relationSearch','relationCategory','relationActive','relationPlayer'].forEach(id=>document.getElementById(id)?.addEventListener(id==='relationSearch'?'input':'change',renderRelationChoices));document.getElementById('clearSelected')?.addEventListener('click',clearRelation);document.getElementById('relationForm')?.addEventListener('submit',e=>{if(!document.getElementById('otherInput').value){e.preventDefault();alert('Selecciona un personaje para crear la relación.')}});
-addEventListener('resize',()=>{clearTimeout(window._rt);window._rt=setTimeout(draw,100)});draw();renderCentral();renderRelationChoices();
-</script>
+
+<dialog class="rel-picker" id="relPicker" aria-labelledby="pickerTitle">
+ <form method="dialog" class="rel-picker-head"><h2 id="pickerTitle">Elegir personaje</h2><button class="rel-icon-btn" value="cancel" aria-label="Cerrar">✕</button></form>
+ <label class="rel-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><span class="sr-only">Buscar personaje</span><input id="pickerSearch" type="search" placeholder="Buscar personaje…" autocomplete="off"></label>
+ <div class="rel-filters is-three">
+  <label><span>Tipo</span><select id="pickerCategory"><?=$tipoOpts?></select></label>
+  <label><span>Estado</span><select id="pickerEstado"><option value="">Todos</option><?=$estadoOpts?></select></label>
+  <label><span>Jugador</span><select id="pickerPlayer"><option value="">Todos</option><?=$playerOpts?></select></label>
+ </div>
+ <div class="rel-roster-list is-picker" id="pickerList" role="list"></div>
+ <p class="rel-roster-count" id="pickerCount" aria-live="polite"></p>
+</dialog>
+
+<div class="rel-toast" id="relToast" role="status" aria-live="polite"<?= $flash===''?' hidden':'' ?>><?=hr($flash)?></div>
+<script type="application/json" id="relData"><?=json_encode($data,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_HEX_TAG|JSON_HEX_AMP)?></script>
+<script src="relaciones.js<?= favor_v(__DIR__ . '/relaciones.js') ?>"></script>
 </body></html>
