@@ -10,6 +10,8 @@ require_once dirname(__DIR__) . '/includes/imagenes.php';
 require_once dirname(__DIR__) . '/includes/migrations.php';
 require_once dirname(__DIR__) . '/includes/discord.php';
 require_once dirname(__DIR__) . '/includes/estado.php';
+require_once dirname(__DIR__) . '/includes/recompensas.php';
+require_once dirname(__DIR__) . '/includes/biblioteca.php';
 guild_session_start();
 
 function respond(bool $ok, array $data = [], int $status = 200): never
@@ -74,6 +76,35 @@ function bind_execute(mysqli_stmt $stmt, array $params): void
     $stmt->execute();
 }
 
+
+/** Borradores del registro de misiones (se crean solos la primera vez). */
+function guild_ensure_mission_drafts(mysqli $db): void
+{
+    $db->query("CREATE TABLE IF NOT EXISTS MisionBorrador (
+        ID int unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        MisionID int unsigned NULL,
+        Nombre varchar(160) NOT NULL DEFAULT '',
+        Datos mediumtext NOT NULL,
+        CreadoPor varchar(50) NULL,
+        Creado timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        Actualizado timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        INDEX idx_borrador_mision (MisionID)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+}
+
+function guild_draft_row(array $row): array
+{
+    $data = json_decode((string)$row['Datos'], true);
+    return [
+        'id' => (int)$row['ID'],
+        'missionId' => $row['MisionID'] !== null ? (int)$row['MisionID'] : 0,
+        'name' => (string)$row['Nombre'],
+        'data' => is_array($data) ? $data : [],
+        'author' => (string)($row['CreadoPor'] ?? ''),
+        'updated' => (string)$row['Actualizado'],
+        'ts' => (int)($row['Ts'] ?? 0),
+    ];
+}
 
 function safe_asset_segment(string $value): string
 {
@@ -345,6 +376,63 @@ try {
         respond(true, ['message' => 'El personaje fue retirado de Archivos del Gremio. La Banca no fue modificada.']);
     }
 
+    if ($action === 'list_mission_drafts') {
+        $db = db();
+        guild_ensure_mission_drafts($db);
+        $res = $db->query('SELECT ID, MisionID, Nombre, Datos, CreadoPor, Actualizado, UNIX_TIMESTAMP(Actualizado) AS Ts FROM MisionBorrador ORDER BY Actualizado DESC LIMIT 100');
+        $drafts = [];
+        while ($row = $res->fetch_assoc()) $drafts[] = guild_draft_row($row);
+        $db->close();
+        respond(true, ['drafts' => $drafts]);
+    }
+
+    if ($action === 'save_mission_draft') {
+        $draftId = (int)($data['draftId'] ?? 0);
+        $missionId = (int)($data['missionId'] ?? 0);
+        $payload = $data['data'] ?? [];
+        if (!is_array($payload)) $payload = [];
+        $json = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        if ($json === false || strlen($json) > 400000) throw new RuntimeException('El borrador es demasiado grande.');
+        $name = mb_substr(trim((string)($payload['name'] ?? '')), 0, 160, 'UTF-8');
+        $db = db();
+        guild_ensure_mission_drafts($db);
+        if ($draftId > 0) {
+            $stmt = $db->prepare('UPDATE MisionBorrador SET MisionID=?, Nombre=?, Datos=?, CreadoPor=? WHERE ID=?');
+            bind_execute($stmt, [$missionId > 0 ? (string)$missionId : null, $name, $json, (string)$admin['username'], (string)$draftId]);
+            $stmt->close();
+            $check = $db->prepare('SELECT ID FROM MisionBorrador WHERE ID=? LIMIT 1');
+            bind_execute($check, [(string)$draftId]);
+            $exists = (bool)$check->get_result()->fetch_assoc();
+            $check->close();
+            if (!$exists) $draftId = 0;
+        }
+        if ($draftId <= 0) {
+            $stmt = $db->prepare('INSERT INTO MisionBorrador (MisionID, Nombre, Datos, CreadoPor) VALUES (?,?,?,?)');
+            bind_execute($stmt, [$missionId > 0 ? (string)$missionId : null, $name, $json, (string)$admin['username']]);
+            $draftId = (int)$stmt->insert_id;
+            $stmt->close();
+        }
+        $stmt = $db->prepare('SELECT ID, MisionID, Nombre, Datos, CreadoPor, Actualizado, UNIX_TIMESTAMP(Actualizado) AS Ts FROM MisionBorrador WHERE ID=? LIMIT 1');
+        bind_execute($stmt, [(string)$draftId]);
+        $row = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+        $db->close();
+        respond(true, ['draft' => guild_draft_row($row)]);
+    }
+
+    if ($action === 'delete_mission_draft') {
+        $draftId = (int)($data['draftId'] ?? 0);
+        if ($draftId > 0) {
+            $db = db();
+            guild_ensure_mission_drafts($db);
+            $stmt = $db->prepare('DELETE FROM MisionBorrador WHERE ID=?');
+            bind_execute($stmt, [(string)$draftId]);
+            $stmt->close();
+            $db->close();
+        }
+        respond(true, ['message' => 'Borrador descartado.']);
+    }
+
     if ($action === 'save_mission') {
         $missionId = (int)($data['id'] ?? 0);
         $name = strv($data, 'name', 160);
@@ -356,8 +444,11 @@ try {
         $generalReward = strv($data, 'generalReward', 255);
         $participants = $data['participants'] ?? [];
         if (!is_array($participants)) $participants = [];
+        $coinReward = favor_recompensa_desde($data);
 
         $db = db();
+        // Antes de la transacción: crear columnas confirma la transacción en MySQL.
+        favor_recompensas_schema($db);
         $oldMissionState = null;
         $missionNames = [];
         $db->begin_transaction();
@@ -376,6 +467,8 @@ try {
                 $missionId = (int)$stmt->insert_id;
                 $stmt->close();
             }
+
+            favor_recompensa_guardar($db, $missionId, $coinReward);
 
             $stmt = $db->prepare('DELETE FROM MisionPersonaje WHERE MisionID=?');
             bind_execute($stmt, [(string)$missionId]);
@@ -440,7 +533,39 @@ try {
             );
         }
 
-        respond(true, ['message' => 'Misión guardada.', 'id' => $missionId]);
+        // La misión ya está guardada: su borrador deja de hacer falta.
+        $draftId = (int)($data['draftId'] ?? 0);
+        if ($draftId > 0) {
+            try {
+                $db = db();
+                guild_ensure_mission_drafts($db);
+                $stmt = $db->prepare('DELETE FROM MisionBorrador WHERE ID=?');
+                bind_execute($stmt, [(string)$draftId]);
+                $stmt->close();
+                $db->close();
+            } catch (Throwable $e) {
+                // Si no se pudo borrar, queda en la lista y se puede descartar a mano.
+            }
+        }
+
+        // Al pasar a Completada se paga la recompensa en monedas (una sola vez por personaje).
+        $payNote = '';
+        if ($state === 'Completada' && $oldMissionState !== 'Completada') {
+            $db = db();
+            try {
+                $payNote = favor_recompensa_pagar_seguro($db, $missionId, (string)($admin['displayName'] ?? $admin['username']));
+            } finally {
+                $db->close();
+            }
+        }
+
+        // Biblioteca: si la misión quedó completada recibe su libro ahora mismo.
+        if ($state === 'Completada') {
+            $db = db();
+            try { favor_biblioteca_sync_seguro($db); } finally { $db->close(); }
+        }
+
+        respond(true, ['message' => trim('Misión guardada. ' . $payNote), 'id' => $missionId, 'rewardNote' => $payNote]);
     }
 
     if ($action === 'delete_mission') {

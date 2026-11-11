@@ -565,6 +565,7 @@
                 </div>
                 ${m.description ? `<div class="mission-description">${esc(m.description)}</div>` : ''}
                 ${m.generalReward ? `<div class="general-reward"><strong>Recompensa general:</strong> ${esc(m.generalReward)}</div>` : ''}
+                ${m.rewardAmount ? `<div class="general-reward"><strong>Pago en la Banca:</strong> ${esc(Number(m.rewardAmount).toLocaleString('es-CL'))} ${esc(String(m.rewardCoin || 'po').toUpperCase())} ${m.rewardMode === 'total' ? 'en total, a repartir' : 'por personaje'}</div>` : ''}
                 ${participants ? `<div class="participant-list">${participants}</div>` : '<p class="mission-meta">Sin participantes registrados.</p>'}
             </article>`;
     }
@@ -595,12 +596,34 @@
         adminModal.setAttribute('aria-hidden', 'false');
         setModalOpen(true);
     }
+    // Antes de cerrar, el formulario abierto puede guardar su borrador.
+    let adminModalBeforeClose = null;
     function closeAdminModal() {
+        if (adminModalBeforeClose) {
+            const before = adminModalBeforeClose;
+            adminModalBeforeClose = null;
+            try { before(); } catch (_) {}
+        }
         adminModal?.classList.remove('open');
         adminModal?.setAttribute('aria-hidden', 'true');
         setModalOpen(false);
     }
-    $$('[data-close-admin]').forEach(el => el.addEventListener('click', closeAdminModal));
+    // Pulsar fuera del formulario ya NO lo cierra (se perdía todo lo escrito):
+    // solo × , «Cancelar/Cerrar» o Esc. Fuera, la tarjeta se sacude como aviso.
+    $$('[data-close-admin]').forEach(el => {
+        if (el.classList.contains('modal-backdrop')) {
+            el.addEventListener('click', () => {
+                const card = adminModal?.querySelector('.admin-modal-card');
+                if (!card) return;
+                card.classList.remove('nudge');
+                void card.offsetWidth;
+                card.classList.add('nudge');
+                showToast('Para cerrar usa × o «Cerrar». Lo escrito no se pierde.');
+            });
+        } else {
+            el.addEventListener('click', closeAdminModal);
+        }
+    });
 
     $('#adminLogout')?.addEventListener('click', () => {
         // Cierra sesión con el formulario de la barra común (POST con token).
@@ -927,6 +950,7 @@
         renderAdminCharacters();
         const missionAdminList = $('#adminMissionList');
         if (missionAdminList) missionAdminList.innerHTML = missions.length ? missions.map(adminMissionRow).join('') : '<div class="notice-sheet">Todavía no hay misiones registradas.</div>';
+        loadMissionDrafts();
     }
 
     function resolvePortraitPreview(value) {
@@ -1138,19 +1162,133 @@
         } catch (err) { showToast(err.message, true); }
     });
 
-    function missionForm(m = null) {
-        const mission = m || {id: 0, name: '', date: '', type: '', state: 'Completada', description: '', generalReward: '', participants: []};
+    // ------------------------------------------------------------
+    // Registro de misiones: formulario, borradores y filtros
+    // ------------------------------------------------------------
+    // Copia de seguridad en este navegador por si se corta la red o se cierra
+    // la página antes de que el borrador llegue al servidor.
+    const DRAFT_LOCAL_KEY = 'guildMissionDraftLocal';
+    let missionDrafts = [];
+    let missionFormDirty = false;
+
+    function readLocalDraft() {
+        try { return JSON.parse(localStorage.getItem(DRAFT_LOCAL_KEY) || 'null'); } catch (_) { return null; }
+    }
+    function writeLocalDraft(value) {
+        try {
+            if (value) localStorage.setItem(DRAFT_LOCAL_KEY, JSON.stringify(value));
+            else localStorage.removeItem(DRAFT_LOCAL_KEY);
+        } catch (_) {}
+    }
+    function draftHasContent(d) {
+        if (!d) return false;
+        return ['name', 'type', 'description', 'generalReward'].some(k => String(d[k] || '').trim() !== '')
+            || (Array.isArray(d.participants) && d.participants.length > 0);
+    }
+    function formatDraftDate(value, ts = 0) {
+        const d = ts ? new Date(ts * 1000) : new Date(String(value || '').replace(' ', 'T'));
+        if (Number.isNaN(d.getTime())) return String(value || '');
+        return d.toLocaleString('es-CL', {day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'});
+    }
+    function nowTime() {
+        return new Date().toLocaleTimeString('es-CL', {hour: '2-digit', minute: '2-digit'});
+    }
+
+    function upsertDraft(draft) {
+        missionDrafts = [draft, ...missionDrafts.filter(d => d.id !== draft.id)];
+        renderMissionDrafts();
+    }
+    function removeDraft(id) {
+        missionDrafts = missionDrafts.filter(d => d.id !== id);
+        renderMissionDrafts();
+    }
+
+    async function loadMissionDrafts() {
+        if (!$('#missionDrafts')) return;
+        const local = readLocalDraft();
+        if (local && draftHasContent(local.data)) {
+            try {
+                await post({action: 'save_mission_draft', draftId: local.draftId || 0, missionId: local.missionId || 0, data: local.data});
+                writeLocalDraft(null);
+            } catch (_) { /* se reintenta la próxima vez */ }
+        }
+        try {
+            const data = await post({action: 'list_mission_drafts'});
+            missionDrafts = Array.isArray(data.drafts) ? data.drafts : [];
+        } catch (_) {
+            missionDrafts = [];
+        }
+        renderMissionDrafts();
+    }
+
+    function renderMissionDrafts() {
+        const box = $('#missionDrafts');
+        const list = $('#missionDraftsList');
+        if (!box || !list) return;
+        box.hidden = missionDrafts.length === 0;
+        const count = $('#missionDraftsCount');
+        if (count) count.textContent = String(missionDrafts.length);
+        list.innerHTML = missionDrafts.map(d => {
+            const m = d.missionId ? missions.find(x => Number(x.id) === Number(d.missionId)) : null;
+            const parts = Array.isArray(d.data?.participants) ? d.data.participants.length : 0;
+            const kind = m ? `Cambios sin guardar de «${esc(m.name)}»` : 'Misión nueva';
+            return `
+                <div class="mission-draft-row">
+                    <div class="mission-draft-text">
+                        <strong>${esc(d.name || d.data?.name || 'Misión sin nombre')}</strong>
+                        <small>${kind} · ${parts} ${parts === 1 ? 'participante' : 'participantes'} · ${esc(formatDraftDate(d.updated, d.ts))}${d.author ? ' · ' + esc(d.author) : ''}</small>
+                    </div>
+                    <div class="mission-draft-actions">
+                        <button type="button" class="ink-button" data-continue-draft="${d.id}">Continuar</button>
+                        <button type="button" class="ink-button subtle" data-discard-draft="${d.id}">Descartar</button>
+                    </div>
+                </div>`;
+        }).join('');
+    }
+
+    $('#missionDraftsList')?.addEventListener('click', async e => {
+        const cont = e.target.closest('[data-continue-draft]');
+        if (cont) {
+            const d = missionDrafts.find(x => String(x.id) === cont.dataset.continueDraft);
+            if (!d) return;
+            const m = d.missionId ? missions.find(x => Number(x.id) === Number(d.missionId)) : null;
+            openMissionEditor(m || null, d);
+            return;
+        }
+        const del = e.target.closest('[data-discard-draft]');
+        if (del) {
+            const d = missionDrafts.find(x => String(x.id) === del.dataset.discardDraft);
+            if (!d || !confirm(`¿Descartar el borrador «${d.name || 'Misión sin nombre'}»? Se borra lo escrito en él.`)) return;
+            try {
+                await post({action: 'delete_mission_draft', draftId: d.id});
+                removeDraft(d.id);
+                showToast('Borrador descartado.');
+            } catch (err) { showToast(err.message, true); }
+        }
+    });
+
+    function missionForm(mission, draft = null) {
         const players = uniqueSorted(characters.map(c => c.player));
+        const isEdit = Number(mission.id) > 0;
         return `
-            <h2 id="adminModalTitle">${mission.id ? 'Editar misión' : 'Nueva misión'}</h2>
+            <h2 id="adminModalTitle">${isEdit ? 'Editar misión' : 'Nueva misión'}</h2>
             <p>El registro guarda una copia del nombre, clase y nivel que tenía cada personaje al participar.</p>
-            <form class="admin-form" id="missionEditForm" data-id="${mission.id || 0}">
+            ${draft ? `<p class="draft-banner">✎ Continúas un borrador guardado el ${esc(formatDraftDate(draft.updated, draft.ts))}</p>` : ''}
+            <form class="admin-form" id="missionEditForm" data-id="${Number(mission.id) || 0}">
                 <div class="form-grid">
                     <div class="form-field"><label>Nombre de la misión</label><input name="name" value="${esc(mission.name)}" required></div>
                     <div class="form-field"><label>Fecha</label><input name="date" type="date" value="${esc(mission.date)}"></div>
                     <div class="form-field"><label>Tipo</label><input name="type" value="${esc(mission.type)}" placeholder="Investigación, combate, rescate…"></div>
                     <div class="form-field"><label>Estado</label><select name="state">${['Publicada','En curso','Completada','Fallida','Cancelada'].map(v => `<option ${mission.state === v ? 'selected' : ''}>${v}</option>`).join('')}</select></div>
                     <div class="form-field full"><label>Recompensa general</label><input name="generalReward" value="${esc(mission.generalReward)}" placeholder="200 po por aventurero, objeto mágico…"></div>
+                    <div class="form-field full"><label>Recompensa en monedas (se paga en la Banca)</label>
+                        <div class="reward-coins">
+                            <input name="rewardAmount" type="number" min="0" max="10000000" step="1" inputmode="numeric" value="${mission.rewardAmount ? Number(mission.rewardAmount) : ''}" placeholder="Ej.: 200" aria-label="Cantidad">
+                            <select name="rewardCoin" aria-label="Moneda">${[['po','PO'],['pl','PL'],['pc','PC']].map(([v, t]) => `<option value="${v}" ${(mission.rewardCoin || 'po') === v ? 'selected' : ''}>${t}</option>`).join('')}</select>
+                            <select name="rewardMode" aria-label="Reparto">${[['personaje','por personaje'],['total','total a repartir']].map(([v, t]) => `<option value="${v}" ${(mission.rewardMode || 'personaje') === v ? 'selected' : ''}>${t}</option>`).join('')}</select>
+                        </div>
+                        <p class="help-text">Al guardar la misión como «Completada» cada participante la recibe una sola vez en su historial. Vacío = sin pago automático.</p>
+                    </div>
                     <div class="form-field full"><label>Descripción</label><textarea name="description">${esc(mission.description)}</textarea></div>
                 </div>
 
@@ -1158,16 +1296,22 @@
                     <div class="participant-selector-head">
                         <div>
                             <label for="participantPlayerFilter">Añadir participantes</label>
-                            <p>Primero elige un jugador. Solo aparecerán sus personajes.</p>
+                            <p>Filtra por jugador y por estado. Toca un personaje para añadirlo o quitarlo.</p>
                         </div>
                         <select id="participantPlayerFilter">
-                            <option value="">Selecciona un jugador…</option>
+                            <option value="">Todos los jugadores</option>
                             ${players.map(player => `<option value="${esc(player)}">${esc(player)}</option>`).join('')}
                         </select>
                     </div>
-                    <div class="participant-picker" id="participantPicker">
-                        <div class="participant-picker-empty">Selecciona un jugador para abrir su carpeta.</div>
+                    <div class="participant-filters">
+                        <div class="participant-state-filter" role="group" aria-label="Estado del personaje">
+                            <button type="button" data-participant-state="active">Activos <b></b></button>
+                            <button type="button" data-participant-state="inactive">No activos <b></b></button>
+                            <button type="button" data-participant-state="all">Todos <b></b></button>
+                        </div>
+                        <label class="participant-search"><span aria-hidden="true">⌕</span><input type="search" id="participantSearch" placeholder="Buscar personaje…" autocomplete="off" aria-label="Buscar personaje"></label>
                     </div>
+                    <div class="participant-picker" id="participantPicker"></div>
                 </section>
 
                 <section class="selected-participants-block">
@@ -1178,24 +1322,37 @@
                     <div class="participant-selected" id="participantSelected"></div>
                 </section>
 
-                <div class="form-actions"><button type="button" class="ink-button subtle" data-modal-cancel>Cancelar</button><button class="ink-button" type="submit">Guardar misión</button></div>
+                <div class="form-actions mission-form-actions">
+                    <span class="draft-status" id="missionDraftStatus" aria-live="polite">${draft ? 'Borrador guardado' : 'Se guarda como borrador mientras escribes.'}</span>
+                    <button type="button" class="ink-button subtle draft-discard" id="missionDraftDiscard" ${draft ? '' : 'hidden'}>Descartar borrador</button>
+                    <button type="button" class="ink-button subtle" data-modal-cancel>Cerrar</button>
+                    <button class="ink-button" type="submit">Guardar misión</button>
+                </div>
             </form>`;
     }
 
-    function bindMissionForm(mission = null) {
-        $('[data-modal-cancel]')?.addEventListener('click', closeAdminModal);
+    function bindMissionForm(mission, draft = null, reuseDraftId = 0) {
         const form = $('#missionEditForm');
         if (!form) return;
+        $('[data-modal-cancel]')?.addEventListener('click', closeAdminModal);
 
+        const missionId = Number(mission?.id || 0);
         const selected = new Map((mission?.participants || []).map(p => [p.id, {
             id: p.id,
             reward: p.reward || '',
             notes: p.notes || ''
         }]));
         const filter = $('#participantPlayerFilter', form);
+        const search = $('#participantSearch', form);
         const picker = $('#participantPicker', form);
         const selectedBox = $('#participantSelected', form);
         const count = $('#participantSelectedCount', form);
+        const statusEl = $('#missionDraftStatus', form);
+        const discardBtn = $('#missionDraftDiscard', form);
+        let stateFilter = 'active';
+        try { stateFilter = sessionStorage.getItem('guildParticipantState') || 'active'; } catch (_) {}
+        try { if (filter) filter.value = sessionStorage.getItem('guildParticipantPlayer') || ''; } catch (_) {}
+        if (filter && ![...filter.options].some(o => o.value === filter.value)) filter.value = '';
 
         function syncSelectedInputs() {
             $$('[data-selected-participant]', selectedBox).forEach(row => {
@@ -1207,23 +1364,43 @@
             });
         }
 
+        function matchesState(c) {
+            if (stateFilter === 'all') return true;
+            return (stateFilter === 'active') === isActiveCharacter(c);
+        }
+
         function renderPicker() {
             if (!picker) return;
             const player = filter?.value || '';
-            if (!player) {
-                picker.innerHTML = '<div class="participant-picker-empty">Selecciona un jugador para abrir su carpeta.</div>';
+            const q = normalize(search?.value || '');
+            const pool = characters.filter(c => !player || c.player === player);
+            const active = pool.filter(isActiveCharacter).length;
+            const counts = {active, inactive: pool.length - active, all: pool.length};
+            $$('[data-participant-state]', form).forEach(btn => {
+                const on = btn.dataset.participantState === stateFilter;
+                btn.classList.toggle('active', on);
+                btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+                const b = $('b', btn);
+                if (b) b.textContent = String(counts[btn.dataset.participantState] ?? 0);
+            });
+            const available = pool
+                .filter(matchesState)
+                .filter(c => !q || normalize(`${c.name} ${c.player} ${c.class || ''}`).includes(q));
+            if (!available.length) {
+                picker.innerHTML = `<div class="participant-picker-empty">${pool.length ? 'Ningún personaje coincide con el filtro.' : 'Ese jugador no tiene personajes en los archivos.'}</div>`;
                 return;
             }
-            const available = characters.filter(c => c.player === player);
-            picker.innerHTML = available.length ? available.map(c => {
+            picker.innerHTML = available.map(c => {
                 const chosen = selected.has(c.id);
+                const inactive = !isActiveCharacter(c);
+                const sub = [player ? '' : c.player, c.class || 'Sin clase'].filter(Boolean).join(' · ');
                 return `
-                    <button type="button" class="participant-pick-card ${chosen ? 'chosen' : ''}" data-pick-participant="${esc(c.id)}">
+                    <button type="button" class="participant-pick-card ${chosen ? 'chosen' : ''}${inactive ? ' is-inactive' : ''}" data-pick-participant="${esc(c.id)}" aria-pressed="${chosen ? 'true' : 'false'}">
                         <span class="participant-pick-portrait">${(c.thumb || c.portrait) ? `<img src="${esc(c.thumb || c.portrait)}" alt="" loading="lazy">` : '✦'}</span>
-                        <span><strong>${esc(c.name)}</strong><small>${esc(c.class || 'Sin clase')}</small></span>
+                        <span><strong>${esc(c.name)}</strong><small>${esc(sub)}${inactive ? ` · <em>${esc(c.state || 'Inactivo')}</em>` : ''}</small></span>
                         <b>${chosen ? 'Quitar' : 'Añadir'}</b>
                     </button>`;
-            }).join('') : '<div class="participant-picker-empty">Ese jugador no tiene personajes en los archivos.</div>';
+            }).join('');
         }
 
         function renderSelected() {
@@ -1243,7 +1420,75 @@
                 </div>`).join('') : '<div class="participant-picker-empty">Todavía no has añadido participantes.</div>';
         }
 
-        filter?.addEventListener('change', renderPicker);
+        // ---- Borrador automático ----
+        let draftId = draft?.id || reuseDraftId || 0;
+        let saving = false;
+        let again = false;
+        let timer = null;
+
+        function snapshot() {
+            syncSelectedInputs();
+            const data = Object.fromEntries(new FormData(form).entries());
+            data.participants = [...selected.values()];
+            return data;
+        }
+        function setStatus(text, bad = false) {
+            if (!statusEl) return;
+            statusEl.textContent = text;
+            statusEl.classList.toggle('bad', bad);
+        }
+
+        let lastSaved = '';
+        async function saveDraft() {
+            clearTimeout(timer);
+            timer = null;
+            const data = snapshot();
+            const json = JSON.stringify(data);
+            if (json === lastSaved) { missionFormDirty = false; return; }
+            if (!draftId && !draftHasContent(data)) { missionFormDirty = false; writeLocalDraft(null); return; }
+            writeLocalDraft({draftId, missionId, data, t: Date.now()});
+            if (saving) { again = true; return; }
+            saving = true;
+            setStatus('Guardando borrador…');
+            try {
+                const r = await post({action: 'save_mission_draft', draftId, missionId, data});
+                draftId = r.draft.id;
+                lastSaved = json;
+                missionFormDirty = false;
+                writeLocalDraft(null);
+                upsertDraft(r.draft);
+                setStatus(`Borrador guardado · ${nowTime()}`);
+                if (discardBtn) discardBtn.hidden = false;
+            } catch (_) {
+                setStatus('Sin conexión: el borrador queda en este navegador y se subirá después.', true);
+            } finally {
+                saving = false;
+                if (again) { again = false; saveDraft(); }
+            }
+        }
+        function changed() {
+            missionFormDirty = true;
+            const data = snapshot();
+            if (draftId || draftHasContent(data)) {
+                writeLocalDraft({draftId, missionId, data, t: Date.now()});
+                setStatus('Cambios sin guardar…');
+            }
+            clearTimeout(timer);
+            timer = setTimeout(saveDraft, 1500);
+        }
+
+        filter?.addEventListener('change', () => {
+            try { sessionStorage.setItem('guildParticipantPlayer', filter.value); } catch (_) {}
+            renderPicker();
+        });
+        search?.addEventListener('input', renderPicker);
+        form.addEventListener('click', e => {
+            const btn = e.target.closest('[data-participant-state]');
+            if (!btn) return;
+            stateFilter = btn.dataset.participantState;
+            try { sessionStorage.setItem('guildParticipantState', stateFilter); } catch (_) {}
+            renderPicker();
+        });
         picker?.addEventListener('click', e => {
             const btn = e.target.closest('[data-pick-participant]');
             if (!btn) return;
@@ -1253,6 +1498,7 @@
             else selected.set(id, {id, reward: '', notes: ''});
             renderSelected();
             renderPicker();
+            changed();
         });
         selectedBox?.addEventListener('click', e => {
             const btn = e.target.closest('[data-remove-participant]');
@@ -1261,35 +1507,98 @@
             selected.delete(btn.dataset.removeParticipant);
             renderSelected();
             renderPicker();
+            changed();
+        });
+        // Solo los campos de la misión cuentan como cambios (no los filtros).
+        form.addEventListener('input', e => {
+            if (e.target.closest('.participant-selector')) return;
+            changed();
+        });
+        form.addEventListener('change', e => {
+            if (e.target.closest('.participant-selector')) return;
+            changed();
+        });
+
+        discardBtn?.addEventListener('click', async () => {
+            if (!confirm('¿Descartar este borrador y cerrar? Lo escrito desde la última vez que guardaste la misión se pierde.')) return;
+            clearTimeout(timer);
+            try {
+                if (draftId) await post({action: 'delete_mission_draft', draftId});
+                removeDraft(draftId);
+            } catch (err) { showToast(err.message, true); return; }
+            writeLocalDraft(null);
+            missionFormDirty = false;
+            adminModalBeforeClose = null;
+            closeAdminModal();
+            showToast('Borrador descartado.');
         });
 
         renderSelected();
         renderPicker();
+        lastSaved = JSON.stringify(snapshot());
+        missionFormDirty = false;
+
+        adminModalBeforeClose = () => {
+            const json = JSON.stringify(snapshot());
+            if (json !== lastSaved && (draftId || draftHasContent(JSON.parse(json)))) {
+                saveDraft();
+                showToast('Guardado como borrador. Lo encuentras en «Borradores».');
+            }
+            clearTimeout(timer);
+            missionFormDirty = false;
+        };
 
         form.addEventListener('submit', async e => {
             e.preventDefault();
+            clearTimeout(timer);
             syncSelectedInputs();
             const payload = Object.fromEntries(new FormData(form).entries());
             payload.participants = [...selected.values()];
+            const submit = $('button[type="submit"]', form);
+            if (submit) { submit.disabled = true; submit.textContent = 'Guardando…'; }
             try {
-                await post({action: 'save_mission', id: Number(form.dataset.id || 0), ...payload});
+                const saved = await post({action: 'save_mission', id: Number(form.dataset.id || 0), draftId, ...payload});
+                if (saved.rewardNote) sessionStorage.setItem('guildToast', saved.rewardNote);
+                writeLocalDraft(null);
+                missionFormDirty = false;
+                adminModalBeforeClose = null;
+                sessionStorage.setItem('guildReturnView', 'admin');
                 showToast('Misión guardada.');
                 location.reload();
-            } catch (err) { showToast(err.message, true); }
+            } catch (err) {
+                showToast(err.message, true);
+                if (submit) { submit.disabled = false; submit.textContent = 'Guardar misión'; }
+            }
         });
     }
 
-    $('#newMission')?.addEventListener('click', () => {
-        openAdminModal(missionForm());
-        bindMissionForm();
+    function openMissionEditor(mission = null, draft = null, reuseDraftId = 0) {
+        const base = mission || {id: 0, name: '', date: '', type: '', state: 'Completada', description: '', generalReward: '', participants: []};
+        const model = draft
+            ? {...base, ...draft.data, id: base.id, participants: Array.isArray(draft.data?.participants) ? draft.data.participants : []}
+            : base;
+        openAdminModal(missionForm(model, draft));
+        bindMissionForm(model, draft, reuseDraftId);
+    }
+
+    window.addEventListener('beforeunload', e => {
+        if (!missionFormDirty || !adminModal?.classList.contains('open')) return;
+        e.preventDefault();
+        e.returnValue = '';
     });
+
+    $('#newMission')?.addEventListener('click', () => openMissionEditor());
     $('#adminMissionList')?.addEventListener('click', async e => {
         const edit = e.target.closest('[data-edit-mission]');
         if (edit) {
             const m = missions.find(x => String(x.id) === edit.dataset.editMission);
             if (!m) return;
-            openAdminModal(missionForm(m));
-            bindMissionForm(m);
+            const d = missionDrafts.find(x => Number(x.missionId) === Number(m.id));
+            if (d && confirm(`Tienes un borrador sin guardar de «${m.name}» (${formatDraftDate(d.updated, d.ts)}).\n\nAceptar: continuar el borrador.\nCancelar: abrir la misión tal como está guardada.`)) {
+                openMissionEditor(m, d);
+            } else {
+                openMissionEditor(m, null, d ? d.id : 0);
+            }
             return;
         }
         const del = e.target.closest('[data-delete-mission]');
@@ -1314,6 +1623,21 @@
     renderCharacters();
     renderMissions();
     if (isAdmin) renderAdminLists();
+
+    const pendingToast = sessionStorage.getItem('guildToast');
+    if (pendingToast) {
+        sessionStorage.removeItem('guildToast');
+        showToast(pendingToast, /^No se pudo/.test(pendingToast));
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast?.classList.remove('show'), 9000);
+    }
+
+    // La biblioteca del Archivo de Misiones (biblioteca.js) reutiliza estas piezas.
+    window.GuildArchive = {
+        missions, characters, isAdmin, esc, normalize, formatDate, missionEntry,
+        openCharacter, setModalOpen, switchView,
+        openMissionEditor: isAdmin ? openMissionEditor : null,
+    };
 
     const returnView = sessionStorage.getItem('guildReturnView');
     if (returnView) {

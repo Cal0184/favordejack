@@ -11,6 +11,8 @@ require_once dirname(__DIR__) . '/includes/imagenes.php';
 require_once dirname(__DIR__) . '/includes/migrations.php';
 require_once dirname(__DIR__) . '/includes/ficha-import.php';
 require_once dirname(__DIR__) . '/includes/estado.php';
+require_once dirname(__DIR__) . '/includes/recompensas.php';
+require_once dirname(__DIR__) . '/includes/biblioteca.php';
 require_once dirname(__DIR__) . '/includes/auth-widget.php';
 guild_session_start();
 $csrf = guild_csrf();
@@ -177,9 +179,10 @@ SQL;
     $missionsInstalled = $hasMission && $hasMissionPerson;
 
     if ($missionsInstalled) {
+        favor_recompensas_schema($db);
         $missionRows = [];
         $res = $db->query(
-            'SELECT ID, Nombre, Fecha, Tipo, Estado, Descripcion, RecompensaGeneral, CreadoPor, Creado, Actualizado ' .
+            'SELECT ID, Nombre, Fecha, Tipo, Estado, Descripcion, RecompensaGeneral, RecompensaCantidad, RecompensaMoneda, RecompensaModo, CreadoPor, Creado, Actualizado ' .
             'FROM Mision ORDER BY COALESCE(Fecha, DATE(Creado)) DESC, ID DESC'
         );
         while ($row = $res->fetch_assoc()) {
@@ -192,6 +195,9 @@ SQL;
                 'state' => (string)$row['Estado'],
                 'description' => (string)($row['Descripcion'] ?? ''),
                 'generalReward' => (string)$row['RecompensaGeneral'],
+                'rewardAmount' => $row['RecompensaCantidad'] !== null ? (int)$row['RecompensaCantidad'] : null,
+                'rewardCoin' => (string)$row['RecompensaMoneda'],
+                'rewardMode' => (string)$row['RecompensaModo'],
                 'createdBy' => (string)$row['CreadoPor'],
                 'created' => (string)$row['Creado'],
                 'updated' => (string)$row['Actualizado'],
@@ -225,6 +231,11 @@ SQL;
             }
             $res->free();
         }
+        // Biblioteca: cada misión completada tiene su libro (modelo y orden fijos).
+        $books = favor_biblioteca_sync_seguro($db);
+        foreach ($books as $bookMissionId => $book) {
+            if (isset($missionRows[$bookMissionId])) $missionRows[$bookMissionId]['book'] = $book;
+        }
         $missions = array_values($missionRows);
     }
 
@@ -246,6 +257,7 @@ SQL;
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css<?= favor_v(__DIR__ . '/style.css') ?>">
+    <link rel="stylesheet" href="biblioteca.css<?= favor_v(__DIR__ . '/biblioteca.css') ?>">
 <?php favor_head('Archivos del Gremio · Favor de Jack'); ?>
 </head>
 <body>
@@ -375,15 +387,23 @@ SQL;
         </section>
 
         <section class="view" id="view-missions" data-view-panel="missions" hidden>
-            <div class="mission-ledger parchment">
-                <div class="page-heading compact">
-                    <span class="chapter-mark">V</span>
-                    <div>
-                        <p class="overline">Libro de expediciones</p>
-                        <h2>Registro de Misiones</h2>
-                        <p>Qué misión realizó cada personaje, cuándo ocurrió y qué recompensa recibió.</p>
+            <div class="mission-library" id="missionLibrary">
+                <header class="library-head">
+                    <div class="library-title">
+                        <p class="overline">Biblioteca del gremio</p>
+                        <h2>Archivo de Misiones</h2>
                     </div>
-                </div>
+                    <?php if ($missionsInstalled): ?>
+                        <div class="library-tools">
+                            <div class="library-search" role="search">
+                                <label class="search-box"><span aria-hidden="true">⌕</span><input id="missionSearch" type="search" placeholder="Buscar misión o personaje…" autocomplete="off" aria-label="Buscar misión o personaje" aria-controls="libraryResults"></label>
+                                <div class="library-results" id="libraryResults" role="listbox" aria-label="Misiones encontradas" hidden></div>
+                            </div>
+                            <p class="library-count" id="libraryCount" aria-live="polite"></p>
+                            <button type="button" class="library-mode" id="libraryMode" aria-pressed="false">Ver como lista</button>
+                        </div>
+                    <?php endif; ?>
+                </header>
 
                 <?php if (!$missionsInstalled): ?>
                     <div class="notice-sheet">
@@ -391,11 +411,19 @@ SQL;
                         <p>Importa <code>archivosdelgremio_misiones.sql</code> una sola vez en phpMyAdmin.</p>
                     </div>
                 <?php else: ?>
-                    <div class="mission-toolbar">
-                        <label class="search-box"><span>⌕</span><input id="missionSearch" type="search" placeholder="Buscar misión o personaje…"></label>
+                    <div class="bookcase-stage" id="bookcaseStage"></div>
+                    <nav class="shelf-nav" id="shelfNav" aria-label="Estanterías">
+                        <button type="button" class="shelf-btn shelf-first" id="shelfFirst" aria-label="Primera estantería">« Primera</button>
+                        <button type="button" class="shelf-btn" id="shelfPrev" aria-label="Estantería anterior"><span aria-hidden="true">◀</span> Anterior</button>
+                        <span class="shelf-indicator" id="shelfIndicator" aria-live="polite"></span>
+                        <button type="button" class="shelf-btn" id="shelfNext" aria-label="Estantería siguiente">Siguiente <span aria-hidden="true">▶</span></button>
+                    </nav>
+                    <p class="library-aside" id="libraryAside" hidden></p>
+
+                    <div class="mission-ledger parchment" id="missionListWrap" hidden>
+                        <div id="missionList" class="mission-list"></div>
+                        <div id="missionEmpty" class="empty-state" hidden><span>✒</span><h3>El libro está vacío</h3><p>Aún no hay misiones registradas.</p></div>
                     </div>
-                    <div id="missionList" class="mission-list"></div>
-                    <div id="missionEmpty" class="empty-state" hidden><span>✒</span><h3>El libro está vacío</h3><p>Aún no hay misiones registradas.</p></div>
                 <?php endif; ?>
             </div>
         </section>
@@ -493,6 +521,11 @@ SQL;
                 <div class="admin-panel" data-admin-content="missions" hidden>
                     <?php if ($missionsInstalled): ?>
                         <div class="admin-actions-row"><button class="ink-button" type="button" id="newMission">+ Nueva misión</button></div>
+                        <section class="mission-drafts" id="missionDrafts" hidden aria-labelledby="missionDraftsTitle">
+                            <h3 id="missionDraftsTitle">Borradores <span id="missionDraftsCount">0</span></h3>
+                            <p>Misiones a medio escribir. Se guardan solas mientras escribes; continúa cuando quieras.</p>
+                            <div class="mission-drafts-list" id="missionDraftsList"></div>
+                        </section>
                         <div class="admin-list" id="adminMissionList"></div>
                     <?php else: ?>
                         <div class="notice-sheet"><strong>Primero importa el SQL de misiones.</strong></div>
@@ -520,6 +553,16 @@ SQL;
     </article>
 </div>
 
+<div class="book-card" id="bookCard" role="tooltip" hidden></div>
+
+<div class="modal book-modal" id="bookModal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-book></div>
+    <article class="book-modal-card" role="dialog" aria-modal="true" aria-labelledby="bookModalTitle">
+        <button class="modal-close" type="button" data-close-book aria-label="Cerrar">×</button>
+        <div id="bookModalContent"></div>
+    </article>
+</div>
+
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
@@ -533,8 +576,10 @@ window.GUILD_STATE = <?= json_encode([
     'user' => $sessionUser,
     'csrf' => $csrf,
     'api' => 'api.php',
+    'libraryCapacity' => FAVOR_BIBLIOTECA_CAPACIDAD,
 ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
 </script>
 <script src="app.js<?= favor_v(__DIR__ . '/app.js') ?>"></script>
+<script src="biblioteca.js<?= favor_v(__DIR__ . '/biblioteca.js') ?>"></script>
 </body>
 </html>

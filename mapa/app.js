@@ -18,7 +18,9 @@ const narrow=window.matchMedia?.('(max-width: 820px)');
 const board=viewport.closest('.map-board');
 // En pantallas estrechas el plano nunca es más angosto que la pantalla (sin franjas grises).
 const isCompact=()=>narrow?.matches??false;
-const minZoom=()=>isCompact()?1:.72;
+// En el ordenador se puede alejar hasta ver el plano entero de arriba abajo.
+const fitHeightZoom=()=>{const w=baseWidth||1,ratio=(image.naturalHeight||1722)/(image.naturalWidth||913);return viewport.clientHeight/(w*ratio)};
+const minZoom=()=>isCompact()?1:clamp(Math.min(.72,fitHeightZoom()),.3,.72);
 const maxZoom=()=>isCompact()?3:2.2;
 
 const clamp=(v,min,max)=>Math.min(max,Math.max(min,v));
@@ -91,7 +93,8 @@ function openMarker(m){
 }
 function setActive(id){
  activeShop=id;
- directory.forEach(b=>b.classList.toggle('active',b.dataset.focusShop===id));
+ markers.forEach(m=>m.classList.toggle('is-active',m.dataset.shopId===id));
+ directory.forEach(b=>{const on=b.dataset.focusShop===id;b.classList.toggle('active',on);b.closest('.dir-item')?.classList.toggle('active',on);if(on)b.setAttribute('aria-current','true');else b.removeAttribute('aria-current')});
  const s=shopById(id);
  if(s&&status){
    const names=(s.sellers||[]).map(x=>x.name).filter(Boolean).join(' · ');
@@ -127,7 +130,8 @@ document.querySelectorAll('[data-zoom]').forEach(btn=>btn.addEventListener('clic
 }));
 
 directory.forEach(btn=>btn.addEventListener('click',()=>{
- // En móvil la lista va debajo del plano: subir hasta el plano antes de mostrar la tienda.
+ // En móvil la lista se pliega al elegir una tienda, para dejar el plano a la vista.
+ if(isCompact())setDirectoryOpen(false);
  if(isCompact()&&!isFit()&&board){
    const r=board.getBoundingClientRect();
    if(r.top<0||r.top>innerHeight*.35)board.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
@@ -150,6 +154,34 @@ markers.forEach(marker=>{
 });
 document.addEventListener('pointerdown',e=>{
  if(coarse&&!e.target.closest('.shop-marker'))markers.forEach(m=>m.classList.remove('touch-open'));
+});
+
+// -------- Directorio: buscador y panel desplegable (móvil) --------
+const dirPanel=document.getElementById('directory');
+const dirToggle=document.getElementById('directoryToggle');
+const search=document.getElementById('shopSearch');
+const searchEmpty=document.getElementById('searchEmpty');
+const fold=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+function setDirectoryOpen(open){
+ if(!dirPanel||!dirToggle)return;
+ dirPanel.classList.toggle('open',open);dirToggle.setAttribute('aria-expanded',open?'true':'false');
+}
+dirToggle?.addEventListener('click',()=>setDirectoryOpen(!dirPanel.classList.contains('open')));
+function filterShops(){
+ const q=fold(search?.value).trim(),words=q.split(/\s+/).filter(Boolean);let shown=0;
+ document.querySelectorAll('.dir-item').forEach(li=>{
+   const text=fold(li.dataset.search);
+   const hit=words.every(w=>text.includes(w));
+   li.hidden=!hit;if(hit)shown++;
+ });
+ if(searchEmpty)searchEmpty.hidden=shown>0;
+}
+search?.addEventListener('input',filterShops);
+search?.addEventListener('keydown',e=>{
+ if(e.key!=='Enter')return;
+ e.preventDefault();
+ const first=document.querySelector('.dir-item:not([hidden]) [data-focus-shop]');
+ if(first)first.click();
 });
 
 // -------- Edit mode --------
@@ -195,6 +227,23 @@ if(editMode&&panel&&editorShop&&readout&&jsonOut){
    m.classList.add('touch-open');
  });
 }
+
+// Arrastrar el plano con el ratón (en el ordenador).
+let drag=null,dragMoved=false;
+viewport.addEventListener('pointerdown',e=>{
+ if(e.pointerType!=='mouse'||e.button!==0||e.target.closest('.shop-marker'))return;
+ drag={x:e.clientX,y:e.clientY,l:viewport.scrollLeft,t:viewport.scrollTop};dragMoved=false;
+});
+addEventListener('pointermove',e=>{
+ if(!drag)return;
+ const dx=e.clientX-drag.x,dy=e.clientY-drag.y;
+ if(!dragMoved&&Math.hypot(dx,dy)<5)return;
+ dragMoved=true;viewport.classList.add('dragging');
+ viewport.scrollLeft=drag.l-dx;viewport.scrollTop=drag.t-dy;
+});
+addEventListener('pointerup',()=>{drag=null;viewport.classList.remove('dragging')});
+// Tras arrastrar, el clic de soltar no cuenta (p. ej. en el editor de posiciones).
+viewport.addEventListener('click',e=>{if(dragMoved){e.stopPropagation();e.preventDefault();dragMoved=false}},true);
 
 // Pellizcar con dos dedos acerca o aleja solo el plano, no toda la página.
 let pinch=null;
