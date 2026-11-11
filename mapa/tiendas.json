@@ -114,14 +114,19 @@
   {
     "id": "tienda-del-gremio",
     "name": "Tienda del Gremio",
-    "category": "Suministros del gremio",
-    "description": "",
-    "url": "",
+    "category": "Gremio · Objetos mágicos · Compraventa",
+    "description": "Lady Gena vende los objetos mágicos del gremio y compra los que traen los aventureros.",
+    "url": "tiendas/gremio/",
     "x": 35.0,
     "y": 63.0,
-    "enabled": false,
+    "enabled": true,
     "marker": "G",
-    "theme": "default",
-    "sellers": []
+    "theme": "guild",
+    "sellers": [
+      {
+        "name": "Lady Gena",
+        "image": "../media/shops/gremio/lady-gena-260.webp"
+      }
+    ]
   }
 ]

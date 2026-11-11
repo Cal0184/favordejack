@@ -54,6 +54,33 @@ function markerClass(array $shop): string {
     if (!empty($shop['theme'])) $classes[] = 'theme-' . preg_replace('/[^a-z0-9_-]/i', '', (string)$shop['theme']);
     return implode(' ', $classes);
 }
+
+/**
+ * Icono medieval de cada comercio. Se puede fijar con «icon» en tiendas.json
+ * (swords, tome, anvil, potion, wand, guild); si no, sale del tema de la tienda.
+ */
+function shopIcon(array $shop): string {
+    $icons = ['swords', 'tome', 'anvil', 'potion', 'wand', 'guild'];
+    $icon = (string)($shop['icon'] ?? '');
+    if (in_array($icon, $icons, true)) return $icon;
+    $byTheme = ['blood' => 'swords', 'emporium' => 'tome', 'forge' => 'anvil', 'potion' => 'potion', 'blackmarket' => 'wand'];
+    return $byTheme[(string)($shop['theme'] ?? '')] ?? 'guild';
+}
+
+function iconSvg(array $shop, string $class = 'ico'): string {
+    return '<svg class="' . h($class) . '" aria-hidden="true" focusable="false"><use href="#ico-' . shopIcon($shop) . '"/></svg>';
+}
+
+function sellerNames(array $shop): array {
+    $names = [];
+    foreach (($shop['sellers'] ?? []) as $seller) {
+        if (is_array($seller) && !empty($seller['name'])) $names[] = (string)$seller['name'];
+    }
+    return $names;
+}
+
+$isAdmin = (($GLOBALS['__favor_auth_widget_user'] ?? null)['role'] ?? '') === 'admin';
+$roll20 = 'https://app.roll20.net/campaigns/details/20586133/-';
 ?>
 <!doctype html>
 <html lang="es">
@@ -66,86 +93,84 @@ function markerClass(array $shop): string {
 <link rel="stylesheet" href="style.css<?= favor_v(__DIR__ . '/style.css') ?>">
 <?php favor_head('Mapa comercial de Waterdeep · Favor de Jack', 'Las tiendas de Waterdeep para los aventureros del Favor de Jack.'); ?>
 </head>
-<body>
+<body class="map-page">
 <?php favor_site_bar(); ?>
-<header class="map-header">
-    <span class="home-link" aria-hidden="true"></span>
-
-    <div class="map-title">
-        <span class="title-ornament">✦</span>
-        <div><small>Directorio comercial del gremio</small><h1>Waterdeep</h1></div>
-        <span class="title-ornament mirror">✦</span>
-    </div>
-
-    <div class="header-actions">
-        <?php if ((($GLOBALS['__favor_auth_widget_user'] ?? null)['role'] ?? '') === 'admin'): ?><a class="roll20-link" href="<?= favor_base_path() ?>tiendas/descuentos.php">✦ Descuentos</a><?php endif; ?>
-        <a class="roll20-link" href="https://app.roll20.net/campaigns/details/20586133/-" target="_blank" rel="noopener noreferrer">⚔ Abrir Roll20</a>
-        <div class="header-count"><strong><?= count($shops) ?>/<?= count($allShops) ?></strong><span>tiendas digitalizadas</span></div>
-    </div>
-</header>
+<svg class="icon-sprite" aria-hidden="true" focusable="false">
+    <symbol id="ico-swords" viewBox="0 0 24 24"><path d="M4 4l10.5 10.5M20 4L9.5 14.5M4 4v3l9 9M20 4v3l-9 9M7 13l4 4M17 13l-4 4M5.5 18.5l2-2M18.5 18.5l-2-2M4 20l2-2M20 20l-2-2"/></symbol>
+    <symbol id="ico-tome" viewBox="0 0 24 24"><path d="M5 4.5h11.5a2 2 0 0 1 2 2V20H7a2 2 0 0 1-2-2zM5 18a2 2 0 0 1 2-2h11.5"/><path d="M12 6.8l.9 2.1 2.2.2-1.7 1.4.6 2.2-2-1.2-2 1.2.6-2.2-1.7-1.4 2.2-.2z"/></symbol>
+    <symbol id="ico-anvil" viewBox="0 0 24 24"><path d="M3 8h13.5c0 2.6 2 3.6 4.5 3.6V13c-3 0-4.6 1.4-5 3H8c-.6-2-2.2-3-4.2-3.6zM9 16l-1.5 4h9L15 16M6 8V5.5M6 5.5h3"/></symbol>
+    <symbol id="ico-potion" viewBox="0 0 24 24"><path d="M9.5 3h5M10.5 3v5.2L6 15.4A3.8 3.8 0 0 0 9.3 21h5.4a3.8 3.8 0 0 0 3.3-5.6l-4.5-7.2V3M7.6 14h8.8"/></symbol>
+    <symbol id="ico-wand" viewBox="0 0 24 24"><path d="M4 20L15 9M13.5 7.5l3 3M18 2.5v3M16.5 4h3M20.5 8v2.4M19.3 9.2h2.4M11 3.5v2M10 4.5h2"/></symbol>
+    <symbol id="ico-guild" viewBox="0 0 24 24"><path d="M12 3l7.5 2.6v5.6c0 4.6-3.2 8-7.5 9.8-4.3-1.8-7.5-5.2-7.5-9.8V5.6zM12 7.5v9M8.5 11h7"/></symbol>
+    <symbol id="ico-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5 5"/></symbol>
+</svg>
 
 <main class="map-shell">
+    <header class="map-header">
+        <div class="map-title">
+            <h1>Waterdeep</h1>
+            <p>Mapa comercial del gremio</p>
+        </div>
+        <div class="header-actions">
+            <span class="header-count"><b><?= count($shops) ?></b> de <?= count($allShops) ?> tiendas abiertas</span>
+            <?php if ($isAdmin): ?><a class="head-link" href="<?= favor_base_path() ?>tiendas/descuentos.php">Descuentos</a><?php endif; ?>
+            <a class="head-link" href="<?= h($roll20) ?>" target="_blank" rel="noopener noreferrer" title="Sede del Gremio: abrir la campaña en Roll20">Roll20 <span aria-hidden="true">↗</span></a>
+        </div>
+    </header>
+
     <?php if ($dataError): ?>
         <div class="map-error" role="alert"><?= h($dataError) ?></div>
     <?php endif; ?>
 
-    <section class="map-intro">
-        <div>
-            <p class="overline">Waterdeep · comercio disponible</p>
-            <h2>¿A dónde vamos?</h2>
-            <p>Los sellos del mapa son las tiendas que ya tienen página. Pasa el cursor o toca un sello para ver su ficha; haz clic o tócalo otra vez para entrar.</p>
-        </div>
-        <div class="intro-side">
-            <div class="intro-stats">
-                <span><b><?= count($shops) ?></b> abiertas</span>
-                <span><b><?= $pendingCount ?></b> pendientes</span>
-            </div>
-            <a class="intro-roll20" href="https://app.roll20.net/campaigns/details/20586133/-" target="_blank" rel="noopener noreferrer"><b>⚔ Sede del Gremio</b><small>Abrir campaña en Roll20 ↗</small></a>
-        </div>
-    </section>
-
     <div class="map-layout">
-        <aside class="directory">
+        <aside class="directory" id="directory" aria-label="Directorio de tiendas">
             <div class="directory-head">
-                <span>DIRECTORIO</span>
-                <strong>Tiendas disponibles</strong>
-            </div>
-
-            <div class="directory-list">
-                <?php foreach ($shops as $shop): ?>
-                <button class="directory-shop" type="button" data-focus-shop="<?= h((string)$shop['id']) ?>">
-                    <span class="dir-icon theme-<?= h((string)($shop['theme'] ?? 'default')) ?>"><?= h((string)($shop['marker'] ?? '•')) ?></span>
-                    <span class="dir-copy">
-                        <strong><?= h((string)$shop['name']) ?></strong>
-                        <small><?= h((string)$shop['category']) ?></small>
-                        <?php
-                        $sellerNames = [];
-                        foreach (($shop['sellers'] ?? []) as $seller) {
-                            if (!empty($seller['name'])) $sellerNames[] = (string)$seller['name'];
-                        }
-                        ?>
-                        <?php if ($sellerNames): ?><em><?= h(implode(' · ', $sellerNames)) ?></em><?php endif; ?>
-                    </span>
-                    <span class="dir-arrow">›</span>
+                <h2>Tiendas disponibles</h2>
+                <button class="directory-toggle" type="button" id="directoryToggle" aria-expanded="false" aria-controls="directoryBody">
+                    <span class="toggle-open">Ver lista</span><span class="toggle-close">Ocultar</span>
+                    <b><?= count($shops) ?></b>
                 </button>
-                <?php endforeach; ?>
             </div>
 
-            <div class="directory-note">
-                <span>⌖</span>
-                <p>En el móvil: un toque abre la ficha y el segundo entra. Pellizca con dos dedos para acercar el plano.</p>
+            <div class="directory-body" id="directoryBody">
+                <label class="directory-search">
+                    <svg class="ico" aria-hidden="true" focusable="false"><use href="#ico-search"/></svg>
+                    <span class="sr-only">Buscar tienda</span>
+                    <input type="search" id="shopSearch" placeholder="Buscar tienda o servicio" autocomplete="off" enterkeyhint="search">
+                </label>
+
+                <ul class="directory-list">
+                    <?php foreach ($shops as $shop): ?>
+                    <?php
+                    $names = sellerNames($shop);
+                    $searchText = implode(' ', [(string)$shop['name'], (string)($shop['category'] ?? ''), (string)($shop['description'] ?? ''), implode(' ', $names)]);
+                    ?>
+                    <li class="dir-item theme-<?= h((string)($shop['theme'] ?? 'default')) ?>" data-search="<?= h($searchText) ?>">
+                        <button class="directory-shop" type="button" data-focus-shop="<?= h((string)$shop['id']) ?>"<?= $names ? ' title="' . h(implode(' · ', $names)) . '"' : '' ?>>
+                            <span class="dir-icon"><?= iconSvg($shop) ?></span>
+                            <span class="dir-copy">
+                                <strong><?= h((string)$shop['name']) ?></strong>
+                                <small><?= h((string)$shop['category']) ?></small>
+                            </span>
+                        </button>
+                        <a class="dir-enter" href="<?= h(shopUrl((string)$shop['url'])) ?>" aria-label="<?= h('Entrar a ' . (string)$shop['name']) ?>">Entrar <span aria-hidden="true">→</span></a>
+                    </li>
+                    <?php endforeach; ?>
+                </ul>
+                <p class="directory-empty" id="searchEmpty" hidden>Ninguna tienda coincide con la búsqueda.</p>
+
+                <p class="directory-note">
+                    <i class="hint-mouse">Pasa el cursor sobre un sello para ver su ficha y haz clic para entrar. Arrastra el plano para moverte.</i><i class="hint-touch">Toca un sello para ver su ficha y tócalo otra vez para entrar. Pellizca o toca dos veces para acercar.</i><?php if ($pendingCount > 0): ?>
+                    <span><?= $pendingCount ?> <?= $pendingCount === 1 ? 'tienda más está' : 'tiendas más están' ?> en camino.</span><?php endif; ?>
+                </p>
             </div>
         </aside>
 
-        <section class="map-board">
-            <div class="map-toolbar">
-                <div class="map-caption">
-                    <span class="map-seal">W</span>
-                    <span><strong>Plano comercial</strong><small>Sellos activos del Favor de Jack</small></span>
-                </div>
-                <div class="zoom-controls">
+        <section class="map-board" aria-label="Mapa de Waterdeep">
+            <div class="map-tools">
+                <div class="zoom-controls" role="group" aria-label="Zoom del mapa">
                     <button type="button" data-zoom="out" aria-label="Alejar">−</button>
-                    <button type="button" data-zoom="reset" class="zoom-reset">100%</button>
+                    <button type="button" data-zoom="reset" class="zoom-reset" aria-label="Volver al zoom normal">100%</button>
                     <button type="button" data-zoom="in" aria-label="Acercar">+</button>
                 </div>
             </div>
@@ -165,9 +190,7 @@ function markerClass(array $shop): string {
                         style="--x:<?= h((string)$shop['x']) ?>%;--y:<?= h((string)$shop['y']) ?>%;"
                         aria-label="<?= h('Entrar a ' . (string)$shop['name']) ?>"
                     >
-                        <span class="shop-pin">
-                            <span class="pin-label"><?= h((string)($shop['marker'] ?? '•')) ?></span>
-                        </span>
+                        <span class="shop-pin"><?= iconSvg($shop, 'ico pin-icon') ?></span>
 
                         <span class="shop-card">
                             <span class="card-ribbon"><?= h((string)$shop['category']) ?></span>
@@ -179,7 +202,7 @@ function markerClass(array $shop): string {
                                     <span class="seller-portrait">
                                         <span class="portrait-placeholder"><?= h(firstChar((string)($seller['name'] ?? '?'))) ?></span>
                                         <?php if (!empty($seller['image'])): ?>
-                                            <img src="<?= h((string)$seller['image']) ?>" alt="" onerror="<?php if (!empty($seller['fallback'])): ?>this.onerror=null;this.src='<?= h((string)$seller['fallback']) ?>'<?php else: ?>this.remove()<?php endif; ?>">
+                                            <img src="<?= h((string)$seller['image']) ?>" alt="" loading="lazy" onerror="<?php if (!empty($seller['fallback'])): ?>this.onerror=null;this.src='<?= h((string)$seller['fallback']) ?>'<?php else: ?>this.remove()<?php endif; ?>">
                                         <?php endif; ?>
                                     </span>
                                     <b><?= h((string)($seller['name'] ?? '')) ?></b>
@@ -193,16 +216,15 @@ function markerClass(array $shop): string {
                                 <span><?= h((string)$shop['description']) ?></span>
                             </span>
 
-                            <span class="shop-enter">Entrar <b>→</b></span>
+                            <span class="shop-enter">Entrar a la tienda <b aria-hidden="true">→</b></span>
                         </span>
                     </a>
                     <?php endforeach; ?>
                 </div>
             </div>
 
-            <div class="map-status">
+            <div class="map-status" aria-live="polite">
                 <span id="mapStatus">Pasa sobre un sello comercial.</span>
-                <span class="map-scale"><i></i><i></i><i></i><i></i></span>
             </div>
         </section>
     </div>
