@@ -1632,6 +1632,13 @@
         toastTimer = setTimeout(() => toast?.classList.remove('show'), 9000);
     }
 
+    // La biblioteca del Archivo de Misiones (biblioteca.js) reutiliza estas piezas.
+    window.GuildArchive = {
+        missions, characters, isAdmin, esc, normalize, formatDate, missionEntry,
+        openCharacter, setModalOpen, switchView,
+        openMissionEditor: isAdmin ? openMissionEditor : null,
+    };
+
     const returnView = sessionStorage.getItem('guildReturnView');
     if (returnView) {
         sessionStorage.removeItem('guildReturnView');

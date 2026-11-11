@@ -7,6 +7,7 @@ header('Cache-Control: no-store');
 require_once dirname(__DIR__) . '/includes/auth.php';
 require_once dirname(__DIR__) . '/includes/migrations.php';
 require_once dirname(__DIR__) . '/includes/tablon.php';
+require_once dirname(__DIR__) . '/includes/biblioteca.php';
 // Los avisos de Discord llegan con el Panel del DM; sin él, el tablón funciona igual.
 if (is_file(dirname(__DIR__) . '/includes/discord.php')) require_once dirname(__DIR__) . '/includes/discord.php';
 
@@ -220,6 +221,8 @@ try {
         if ($state === 'Completada' && $m['Estado'] !== 'Completada') {
             $payNote = favor_recompensa_pagar_seguro($db, $id, (string)($admin['displayName'] ?? $admin['username']));
         }
+        // Biblioteca del Archivo de Misiones: la misión completada recibe su libro.
+        if ($state === 'Completada') favor_biblioteca_sync_seguro($db);
         tablon_respond(true, ['message' => trim(($state === 'En curso' ? 'La misión vuelve a estar en curso.' : 'Misión marcada como ' . mb_strtolower($state, 'UTF-8') . '.') . ' ' . $payNote), 'rewardNote' => $payNote]);
     }
 

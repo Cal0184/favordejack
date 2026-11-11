@@ -76,6 +76,18 @@ CREATE TABLE IF NOT EXISTS `MisionPersonaje` (
   CONSTRAINT `fk_misionpersonaje_personaje` FOREIGN KEY (`PersonajeID`) REFERENCES `Personaje` (`ID`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Biblioteca del Archivo de Misiones: un libro por misión completada (modelo y orden fijos).
+-- La web la crea sola (includes/biblioteca.php); aquí solo como referencia.
+CREATE TABLE IF NOT EXISTS `MisionLibro` (
+  `MisionID` int(10) unsigned NOT NULL,
+  `Modelo` tinyint unsigned NOT NULL,
+  `Orden` int unsigned NOT NULL,
+  `Creado` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`MisionID`),
+  UNIQUE KEY `uq_misionlibro_orden` (`Orden`),
+  CONSTRAINT `fk_misionlibro_mision` FOREIGN KEY (`MisionID`) REFERENCES `Mision` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `Movimiento` (
   `ID` varchar(100) NOT NULL,
   `Personaje` varchar(100) NOT NULL,

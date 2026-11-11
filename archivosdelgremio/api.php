@@ -11,6 +11,7 @@ require_once dirname(__DIR__) . '/includes/migrations.php';
 require_once dirname(__DIR__) . '/includes/discord.php';
 require_once dirname(__DIR__) . '/includes/estado.php';
 require_once dirname(__DIR__) . '/includes/recompensas.php';
+require_once dirname(__DIR__) . '/includes/biblioteca.php';
 guild_session_start();
 
 function respond(bool $ok, array $data = [], int $status = 200): never
@@ -556,6 +557,12 @@ try {
             } finally {
                 $db->close();
             }
+        }
+
+        // Biblioteca: si la misión quedó completada recibe su libro ahora mismo.
+        if ($state === 'Completada') {
+            $db = db();
+            try { favor_biblioteca_sync_seguro($db); } finally { $db->close(); }
         }
 
         respond(true, ['message' => trim('Misión guardada. ' . $payNote), 'id' => $missionId, 'rewardNote' => $payNote]);
