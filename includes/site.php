@@ -22,6 +22,7 @@ function favor_nav_items(): array
         'banca' => ['Banca', 'bancadigital/', 'coins'],
         'archivos' => ['Archivos', 'archivosdelgremio/', 'folder'],
         'inventario' => ['Inventario', 'inventario/', 'bag'],
+        'armeria' => ['Armas y Armaduras', 'armeria/', 'swords'],
         'misiones' => ['Misiones', 'tablon/', 'board'],
         'dados' => ['Dados', 'rolldice/', 'die'],
         'mapa' => ['Mapa y tiendas', 'mapa/', 'map'],
@@ -60,6 +61,7 @@ function favor_page_context(): array
         'archivosdelgremio/relaciones.php' => ['archivos', $files, 'gremio'],
         'archivosdelgremio/importar-ficha.php' => ['archivos', $files, 'gremio'],
         'inventario/index.php' => ['inventario', $hub, 'bosque'],
+        'armeria/index.php' => ['armeria', $hub, 'gremio'],
         'rolldice/index.php' => ['dados', $hub, 'gremio'],
         'tablon/index.php' => ['misiones', $hub, 'gremio'],
         'mapa/index.php' => ['mapa', $hub, 'gremio'],
@@ -152,6 +154,7 @@ function favor_nav_icon(string $name): string
         'hourglass' => '<path d="M6 3h12M6 21h12M7 3c0 5 3 7 5 9-2 2-5 4-5 9M17 3c0 5-3 7-5 9 2 2 5 4 5 9"/>',
         'board' => '<rect x="3" y="4" width="18" height="16" rx="1"/><path d="M7 8h5v6H7zM14 9h4v8h-4z"/>',
         'more' => '<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>',
+        'swords' => '<path d="M5 4l11 11M4 5l1-1M15 13l2 2-2 2-2-2M17 15l3 3M18 21l3-3"/><path d="M19 4 8 15M20 5l-1-1M9 13l-2 2 2 2 2-2M7 15l-3 3M6 21l-3-3"/>',
         'user' => '<circle cx="12" cy="8" r="4"/><path d="M4 21c1-5 4-7 8-7s7 2 8 7"/>',
         'back' => '<path d="M15 5 8 12l7 7"/>',
     ];
