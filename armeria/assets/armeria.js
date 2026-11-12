@@ -48,22 +48,37 @@
     const st = {
         q: '', cat: 'todo', dano: new Set(), props: new Set(), coste: '', costeMax: '', uso: '', comp: '',
         ataque: '', req: '', regla: '', sigilo: false, inactivos: false, avisos: false,
-        orden: 'doc', porPagina: 50, pagina: 1, sel: null, vista: 'catalogo', qProp: '', qRegla: '', secReglas: '',
+        orden: 'nombre', porPagina: 10, pagina: 1, sel: null, vista: 'catalogo', qProp: '', qRegla: '', secReglas: '',
     };
 
     const GRUPOS = [
-        { id: 'todo', nombre: 'Todas', test: () => true },
-        { id: 'armas', nombre: 'Todas las armas', test: o => o.tipo === 'arma' },
-        { id: 'cat:simple', nombre: 'Armas simples', sub: true },
-        { id: 'cat:simple-distancia', nombre: 'Armas simples a distancia', sub: true },
-        { id: 'cat:marcial', nombre: 'Armas marciales', sub: true },
-        { id: 'cat:marcial-distancia', nombre: 'Armas marciales a distancia', sub: true },
-        { id: 'armaduras', nombre: 'Todas las armaduras', test: o => o.tipo === 'armadura' },
-        { id: 'cat:armadura-ligera', nombre: 'Armaduras ligeras', sub: true },
-        { id: 'cat:armadura-media', nombre: 'Armaduras medias', sub: true },
-        { id: 'cat:armadura-pesada', nombre: 'Armaduras pesadas', sub: true },
-        { id: 'cat:escudo', nombre: 'Escudos' },
+        { id: 'todo', nombre: 'Todas', ico: 'todas', test: () => true },
+        { id: 'cat:simple', nombre: 'Armas simples', ico: 'simple' },
+        { id: 'cat:simple-distancia', nombre: 'Armas simples a distancia', ico: 'distancia' },
+        { id: 'cat:marcial', nombre: 'Armas marciales', ico: 'marcial' },
+        { id: 'cat:marcial-distancia', nombre: 'Armas marciales a distancia', ico: 'arco' },
+        { id: 'cat:armadura-ligera', nombre: 'Armaduras ligeras', ico: 'armadura' },
+        { id: 'cat:armadura-media', nombre: 'Armaduras medias', ico: 'armadura' },
+        { id: 'cat:armadura-pesada', nombre: 'Armaduras pesadas', ico: 'armadura' },
+        { id: 'cat:escudo', nombre: 'Escudos', ico: 'escudo' },
+        // Grupos que se pueden pedir por URL (?cat=armas) aunque no tengan botón.
+        { id: 'armas', nombre: 'Todas las armas', oculto: true, test: o => o.tipo === 'arma' },
+        { id: 'armaduras', nombre: 'Todas las armaduras', oculto: true, test: o => o.tipo === 'armadura' },
     ];
+    const ICO_CAT = {
+        todas: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="4" y="4" width="6.5" height="6.5" rx="1"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1"/></svg>',
+        simple: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M5 5l11 11M4 6l2-2M15 13l3 3-2 2-3-3M17 17l3 3"/></svg>',
+        marcial: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4l10 10M3 5l2-2M13 12l3 3-2 2-3-3M15 16l4 4"/><path d="M20 4 10 14M21 5l-2-2M11 12l-3 3 2 2 3-3M9 16l-4 4"/></svg>',
+        distancia: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20 18 6M14 5h5v5M4 20l1-4M4 20l4-1"/></svg>',
+        arco: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3c8 2 13 7 15 15"/><path d="M6 3 3 21l18-3"/><path d="M7 17 17 7M14 7h3v3"/></svg>',
+        armadura: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3h8l4 3-2 5v9H6v-9L4 6z"/><path d="M8 3c0 2 2 3 4 3s4-1 4-3M12 6v14"/></svg>',
+        escudo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="M12 3v18M4.5 11h15"/></svg>',
+    };
+    const PILL = {
+        'simple': ['Simple', 'simple'], 'simple-distancia': ['A distancia', 'dist'], 'marcial': ['Marcial', 'marcial'], 'marcial-distancia': ['Marcial a dist.', 'dist'],
+        'armadura-ligera': ['Ligera', 'arm'], 'armadura-media': ['Media', 'arm'], 'armadura-pesada': ['Pesada', 'arm'], 'escudo': ['Escudo', 'esc'],
+    };
+    const pill = (o, cls = '') => { const [t, k] = PILL[o.categoria] || [catByClave[o.categoria]?.nombre || '', 'arm']; return `<span class="arm-pill p-${k}${cls}" title="${esc(catByClave[o.categoria]?.nombre || '')}">${esc(t)}</span>`; };
     // El filtro de atributo no tiene sentido mirando solo armaduras o escudos.
     const sinAtaque = () => st.cat === 'armaduras' || st.cat.startsWith('cat:armadura') || st.cat === 'cat:escudo';
     const ATRIB = { 'FUE': 'Fuerza', 'DES': 'Destreza', 'FUE/DES': 'Fuerza o Destreza', 'MODOS': 'Según el modo', 'REVISAR': 'Por revisar' };
@@ -188,15 +203,16 @@
     // ------------------------------------------------------------- render
     function renderCats() {
         const base = filtrar('cat');
-        const html = GRUPOS.map(g => {
+        const visibles = GRUPOS.filter(g => !g.oculto);
+        const html = visibles.map(g => {
             const n = base.filter(grupoTest(g.id)).length;
-            return `<button type="button" class="arm-cat${g.sub ? ' sub' : ''}" data-cat="${g.id}" aria-pressed="${st.cat === g.id}"><span>${esc(g.nombre)}</span><b>${n}</b></button>`;
+            return `<button type="button" class="arm-cat" data-cat="${g.id}" aria-pressed="${st.cat === g.id}"><i>${ICO_CAT[g.ico] || ''}</i><span>${esc(g.nombre)}</span><b>${n}</b></button>`;
         }).join('');
         $('#armCats').innerHTML = html;
-        $('#armCatsStrip').innerHTML = GRUPOS.map(g => `<button type="button" role="tab" data-cat="${g.id}" aria-selected="${st.cat === g.id}">${esc(g.nombre)}</button>`).join('');
+        $('#armCatsStrip').innerHTML = visibles.map(g => `<button type="button" role="tab" data-cat="${g.id}" aria-selected="${st.cat === g.id}">${esc(g.nombre)}</button>`).join('');
     }
 
-    const abiertos = new Set(['dano', 'ataque', 'props']);
+    const abiertos = new Set();
     function renderFiltros() {
         const tipos = [...new Set(cat.objetos.flatMap(o => o.tiposDano || []))].sort((a, b) => a.localeCompare(b, 'es'));
         const usadas = {};
@@ -240,27 +256,23 @@
         const page = st.porPagina ? visibles.slice(desde, desde + pp) : visibles;
         $('#armFilas').innerHTML = page.map(o => `
             <tr data-id="${o.id}" tabindex="0" aria-selected="${o.id === st.sel}"${o.activo === false ? ' class="inactivo"' : ''}>
-                <td class="arm-c-nombre"><div class="arm-c-in"><span class="arm-ico">${iconoDe(o)}</span><span class="arm-nombre">${esc(o.nombre)}${o.reglaId ? MARCA_REGLA : ''}${o.notas ? '<span class="arm-aviso" title="Tiene advertencias del documento">!</span>' : ''}</span>${badgeDe(o)}<span class="arm-c-catm">${esc(TIPO_CORTO[o.categoria] || '')}</span></div></td>
-                <td class="arm-col-cat" title="${esc(catByClave[o.categoria]?.nombre || '')}">${esc(TIPO_CORTO[o.categoria] || catByClave[o.categoria]?.nombre || '')}</td>
+                <td class="arm-c-nombre"><div class="arm-c-in"><span class="arm-ico">${iconoDe(o)}</span><span class="arm-nombre">${esc(o.nombre)}${o.reglaId ? MARCA_REGLA : ''}${o.notas ? '<span class="arm-aviso" title="Tiene advertencias del documento">!</span>' : ''}</span><span class="arm-c-catm">${pill(o)}${badgeDe(o)}</span></div></td>
+                <td class="arm-col-cat"><span class="arm-tipo">${pill(o)}${badgeDe(o)}</span></td>
                 <td class="arm-col-num arm-c-valor">${esc(valorTexto(o))}</td>
                 <td class="arm-col-num arm-c-coste">${esc(o.coste || '—')}</td>
+                <td class="arm-col-chev" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 10 5 5 5-5"/></svg></td>
             </tr>`).join('');
         $('#armVacio').hidden = total > 0;
         $('#armCount').innerHTML = total === 0 ? 'Sin resultados'
             : `<strong>${total}</strong> ${total === 1 ? 'objeto' : 'objetos'}${st.porPagina && paginas > 1 ? ` · ${desde + 1}–${Math.min(desde + pp, total)}` : ''}`;
+        $('.arm-pie').hidden = total === 0;
         const n = nFiltros();
         const b = $('#armFiltrosN');
         b.hidden = n === 0; b.textContent = n;
-        // Paginación compacta.
-        if (paginas <= 1) { $('#armPager').innerHTML = ''; return; }
-        const btn = (p, l = p, extra = '') => `<button type="button" data-page="${p}"${p === st.pagina ? ' aria-current="page"' : ''}${extra}>${l}</button>`;
-        let html = btn(Math.max(1, st.pagina - 1), '‹', st.pagina === 1 ? ' disabled' : '') ;
-        for (let p = 1; p <= paginas; p++) {
-            if (p === 1 || p === paginas || Math.abs(p - st.pagina) <= 1) html += btn(p);
-            else if (Math.abs(p - st.pagina) === 2) html += '<span>…</span>';
-        }
-        html += btn(Math.min(paginas, st.pagina + 1), '›', st.pagina === paginas ? ' disabled' : '');
-        $('#armPager').innerHTML = html;
+        // Anterior · Página X de Y · Siguiente
+        $('#armPager').innerHTML = `<button type="button" class="arm-pg" data-page="${Math.max(1, st.pagina - 1)}"${st.pagina === 1 ? ' disabled' : ''}><span aria-hidden="true">‹</span> Anterior</button>
+            <span class="arm-pg-n">Página ${st.pagina} de ${paginas}</span>
+            <button type="button" class="arm-pg" data-page="${Math.min(paginas, st.pagina + 1)}"${st.pagina === paginas ? ' disabled' : ''}>Siguiente <span aria-hidden="true">›</span></button>`;
     }
 
     function stat(label, value, extra = '') {
@@ -303,36 +315,66 @@
         </div>`;
     }
 
+    const ORNA = '<div class="arm-orna" aria-hidden="true"><span></span><svg viewBox="0 0 40 12"><path d="M2 6h8M30 6h8" stroke="currentColor" stroke-width="1.2"/><path d="M20 1l5 5-5 5-5-5z" fill="none" stroke="currentColor" stroke-width="1.3"/><circle cx="12.5" cy="6" r="1.4" fill="currentColor"/><circle cx="27.5" cy="6" r="1.4" fill="currentColor"/></svg><span></span></div>';
+    const CAT_FICHA = {
+        'simple': 'Arma simple', 'simple-distancia': 'Arma simple a distancia', 'marcial': 'Arma marcial', 'marcial-distancia': 'Arma marcial a distancia',
+        'armadura-ligera': 'Armadura ligera', 'armadura-media': 'Armadura media', 'armadura-pesada': 'Armadura pesada', 'escudo': 'Escudo',
+    };
+    function primeraFrase(t) {
+        const txt = String(t || '').replace(/\s+/g, ' ').trim();
+        const m = txt.match(/^.{20,}?[.!?](\s|$)/);
+        const f = m ? m[0].trim() : txt;
+        return f.length > 170 ? f.slice(0, 165).replace(/\s\S*$/, '') + '…' : f;
+    }
+    function caja(label, big, small = '', extra = '') {
+        return `<div class="arm-caja${extra}"><span>${esc(label)}</span><strong>${esc(big || '—')}</strong>${small ? `<small>${esc(small)}</small>` : ''}</div>`;
+    }
+    function partir(texto) {
+        // «1d10 cortante» → ['1d10', 'cortante']; «20 Oro» → ['20', 'oro'].
+        const m = String(texto || '').match(/^\s*(\S+)\s+(.+)$/);
+        return m ? [m[1], m[2].toLowerCase()] : [texto || '—', ''];
+    }
+
     function renderFicha() {
         const el = $('#armFicha');
         const o = cat.objetos.find(x => x.id === st.sel);
         document.body.classList.toggle('arm-ficha-abierta', !!o && mobile() && st.vista === 'catalogo');
+        $('#armFilas')?.querySelectorAll('tr').forEach(tr => tr.setAttribute('aria-selected', String(Number(tr.dataset.id) === st.sel)));
         if (!o) { el.innerHTML = '<p class="arm-ficha-vacia">Elige un objeto del catálogo para ver su ficha.</p>'; return; }
         const regla = o.reglaId ? reglaById[o.reglaId] : null;
-        let stats = '';
+        const [cn, cu] = partir(o.coste);
+        const propsTexto = o.propiedades.map(propLabel).join(', ');
+        let cajas = '';
         if (o.tipo === 'arma') {
-            stats = stat('Daño', o.dano) + stat('Tipo de daño', (o.tiposDano || []).map(t => t[0].toUpperCase() + t.slice(1)).join(' / ') || '—') + stat('Coste', o.coste) + (o.alcance ? stat('Rango', o.alcance + ' pies') : '');
+            const [dn, du] = partir(o.dano);
+            cajas = caja('Daño', dn, du) + caja('Coste', cn, cu) + caja('Propiedades', propsTexto || 'Ninguna', '', ' ancha');
         } else if (o.tipo === 'armadura') {
-            stats = stat('Clase de armadura', o.ca, ' wide') + stat('Mod. Destreza', desTexto(o)) + stat('Fuerza', o.fuerza) + stat('Sigilo', o.sigilo) + stat('Coste', o.coste);
+            cajas = caja('Clase de armadura', o.ca, desTexto(o) !== '—' ? 'Destreza: ' + desTexto(o) : '') + caja('Coste', cn, cu)
+                + caja('Fuerza · Sigilo', o.fuerza && o.fuerza !== '—' ? o.fuerza : 'Sin requisito', o.sigilo && o.sigilo !== '—' ? 'Sigilo: ' + o.sigilo : 'Sin penalización', ' ancha');
         } else {
-            stats = stat('Bonif. CA', o.ca && o.ca !== '-' ? o.ca : '—') + stat('Fuerza', o.fuerza) + stat('Sigilo', o.sigilo) + stat('Coste', o.coste);
+            cajas = caja('Bonif. CA', o.ca && o.ca !== '-' ? o.ca : '—') + caja('Coste', cn, cu) + caja('Propiedades', propsTexto || 'Ninguna', [o.fuerza && o.fuerza !== '—' ? 'Fuerza ' + o.fuerza : '', o.sigilo && o.sigilo !== '—' ? 'Sigilo: ' + o.sigilo : ''].filter(Boolean).join(' · '), ' ancha');
         }
-        const tags = o.propiedades.map(p => `<button type="button" class="arm-tag" data-def="${esc(p.clave)}" title="Ver definición">${esc(propLabel(p))}</button>`).join('');
+        const props = o.propiedades.map(p => {
+            const d = propByClave[p.clave];
+            return `<li><button type="button" class="arm-tag" data-def="${esc(p.clave)}" title="Ver la definición completa">${esc(propLabel(p))}</button><span>${esc(primeraFrase(d?.definicion) || 'Sin definición en el documento.')}</span></li>`;
+        }).join('');
         const otros = regla ? (reglaUsos[regla.id] || []).filter(x => x.id !== o.id) : [];
         const notas = notasDe[o.id] || [];
-        el.innerHTML = `
+        el.innerHTML = `<div class="arm-ficha-in">
             ${mobile() ? '<button type="button" class="arm-ficha-cerrar" data-cerrar-ficha>‹ Volver a la lista</button>' : ''}
             <header class="arm-ficha-head">
-                <span class="arm-ficha-ico">${iconoDe(o)}</span>
-                <div><h2>${esc(o.nombre)}</h2><p>${esc(ETIQ_CAT[o.categoria] || catByClave[o.categoria]?.nombre || '')}${o.activo === false ? ' · <em>desactivado</em>' : ''}</p></div>
+                <h2>${esc(o.nombre)}</h2>
+                <span class="arm-catpill">${esc(CAT_FICHA[o.categoria] || catByClave[o.categoria]?.nombre || '')}</span>${o.activo === false ? ' <em class="arm-muted">desactivado</em>' : ''}
             </header>
-            <div class="arm-stats">${stats}</div>
+            <div class="arm-cajas">${cajas}</div>
+            ${o.alcance ? `<p class="arm-rango">Rango: ${esc(o.alcance)} pies</p>` : ''}
+            ${ORNA}
             ${seccionAtaque(o)}
-            ${o.tipo !== 'armadura' ? `<section class="arm-sec"><h3>Propiedades</h3>${tags ? `<div class="arm-tags">${tags}</div>` : '<p class="arm-muted">Sin propiedades.</p>'}
-                ${o.propiedadesTexto && o.propiedadesTexto !== tags ? `<p class="arm-orig">En la tabla: «${esc(o.propiedadesTexto)}»</p>` : ''}</section>` : ''}
+            ${o.descripcion ? `<section class="arm-sec"><h3>Descripción</h3><div class="arm-desc">${paras(o.descripcion)}</div></section>` : ''}
+            ${props ? `<section class="arm-sec"><h3>Propiedades</h3><ul class="arm-props">${props}</ul>
+                ${o.propiedadesTexto && fold(o.propiedadesTexto) !== fold(propsTexto) ? `<p class="arm-orig">En la tabla: «${esc(o.propiedadesTexto)}»</p>` : ''}</section>` : ''}
             ${seccionRequisitos(o)}
-            ${o.descripcion ? `<section class="arm-sec"><h3>Descripción</h3>${paras(o.descripcion)}</section>` : ''}
-            ${regla ? `<section class="arm-sec arm-regla"><h3>${MARCA_REGLA} Regla especial${fold(regla.titulo) !== fold(o.nombre) ? ` · <span>${esc(regla.titulo)}</span>` : ''}</h3>${paras(regla.texto)}
+            ${regla ? ORNA + `<section class="arm-sec arm-regla"><h3>${MARCA_REGLA} Regla especial${fold(regla.titulo) !== fold(o.nombre) ? ` · <span>${esc(regla.titulo)}</span>` : ''}</h3>${paras(regla.texto)}
                 <p class="arm-fuente">Texto del documento</p>
                 ${otros.length ? `<p class="arm-muted">También se aplica a: ${otros.map(x => `<button type="button" class="arm-link" data-ir="${x.id}">${esc(x.nombre)}</button>`).join(', ')}</p>` : ''}</section>` : ''}
             ${notas.length ? `<section class="arm-sec"><h3>Aclaraciones</h3>${notas.map(n => notaHTML(n)).join('')}</section>` : ''}
@@ -344,7 +386,8 @@
                     <button type="button" class="arm-btn" data-editar-ataque="${o.id}">Atributo y requisitos</button>
                     <button type="button" class="arm-btn" data-nueva-nota="${o.id}">+ Aclaración</button>
                 </div>
-            </section>` : `<p class="arm-id">Ref. ${esc(o.clave)}</p>`}`;
+            </section>` : `<p class="arm-id">Ref. ${esc(o.clave)}</p>`}
+        </div>`;
     }
 
     function renderGlosario() {
@@ -428,8 +471,8 @@
         if (st.dano.size) u.set('dano', [...st.dano].join(','));
         for (const k of ['coste', 'costeMax', 'uso', 'comp', 'ataque', 'req', 'regla']) if (st[k] !== '') u.set(k, st[k]);
         for (const k of ['sigilo', 'avisos']) if (st[k]) u.set(k, '1');
-        if (st.orden !== 'doc') u.set('orden', st.orden);
-        if (st.porPagina !== 50) u.set('n', st.porPagina);
+        if (st.orden !== 'nombre') u.set('orden', st.orden);
+        if (st.porPagina !== 10) u.set('n', st.porPagina);
         if (st.pagina > 1) u.set('p', st.pagina);
         const o = cat.objetos.find(x => x.id === st.sel);
         if (o) u.set('ver', o.clave);
@@ -448,9 +491,9 @@
         for (const k of ['coste', 'costeMax', 'uso', 'comp', 'ataque', 'req', 'regla']) st[k] = u.get(k) || '';
         if (!['', 'FUE', 'DES', 'FUE/DES', 'REVISAR'].includes(st.ataque)) st.ataque = '';
         for (const k of ['sigilo', 'avisos']) st[k] = u.get(k) === '1';
-        st.orden = u.get('orden') || 'doc';
+        st.orden = u.get('orden') || 'nombre';
         const n = Number(u.get('n'));
-        if ([0, 25, 50, 100].includes(n) && u.has('n')) st.porPagina = n;
+        if ([0, 10, 25, 50].includes(n) && u.has('n')) st.porPagina = n;
         st.pagina = Number(u.get('p')) || 1;
         const ver = u.get('ver');
         const o = ver && cat.objetos.find(x => x.clave === ver);

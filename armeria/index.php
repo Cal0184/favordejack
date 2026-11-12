@@ -54,26 +54,28 @@ $total = (int)($catalogo['total'] ?? 0); // COUNT(*) en MySQL, objetos activos
 
 <main class="arm" id="arm" data-vista="catalogo">
     <header class="arm-head">
-        <div class="arm-title">
-            <span class="arm-seal" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 7l23 23M7 9l2-2M30 27l4 4-3 3-4-4M34 31l5 5M37 39l3-3"/><path d="M39 7L16 30M41 9l-2-2M18 27l-4 4 3 3 4-4M14 31l-5 5M11 39l-3-3"/></svg></span>
-            <div>
-                <h1>Armas y Armaduras</h1>
-                <p>Catálogo del Gremio · <span id="armTotal"><?= (int)$total ?></span> objetos registrados</p>
+        <div class="arm-hero">
+            <div class="arm-title">
+                <span class="arm-seal" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 7l23 23M7 9l2-2M30 27l4 4-3 3-4-4M34 31l5 5M37 39l3-3"/><path d="M39 7L16 30M41 9l-2-2M18 27l-4 4 3 3 4-4M14 31l-5 5M11 39l-3-3"/></svg></span>
+                <div>
+                    <h1>Armas y Armaduras</h1>
+                    <p>Catálogo del Gremio · <span id="armTotal"><?= (int)$total ?></span> objetos registrados</p>
+                </div>
             </div>
+            <?php if ($isAdmin): ?>
+                <div class="arm-admin-bar">
+                    <button type="button" class="arm-btn arm-btn-gold" id="armNuevo">+ Nuevo objeto</button>
+                    <button type="button" class="arm-btn" id="armNuevaProp">+ Propiedad</button>
+                    <button type="button" class="arm-btn" data-nueva-nota="0">+ Aclaración</button>
+                    <button type="button" class="arm-btn" id="armReimportar" title="Vuelve a leer los datos del documento sin tocar lo que editaste">Reimportar</button>
+                </div>
+            <?php endif; ?>
         </div>
         <nav class="arm-tabs" role="tablist" aria-label="Secciones">
-            <button type="button" role="tab" id="tabCatalogo" aria-controls="vistaCatalogo" aria-selected="true" data-vista="catalogo">Catálogo</button>
-            <button type="button" role="tab" id="tabGlosario" aria-controls="vistaGlosario" aria-selected="false" data-vista="glosario">Propiedades</button>
-            <button type="button" role="tab" id="tabReglas" aria-controls="vistaReglas" aria-selected="false" data-vista="reglas">Reglas y notas</button>
+            <button type="button" role="tab" id="tabCatalogo" aria-controls="vistaCatalogo" aria-selected="true" data-vista="catalogo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/></svg><span>Catálogo</span></button>
+            <button type="button" role="tab" id="tabGlosario" aria-controls="vistaGlosario" aria-selected="false" data-vista="glosario"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M3 5c3-1.5 6-1.5 9 .5 3-2 6-2 9-.5v14c-3-1.5-6-1.5-9 .5-3-2-6-2-9-.5z"/><path d="M12 5.5v14"/></svg><span>Propiedades</span></button>
+            <button type="button" role="tab" id="tabReglas" aria-controls="vistaReglas" aria-selected="false" data-vista="reglas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h11a2 2 0 0 1 0 4h-1v12a2 2 0 0 1-2 2H6a2 2 0 0 1 0-4h1z"/><path d="M10 8h4M10 12h4"/></svg><span>Reglas y notas</span></button>
         </nav>
-        <?php if ($isAdmin): ?>
-            <div class="arm-admin-bar">
-                <button type="button" class="arm-btn arm-btn-gold" id="armNuevo">+ Nuevo objeto</button>
-                <button type="button" class="arm-btn" id="armNuevaProp">+ Propiedad</button>
-                <button type="button" class="arm-btn" data-nueva-nota="0">+ Aclaración</button>
-                <button type="button" class="arm-btn" id="armReimportar" title="Vuelve a leer los datos del documento sin tocar lo que editaste">Reimportar</button>
-            </div>
-        <?php endif; ?>
     </header>
 
     <?php if ($error !== ''): ?>
@@ -81,68 +83,69 @@ $total = (int)($catalogo['total'] ?? 0); // COUNT(*) en MySQL, objetos activos
     <?php endif; ?>
 
     <section class="arm-view" id="vistaCatalogo" role="tabpanel" aria-labelledby="tabCatalogo">
-        <div class="arm-searchrow">
-            <label class="arm-search">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m15.5 15.5 5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                <input id="armBuscar" type="search" autocomplete="off" spellcheck="false" placeholder="Buscar por nombre, daño, propiedad, regla o atributo…" aria-label="Buscar armamento">
-            </label>
-            <button type="button" class="arm-btn arm-filtros-toggle" id="armFiltrosBtn" aria-expanded="false" aria-controls="armFiltros">Filtros <b id="armFiltrosN" hidden></b></button>
-        </div>
         <div class="arm-cats-strip" id="armCatsStrip" role="tablist" aria-label="Categorías"></div>
 
         <div class="arm-grid">
             <aside class="arm-filtros" id="armFiltros" aria-label="Categorías y filtros">
-                <div class="arm-panel">
-                    <h2 class="arm-panel-title">Categorías</h2>
+                <div class="arm-panel arm-panel-cats">
+                    <h2 class="arm-panel-title">Categoría</h2>
                     <div id="armCats" class="arm-cats"></div>
                 </div>
                 <div class="arm-panel" id="armFiltrosPanel">
-                    <div class="arm-panel-head">
-                        <h2 class="arm-panel-title">Filtros</h2>
-                        <button type="button" class="arm-link" id="armLimpiar">Limpiar filtros</button>
-                    </div>
+                    <h2 class="arm-panel-title">Filtros</h2>
                     <div id="armFiltrosBody"></div>
+                    <button type="button" class="arm-limpiar" id="armLimpiar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.4-5.7L4 8.6M4 4v4.6h4.6"/></svg>Limpiar filtros</button>
                 </div>
             </aside>
 
             <section class="arm-lista" aria-label="Catálogo">
                 <div class="arm-toolbar">
-                    <p class="arm-count" id="armCount" aria-live="polite"></p>
-                    <label>Orden
-                        <select id="armOrden">
-                            <option value="doc">Del documento</option>
-                            <option value="nombre">Nombre (A–Z)</option>
-                            <option value="nombre-desc">Nombre (Z–A)</option>
-                            <option value="valor-desc">Daño / CA (mayor)</option>
-                            <option value="valor">Daño / CA (menor)</option>
-                            <option value="coste">Coste (menor)</option>
-                            <option value="coste-desc">Coste (mayor)</option>
+                    <label class="arm-search">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m15.5 15.5 5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                        <input id="armBuscar" type="search" autocomplete="off" spellcheck="false" placeholder="Buscar por nombre, propiedad, regla o atributo…" aria-label="Buscar armamento">
+                    </label>
+                    <label class="arm-orden"><span class="arm-sr">Orden</span>
+                        <select id="armOrden" aria-label="Orden">
+                            <option value="nombre">Orden: Nombre (A – Z)</option>
+                            <option value="nombre-desc">Orden: Nombre (Z – A)</option>
+                            <option value="doc">Orden: del documento</option>
+                            <option value="valor-desc">Orden: Daño / CA (mayor)</option>
+                            <option value="valor">Orden: Daño / CA (menor)</option>
+                            <option value="coste">Orden: Coste (menor)</option>
+                            <option value="coste-desc">Orden: Coste (mayor)</option>
                         </select>
                     </label>
-                    <label>Mostrar
-                        <select id="armPorPagina">
-                            <option value="25">25</option>
-                            <option value="50" selected>50</option>
-                            <option value="100">100</option>
-                            <option value="0">Todos</option>
-                        </select>
-                    </label>
+                    <button type="button" class="arm-btn arm-filtros-toggle" id="armFiltrosBtn" aria-expanded="false" aria-controls="armFiltros">Filtros <b id="armFiltrosN" hidden></b></button>
                 </div>
                 <div class="arm-tablewrap">
                     <table class="arm-table">
                         <thead>
                             <tr>
-                                <th scope="col"><button type="button" data-sort="nombre">Nombre</button></th>
+                                <th scope="col"><button type="button" data-sort="nombre">Nombre <span class="arm-sorticon" aria-hidden="true">⇅</span></button></th>
                                 <th scope="col" class="arm-col-cat">Tipo</th>
                                 <th scope="col" class="arm-col-num"><button type="button" data-sort="valor">Daño / CA</button></th>
                                 <th scope="col" class="arm-col-num"><button type="button" data-sort="coste">Coste</button></th>
+                                <th scope="col" class="arm-col-chev"><span class="arm-sr">Abrir</span></th>
                             </tr>
                         </thead>
                         <tbody id="armFilas"></tbody>
                     </table>
                     <p class="arm-vacio" id="armVacio" hidden>Nada coincide con la búsqueda y los filtros. <button type="button" class="arm-link" data-limpiar>Limpiar filtros</button></p>
                 </div>
-                <nav class="arm-pager" id="armPager" aria-label="Páginas"></nav>
+                <div class="arm-pie">
+                    <nav class="arm-pager" id="armPager" aria-label="Páginas"></nav>
+                    <div class="arm-pie-info">
+                        <p class="arm-count" id="armCount" aria-live="polite"></p>
+                        <label class="arm-porpagina">Mostrar
+                            <select id="armPorPagina">
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="0">Todos</option>
+                            </select>
+                        </label>
+                    </div>
+                </div>
             </section>
 
             <article class="arm-ficha" id="armFicha" aria-live="polite" tabindex="-1">
