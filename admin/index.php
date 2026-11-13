@@ -13,6 +13,7 @@ require_once dirname(__DIR__) . '/includes/auth-widget.php';
 require_once dirname(__DIR__) . '/includes/estado.php';
 require_once dirname(__DIR__) . '/includes/clave.php';
 require_once dirname(__DIR__) . '/includes/tiendas.php';
+require_once dirname(__DIR__) . '/includes/recompensas.php';
 
 favor_session_start();
 header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
@@ -71,6 +72,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($ok) $notice = ($give ? 'Dado ' : 'Quitado ') . favor_copper_label($copper) . ($give ? ' a ' : ' de ') . $names($ok) . '.';
             foreach ($fails as $id => $why) $error .= ($all[$id]['name'] ?? $id) . ': ' . $why . ' ';
             $error = trim($error);
+        } elseif ($action === 'mission_pay') {
+            // Revisión del DM: paga solo a los participantes que aún no cobraron.
+            $db = favor_db();
+            try {
+                $result = favor_recompensa_pagar($db, (int)($_POST['id'] ?? 0), $by);
+            } finally {
+                $db->close();
+            }
+            $notice = $result['paid'] ? favor_recompensa_resumen(['paid' => $result['paid'], 'warnings' => []]) : '';
+            $error = implode(' ', $result['warnings']);
+            if (!$notice && !$error) $notice = 'No había nadie pendiente de cobrar.';
         } elseif ($action === 'estado') {
             $db = favor_db();
             try {
@@ -181,6 +193,15 @@ try {
 } catch (Throwable) {
     $missions = [];
 }
+// Recompensas de misiones completadas: lo pagado y lo pendiente, para revisar.
+try {
+    $db = favor_db();
+    $rewardReview = favor_recompensas_revision($db, 15);
+    $db->close();
+} catch (Throwable $e) {
+    error_log('Panel recompensas: ' . $e->getMessage());
+    $rewardReview = [];
+}
 $discord = favor_discord_config();
 // Jugadores que pidieron una contraseña temporal (se dan en Mi cuenta).
 try {
@@ -286,6 +307,7 @@ ol{padding-left:22px}
     <p class="sub">Revisa y anula compras, reparte oro y controla los avisos de Discord desde un solo sitio.</p>
     <nav class="shortcuts" aria-label="Atajos del DM">
         <a href="#compras">Últimas compras</a>
+        <a href="#recompensas">Recompensas de misiones</a>
         <a href="<?= e(favor_url('tiendas/emporio/admin.php')) ?>">Cartas del Emporio</a>
         <a href="<?= e(favor_url('tiendas/descuentos.php')) ?>">Descuentos</a>
         <a href="<?= e(favor_url('bancadigital/')) ?>">Banca</a>
@@ -391,6 +413,31 @@ ol{padding-left:22px}
             </div>
             <button type="submit">Aplicar</button>
         </form>
+    </section>
+
+    <section class="card" id="recompensas">
+        <h2>Recompensas de misiones</h2>
+        <p class="note">Cuando una misión pasa a <b>Completada</b> (en el Tablón o en Archivos) y tiene <b>pago en la Banca</b>, cada participante lo recibe una sola vez en su historial. Si cambias la misión después, lo ya pagado no se toca: aquí ves lo entregado y quién falta. <b>Pagar a los pendientes</b> solo paga a quien todavía no cobró. Las misiones antiguas sin pago en la Banca no se pagan solas.</p>
+        <?php if (!$rewardReview): ?><div class="empty">Todavía no hay misiones completadas.</div><?php else: ?>
+        <div style="overflow-x:auto"><table>
+            <?php foreach ($rewardReview as $r): ?>
+                <tr>
+                    <td><b><?= e($r['name']) ?></b><br><span class="muted"><?= e($r['date'] !== '' ? date('d-m-Y', strtotime($r['date']) ?: time()) : '') ?> · <?= (int)$r['party'] ?> participantes</span></td>
+                    <td><?php if ($r['reward'] !== ''): ?><?= e($r['reward']) ?><?php else: ?><span class="muted">Sin pago en la Banca<?= $r['text'] !== '' ? ' · «' . e($r['text']) . '»' : '' ?></span><?php endif; ?></td>
+                    <td><?php if ($r['paid']): ?>
+                        <?php foreach ($r['paid'] as $p): ?><?= e($p['Nombre']) ?>: <?= e(favor_copper_label((int)$p['Cobre'])) ?> <span class="muted"><?= e(date('d-m H:i', strtotime((string)$p['Fecha']) ?: time())) ?></span><br><?php endforeach; ?>
+                    <?php else: ?><span class="muted">Nada pagado</span><?php endif; ?>
+                    <?php if ($r['pending'] && ($r['paid'] || $r['amount'] > 0)): ?><span class="muted">Falta: <?= e(implode(', ', $r['pending'])) ?></span><?php endif; ?></td>
+                    <td><?php if ($r['amount'] > 0 && $r['pending']): ?>
+                        <form method="post" action="#recompensas" onsubmit="return confirm('¿Pagar la recompensa a los participantes que faltan? Queda en su historial de la Banca.')">
+                            <input type="hidden" name="csrf" value="<?= e($csrf) ?>"><input type="hidden" name="action" value="mission_pay"><input type="hidden" name="id" value="<?= (int)$r['id'] ?>">
+                            <button type="submit">Pagar a los pendientes</button>
+                        </form>
+                    <?php elseif ($r['amount'] > 0): ?><span class="muted">Todo pagado</span><?php endif; ?></td>
+                </tr>
+            <?php endforeach; ?>
+        </table></div>
+        <?php endif; ?>
     </section>
 
     <?php if ($mismatch): ?>

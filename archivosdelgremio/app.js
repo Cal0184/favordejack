@@ -565,6 +565,7 @@
                 </div>
                 ${m.description ? `<div class="mission-description">${esc(m.description)}</div>` : ''}
                 ${m.generalReward ? `<div class="general-reward"><strong>Recompensa general:</strong> ${esc(m.generalReward)}</div>` : ''}
+                ${m.rewardAmount ? `<div class="general-reward"><strong>Pago en la Banca:</strong> ${esc(Number(m.rewardAmount).toLocaleString('es-CL'))} ${esc(String(m.rewardCoin || 'po').toUpperCase())} ${m.rewardMode === 'total' ? 'en total, a repartir' : 'por personaje'}</div>` : ''}
                 ${participants ? `<div class="participant-list">${participants}</div>` : '<p class="mission-meta">Sin participantes registrados.</p>'}
             </article>`;
     }
@@ -1280,6 +1281,14 @@
                     <div class="form-field"><label>Tipo</label><input name="type" value="${esc(mission.type)}" placeholder="Investigación, combate, rescate…"></div>
                     <div class="form-field"><label>Estado</label><select name="state">${['Publicada','En curso','Completada','Fallida','Cancelada'].map(v => `<option ${mission.state === v ? 'selected' : ''}>${v}</option>`).join('')}</select></div>
                     <div class="form-field full"><label>Recompensa general</label><input name="generalReward" value="${esc(mission.generalReward)}" placeholder="200 po por aventurero, objeto mágico…"></div>
+                    <div class="form-field full"><label>Recompensa en monedas (se paga en la Banca)</label>
+                        <div class="reward-coins">
+                            <input name="rewardAmount" type="number" min="0" max="10000000" step="1" inputmode="numeric" value="${mission.rewardAmount ? Number(mission.rewardAmount) : ''}" placeholder="Ej.: 200" aria-label="Cantidad">
+                            <select name="rewardCoin" aria-label="Moneda">${[['po','PO'],['pl','PL'],['pc','PC']].map(([v, t]) => `<option value="${v}" ${(mission.rewardCoin || 'po') === v ? 'selected' : ''}>${t}</option>`).join('')}</select>
+                            <select name="rewardMode" aria-label="Reparto">${[['personaje','por personaje'],['total','total a repartir']].map(([v, t]) => `<option value="${v}" ${(mission.rewardMode || 'personaje') === v ? 'selected' : ''}>${t}</option>`).join('')}</select>
+                        </div>
+                        <p class="help-text">Al guardar la misión como «Completada» cada participante la recibe una sola vez en su historial. Vacío = sin pago automático.</p>
+                    </div>
                     <div class="form-field full"><label>Descripción</label><textarea name="description">${esc(mission.description)}</textarea></div>
                 </div>
 
@@ -1548,7 +1557,8 @@
             const submit = $('button[type="submit"]', form);
             if (submit) { submit.disabled = true; submit.textContent = 'Guardando…'; }
             try {
-                await post({action: 'save_mission', id: Number(form.dataset.id || 0), draftId, ...payload});
+                const saved = await post({action: 'save_mission', id: Number(form.dataset.id || 0), draftId, ...payload});
+                if (saved.rewardNote) sessionStorage.setItem('guildToast', saved.rewardNote);
                 writeLocalDraft(null);
                 missionFormDirty = false;
                 adminModalBeforeClose = null;
@@ -1613,6 +1623,14 @@
     renderCharacters();
     renderMissions();
     if (isAdmin) renderAdminLists();
+
+    const pendingToast = sessionStorage.getItem('guildToast');
+    if (pendingToast) {
+        sessionStorage.removeItem('guildToast');
+        showToast(pendingToast, /^No se pudo/.test(pendingToast));
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast?.classList.remove('show'), 9000);
+    }
 
     const returnView = sessionStorage.getItem('guildReturnView');
     if (returnView) {

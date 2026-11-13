@@ -199,6 +199,12 @@ $boot = [
                 <label>Recompensa<input name="reward" maxlength="255" placeholder="Ej.: 200 monedas de oro"></label>
                 <label>Tipo<input name="type" maxlength="80" placeholder="Ej.: Caza, Escolta…"></label>
             </div>
+            <div class="edit-row edit-coins">
+                <label>Pago en la Banca <small>(opcional)</small><input name="rewardAmount" type="number" min="0" max="10000000" step="1" inputmode="numeric" placeholder="Ej.: 200"></label>
+                <label>Moneda<select name="rewardCoin"><option value="po">PO</option><option value="pl">PL</option><option value="pc">PC</option></select></label>
+                <label>Reparto<select name="rewardMode"><option value="personaje">por personaje</option><option value="total">total a repartir</option></select></label>
+            </div>
+            <p class="edit-hint">Al marcarla «Completada», cada personaje del grupo recibe el pago una sola vez en su historial de la Banca. Vacío = sin pago automático.</p>
             <label>Más detalles <small>(no va en el papel; se ve al abrir la misión)</small><textarea name="details" rows="3" maxlength="20000" placeholder="Quién la encarga, pistas, condiciones…"></textarea></label>
             <div class="edit-row edit-looks">
                 <fieldset><legend>Tamaño</legend><div class="seg" id="size-choices"></div></fieldset>

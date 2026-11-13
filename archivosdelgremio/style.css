@@ -1438,3 +1438,7 @@ html.keep-gutter{scrollbar-gutter:stable}
    en el móvil la barra inferior tapaba «Guardar misión». */
 .modal{z-index:9500}
 .toast{z-index:9700}
+
+/* Recompensa en monedas de la misión */
+.reward-coins{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px}
+@media (max-width:520px){.reward-coins{grid-template-columns:1fr 1fr}.reward-coins input{grid-column:1/-1}}

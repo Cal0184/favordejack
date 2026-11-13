@@ -212,6 +212,41 @@ function can_access_character(array $user, array $character): bool {
     return ($user['role'] ?? '') === 'admin' || ($character['playerId'] ?? '') === ($user['playerId'] ?? '');
 }
 
+/** El icono del jugador también es una imagen global: solo el admin lo cambia. */
+function deny_player_icon_change(array $user, array $candidate, ?array $oldRow): void {
+    if (($user['role'] ?? '') === 'admin' || !array_key_exists('iconUrl', $candidate)) return;
+    $wanted = clean_asset_url($candidate['iconUrl']);
+    $stored = (string)($oldRow['IconUrl'] ?? '');
+    // Se acepta lo que la propia API devolvió (ruta guardada o la ya resuelta).
+    if ($wanted === '' || $wanted === clean_asset_url($stored) || $wanted === clean_asset_url(favor_asset_existing($stored))) return;
+    throw new DomainException('Solo un administrador puede cambiar las imágenes globales.');
+}
+
+/**
+ * Lo que un jugador no puede tocar de un personaje, ni siquiera del suyo:
+ * el estado administrativo (activo/desactivado) y las imágenes globales que
+ * comparten Banca, Inventario y Archivos. Se comprueba en el servidor para que
+ * una petición manipulada reciba un rechazo explícito (403) en vez de colarse.
+ */
+function deny_player_admin_fields(array $user, array $candidate, ?array $oldRow): void {
+    if (($user['role'] ?? '') === 'admin') return;
+    if (array_key_exists('active', $candidate)) {
+        $wanted = $candidate['active'] !== false;
+        $current = $oldRow ? (int)$oldRow['Activo'] === 1 : true;
+        if ($wanted !== $current) {
+            throw new DomainException('Solo un administrador puede desactivar o reactivar personajes.');
+        }
+    }
+    foreach (['iconUrl' => 'IconUrl', 'portraitUrl' => 'PortraitUrl'] as $key => $column) {
+        if (!array_key_exists($key, $candidate)) continue;
+        $wanted = clean_asset_url($candidate[$key]);
+        $current = $oldRow ? clean_asset_url((string)($oldRow[$column] ?? '')) : '';
+        if ($wanted !== $current) {
+            throw new DomainException('Solo un administrador puede cambiar las imágenes globales.');
+        }
+    }
+}
+
 function movement_from_row(array $row): array {
     $date = (string)$row['Fecha'];
     $dateIso = str_replace(' ', 'T', $date) . 'Z';
@@ -340,6 +375,7 @@ try {
             if (!$oldRow && !$isAdmin) {
                 throw new DomainException('Solo un administrador puede crear jugadores.');
             }
+            deny_player_icon_change($user, $candidate, $oldRow);
 
             $name = clean_text($candidate['name'] ?? '', 60);
             if ($name === '') throw new DomainException('Escribe un nombre para el jugador.');
@@ -407,6 +443,7 @@ try {
             if (($user['role'] ?? '') !== 'admin' && $pid !== ($user['playerId'] ?? '')) {
                 throw new DomainException('No puedes modificar ese personaje.');
             }
+            deny_player_admin_fields($user, $candidate, $oldRow);
 
             $stmt = $db->prepare('SELECT ID, Nombre FROM Jugador WHERE ID=? LIMIT 1');
             $stmt->bind_param('s', $pid);
@@ -419,10 +456,12 @@ try {
             if ($name === '') throw new DomainException('Escribe un nombre para el personaje.');
             $description = clean_text($candidate['description'] ?? '', 255);
             $notes = clean_text($candidate['notes'] ?? '', 5000);
-            $active = (($candidate['active'] ?? true) !== false) ? 1 : 0;
-
             $playerName = (string)$playerRow['Nombre'];
             $isAdmin = ($user['role'] ?? '') === 'admin';
+            // Activar o desactivar es cosa del admin; el jugador conserva el estado actual.
+            $active = $isAdmin
+                ? ((($candidate['active'] ?? true) !== false) ? 1 : 0)
+                : ($oldRow ? (int)$oldRow['Activo'] : 1);
 
             // NewBanca 2.0: máximo 5 personajes activos por jugador real.
             // Las categorías técnicas NPC / Muertos / Personajes fuera no cuentan como jugadores.
@@ -626,6 +665,7 @@ try {
                 $isAdmin = ($user['role'] ?? '') === 'admin';
                 if (!$isAdmin && $id !== ($user['playerId'] ?? '')) continue;
                 if (!$oldRow && !$isAdmin) continue;
+                deny_player_icon_change($user, $candidate, $oldRow);
 
                 $name = clean_text($candidate['name'] ?? '', 60);
                 if ($name === '') continue;
@@ -689,6 +729,7 @@ try {
 
                 $pid = $oldRow ? (string)$oldRow['Jugador'] : $requestedPid;
                 if (($user['role'] ?? '') !== 'admin' && $pid !== ($user['playerId'] ?? '')) continue;
+                deny_player_admin_fields($user, $candidate, $oldRow);
 
                 $stmt = $db->prepare('SELECT ID, Nombre FROM Jugador WHERE ID=? LIMIT 1');
                 $stmt->bind_param('s', $pid);
@@ -701,10 +742,11 @@ try {
                 if ($name === '') continue;
                 $description = clean_text($candidate['description'] ?? '', 255);
                 $notes = clean_text($candidate['notes'] ?? '', 5000);
-                $active = (($candidate['active'] ?? true) !== false) ? 1 : 0;
-
                 $playerName = (string)$playerRow['Nombre'];
                 $isAdmin = ($user['role'] ?? '') === 'admin';
+                $active = $isAdmin
+                    ? ((($candidate['active'] ?? true) !== false) ? 1 : 0)
+                    : ($oldRow ? (int)$oldRow['Activo'] : 1);
                 if (is_text_only_player_name($playerName)) {
                     $iconUrl = null;
                     $portraitUrl = null;
@@ -908,10 +950,11 @@ try {
             $delta[$coin] = $value;
         }
 
-        // Economía: añadir dinero, saldo inicial y correcciones son cosa del DM.
-        // Los jugadores solo gastan, cambian monedas y transfieren.
-        if (in_array($type, ['add', 'initial', 'correction'], true) && ($user['role'] ?? '') !== 'admin') {
-            respond(['ok' => false, 'error' => 'Solo el DM puede añadir dinero o hacer correcciones.'], 403);
+        // Economía: cada jugador añade, gasta, cambia y transfiere con sus propios
+        // personajes (la propiedad se comprueba más abajo con can_access_character).
+        // El saldo inicial y las correcciones siguen siendo cosa del DM.
+        if (in_array($type, ['initial', 'correction'], true) && ($user['role'] ?? '') !== 'admin') {
+            respond(['ok' => false, 'error' => 'Solo el DM puede poner saldos iniciales o hacer correcciones.'], 403);
         }
 
         // El platino ya no se reparte: solo puede salir de la bolsa (gastarlo o cambiarlo).

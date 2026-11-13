@@ -10,6 +10,7 @@ require_once dirname(__DIR__) . '/includes/imagenes.php';
 require_once dirname(__DIR__) . '/includes/migrations.php';
 require_once dirname(__DIR__) . '/includes/discord.php';
 require_once dirname(__DIR__) . '/includes/estado.php';
+require_once dirname(__DIR__) . '/includes/recompensas.php';
 guild_session_start();
 
 function respond(bool $ok, array $data = [], int $status = 200): never
@@ -442,8 +443,11 @@ try {
         $generalReward = strv($data, 'generalReward', 255);
         $participants = $data['participants'] ?? [];
         if (!is_array($participants)) $participants = [];
+        $coinReward = favor_recompensa_desde($data);
 
         $db = db();
+        // Antes de la transacción: crear columnas confirma la transacción en MySQL.
+        favor_recompensas_schema($db);
         $oldMissionState = null;
         $missionNames = [];
         $db->begin_transaction();
@@ -462,6 +466,8 @@ try {
                 $missionId = (int)$stmt->insert_id;
                 $stmt->close();
             }
+
+            favor_recompensa_guardar($db, $missionId, $coinReward);
 
             $stmt = $db->prepare('DELETE FROM MisionPersonaje WHERE MisionID=?');
             bind_execute($stmt, [(string)$missionId]);
@@ -541,7 +547,18 @@ try {
             }
         }
 
-        respond(true, ['message' => 'Misión guardada.', 'id' => $missionId]);
+        // Al pasar a Completada se paga la recompensa en monedas (una sola vez por personaje).
+        $payNote = '';
+        if ($state === 'Completada' && $oldMissionState !== 'Completada') {
+            $db = db();
+            try {
+                $payNote = favor_recompensa_pagar_seguro($db, $missionId, (string)($admin['displayName'] ?? $admin['username']));
+            } finally {
+                $db->close();
+            }
+        }
+
+        respond(true, ['message' => trim('Misión guardada. ' . $payNote), 'id' => $missionId, 'rewardNote' => $payNote]);
     }
 
     if ($action === 'delete_mission') {
