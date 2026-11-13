@@ -468,34 +468,19 @@
         person.classList.add('height-image-ready');
     }
 
-    function resizeHeightStage() {
-        const stage = $('#heightChart');
-        const people = $('.height-people', stage || document);
-        const scroll = $('#heightScroll');
-        if (!stage || !people) return;
-        const needed = Math.ceil(people.scrollWidth + 92);
-        const viewport = Math.max(900, (scroll?.clientWidth || 0));
-        stage.style.width = `${Math.max(viewport, needed)}px`;
-    }
-
     function bindHeightPhotos() {
         const stage = $('#heightChart');
         if (!stage) return;
         $$('[data-height-photo]', stage).forEach(img => {
-            const fit = () => {
-                fitHeightPhoto(img);
-                requestAnimationFrame(resizeHeightStage);
-            };
+            const fit = () => fitHeightPhoto(img);
             if (img.complete && img.naturalWidth) fit();
             else img.addEventListener('load', fit, {once: true});
             img.addEventListener('error', () => {
                 img.hidden = true;
                 const fallback = img.nextElementSibling;
                 if (fallback) fallback.hidden = false;
-                requestAnimationFrame(resizeHeightStage);
             }, {once: true});
         });
-        requestAnimationFrame(resizeHeightStage);
     }
 
     function renderHeightChart() {
@@ -513,17 +498,24 @@
         }
 
         const maxCm = Math.max(200, Math.ceil(Math.max(...rows.map(c => c._h * 100)) / 10) * 10 + 10);
-        const plotHeight = Math.max(560, Math.round(maxCm * 3));
+        // Escala más compacta: se ven más personajes a la vez sin perder detalle.
+        const plotHeight = Math.min(540, Math.max(420, Math.round(maxCm * 2.2)));
         const pxPerCm = plotHeight / maxCm;
         el.style.setProperty('--height-plot-px', `${plotHeight}px`);
         el.style.setProperty('--height-max-cm', String(maxCm));
 
-        const ticks = [];
+        // La regla (cm) queda fija a la izquierda al desplazar; la cuadrícula
+        // va dentro del área de personajes y se estira con ellos, sean cuantos sean.
+        const lines = [];
+        const labels = [];
         for (let cm = 0; cm <= maxCm; cm += 10) {
-            ticks.push(`<div class="height-grid-line" style="bottom:${cm * pxPerCm}px"><span>${cm} cm</span></div>`);
+            const bottom = cm * pxPerCm;
+            lines.push(`<div class="height-grid-line${cm % 50 === 0 ? ' major' : ''}" style="bottom:${bottom}px"></div>`);
+            if (cm % 20 === 0) labels.push(`<span style="bottom:${bottom}px">${cm} cm</span>`);
         }
         const people = rows.map(c => heightPersonHtml(c, Math.round(c._h * 100 * pxPerCm))).join('');
-        el.innerHTML = `<div class="height-grid">${ticks.join('')}</div><div class="height-people">${people}</div>`;
+        el.innerHTML = `<div class="height-axis" aria-hidden="true">${labels.join('')}</div>
+            <div class="height-plot"><div class="height-grid">${lines.join('')}</div><div class="height-people">${people}</div></div>`;
         bindHeightPhotos();
     }
 
@@ -609,18 +601,6 @@
         setModalOpen(false);
     }
     $$('[data-close-admin]').forEach(el => el.addEventListener('click', closeAdminModal));
-
-    $('#adminOpen')?.addEventListener('click', () => {
-        if (isAdmin) {
-            switchView('admin');
-            return;
-        }
-        if (isLogged) {
-            window.location.href = FAVOR_BASE + 'cuenta.php';
-            return;
-        }
-        window.location.href = FAVOR_BASE + 'login.php?next=' + encodeURIComponent(FAVOR_BASE + 'archivosdelgremio/');
-    });
 
     $('#adminLogout')?.addEventListener('click', () => {
         // Cierra sesión con el formulario de la barra común (POST con token).
