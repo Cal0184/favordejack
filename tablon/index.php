@@ -117,7 +117,7 @@ $boot = [
     <?php else: ?>
         <?php if ($error !== ''): ?><p class="tablon-error" role="alert"><?= favor_h($error) ?></p><?php endif; ?>
         <p class="tablon-hint"><?= $isAdmin ? 'Arrastra los papeles para acomodarlos. Tócalos para iniciar, terminar o eliminar una misión.' : 'Toca un papel para leer la misión completa.' ?><span class="tablon-hint-mobile"> Desliza el tablón hacia los lados para verlo completo.</span></p>
-        <div class="tablon-scroll">
+        <div class="tablon-scroll" tabindex="0" role="region" aria-label="Tablón de misiones (desliza o usa las flechas para ver más)">
             <div class="tablon-board<?= $surface !== '' ? ' has-image' : '' ?>" id="tablon-board"<?= $surface !== '' ? ' style="background-image:url(\'' . favor_h($surface) . '\')"' : '' ?>>
                 <div class="tablon-surface" id="tablon-surface">
                     <p class="tablon-empty" id="tablon-empty" hidden><?= $isAdmin ? 'El tablón está vacío. Usa «Ingresar misión» para clavar el primer papel.' : 'Por ahora no hay misiones en el tablón.' ?></p>

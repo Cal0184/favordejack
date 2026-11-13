@@ -293,6 +293,7 @@ body:not(.is-admin) .paper.on-board{touch-action:manipulation}
 @keyframes card-pin{from{transform:scale(.6) rotate(-8deg);opacity:0}}
 
 @media (max-width:820px){
+.tablon-empty{inset:28% auto auto 14px;width:min(72vw,420px)}
     .tablon-shell{width:calc(100% - 32px)}
     .dlg-body{padding:18px 16px}
     .dlg-view,.dlg-edit,.start-main{grid-template-columns:1fr}

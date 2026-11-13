@@ -7,6 +7,7 @@ header('Pragma: no-cache');
 
 require_once __DIR__ . '/auth.php';
 require_once dirname(__DIR__) . '/includes/assets.php';
+require_once dirname(__DIR__) . '/includes/imagenes.php';
 require_once dirname(__DIR__) . '/includes/migrations.php';
 require_once dirname(__DIR__) . '/includes/ficha-import.php';
 require_once dirname(__DIR__) . '/includes/auth-widget.php';
@@ -114,6 +115,8 @@ SQL;
             'handle' => clean($row['JugadorHandle'] ?? ''),
             'portrait' => portrait_url($row['PortraitUrl'] ?? ''),
             'icon' => portrait_url($row['IconUrl'] ?? ''),
+            // Miniatura para tarjetas y listas; el retrato entero solo en el expediente.
+            'thumb' => favor_thumb_url((string)(($row['PortraitUrl'] ?? '') ?: ($row['IconUrl'] ?? ''))),
             'description' => clean($row['Descripcion'] ?? ''),
             'biography' => clean($row['Biografia'] ?? ''),
             'height' => $row['Altura'] !== null ? (string)$row['Altura'] : '',
@@ -199,7 +202,7 @@ SQL;
                     'level' => $row['NivelSnapshot'] !== null ? (string)$row['NivelSnapshot'] : '',
                     'reward' => (string)$row['Recompensa'],
                     'notes' => (string)($row['Notas'] ?? ''),
-                    'portrait' => portrait_url($row['PortraitUrl'] ?? ''),
+                    'portrait' => favor_thumb_url((string)($row['PortraitUrl'] ?? '')),
                 ];
             }
             $res->free();
@@ -243,7 +246,7 @@ SQL;
             <span class="brand-ornament mirror" aria-hidden="true">❦</span>
         </div>
 
-        <button class="admin-seal <?= $isLogged ? 'logged' : '' ?>" id="adminOpen" type="button">
+        <button class="admin-seal <?= $isLogged ? 'logged' : '' ?>" id="adminOpen" type="button" aria-label="<?= $isAdmin ? 'Administración' : ($isLogged ? 'Mi cuenta' : 'Iniciar sesión') ?>">
             <span aria-hidden="true">✦</span>
             <span><?= $isAdmin ? 'Administración' : ($isLogged ? 'Mi cuenta' : 'Iniciar sesión') ?></span>
         </button>

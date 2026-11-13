@@ -15,6 +15,7 @@ archivosdelgremio/fichas/*
 media/characters/
 media/icons/
 media/profiles/
+media/mini/
 
 # --- Copias duplicadas que se limpian en la fase 2 ---
 emporio/Cartas/

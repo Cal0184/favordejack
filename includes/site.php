@@ -205,7 +205,7 @@ function favor_site_bar(): void
         <div class="favor-account">
             <?php if ($user): ?>
                 <button class="favor-btn favor-account-toggle" type="button" aria-expanded="false" aria-controls="favor-account-menu">
-                    <span class="favor-avatar" aria-hidden="true"<?= !empty($user['iconBg']) ? ' style="background:' . favor_h($user['iconBg']) . '"' : '' ?>><?php if (!empty($user['iconUrl'])): ?><img src="<?= favor_h(favor_asset_url((string)$user['iconUrl'])) ?>" alt="" onerror="this.remove()"><?php endif; ?><span><?= favor_h(!empty($user['emoji']) ? (string)$user['emoji'] : $initial) ?></span></span>
+                    <span class="favor-avatar" aria-hidden="true"<?= !empty($user['iconBg']) ? ' style="background:' . favor_h($user['iconBg']) . '"' : '' ?>><?php $favorIcon = favor_asset_existing((string)($user['iconUrl'] ?? '')); if ($favorIcon !== ''): ?><img src="<?= favor_h(favor_asset_url($favorIcon)) ?>" alt="" onerror="this.remove()"><?php endif; ?><span><?= favor_h(!empty($user['emoji']) ? (string)$user['emoji'] : $initial) ?></span></span>
                     <span class="favor-account-name"><?= favor_h((string)$user['displayName']) ?><?= $isAdmin ? ' · Admin' : '' ?></span>
                 </button>
                 <div class="favor-popover" id="favor-account-menu" hidden>

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/session.php';
 require_once dirname(__DIR__) . '/includes/assets.php';
+require_once dirname(__DIR__) . '/includes/imagenes.php';
 require_once dirname(__DIR__) . '/includes/migrations.php';
 require_once dirname(__DIR__) . '/includes/emojis.php';
 require_once dirname(__DIR__) . '/includes/estado.php';
@@ -126,7 +127,7 @@ function player_from_row(array $row): array {
         'handle' => (string)$row['Handle'],
         'emoji' => array_key_exists((string)$row['Emoji'], favor_allowed_emojis()) ? (string)$row['Emoji'] : '🛡️',
         'iconBg' => (string)($row['IconBg'] ?? '#22402F'),
-        'iconUrl' => (string)$row['IconUrl'],
+        'iconUrl' => favor_asset_existing((string)$row['IconUrl']),
         'order' => (int)$row['Orden'],
         'active' => (bool)$row['Activo'],
     ];
@@ -158,7 +159,11 @@ function character_from_row(array $row): array {
         'active' => (bool)$row['Activo'],
     ];
     if ($row['IconUrl'] !== null && (string)$row['IconUrl'] !== '') $character['iconUrl'] = (string)$row['IconUrl'];
-    if ($row['PortraitUrl'] !== null && (string)$row['PortraitUrl'] !== '') $character['portraitUrl'] = (string)$row['PortraitUrl'];
+    if ($row['PortraitUrl'] !== null && (string)$row['PortraitUrl'] !== '') {
+        $character['portraitUrl'] = (string)$row['PortraitUrl'];
+        // Para mostrar se usa la miniatura; portraitUrl se conserva para editar.
+        $character['thumbUrl'] = favor_thumb_url((string)$row['PortraitUrl']);
+    }
     return $character;
 }
 

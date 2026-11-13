@@ -1136,6 +1136,9 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('[onclick]').forEach(el => {
         if (el.matches('a, button, input, select, textarea, label')) return;
         if (el.classList.contains('dice_element')) return; // el dado 3D ya tiene «Lanzar de nuevo»
+        // Recuadros que solo envuelven un campo (cantidad, modificador): el campo ya es
+        // accesible; como «botón» el Espacio escrito en el campo pulsaba el recuadro.
+        if (el.querySelector('input, select, textarea, button, a')) return;
         el.setAttribute('role', 'button');
         el.tabIndex = 0;
         if (!el.hasAttribute('aria-label') && el.title) el.setAttribute('aria-label', el.title);

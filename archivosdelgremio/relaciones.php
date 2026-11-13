@@ -2,16 +2,13 @@
 declare(strict_types=1);
 require_once dirname(__DIR__) . '/includes/auth.php';
 require_once dirname(__DIR__) . '/includes/assets.php';
+require_once dirname(__DIR__) . '/includes/imagenes.php';
 require_once dirname(__DIR__) . '/includes/migrations.php';
 require_once dirname(__DIR__) . '/includes/auth-widget.php';
 require_once dirname(__DIR__) . '/includes/estado.php';
 favor_session_start();
 $user=favor_current_user();
 function hr(string $v):string{return htmlspecialchars($v,ENT_QUOTES|ENT_SUBSTITUTE,'UTF-8');}
-function relation_asset_url(?string $url):string{
- // Todas las imágenes viven en media/ (fase 2); favor_asset_url() traduce las rutas antiguas.
- $value=trim(str_replace('\\','/',(string)$url));return $value===''?'':favor_asset_url($value);
-}
 // Tipos de vínculo con su color (el texto de la relación sigue siendo libre).
 const REL_VINCULOS=[
  'familia'=>['Familia','#d1a531'],'amistad'=>['Amistad','#5fa65a'],'amor'=>['Amor','#d0609a'],'aliados'=>['Aliados','#4f8fc6'],
@@ -74,14 +71,14 @@ if($focus){
  $ids=[$focusId=>true];foreach($relations as $r){if($r['PersonajeA']===$focusId){$ids[$r['PersonajeB']]=true;}if($r['PersonajeB']===$focusId){$ids[$r['PersonajeA']]=true;}}
  // Incluye un segundo anillo para que se entienda como árbol/red, sin saturar con todo el censo.
  foreach($relations as $r){if(isset($ids[$r['PersonajeA']])||isset($ids[$r['PersonajeB']])){$ids[$r['PersonajeA']]=true;$ids[$r['PersonajeB']]=true;}}
- foreach(array_keys($ids) as $id)if(isset($characters[$id])){$c=$characters[$id];$graphChars[]=['id'=>$id,'name'=>$c['displayName'],'player'=>$c['JugadorNombre'],'category'=>$c['Categoria']??'Personaje','active'=>($c['Estado']??'Activo')==='Activo'?1:0,'estado'=>favor_estado_publico((string)($c['Estado']??'Activo')),'image'=>relation_asset_url((string)($c['PortraitUrl']?:$c['IconUrl']??'')),'focus'=>$id===$focusId];}
+ foreach(array_keys($ids) as $id)if(isset($characters[$id])){$c=$characters[$id];$graphChars[]=['id'=>$id,'name'=>$c['displayName'],'player'=>$c['JugadorNombre'],'category'=>$c['Categoria']??'Personaje','active'=>($c['Estado']??'Activo')==='Activo'?1:0,'estado'=>favor_estado_publico((string)($c['Estado']??'Activo')),'image'=>favor_thumb_url((string)($c['PortraitUrl']?:$c['IconUrl']??'')),'focus'=>$id===$focusId];}
  foreach($relations as $r)if(isset($ids[$r['PersonajeA']],$ids[$r['PersonajeB']]))$graphRels[]=$r;
 }else{
- foreach($characters as $id=>$c)$graphChars[]=['id'=>$id,'name'=>$c['displayName'],'player'=>$c['JugadorNombre'],'category'=>$c['Categoria']??'Personaje','active'=>($c['Estado']??'Activo')==='Activo'?1:0,'estado'=>favor_estado_publico((string)($c['Estado']??'Activo')),'image'=>relation_asset_url((string)($c['PortraitUrl']?:$c['IconUrl']??'')),'focus'=>false];$graphRels=$relations;
+ foreach($characters as $id=>$c)$graphChars[]=['id'=>$id,'name'=>$c['displayName'],'player'=>$c['JugadorNombre'],'category'=>$c['Categoria']??'Personaje','active'=>($c['Estado']??'Activo')==='Activo'?1:0,'estado'=>favor_estado_publico((string)($c['Estado']??'Activo')),'image'=>favor_thumb_url((string)($c['PortraitUrl']?:$c['IconUrl']??'')),'focus'=>false];$graphRels=$relations;
 }
 $focusRelations=array_values(array_filter($relations,fn($r)=>$focusId!==''&&($r['PersonajeA']===$focusId||$r['PersonajeB']===$focusId)));
 $centralChoices=[];
-foreach($editableCharacters as $id=>$c){$centralChoices[]=['id'=>$id,'name'=>$c['displayName'],'player'=>$c['JugadorNombre'],'category'=>$c['Categoria']??'Personaje','active'=>($c['Estado']??'Activo')==='Activo'?1:0,'estado'=>favor_estado_publico((string)($c['Estado']??'Activo')),'image'=>relation_asset_url((string)($c['PortraitUrl']?:$c['IconUrl']??''))];}
+foreach($editableCharacters as $id=>$c){$centralChoices[]=['id'=>$id,'name'=>$c['displayName'],'player'=>$c['JugadorNombre'],'category'=>$c['Categoria']??'Personaje','active'=>($c['Estado']??'Activo')==='Activo'?1:0,'estado'=>favor_estado_publico((string)($c['Estado']??'Activo')),'image'=>favor_thumb_url((string)($c['PortraitUrl']?:$c['IconUrl']??''))];}
 $relationChoices=[];
 foreach($characters as $id=>$c){$relationChoices[]=['id'=>$id,'name'=>$c['displayName'],'player'=>$c['JugadorNombre'],'category'=>$c['Categoria']??'Personaje','active'=>($c['Estado']??'Activo')==='Activo'?1:0,'estado'=>favor_estado_publico((string)($c['Estado']??'Activo'))];}
 $playerNames=array_values(array_unique(array_filter(array_map(fn($c)=>(string)($c['JugadorNombre']??''),$characters))));sort($playerNames,SORT_NATURAL|SORT_FLAG_CASE);
@@ -152,6 +149,7 @@ a{color:inherit;text-decoration:none}button,input,select,textarea{font:inherit}
 .vinculo-pick input:checked+span{background:var(--vc);color:#160f0a;font-weight:800;transform:translateY(-1px)}.vinculo-pick input:focus-visible+span{outline:2px solid #f0d08a;outline-offset:2px}
 .edge{transition:stroke-width .18s}.edge.focus{filter:drop-shadow(0 0 3px #0006)}
 .node.gone .node-img{filter:grayscale(.75) brightness(.85)}.estado-mark{display:inline-block;margin-top:2px;padding:0 6px;border-radius:99px;background:var(--ec);color:#fff;font-size:.62rem;font-weight:800}
+.rel-hint-touch{display:none}@media (hover:none){.rel-hint-click{display:none}.rel-hint-touch{display:inline}}
 </style>
 <?php favor_head('Relaciones · Archivos del Gremio'); ?>
 </head>
@@ -171,7 +169,7 @@ a{color:inherit;text-decoration:none}button,input,select,textarea{font:inherit}
 
  <section class="paper graph-card">
   <div class="graph-head">
-   <div class="titleline"><div class="sigil">✦</div><div><h2><?= $focus?hr((string)$focus['displayName']):'Relaciones del gremio' ?></h2><p>Haz clic en un retrato del mapa para centrar la red en ese personaje.</p></div></div>
+   <div class="titleline"><div class="sigil">✦</div><div><h2><?= $focus?hr((string)$focus['displayName']):'Relaciones del gremio' ?></h2><p><span class="rel-hint-click">Haz clic en</span><span class="rel-hint-touch">Toca</span> un retrato del mapa para centrar la red en ese personaje.</p></div></div>
    <?php if($focus):?><span class="focus-badge"><?=hr((string)($focus['Categoria']??'Personaje'))?> · <?=hr((string)$focus['JugadorNombre'])?></span><?php endif;?>
   </div>
   <div class="graph" id="graph"><svg id="edges" aria-hidden="true"></svg><div id="nodes"></div></div>

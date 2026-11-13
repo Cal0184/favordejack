@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 require_once dirname(__DIR__) . '/includes/auth.php';
 require_once dirname(__DIR__) . '/includes/assets.php';
+require_once dirname(__DIR__) . '/includes/imagenes.php';
 require_once dirname(__DIR__) . '/includes/migrations.php';
 require_once dirname(__DIR__) . '/includes/estado.php';
 
@@ -42,7 +43,7 @@ function inv_character_payload(array $row): array {
         'playerName' => (string)($row['JugadorNombre'] ?? ''),
         'active' => (int)($row['Activo'] ?? 1) === 1,
         'status' => favor_estado_publico(favor_estado_de((string)$row['ID'])),
-        'portraitUrl' => favor_asset_url($portraitInput),
+        'portraitUrl' => favor_thumb_url($portraitInput),
     ];
 }
 

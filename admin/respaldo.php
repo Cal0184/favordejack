@@ -194,7 +194,8 @@ summary{cursor:pointer;color:#e0b26a}
         <form method="post" enctype="multipart/form-data" class="restore">
             <input type="hidden" name="csrf" value="<?= h($csrf) ?>">
             <input type="hidden" name="action" value="upload">
-            <input type="file" name="paquete" accept=".zip" required>
+            <label for="paquete-zip">Paquete .zip</label>
+            <input type="file" id="paquete-zip" name="paquete" accept=".zip" required>
             <button type="submit">Subir paquete</button>
         </form>
     </section>

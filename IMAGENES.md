@@ -27,8 +27,11 @@ misma imagen, las dos apuntan al mismo archivo; nunca se copia.
    misma función (`favor_asset_url` en PHP, `resolveAssetSrc` en la Banca). No hay
    copias en `bancadigital/`.
 5. **Las miniaturas no son copias.** `tiendas/emporio/Cartas/mini/` guarda una versión
-   pequeña de cada carta para que la cuadrícula cargue rápido. Se crea sola desde la
-   carta; si se borra, se vuelve a crear.
+   pequeña de cada carta para que la cuadrícula cargue rápido, y `media/mini/` una de
+   cada retrato e icono (320 × 400 px como mucho) para Archivos, Relaciones, Inventario,
+   la Banca y el tablón; el retrato entero solo se carga al abrir el expediente. Se
+   crean solas desde el original (`favor_thumb()` en `includes/imagenes.php`); si se
+   borran o cambia el original, se vuelven a crear.
 6. **Nada se borra a mano.** Lo que sobra se aparta en `respaldos/` con
    *Mi cuenta → Ordenar imágenes* (iconos, retratos y carpetas antiguas) o con
    *Admin del Emporio → Duplicados y limpieza* (cartas).
