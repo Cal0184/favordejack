@@ -1,0 +1,110 @@
+[
+  {
+    "id": "gremio-anillo-resistencia-acido",
+    "name": "Anillo de resistencia al Ácido",
+    "price": "450 po",
+    "subcategory": "Anillo",
+    "effect": "Resistencia al daño por ácido.",
+    "attunement": "Requiere",
+    "image": "assets/objetos/anillo.svg",
+    "review": "",
+    "category": "Objeto mágico",
+    "stock": 1
+  },
+  {
+    "id": "gremio-guantelete-invocador",
+    "name": "Guantelete del invocador",
+    "price": "450 po",
+    "subcategory": "Guantelete",
+    "effect": "En caso de fallar una tirada de concentración para mantener una invocación puedes infligir 20 de daño a un aliado para conseguirla.",
+    "attunement": "Requiere",
+    "image": "assets/objetos/guantelete.svg",
+    "review": "",
+    "category": "Objeto mágico",
+    "stock": 1
+  },
+  {
+    "id": "gremio-libro-conjuros-a",
+    "name": "Libro de Conjuros",
+    "price": "500 po",
+    "subcategory": "Libro de conjuros",
+    "effect": "Trucos: Prestidigitación / Salpicadura de ácido / Spray de veneno\nNivel 1: Armadura de mago, Escudo, Orbe cromático, Silvery barbs, Rayo de veneno\nNivel 2: Ceguera / sordera, Oscuridad, Ver oscuridad, Flecha ácida de Melf\nNivel 3: Forma gaseosa, Contrahechizo, Nube apestosa\nNivel 4: Puerta dimensional",
+    "attunement": "No requerida",
+    "image": "assets/objetos/libro.svg",
+    "review": "",
+    "category": "Objeto mágico",
+    "stock": 1
+  },
+  {
+    "id": "gremio-libro-conjuros-b",
+    "name": "Libro de Conjuros B",
+    "price": "500 po",
+    "subcategory": "Libro de conjuros",
+    "effect": "Trucos: Prestidigitación, Luz, Mensaje\nNivel 1: Invocar Familiar, Criar Pequeñas Criaturas\nNivel 2: Invocar Bestias, Conjurar Criaturas Menores\nNivel 3: Invocar Espíritus, Espectros\nNivel 4: Conjurar Elementales",
+    "attunement": "No requerida",
+    "image": "assets/objetos/libro.svg",
+    "review": "",
+    "category": "Objeto mágico",
+    "stock": 1
+  },
+  {
+    "id": "gremio-libro-conjuros-c",
+    "name": "Libro de Conjuros C",
+    "price": "500 po",
+    "subcategory": "Libro de conjuros",
+    "effect": "Trucos: Taumaturgia, Espada Mágica, Golpe Verdadero\nNivel 1: Hoja de Trueno, Escudo, Salto\nNivel 2: Celeridad, Espada Sombría\nNivel 3: Pisotón del Trueno, Desplazamiento\nNivel 4: Polimorfar",
+    "attunement": "No requerida",
+    "image": "assets/objetos/libro.svg",
+    "review": "",
+    "category": "Objeto mágico",
+    "stock": 1
+  },
+  {
+    "id": "gremio-libro-conjuros-d",
+    "name": "Libro de Conjuros D",
+    "price": "500 po",
+    "subcategory": "Libro de conjuros",
+    "effect": "Trucos: Prestidigitación, Llamas Sagradas, Mano de mago\nNivel 1: Misil Mágico, Escudo, Quemar\nNivel 2: Rayo Abrasador, Espina Mental\nNivel 3: Bola de Fuego, Disipar Magia\nNivel 4: Muro de Fuego",
+    "attunement": "No requerida",
+    "image": "assets/objetos/libro.svg",
+    "review": "",
+    "category": "Objeto mágico",
+    "stock": 1
+  },
+  {
+    "id": "gremio-pergamino-bola-de-fuego",
+    "name": "Pergamino Bola de Fuego",
+    "price": "150 po",
+    "subcategory": "Pergamino",
+    "effect": "",
+    "attunement": "No requerida",
+    "image": "assets/objetos/pergamino.svg",
+    "review": "El documento no trae el efecto de este pergamino.",
+    "category": "Objeto mágico",
+    "stock": 1
+  },
+  {
+    "id": "gremio-corazon-cristal-quemado",
+    "name": "Corazón de Cristal Quemado",
+    "price": "300 po",
+    "subcategory": "Reliquia",
+    "effect": "1 vez por día: puedes sacrificar tu acción y movimiento para otorgar a un aliado 2d10 HP y remover miedo o encanto.",
+    "attunement": "No requerida",
+    "image": "assets/objetos/corazon.svg",
+    "review": "",
+    "category": "Objeto mágico",
+    "stock": 1
+  },
+  {
+    "id": "gremio-jabalina-relampago",
+    "name": "Jabalina Relámpago",
+    "price": "600 po",
+    "subcategory": "Arma mágica",
+    "effect": "Al ser lanzada y decir la palabra de mando se transforma en un rayo, el cual realiza 4d6 de daño de rayo (1/día).\nJabalina, arma mágica.",
+    "attunement": "No requerida",
+    "image": "assets/objetos/jabalina.svg",
+    "review": "",
+    "category": "Objeto mágico",
+    "stock": 1
+  }
+]

@@ -79,6 +79,7 @@ function favor_page_context(): array
         'tiendas/ladamadelasllamas/index.php' => ['mapa', $map, 'llamas'],
         'tiendas/lapocionpicante/index.php' => ['mapa', $map, 'pocion'],
         'tiendas/lavaritaeconomica/index.php' => ['mapa', $map, 'varita'],
+        'tiendas/gremio/index.php' => ['mapa', $map, 'gremio'],
         'tiendas/emporio/index.php' => ['mapa', $map, 'emporio'],
         'tiendas/emporio/admin.php' => ['mapa', $emporio, 'emporio'],
         'tiendas/emporio/pedidos.php' => ['mapa', $emporio, 'emporio'],
@@ -184,6 +185,7 @@ function favor_site_bar(): void
             $accountLinks[] = ['Wiki del DM', 'timetoplay/'];
             $accountLinks[] = ['Admin del Emporio', 'tiendas/emporio/admin.php'];
             $accountLinks[] = ['Descuentos', 'tiendas/descuentos.php'];
+            $accountLinks[] = ['Almacén del Gremio', 'tiendas/gremio/#almacen'];
             $accountLinks[] = ['Respaldo de la web', 'admin/respaldo.php'];
             $accountLinks[] = ['Ordenar imágenes', 'admin/imagenes.php'];
         }
