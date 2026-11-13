@@ -50,6 +50,7 @@ $config = [
     <meta name="theme-color" content="#061813">
     <title>Inventario · Favor de Jack</title>
     <link rel="stylesheet" href="assets/inventory.css<?= favor_v(__DIR__ . '/assets/inventory.css') ?>">
+    <link rel="stylesheet" href="assets/movil.css<?= favor_v(__DIR__ . '/assets/movil.css') ?>">
     <style>
         :root{
             --inventory-bg-image:url(<?= json_encode($visualAssets['background'], JSON_UNESCAPED_SLASHES) ?>);
@@ -155,6 +156,7 @@ $config = [
                         <input id="itemSearch" type="search" placeholder="Buscar objeto…" autocomplete="off">
                     </label>
 
+                    <button class="filters-toggle" id="filtersToggle" type="button" aria-expanded="false" aria-controls="inventoryFilters"><span aria-hidden="true">⚙</span> Filtros<b id="filtersBadge" hidden></b></button>
                     <label class="sr-only" for="categoryFilter">Categoría</label>
                     <select id="categoryFilter" class="filter-select">
                         <option value="">Todas las categorías</option>
@@ -278,5 +280,6 @@ $config = [
 
 <script id="inventoryConfig" type="application/json"><?= json_encode($config, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) ?></script>
 <script src="assets/inventory.js<?= favor_v(__DIR__ . '/assets/inventory.js') ?>" defer></script>
+<script src="assets/movil.js<?= favor_v(__DIR__ . '/assets/movil.js') ?>" defer></script>
 </body>
 </html>

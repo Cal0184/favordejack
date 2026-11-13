@@ -493,6 +493,11 @@ SQL;
                 <div class="admin-panel" data-admin-content="missions" hidden>
                     <?php if ($missionsInstalled): ?>
                         <div class="admin-actions-row"><button class="ink-button" type="button" id="newMission">+ Nueva misión</button></div>
+                        <section class="mission-drafts" id="missionDrafts" hidden aria-labelledby="missionDraftsTitle">
+                            <h3 id="missionDraftsTitle">Borradores <span id="missionDraftsCount">0</span></h3>
+                            <p>Misiones a medio escribir. Se guardan solas mientras escribes; continúa cuando quieras.</p>
+                            <div class="mission-drafts-list" id="missionDraftsList"></div>
+                        </section>
                         <div class="admin-list" id="adminMissionList"></div>
                     <?php else: ?>
                         <div class="notice-sheet"><strong>Primero importa el SQL de misiones.</strong></div>

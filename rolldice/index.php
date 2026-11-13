@@ -39,6 +39,7 @@ function asset(string $path): string
 <link href="<?= asset('base.css') ?>" rel="stylesheet"/>
 <link href="<?= asset('dice.css') ?>" rel="stylesheet"/>
 <link href="<?= asset('jack.css') ?>" rel="stylesheet"/>
+<link href="<?= asset('movil.css') ?>" rel="stylesheet"/>
 <link href="<?= e(favor_static(FAVOR_LOGO)) ?>" rel="icon" type="image/webp"/><?php favor_head('Lanzador de dados · Favor de Jack'); ?>
 </head>
 <body>
@@ -478,5 +479,6 @@ function asset(string $path): string
 </div>
 <?php if ($diceUser): ?><script>window.FAVOR_DADOS = <?= json_encode(['csrf' => $diceCsrf, 'aviso' => 'aviso.php', 'tiradas' => 'guardadas.php'], JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) ?>;</script><?php endif; ?>
 <script src="<?= asset('dice.js') ?>"></script>
-<script src="<?= asset('jack-features.js') ?>"></script></body>
+<script src="<?= asset('jack-features.js') ?>"></script>
+<script src="<?= asset('movil.js') ?>"></script></body>
 </html>

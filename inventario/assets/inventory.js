@@ -618,7 +618,14 @@
         name.textContent = item.name;
         const categorySmall = document.createElement('small');
         categorySmall.textContent = item.imageUrl ? 'Imagen propia' : 'Visual de categoría';
-        mainText.append(name, categorySmall);
+        // En el móvil la categoría va bajo el nombre (la columna «Categoría» se oculta).
+        const categoryLine = document.createElement('small');
+        categoryLine.className = 'item-main__cat';
+        categoryLine.textContent = canonicalCategory(item.category);
+        const descLine = document.createElement('small');
+        descLine.className = 'item-main__desc';
+        descLine.textContent = item.description || canonicalCategory(item.category);
+        mainText.append(name, categorySmall, categoryLine, descLine);
         main.append(visual, mainText);
 
         const categoryCell = makeCell();
@@ -741,6 +748,82 @@
     // abiertos y el scroll: se usa cuando cambian los datos, no cuando el usuario navega.
     // Si la lista aún está entrando (clic reciente), las filas nuevas continúan esa misma
     // animación desde donde iba en lugar de cortarla.
+    // Móvil: la lista se agrupa por categoría en secciones plegables, como un
+    // inventario de juego. El escritorio conserva la tabla con páginas.
+    const groupedQuery = window.matchMedia('(max-width: 860px)');
+    const GROUP_ORDER = ['combat', 'magic', 'utility', 'vanity'];
+    const GROUP_ICONS = { combat: '⚔', magic: '✦', utility: '⚒', vanity: '♛' };
+    const collapsedGroups = new Set((() => {
+        try { return JSON.parse(localStorage.getItem('favorInventoryCollapsed') || '[]'); } catch (_) { return []; }
+    })());
+    function saveCollapsed() {
+        try { localStorage.setItem('favorInventoryCollapsed', JSON.stringify([...collapsedGroups])); } catch (_) {}
+    }
+    function useGroups() {
+        return groupedQuery.matches && state.view !== 'cards' && ['default', 'category'].includes(dom.sortFilter.value);
+    }
+    function buildGroups(items, canEdit, offset) {
+        const fragment = document.createDocumentFragment();
+        const byKey = new Map();
+        items.forEach((item) => {
+            const key = categoryVisual(item.category).key;
+            if (!byKey.has(key)) byKey.set(key, []);
+            byKey.get(key).push(item);
+        });
+        let index = 0;
+        GROUP_ORDER.filter((key) => byKey.has(key)).forEach((key) => {
+            const list = byKey.get(key);
+            const group = document.createElement('section');
+            group.className = `item-group item-group--${key}`;
+            group.dataset.group = key;
+            const collapsed = collapsedGroups.has(key);
+            group.classList.toggle('is-collapsed', collapsed);
+            const head = document.createElement('button');
+            head.type = 'button';
+            head.className = 'item-group__head';
+            head.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+            const icon = document.createElement('span');
+            icon.className = 'item-group__icon';
+            icon.setAttribute('aria-hidden', 'true');
+            icon.textContent = GROUP_ICONS[key] || '✦';
+            const label = document.createElement('span');
+            label.className = 'item-group__name';
+            label.textContent = canonicalCategory(list[0].category);
+            const count = document.createElement('span');
+            count.className = 'item-group__count';
+            count.textContent = `(${list.length})`;
+            const chev = document.createElement('span');
+            chev.className = 'item-group__chev';
+            chev.setAttribute('aria-hidden', 'true');
+            chev.textContent = '⌃';
+            head.append(icon, label, count, chev);
+            const body = document.createElement('div');
+            body.className = 'item-group__body';
+            const inner = document.createElement('div');
+            inner.className = 'item-group__inner';
+            list.forEach((item) => {
+                const row = createItemRow(item, canEdit);
+                row.style.animationDelay = `${Math.min(index++, 12) * 22 - offset}ms`;
+                inner.append(row);
+            });
+            body.append(inner);
+            group.append(head, body);
+            fragment.append(group);
+        });
+        return fragment;
+    }
+    dom.itemRows.addEventListener('click', (event) => {
+        const head = event.target.closest('.item-group__head');
+        if (!head) return;
+        const group = head.closest('.item-group');
+        const collapsed = !group.classList.contains('is-collapsed');
+        group.classList.toggle('is-collapsed', collapsed);
+        head.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+        if (collapsed) collapsedGroups.add(group.dataset.group); else collapsedGroups.delete(group.dataset.group);
+        saveCollapsed();
+    });
+    groupedQuery.addEventListener('change', () => { if (state.currentInventory) renderItemsOnly({ quiet: true }); });
+
     function renderItemsOnly({ quiet = false } = {}) {
         const payload = state.currentInventory;
         if (!payload) return;
@@ -775,10 +858,13 @@
             return;
         }
 
-        const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+        const grouped = useGroups();
+        const pageSize = grouped ? Math.max(1, filtered.length) : PAGE_SIZE;
+        const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
         if (state.page > totalPages) state.page = totalPages;
-        const startIndex = (state.page - 1) * PAGE_SIZE;
-        const pageItems = filtered.slice(startIndex, startIndex + PAGE_SIZE);
+        const startIndex = (state.page - 1) * pageSize;
+        const pageItems = filtered.slice(startIndex, startIndex + pageSize);
+        dom.inventoryList.classList.toggle('is-grouped', grouped);
 
         if (state.view === 'cards') {
             const fragment = document.createDocumentFragment();
@@ -786,6 +872,10 @@
             dom.itemCards.append(fragment);
             dom.inventoryList.hidden = true;
             dom.inventoryCards.hidden = false;
+        } else if (grouped) {
+            dom.itemRows.append(buildGroups(pageItems, payload.canEdit, offset));
+            dom.inventoryList.hidden = false;
+            dom.inventoryCards.hidden = true;
         } else {
             const fragment = document.createDocumentFragment();
             pageItems.forEach((item, index) => { const row = createItemRow(item, payload.canEdit); row.style.animationDelay = `${Math.min(index, 12) * 22 - offset}ms`; fragment.append(row); });
@@ -802,7 +892,7 @@
         dom.resultCount.textContent = filtered.length === sourceItems.length
             ? `Mostrando ${first}–${last} de ${filtered.length}`
             : `Mostrando ${first}–${last} de ${filtered.length} filtrados (${sourceItems.length} total)`;
-        renderPager(filtered.length);
+        if (grouped) dom.itemPager.replaceChildren(); else renderPager(filtered.length);
 
         if (quiet) {
             const container = state.view === 'cards' ? dom.itemCards : dom.itemRows;

@@ -1,0 +1,136 @@
+/* ==========================================================================
+   Inventario — versión móvil v2 (2026-11)
+   Más objetos a la vista: filas compactas, cabecera corta, filtros plegables.
+   Solo afecta a pantallas ≤ 860px; el escritorio queda igual.
+   ========================================================================== */
+.filters-toggle{display:none}
+.item-main__text small.item-main__cat,.item-main__text small.item-main__desc{display:none}
+
+@media(max-width:860px){
+  /* La barra común del sitio ya muestra la marca: fuera el segundo encabezado. */
+  #inventoryTopbar{display:none!important}
+
+  /* Selector de personaje compacto */
+  .sidebar__top{padding:10px 12px 6px!important;display:flex;flex-wrap:wrap;gap:6px}
+  .sidebar__title-row{flex:1 0 100%}
+  .sidebar__title-row{margin-bottom:6px!important;padding-bottom:6px!important}
+  .sidebar__title-row .eyebrow{display:none}
+  .sidebar__title-row h1{font-size:.98rem!important}
+  .player-picker,.character-search{display:flex!important;flex:1 1 0;width:auto!important;min-width:0;margin:0!important}
+  .player-picker select,.character-search input{font-size:16px!important}
+  .character-state{padding:6px 12px!important}
+  .character-list{padding:0 12px 10px!important}
+  .character-card{flex:0 0 148px!important;grid-template-columns:40px minmax(0,1fr)!important;gap:8px!important;padding:6px!important}
+  .character-card__image{width:40px!important;height:44px!important}
+
+  /* Ficha del personaje: retrato pequeño y botones en una fila */
+  .inventory-workspace{padding:10px 8px 20px!important}
+  .character-hero{grid-template-columns:64px minmax(0,1fr)!important;gap:10px!important;padding:10px!important}
+  .portrait{width:64px!important;height:70px!important}
+  .character-hero__identity h2{font-size:1.35rem!important;line-height:1.1}
+  .hero-meta{font-size:.76rem!important;margin:2px 0 0!important}
+  .hero-quote{display:none!important}
+  .character-hero__watermark{display:none}
+  .character-hero__actions{display:flex!important;flex-wrap:wrap;gap:6px!important;grid-column:1/-1}
+  .character-hero__actions .hero-button{flex:1 1 0;min-width:0;min-height:38px;padding:6px 8px!important;font-size:.72rem!important;justify-content:center;white-space:nowrap}
+  .character-hero__actions .hero-button--primary{flex:1 0 100%;min-height:44px;font-size:.82rem!important}
+
+  /* Resumen: cuatro cifras en una fila */
+  .summary-strip{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:6px;margin:0 8px 10px!important;border-top:0!important;background:transparent!important}
+  .summary-card{min-height:0!important;padding:7px 4px!important;align-items:center;text-align:center;border:1px solid rgba(121,91,43,.35)!important;border-radius:7px;background:rgba(255,250,235,.45)!important;box-shadow:inset 0 0 0 2px rgba(255,250,235,.4)}
+  .summary-card::before{display:none!important}
+  .summary-card span{font-size:.54rem!important;letter-spacing:.06em!important}
+  .summary-card strong{font-size:1.15rem!important;margin-top:3px!important}
+
+  /* Filtros: buscador + «Filtros» + vista; los desplegables se abren al tocar «Filtros» */
+  .inventory-filters{display:grid!important;grid-template-columns:minmax(0,1fr) auto auto!important;gap:6px!important;padding:8px!important;position:relative}
+  .inventory-filters .search-box{grid-column:1/-1!important}
+  .inventory-filters .search-box input{font-size:16px}
+  .filters-toggle{
+    display:inline-flex;align-items:center;justify-content:center;gap:6px;
+    min-height:40px;padding:0 12px;border:1px solid #b28b42;border-radius:8px;
+    background:linear-gradient(180deg,#f3e3bd,#dcc493);color:#3b2a16;transition:transform .16s ease,filter .2s ease;
+    font:800 .74rem/1 system-ui,sans-serif;cursor:pointer;grid-column:1;justify-self:start
+  }
+  .filters-toggle:active{transform:scale(.95)}
+  .filters-toggle[aria-expanded="true"]{background:linear-gradient(180deg,#e7cf98,#c9a865);box-shadow:inset 0 2px 4px rgba(0,0,0,.2)}
+  .hero-button,.view-switch button,.refresh-inventory,.character-card,.equip-button,.row-action{transition:transform .16s ease,filter .2s ease,background-color .2s ease}
+  .hero-button:active,.view-switch button:active,.refresh-inventory:active,.character-card:active,.equip-button:active,.row-action:active{transform:scale(.94)}
+  .filters-toggle b{display:grid;place-items:center;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#7a2430;color:#f6e3b8;font-size:.66rem}
+  .filters-toggle b[hidden]{display:none}
+  .inventory-filters .filter-select{display:none;grid-column:1/-1}
+  .inventory-filters.filters-open .filter-select{display:block;animation:invFilterIn .2s ease both}
+  .inventory-filters .view-switch{grid-column:2!important;grid-row:2}
+  .inventory-filters .view-switch button{min-height:40px;padding:0 10px;font-size:.72rem}
+  .inventory-filters .refresh-inventory{position:static!important;grid-column:3;grid-row:2;width:40px;height:40px}
+
+  /* Filas tipo inventario de juego: imagen · nombre/categoría · equipado · ×cantidad · ⋯ */
+  .inventory-row{grid-template-columns:minmax(0,1fr) auto auto auto!important;align-items:center;margin-bottom:6px!important;transition:background-color .2s ease,transform .16s ease}
+  .inventory-row:active{transform:scale(.99)}
+  .inventory-row>.inventory-cell{padding:6px 6px!important}
+  .inventory-row>.item-main{grid-column:1!important;grid-row:1!important;padding-left:8px!important}
+  .inventory-row>.inventory-cell:nth-child(2){display:none!important}
+  .inventory-row>.inventory-cell:nth-child(4){grid-column:2!important;grid-row:1!important;padding:0 2px!important}
+  .inventory-row>.inventory-cell:nth-child(3){grid-column:3!important;grid-row:1!important;padding:0 4px!important;justify-content:flex-end;min-width:34px}
+  .inventory-row>.inventory-cell:nth-child(6){grid-column:4!important;grid-row:1!important;padding:6px 8px 6px 2px!important}
+  .inventory-row .item-visual{flex-basis:46px!important;width:46px!important;height:46px!important}
+  .inventory-row .item-main__text strong{font-size:.95rem;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.15}
+  .inventory-row .item-main__text small{display:none}
+  .inventory-row .item-main__text small.item-main__cat{display:block;font:italic 500 .74rem/1.2 Georgia,serif;color:#6f5c40;margin-top:2px}
+  .inventory-row .quantity-value{font-size:.95rem;color:#3a2a19}
+  .inventory-row .row-action{width:34px;height:34px;border-color:transparent;background:transparent;font-size:1rem}
+  .inventory-row .equip-button,.inventory-row .equip-label{min-height:26px;padding:3px 8px;font-size:.6rem}
+  .inventory-row .equip-label.is-unequipped{display:none}
+  .inventory-row>.row-details{grid-column:1/-1!important;grid-row:2!important}
+
+  /* Secciones por categoría, plegables (cabecera granate como en el diseño) */
+  .inventory-list.is-grouped{display:grid;gap:10px}
+  .item-group{border:1px solid #a9823f;border-radius:9px;background:linear-gradient(rgba(240,226,190,.86),rgba(231,214,174,.86)),var(--inventory-paper-image) center/430px 430px repeat;box-shadow:0 8px 18px rgba(0,0,0,.22)}
+  .item-group__head{
+    width:100%;display:grid;grid-template-columns:30px minmax(0,1fr) auto 22px;align-items:center;gap:8px;
+    min-height:50px;padding:0 12px;border:0;border-radius:8px 8px 0 0;cursor:pointer;text-align:left;
+    background:linear-gradient(180deg,#7a2430,#521620);color:#f6e3b8;
+    font:600 1.08rem/1.1 Georgia,'Times New Roman',serif;
+    box-shadow:inset 0 -2px 0 rgba(0,0,0,.25);transition:filter .2s ease;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .item-group__head:active{filter:brightness(1.15)}
+  .item-group__icon{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:rgba(0,0,0,.25);color:#f0cf75;font-size:1rem}
+  .item-group__name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .item-group__count{font-size:.92rem;color:#e7cf98}
+  .item-group__chev{display:grid;place-items:center;font-size:1rem;color:#f0cf75;transition:transform .28s ease}
+  .item-group.is-collapsed .item-group__chev{transform:rotate(180deg)}
+  .item-group.is-collapsed .item-group__head{border-radius:8px}
+  .item-group .item-main__text small.item-main__cat{display:none}
+  .item-group .item-main__text small.item-main__desc{display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;font:italic 500 .74rem/1.25 Georgia,serif;color:#6f5c40;margin-top:2px}
+  .item-group--combat .item-group__head{background:linear-gradient(180deg,#7a2430,#521620)}
+  .item-group--magic .item-group__head{background:linear-gradient(180deg,#4b2d63,#2f1a42)}
+  .item-group--utility .item-group__head{background:linear-gradient(180deg,#2c5a43,#173a2a)}
+  .item-group--vanity .item-group__head{background:linear-gradient(180deg,#7a5420,#4f3410)}
+  .item-group__body{display:grid;grid-template-rows:1fr;transition:grid-template-rows .3s ease}
+  .item-group.is-collapsed .item-group__body{grid-template-rows:0fr}
+  .item-group__inner{min-height:0;overflow:hidden}
+  .item-group.is-collapsed .item-group__inner{overflow:hidden}
+  .item-group:not(.is-collapsed) .item-group__inner:has(.is-menu-open){overflow:visible}
+  .item-group .inventory-row{margin:0!important;border:0!important;border-radius:0!important;background:transparent!important;border-top:1px solid rgba(120,90,40,.22)!important}
+  .item-group .inventory-row:first-child{border-top:0!important}
+  .item-group .inventory-row:has(.equip-button.is-equipped),.item-group .inventory-row:has(.equip-label.is-equipped){background:rgba(120,170,110,.18)!important}
+
+  /* Tarjetas: dos por fila también en teléfonos */
+  .inventory-cards>div{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
+  .item-card__body{padding:8px!important}
+  .item-card__body p{min-height:0!important;-webkit-line-clamp:2;display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden}
+  .item-card__footer{flex-wrap:wrap}
+
+  /* Editor de objetos ocupa la pantalla y no queda tapado por la barra inferior */
+  .modal{padding:6px!important;z-index:9600!important}
+  .modal__card{width:100%!important;max-height:calc(100dvh - 12px)!important;padding:16px 14px!important}
+  .modal__card input,.modal__card select,.modal__card textarea{font-size:16px}
+
+  .toast-stack{bottom:calc(var(--favor-tab-h,64px) + 10px)!important}
+}
+@media(max-width:340px){
+  .inventory-cards>div{grid-template-columns:1fr!important}
+  .player-picker,.character-search{flex-basis:100%}
+}
+@keyframes invFilterIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}

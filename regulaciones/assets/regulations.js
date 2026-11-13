@@ -26,8 +26,38 @@
     const normalize = value => String(value || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
     items.forEach(item => { item.dataset.haystack = normalize(item.dataset.search); });
 
+    const home = $('#regHome');
+    const crumbTitle = $('#crumbTitle');
+    const listEl = $('#ruleList');
+    let atHome = !!home;
+
+    // Portada móvil (tarjetas de sección) ↔ lista filtrada.
+    function setHome(on) {
+        atHome = !!home && on;
+        book.classList.toggle('at-home', atHome);
+    }
+
+    function filterLabel(value) {
+        if (value === 'all') return 'Todas las reglas';
+        const btn = filters.find(b => b.dataset.filter === value && b.classList.contains('chip'))
+            || filters.find(b => b.dataset.filter === value);
+        return (btn?.querySelector('.home-name, span')?.textContent || btn?.textContent || '').trim();
+    }
+
+    // Las filas entran una tras otra, para que se note que el filtro respondió.
+    function animateList() {
+        if (!listEl) return;
+        let i = 0;
+        for (const item of items) {
+            item.classList.remove('enter');
+            if (!item.hidden && i < 14) item.style.setProperty('--i', String(i++));
+        }
+        void listEl.offsetWidth;
+        items.forEach(item => { if (!item.hidden) item.classList.add('enter'); });
+    }
+
     function matchesFilter(item) {
-        if (filter === 'all') return true;
+        if (filter === 'all') return item.dataset.type !== 'parche';
         if (filter.startsWith('cat:')) return item.dataset.category === filter.slice(4);
         if (filter.startsWith('type:')) return item.dataset.type === filter.slice(5);
         return true;
@@ -42,6 +72,7 @@
             if (show) shown += 1;
         }
         visibleCount.textContent = String(shown);
+        if (crumbTitle) crumbTitle.textContent = words.length && filter === 'all' ? 'Resultados de búsqueda' : filterLabel(filter);
         emptyState.hidden = shown !== 0;
         if (shown === 0) {
             emptyText.textContent = words.length
@@ -58,6 +89,53 @@
             btn.setAttribute('aria-pressed', on ? 'true' : 'false');
         });
         applyFilters();
+        animateList();
+    }
+
+    const visibleItems = () => items.filter(i => !i.hidden);
+    const titleOf = item => item?.querySelector('.rule-title')?.textContent.trim() || '';
+
+    // Botones «Anterior / Siguiente» al final del detalle (dentro de la lista filtrada).
+    function navFor(item) {
+        const list = visibleItems();
+        const at = list.indexOf(item);
+        const prev = at > 0 ? list[at - 1] : null;
+        const next = at >= 0 && at < list.length - 1 ? list[at + 1] : null;
+        const nav = document.createElement('nav');
+        nav.className = 'detail-nav';
+        nav.setAttribute('aria-label', 'Otras regulaciones');
+        const make = (target, cls, label) => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = cls;
+            btn.disabled = !target;
+            const small = document.createElement('small');
+            small.textContent = label;
+            const span = document.createElement('span');
+            span.textContent = titleOf(target);
+            btn.append(small, span);
+            if (target) btn.addEventListener('click', () => go(target, cls === 'nav-prev'));
+            return btn;
+        };
+        nav.append(make(prev, 'nav-prev', '‹ Anterior'), make(next, 'nav-next', 'Siguiente ›'));
+        return nav;
+    }
+
+    function go(target, backwards = false) {
+        if (!target) return;
+        history.replaceState(null, '', '#' + target.id);
+        detail.classList.toggle('from-left', backwards);
+        detail.style.animation = 'none';
+        void detail.offsetWidth;
+        detail.style.animation = '';
+        show(target);
+    }
+
+    function step(delta) {
+        if (!current) return;
+        const list = visibleItems();
+        const at = list.indexOf(current);
+        go(list[at + delta], delta < 0);
     }
 
     function show(item, { focus = false } = {}) {
@@ -65,8 +143,9 @@
         current = item;
         items.forEach(i => i.classList.toggle('selected', i === item));
         const tpl = item.querySelector('template');
-        detailContent.replaceChildren(tpl.content.cloneNode(true));
-        if (detailAdmin) detailAdmin.hidden = false;
+        detailContent.replaceChildren(tpl.content.cloneNode(true), navFor(item));
+        if (detailAdmin) detailAdmin.hidden = item.dataset.type === 'parche';
+        setHome(false);
         detail.scrollTop = 0;
         if (mobile.matches) {
             book.classList.add('reading');
@@ -90,7 +169,10 @@
         id = OLD_IDS[id] || id;
         const item = id && document.getElementById(id);
         if (item && item.classList.contains('rule-item')) {
-            if (item.hidden) setFilter('all');
+            if (item.hidden) {
+                if (search) search.value = '';
+                setFilter(item.dataset.type === 'parche' ? 'cat:Patch Notes' : 'all');
+            }
             show(item);
             if (!mobile.matches) item.scrollIntoView({ block: 'nearest' });
         } else if (mobile.matches) {
@@ -105,14 +187,50 @@
             show(item, { focus: true });
         });
     });
-    filters.forEach(btn => btn.addEventListener('click', () => setFilter(btn.dataset.filter)));
-    search?.addEventListener('input', applyFilters);
+    filters.forEach(btn => btn.addEventListener('click', () => {
+        setFilter(btn.dataset.filter);
+        if (btn.closest('#regHome')) {
+            setHome(false);
+            const tools = document.querySelector('.list-tools');
+            if (mobile.matches && tools) window.scrollTo({ top: tools.getBoundingClientRect().top + window.scrollY - 4, behavior: 'smooth' });
+        }
+    }));
+    search?.addEventListener('input', () => {
+        if (search.value.trim() !== '') setHome(false);
+        applyFilters();
+    });
+    document.querySelectorAll('.recent-card').forEach(link => link.addEventListener('click', e => {
+        e.preventDefault();
+        history.pushState(null, '', link.getAttribute('href'));
+        fromHash();
+    }));
+    $('#crumbBack')?.addEventListener('click', () => {
+        if (search) search.value = '';
+        setFilter('all');
+        setHome(true);
+    });
     $('#detailClose')?.addEventListener('click', closeDetail);
     window.addEventListener('popstate', fromHash);
     document.addEventListener('keydown', e => {
         if (e.key === 'Escape' && book.classList.contains('reading') && !document.querySelector('dialog[open]')) closeDetail();
     });
 
+    // Deslizar el dedo a izquierda/derecha cambia de regulación en el móvil.
+    let touchX = null, touchY = null;
+    detail.addEventListener('touchstart', e => {
+        if (!mobile.matches || e.touches.length !== 1) return;
+        touchX = e.touches[0].clientX; touchY = e.touches[0].clientY;
+    }, { passive: true });
+    detail.addEventListener('touchend', e => {
+        if (touchX === null) return;
+        const dx = e.changedTouches[0].clientX - touchX;
+        const dy = e.changedTouches[0].clientY - touchY;
+        touchX = null;
+        if (e.target.closest('table, .table-wrap, pre')) return;
+        if (Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.6) step(dx < 0 ? 1 : -1);
+    }, { passive: true });
+
+    setHome(true);
     applyFilters();
     if (location.hash) fromHash();
     else if (!mobile.matches) show(items.find(i => !i.hidden));
