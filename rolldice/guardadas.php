@@ -18,7 +18,11 @@ function guardadas_out(array $data, int $code = 200): never
 }
 
 favor_session_start();
-$user = favor_current_user();
+try {
+    $user = favor_current_user();
+} catch (Throwable $e) {
+    guardadas_out(['ok' => false, 'error' => 'No se pudo comprobar tu cuenta. Inténtalo otra vez.'], 503);
+}
 if (!$user) guardadas_out(['ok' => false, 'error' => 'Inicia sesión para guardar tiradas en tu cuenta.'], 401);
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {

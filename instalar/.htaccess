@@ -1,4 +1,7 @@
-Require all denied
-<IfModule !mod_authz_core.c>
-  Deny from all
-</IfModule>
+# Solo el instalador (index.php) se abre desde el navegador, y él mismo se
+# cierra cuando no existe clave.php. El resto (esquema.sql, respaldo-cli.php,
+# clave.php) nunca se sirve.
+<FilesMatch "^(?!index\.php$).">
+  Require all denied
+</FilesMatch>
+DirectoryIndex index.php

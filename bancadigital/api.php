@@ -167,11 +167,19 @@ function character_from_row(array $row): array {
     return $character;
 }
 
+/** El grupo especial «NPC» de la Banca. */
+function is_npc_player_name(string $value): bool {
+    return in_array(asset_name($value), ['npc', 'npcs'], true);
+}
+
 function fetch_players(mysqli $db, array $user): array {
     // La Banca es visible en modo lectura para todos. Los permisos se aplican al modificar.
     $result = $db->query('SELECT ID, Nombre, Handle, Emoji, IconBg, IconUrl, Orden, Activo FROM Jugador ORDER BY Orden, Nombre');
     $players = [];
-    while ($row = $result->fetch_assoc()) $players[] = player_from_row($row);
+    while ($row = $result->fetch_assoc()) {
+        if (is_npc_player_name((string)$row['Nombre'])) continue;
+        $players[] = player_from_row($row);
+    }
     $result->free();
     return $players;
 }
@@ -179,8 +187,12 @@ function fetch_players(mysqli $db, array $user): array {
 function fetch_characters(mysqli $db, array $user): array {
     // Igual que los jugadores: lectura global, escritura limitada por can_access_character().
     $result = $db->query('SELECT ID, Jugador, Nombre, Platino, Oro, Plata, Cobre, Descripcion, Notas, IconUrl, PortraitUrl, Orden, Activo FROM Personaje ORDER BY Jugador, Orden, Nombre');
+    $npc = favor_npc_ids($db);
     $characters = [];
-    while ($row = $result->fetch_assoc()) $characters[] = character_from_row($row);
+    while ($row = $result->fetch_assoc()) {
+        if (isset($npc[(string)$row['ID']])) continue;
+        $characters[] = character_from_row($row);
+    }
     $result->free();
     return $characters;
 }
@@ -238,17 +250,14 @@ function fetch_movements(mysqli $db, string $charId): array {
     return $items;
 }
 
-function close_session_lock(): void {
-    if (session_status() === PHP_SESSION_ACTIVE) {
-        session_write_close();
-    }
-}
-
 try {
     /** @var mysqli $db */
     $db = require __DIR__ . '/db.php';
-    favor_ensure_schema($db);
     $user = current_user($db);
+    // Con la identidad y el token ya en memoria, la sesión se suelta: las demás
+    // peticiones del mismo jugador no esperan a estas consultas.
+    favor_session_close();
+    favor_ensure_schema($db);
     $action = (string)($_GET['action'] ?? 'state');
 
     if ($action === 'state') {
@@ -289,7 +298,9 @@ try {
         $stmt->execute();
         $result = $stmt->get_result();
         $targets = [];
+        $npc = favor_npc_ids($db);
         while ($row = $result->fetch_assoc()) {
+            if (isset($npc[(string)$row['ID']])) continue;
             $targets[] = [
                 'id' => (string)$row['ID'],
                 'name' => (string)$row['Nombre'],
@@ -418,10 +429,15 @@ try {
             // Se valida tanto al crear como al reactivar un personaje previamente desactivado.
             // El admin puede pasar el límite (por ejemplo, para personajes de prueba o especiales).
             if (!$isAdmin && !is_text_only_player_name($playerName) && $active === 1 && (!$oldRow || (int)$oldRow['Activo'] !== 1)) {
-                $stmt = $db->prepare('SELECT COUNT(*) AS Total FROM Personaje WHERE Jugador=? AND Activo=1');
+                // Los NPC que el jugador tenga en Archivos no cuentan para el límite.
+                $stmt = $db->prepare('SELECT ID FROM Personaje WHERE Jugador=? AND Activo=1');
                 $stmt->bind_param('s', $pid);
                 $stmt->execute();
-                $activeCount = (int)($stmt->get_result()->fetch_assoc()['Total'] ?? 0);
+                $npc = favor_npc_ids($db);
+                $activeCount = 0;
+                foreach ($stmt->get_result()->fetch_all() as $countRow) {
+                    if (!isset($npc[(string)$countRow[0]])) $activeCount++;
+                }
                 $stmt->close();
                 if ($activeCount >= 5) {
                     throw new DomainException('Este jugador ya tiene el máximo de 5 personajes activos.');
@@ -794,6 +810,10 @@ try {
             if (!can_access_character($user, $source)) {
                 throw new DomainException('No puedes transferir dinero desde ese personaje.');
             }
+            $npc = favor_npc_ids($db);
+            if (isset($npc[$sourceId]) || isset($npc[$targetId])) {
+                throw new DomainException('Los NPC no usan la Banca.');
+            }
             if (!$source['active'] || !$target['active'] || (int)$locked[$targetId]['JugadorActivo'] !== 1) {
                 throw new DomainException('El personaje de destino no está disponible.');
             }
@@ -914,6 +934,7 @@ try {
             if (!$character || !can_access_character($user, $character)) {
                 throw new DomainException('Personaje no autorizado.');
             }
+            if (isset(favor_npc_ids($db)[$charId])) throw new DomainException('Los NPC no usan la Banca.');
 
             $newCoins = [];
             foreach (COINS as $coin) {

@@ -22,4 +22,7 @@ return [
     // Opcional. Déjalo vacío: la web detecta sola si vive en «/» o en una carpeta.
     // Solo si tu hosting lo detecta mal, pon la carpeta, por ejemplo '/favordejack/'.
     'base_path' => '',
+
+    // true cuando el dominio ya tiene certificado (candado): toda la web pasa a https://.
+    'force_https' => false,
 ];

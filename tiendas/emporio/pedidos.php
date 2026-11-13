@@ -21,7 +21,13 @@ function out(array $data, int $code = 200): never
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') out(['ok' => false, 'error' => 'Método no permitido.'], 405);
 
-$user = favor_current_user();
+try {
+    // Cuenta releída de la base de datos: una cuenta desactivada o un rol
+    // retirado no compran ni gestionan con los permisos viejos.
+    $user = favor_current_user(true);
+} catch (Throwable $e) {
+    out(['ok' => false, 'error' => 'No se pudo comprobar tu cuenta. Inténtalo otra vez.'], 503);
+}
 if (!$user) out(['ok' => false, 'error' => 'Inicia sesión para hacer pedidos.'], 401);
 try {
     favor_verify_csrf((string)($_SERVER['HTTP_X_CSRF_TOKEN'] ?? ''));
@@ -60,6 +66,8 @@ try {
             if (isset($cards[$id])) {
                 $card = $cards[$id];
                 if ($card['soldOut']) throw new RuntimeException($card['name'] . ' está agotado.');
+                // Aviso rápido; el cobro vuelve a mirarlo con candado.
+                if ($qty > $card['stock']) throw new RuntimeException('De ' . $card['name'] . ' solo ' . ($card['stock'] === 1 ? 'queda 1 unidad.' : 'quedan ' . $card['stock'] . ' unidades.'));
                 $item = ['id' => $id, 'name' => $card['name'], 'price' => $card['priceLabel'], 'pricePo' => $card['pricePo'], 'qty' => $qty];
             } elseif (isset($services[$id])) {
                 $price = (string)($services[$id]['price'] ?? '');
@@ -129,6 +137,9 @@ try {
                 });
             } catch (Throwable $e) {
                 favor_purchase_refund($order['characterId'], $order['charge'], 'Compra deshecha (no se pudo registrar)', $by);
+                if (is_array($order['stock'] ?? null)) {
+                    try { emporio_stock_move($order['stock'], 1, emporio_all_cards()); } catch (Throwable) {}
+                }
                 throw $e;
             }
         } catch (Throwable $e) {

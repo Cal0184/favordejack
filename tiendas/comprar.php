@@ -19,7 +19,13 @@ function out(array $data, int $code = 200): never
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') out(['ok' => false, 'error' => 'Método no permitido.'], 405);
-$user = favor_current_user();
+try {
+    // Cuenta releída de la base de datos: una cuenta desactivada o un rol
+    // retirado no compran ni gestionan con los permisos viejos.
+    $user = favor_current_user(true);
+} catch (Throwable $e) {
+    out(['ok' => false, 'error' => 'No se pudo comprobar tu cuenta. Inténtalo otra vez.'], 503);
+}
 if (!$user) out(['ok' => false, 'error' => 'Inicia sesión para comprar.'], 401);
 try {
     favor_verify_csrf((string)($_SERVER['HTTP_X_CSRF_TOKEN'] ?? ''));

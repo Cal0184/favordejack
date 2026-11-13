@@ -19,6 +19,9 @@ if (!$user) {
 }
 $isAdmin = ($user['role'] ?? '') === 'admin';
 $csrf = favor_csrf();
+// Leer y procesar el PDF tarda: la sesión se suelta ya y solo se reabre un
+// instante para apuntar o quitar la subida pendiente.
+favor_session_close();
 
 function h(mixed $value): string
 {
@@ -77,9 +80,12 @@ try {
             if (!@move_uploaded_file((string)$file['tmp_name'], ficha_storage_dir() . '/tmp-' . $token . '.pdf')) {
                 throw new RuntimeException('El servidor no pudo guardar el PDF temporalmente.');
             }
-            $pending = array_slice($pending, -4, null, true);
-            $pending[$token] = ['user' => (int)$user['id'], 'file' => (string)$file['name']];
-            $_SESSION['ficha_import'] = $pending;
+            $entry = ['user' => (int)$user['id'], 'file' => (string)$file['name']];
+            favor_session_write(static function () use ($token, $entry): void {
+                $list = array_slice((array)($_SESSION['ficha_import'] ?? []), -4, null, true);
+                $list[$token] = $entry;
+                $_SESSION['ficha_import'] = $list;
+            });
             $guess = ficha_guess_character($characters, (string)$parsed['name']);
             if ($selectedId === '' || !in_array($selectedId, array_column($characters, 'ID'), true)) $selectedId = (string)($_POST['character'] ?? '');
             if ($selectedId === '' || !in_array($selectedId, array_column($characters, 'ID'), true)) $selectedId = (string)$guess;
@@ -110,8 +116,11 @@ try {
                     'items' => array_map('intval', (array)($_POST['items'] ?? [])),
                     'itemActions' => array_map('strval', (array)($_POST['itemAction'] ?? [])),
                 ], $path);
-                unset($pending[$token]);
-                $_SESSION['ficha_import'] = $pending;
+                favor_session_write(static function () use ($token): void {
+                    $list = (array)($_SESSION['ficha_import'] ?? []);
+                    unset($list[$token]);
+                    $_SESSION['ficha_import'] = $list;
+                });
                 $step = 'done';
             }
         } else {

@@ -1,9 +1,19 @@
 Options -Indexes
 
 # Archivos de soporte/backup nunca deben servirse directamente.
-<FilesMatch "\.(?:sql|bak|log|ini|env)$">
+<FilesMatch "\.(?:sql|bak|log|ini|env|tmp|swp|orig|old|dist)$|~$">
   Require all denied
 </FilesMatch>
+
+# Archivos ocultos (.git, .env, volcados temporales «.volcado-…»). Hestia ya los
+# bloquea en Nginx; esto cubre el caso de que la petición llegue a Apache.
+<FilesMatch "^\.(?!well-known)">
+  Require all denied
+</FilesMatch>
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule (?:^|/)\.(?!well-known/) - [F,L]
+</IfModule>
 
 # Datos internos (JSON), notas (README) y bloqueos: la web los lee desde PHP,
 # el navegador nunca los necesita.
@@ -47,6 +57,14 @@ Options -Indexes
 </IfModule>
 
 <IfModule mod_headers.c>
+  # Cabeceras de seguridad: el navegador no adivina tipos de archivo, no deja
+  # meter la web dentro de otra página y no manda la dirección completa a
+  # sitios externos. No buscadores (la web es privada del grupo).
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set X-Robots-Tag "noindex, nofollow"
+
   # Las páginas PHP piden ?v=<fecha del archivo>: si cambia el archivo, cambia la
   # dirección, así que el navegador puede guardarlas un año sin preguntar.
   <FilesMatch "\.(?:css|js)$">

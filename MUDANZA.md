@@ -15,28 +15,27 @@ Con las dos partes la web queda igual en cualquier servidor con PHP 8 y MySQL o 
 
 No compartas el paquete: lleva las contraseñas cifradas de los usuarios.
 
-## 2. En el hosting nuevo: preparar
+## 2. En el hosting nuevo: copiar la web
 
-1. Crea una **base de datos vacía** y un **usuario** con todos los permisos sobre ella (en el panel del hosting, «Bases de datos MySQL»).
-2. Descarga el código de GitHub: botón verde **Code → Download ZIP**.
-3. Sube el contenido del ZIP a la carpeta de la web: a `public_html/` si va en la raíz, o a `public_html/favordejack/` si va en una carpeta.
-4. Copia `config.example.php` como **`config.local.php`** y rellena el nombre de la base de datos, el usuario y la contraseña.
+1. Crea una **base de datos vacía** y un **usuario** con todos los permisos sobre ella (en el panel del hosting).
+2. Copia la carpeta entera de la web vieja (con su `respaldos/` y el paquete del paso 1) a la carpeta del dominio nuevo: `public_html/` si va en la raíz.
+   Si no puedes copiar la carpeta, sirve también el código de GitHub (**Code → Download ZIP**) más el paquete en `respaldos/`.
+3. Crea `instalar/clave.php` con una clave larga: `<?php return 'tu-clave-larga';` (el paquete de mudanza ya lo trae).
 
-## 3. Cargar los datos
+## 3. Cargar los datos: el instalador
 
-1. Abre el paquete .zip en tu ordenador y saca el archivo **`base-de-datos.sql`**.
-2. En phpMyAdmin, entra en la base de datos nueva y usa **Importar** con ese archivo. Esto crea las tablas y los usuarios, así que ya puedes iniciar sesión.
-3. Sube el paquete .zip entero por FTP a la carpeta **`respaldos/`** de la web.
-4. Entra con tu cuenta de admin en `admin/respaldo.php`. En el paquete, abre **Restaurar este paquete**, escribe `RESTAURAR` y confirma. Esto copia las imágenes, las fichas y los datos de las tiendas.
+1. Abre `https://dominio-nuevo/instalar/`.
+2. Escribe la clave, los datos de la base de datos nueva y elige el paquete.
+3. Pulsa **Instalar**. Escribe `config.local.php`, carga la base de datos y los archivos del paquete, y se cierra solo (borra `clave.php`).
 
-Si el servidor tiene SSH, los pasos 1 a 4 se reducen a uno:
-`php instalar/respaldo-cli.php restaurar respaldos/paquete.zip`
+Si el servidor tiene SSH, también sirve:
+`php instalar/respaldo-cli.php restaurar respaldos/paquete.zip` (con `config.local.php` hecho a mano desde `config.example.php`).
 
 ## 4. Apuntar el dominio
 
 1. En el registrador del dominio, cambia los **DNS** (o el registro A) a los del hosting nuevo.
-2. Activa **HTTPS** (Let's Encrypt) en el panel del hosting nuevo.
-3. Si cambias de dominio, deja en el viejo una redirección al nuevo.
+2. Activa **HTTPS** (Let's Encrypt) en el panel del hosting nuevo y pon `'force_https' => true` en `config.local.php` (el instalador lo marca si ya abriste con https://).
+3. Si cambias de dominio, deja en el viejo una redirección al nuevo: una carpeta con solo un `index.php` que haga `header('Location: https://nuevo/…', true, 301)` y un `.htaccess` que mande todo a ese `index.php`.
 
 ## Instalar desde cero (sin datos)
 

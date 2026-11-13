@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 /*
  * La wiki contiene notas privadas del DM: solo la ve un administrador.
- * El contenido sigue en index.html, que el .htaccess bloquea por URL.
+ * El contenido está en contenido.php, que no muestra nada si se abre directo.
+ * (Antes era index.html: en Hestia, Nginx entregaba los .html sin mirar el
+ * .htaccess, así que cualquiera podía leerlo.)
  */
 require_once dirname(__DIR__) . '/includes/auth.php';
 
@@ -28,4 +30,5 @@ if (($user['role'] ?? '') !== 'admin') {
 }
 
 header('Content-Type: text/html; charset=UTF-8');
-readfile(__DIR__ . '/index.html');
+define('FAVOR_TIMETOPLAY', true);
+require __DIR__ . '/contenido.php';

@@ -38,14 +38,53 @@ function ficha_storage_dir(): string
     return $dir;
 }
 
-function ficha_pdf_path(string $characterId): string
+/*
+ * Cada PDF se guarda como <ID>-<clave al azar>.pdf. En Hestia, Nginx entrega
+ * los .pdf directamente sin pasar por Apache, así que el .htaccess de fichas/
+ * podría no aplicarse: con la clave nadie adivina la dirección (antes era
+ * fichas/<ID>.pdf). La web los entrega solo desde hoja.php, con permiso.
+ */
+function ficha_pdf_safe_id(string $characterId): string
 {
-    return ficha_storage_dir() . '/' . preg_replace('~[^A-Za-z0-9_-]~', '_', $characterId) . '.pdf';
+    return (string)preg_replace('~[^A-Za-z0-9_-]~', '_', $characterId);
+}
+
+/** PDF guardado de un personaje, o null si no tiene. */
+function ficha_pdf_find(string $characterId): ?string
+{
+    $dir = ficha_storage_dir();
+    $safe = ficha_pdf_safe_id($characterId);
+    foreach (glob($dir . '/' . $safe . '-*.pdf') ?: [] as $file) {
+        if (preg_match('~^' . preg_quote($safe, '~') . '-[a-f0-9]{24}\.pdf$~', basename($file))) return $file;
+    }
+    $legacy = $dir . '/' . $safe . '.pdf';
+    if (!is_file($legacy)) return null;
+    $secret = ficha_pdf_new_path($characterId);
+    return @rename($legacy, $secret) ? $secret : $legacy;
+}
+
+/** Dirección nueva (con clave) para guardar el PDF de un personaje. */
+function ficha_pdf_new_path(string $characterId): string
+{
+    return ficha_storage_dir() . '/' . ficha_pdf_safe_id($characterId) . '-' . bin2hex(random_bytes(12)) . '.pdf';
+}
+
+/** Pone clave a los PDF con el nombre antiguo (<ID>.pdf), p. ej. tras restaurar un respaldo viejo. */
+function ficha_pdf_secure_all(): int
+{
+    $renamed = 0;
+    foreach (glob(ficha_storage_dir() . '/*.pdf') ?: [] as $file) {
+        $name = basename($file, '.pdf');
+        if (str_starts_with($name, 'tmp-') || preg_match('~-[a-f0-9]{24}$~', $name)) continue;
+        if (@rename($file, ficha_pdf_new_path($name))) $renamed++;
+    }
+    return $renamed;
 }
 
 /** Borra las subidas pendientes que nadie confirmó en 24 h. */
 function ficha_cleanup_pending(): void
 {
+    ficha_pdf_secure_all();
     foreach (glob(ficha_storage_dir() . '/tmp-*.pdf') ?: [] as $file) {
         if (@filemtime($file) < time() - 86400) @unlink($file);
     }
@@ -231,6 +270,8 @@ function ficha_apply(mysqli $db, array $user, array $parsed, array $choice, stri
     $isAdmin = ($user['role'] ?? '') === 'admin';
     $author = mb_substr((string)($user['displayName'] ?? $user['username'] ?? ''), 0, 100, 'UTF-8');
     $summary = [];
+    $previous = null;
+    $target = null;
 
     $db->begin_transaction();
     try {
@@ -336,7 +377,8 @@ function ficha_apply(mysqli $db, array $user, array $parsed, array $choice, stri
             'hoja' => $parsed['sheet'],
             'objetos' => $parsed['items'],
         ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-        $target = ficha_pdf_path($characterId);
+        $previous = ficha_pdf_find($characterId);
+        $target = ficha_pdf_new_path($characterId);
         ficha_q($db, 'INSERT INTO PersonajeFicha (PersonajeID,Datos,Archivo,ImportadoPor,Importado) VALUES (?,?,?,?,UTC_TIMESTAMP()) '
             . 'ON DUPLICATE KEY UPDATE Datos=VALUES(Datos),Archivo=VALUES(Archivo),ImportadoPor=VALUES(ImportadoPor),Importado=VALUES(Importado)',
             [$characterId, $data, basename($target), $author])->close();
@@ -346,8 +388,10 @@ function ficha_apply(mysqli $db, array $user, array $parsed, array $choice, stri
         $db->commit();
     } catch (Throwable $e) {
         $db->rollback();
+        if ($target !== null && is_file($target)) @unlink($target);
         throw $e;
     }
+    if ($previous !== null && $previous !== $target) @unlink($previous);
     @unlink($pdfTmpPath);
     return ['id' => $characterId, 'summary' => $summary];
 }

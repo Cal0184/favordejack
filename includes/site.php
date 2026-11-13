@@ -26,6 +26,7 @@ function favor_nav_items(): array
         'dados' => ['Dados', 'rolldice/', 'die'],
         'mapa' => ['Mapa y tiendas', 'mapa/', 'map'],
         'reglamento' => ['Reglamento', 'regulaciones/', 'scales'],
+        'cronicas' => ['Crónicas', 'cronicas/', 'hourglass'],
     ];
 }
 
@@ -63,6 +64,7 @@ function favor_page_context(): array
         'tablon/index.php' => ['misiones', $hub, 'gremio'],
         'mapa/index.php' => ['mapa', $hub, 'gremio'],
         'regulaciones/index.php' => ['reglamento', $hub, 'gremio'],
+        'cronicas/index.php' => ['cronicas', $hub, 'gremio'],
         'perfil.php' => ['perfil', $hub, 'gremio'],
         'cuenta.php' => ['cuenta', $hub, 'gremio'],
         'login.php' => ['cuenta', $hub, 'gremio'],
@@ -147,6 +149,7 @@ function favor_nav_icon(string $name): string
         'die' => '<path d="m12 2 9 5v10l-9 5-9-5V7z"/><path d="m3 7 9 5 9-5M12 12v10"/>',
         'map' => '<path d="m3 6 6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/>',
         'scales' => '<path d="M12 3v18M7 21h10M5 7h14"/><path d="m5 7-3 6h6zM19 7l-3 6h6z"/>',
+        'hourglass' => '<path d="M6 3h12M6 21h12M7 3c0 5 3 7 5 9-2 2-5 4-5 9M17 3c0 5-3 7-5 9 2 2 5 4 5 9"/>',
         'board' => '<rect x="3" y="4" width="18" height="16" rx="1"/><path d="M7 8h5v6H7zM14 9h4v8h-4z"/>',
         'more' => '<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>',
         'user' => '<circle cx="12" cy="8" r="4"/><path d="M4 21c1-5 4-7 8-7s7 2 8 7"/>',

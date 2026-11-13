@@ -132,10 +132,20 @@ function inv_inventory_payload(mysqli $db, ?array $user, array $character): arra
 }
 
 favor_session_start();
-$user = favor_current_user();
+try {
+    // En POST se relee la cuenta: permisos al día antes de escribir.
+    $user = favor_current_user();
+} catch (Throwable $e) {
+    inv_close_session();
+    inv_fail('No se pudo comprobar tu cuenta. Inténtalo otra vez.', 503);
+}
 $method = strtoupper((string)($_SERVER['REQUEST_METHOD'] ?? 'GET'));
 $action = trim((string)($method === 'POST' ? ($_POST['action'] ?? '') : ($_GET['action'] ?? '')));
 
+if ($method === 'POST' && !$user) {
+    inv_close_session();
+    inv_fail('Tu sesión terminó. Vuelve a iniciar sesión para modificar el inventario.', 401);
+}
 if ($method === 'POST') {
     try {
         favor_verify_csrf((string)($_POST['csrf'] ?? ''));

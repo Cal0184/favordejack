@@ -10,6 +10,7 @@ require_once dirname(__DIR__) . '/includes/assets.php';
 require_once dirname(__DIR__) . '/includes/imagenes.php';
 require_once dirname(__DIR__) . '/includes/migrations.php';
 require_once dirname(__DIR__) . '/includes/ficha-import.php';
+require_once dirname(__DIR__) . '/includes/estado.php';
 require_once dirname(__DIR__) . '/includes/auth-widget.php';
 guild_session_start();
 $csrf = guild_csrf();
@@ -17,6 +18,7 @@ $isAdmin = guild_is_admin();
 $isLogged = guild_is_logged_in();
 $sessionUser = guild_user();
 $adminUser = guild_admin_user();
+favor_session_close();
 
 function h(?string $value): string {
     return htmlspecialchars((string)$value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
@@ -97,16 +99,31 @@ SELECT
     pp.Estado,
     pp.Categoria,
     pp.Biografia,
-    pp.Actualizado
-FROM PersonajePerfil pp
-INNER JOIN Personaje p ON p.ID = pp.ID
+    pp.Actualizado,
+    pp.ID AS PerfilID
+FROM Personaje p
+LEFT JOIN PersonajePerfil pp ON pp.ID = p.ID
 LEFT JOIN Jugador j ON j.ID = p.Jugador
 ORDER BY COALESCE(j.Orden,9999), COALESCE(p.Orden,9999), COALESCE(NULLIF(pp.NombreCompleto,''),p.Nombre)
 SQL;
 
+    // Personajes creados en la Banca que aún no tienen expediente también salen
+    // (con su mismo ID): al guardarlos se crea el expediente. No salen los de
+    // grupos especiales, ni los que ya tienen su ficha «gemela» en Archivos, ni
+    // los que el archivero retiró a propósito («Retirar de Archivos»): los
+    // creados aquí (ID arch-…) siempre nacen con expediente, así que sin él es
+    // que se retiraron; los demás quedan apuntados en FavorMeta.
+    $estados = favor_estado_todos($db);
+    $removed = guild_removed_profiles($db);
     $result = $db->query($sql);
     while ($row = $result->fetch_assoc()) {
+        $pending = $row['PerfilID'] === null;
+        $est = $estados[(string)$row['ID']] ?? null;
+        if ($pending && (!$est || $est['especial'] || $est['npc'] || $est['gemelos']
+            || str_starts_with((string)$row['ID'], 'arch-') || isset($removed[(string)$row['ID']]))) continue;
+        if ($pending) $row['Estado'] = $est['estado'];
         $characters[] = [
+            'pendingProfile' => $pending,
             'id' => (string)$row['ID'],
             'playerId' => (string)$row['Jugador'],
             'name' => clean($row['NombreCompleto'] ?? '') ?: clean($row['Nombre'] ?? ''),
@@ -143,6 +160,7 @@ SQL;
 
     // Personajes con ficha PDF importada (botón "Hoja" en el folio).
     ficha_ensure_schema($db);
+    try { ficha_pdf_secure_all(); } catch (Throwable $e) { error_log('fichas: ' . $e->getMessage()); }
     $sheetIds = [];
     $sheetResult = $db->query('SELECT PersonajeID FROM PersonajeFicha');
     while ($sheetRow = $sheetResult->fetch_row()) $sheetIds[(string)$sheetRow[0]] = true;

@@ -187,6 +187,7 @@ try {
 
     guild_verify_csrf(strv($data, 'csrf', 100));
     $admin = guild_require_admin();
+    favor_session_close();
 
     if ($action === 'save_character') {
         $id = strv($data, 'id', 100);
@@ -290,21 +291,20 @@ try {
                 bind_execute($stmt, [$shortName, $description, $portrait, $portrait, $id]);
                 $stmt->close();
 
+                // Un personaje creado en la Banca puede no tener expediente todavía:
+                // se crea con el mismo ID (una sola identidad), o se actualiza si ya está.
                 $stmt = $db->prepare(
-                    'UPDATE PersonajePerfil SET NombreCompleto=?,Altura=?,Edad=?,Sexo=?,Raza=?,TipoRaza=?,Clase=?,Nivel=?,Fuerza=?,Destreza=?,Constitucion=?,Inteligencia=?,Sabiduria=?,Carisma=?,Dotes=?,NivelAmenaza=?,Estado=?,Categoria=?,Biografia=? WHERE ID=?'
+                    'INSERT INTO PersonajePerfil (ID,NombreCompleto,Altura,Edad,Sexo,Raza,TipoRaza,Clase,Nivel,Fuerza,Destreza,Constitucion,Inteligencia,Sabiduria,Carisma,Dotes,NivelAmenaza,Estado,Categoria,Biografia) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) '
+                    . 'ON DUPLICATE KEY UPDATE NombreCompleto=VALUES(NombreCompleto),Altura=VALUES(Altura),Edad=VALUES(Edad),Sexo=VALUES(Sexo),Raza=VALUES(Raza),TipoRaza=VALUES(TipoRaza),Clase=VALUES(Clase),Nivel=VALUES(Nivel),'
+                    . 'Fuerza=VALUES(Fuerza),Destreza=VALUES(Destreza),Constitucion=VALUES(Constitucion),Inteligencia=VALUES(Inteligencia),Sabiduria=VALUES(Sabiduria),Carisma=VALUES(Carisma),Dotes=VALUES(Dotes),'
+                    . 'NivelAmenaza=VALUES(NivelAmenaza),Estado=VALUES(Estado),Categoria=VALUES(Categoria),Biografia=VALUES(Biografia)'
                 );
                 bind_execute($stmt, [
-                    $name, $height, $age, $sex, $race, $raceType, $class, $level,
-                    $str, $dex, $con, $int, $wis, $cha, $feats, $threat, $state, $category, $biography, $id
+                    $id, $name, $height, $age, $sex, $race, $raceType, $class, $level,
+                    $str, $dex, $con, $int, $wis, $cha, $feats, $threat, $state, $category, $biography
                 ]);
-                if ($stmt->affected_rows === 0) {
-                    $check = $db->prepare('SELECT ID FROM PersonajePerfil WHERE ID=?');
-                    bind_execute($check, [$id]);
-                    $exists = (bool)$check->get_result()->fetch_assoc();
-                    $check->close();
-                    if (!$exists) throw new RuntimeException('El perfil ya no existe.');
-                }
                 $stmt->close();
+                guild_mark_removed_profile($db, $id, false);
             }
 
             $db->commit();
@@ -339,6 +339,7 @@ try {
         bind_execute($stmt, [$id]);
         $deleted = $stmt->affected_rows;
         $stmt->close();
+        if ($deleted > 0) guild_mark_removed_profile($db, $id);
         $db->close();
         if ($deleted < 1) throw new RuntimeException('El perfil ya no existe.');
         respond(true, ['message' => 'El personaje fue retirado de Archivos del Gremio. La Banca no fue modificada.']);

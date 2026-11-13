@@ -3,48 +3,54 @@ declare(strict_types=1);
 
 require_once dirname(__DIR__) . '/includes/paths.php';
 require_once dirname(__DIR__) . '/includes/auth-widget.php';
-$authPath = dirname(__DIR__) . '/includes/auth.php';
-$user = null;
+require_once dirname(__DIR__) . '/includes/auth.php';
+require_once __DIR__ . '/lib.php';
 
-if (is_file($authPath)) {
-    require_once $authPath;
-    if (function_exists('favor_session_start')) {
-        favor_session_start();
-        if (function_exists('favor_current_user')) {
-            $user = favor_current_user();
-        }
-        if (function_exists('favor_session_close')) {
-            favor_session_close();
-        } elseif (session_status() === PHP_SESSION_ACTIVE) {
-            session_write_close();
-        }
-    }
+favor_session_start();
+try {
+    $user = favor_current_user();
+} catch (Throwable $e) {
+    $user = null;
 }
+$isAdmin = ($user['role'] ?? '') === 'admin';
+$csrf = $isAdmin ? favor_csrf() : '';
+favor_session_close();
 
-function rg_h(string $value): string {
-    return htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-}
+$data = reg_load();
+// Los borradores solo los ve el admin.
+$rules = array_values(array_filter($data['rules'], static fn(array $r): bool => $isAdmin || empty($r['draft'])));
+$categories = reg_categories($data, $rules);
+$updated = (string)($data['updated'] ?? '');
 
-$dataPath = __DIR__ . '/data/regulations.json';
-$payload = ['tabs' => [], 'rules' => [], 'updated' => ''];
-
-if (is_file($dataPath)) {
-    $decoded = json_decode((string)file_get_contents($dataPath), true);
-    if (is_array($decoded)) {
-        $payload = array_replace($payload, $decoded);
-    }
-}
-
-$rules = is_array($payload['rules'] ?? null) ? $payload['rules'] : [];
-$tabs = is_array($payload['tabs'] ?? null) ? $payload['tabs'] : [];
-$updated = (string)($payload['updated'] ?? '');
-
-$categories = [];
+$byCategory = array_fill_keys($categories, 0);
+$byType = array_fill_keys(array_keys(REG_TYPES), 0);
 foreach ($rules as $rule) {
-    $category = trim((string)($rule['category'] ?? 'General'));
-    if ($category !== '') $categories[$category] = true;
+    $byCategory[(string)($rule['category'] ?? '')] = ($byCategory[(string)($rule['category'] ?? '')] ?? 0) + 1;
+    $t = (string)($rule['type'] ?? 'regla');
+    if (isset($byType[$t])) $byType[$t]++;
 }
-$categories = array_keys($categories);
+// Una sección sin nada que leer no se ofrece a los jugadores; el admin la ve igual.
+if (!$isAdmin) $categories = array_values(array_filter($categories, static fn(string $c): bool => ($byCategory[$c] ?? 0) > 0));
+
+$config = $isAdmin ? [
+    'csrf' => $csrf,
+    'categories' => $categories,
+    'icons' => reg_icon_names(),
+    'sprite' => reg_sprite_url(),
+    'types' => REG_TYPES,
+    'rules' => array_column(array_map(static fn(array $r): array => [
+        'id' => (string)($r['id'] ?? ''),
+        'type' => (string)($r['type'] ?? 'regla'),
+        'category' => (string)($r['category'] ?? ''),
+        'title' => (string)($r['title'] ?? ''),
+        'icon' => (string)($r['icon'] ?? ''),
+        'summary' => (string)($r['summary'] ?? ''),
+        'body' => (string)($r['body'] ?? ''),
+        'source' => (string)($r['source'] ?? ''),
+        'mesa' => !empty($r['mesa']),
+        'draft' => !empty($r['draft']),
+    ], $rules), null, 'id'),
+] : null;
 ?>
 <!doctype html>
 <html lang="es">
@@ -55,109 +61,190 @@ $categories = array_keys($categories);
 <title>Regulaciones · Favor de Jack</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cinzel+Decorative:wght@700&family=EB+Garamond:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cinzel+Decorative:wght@700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<?php favor_head('Reglamento · Favor de Jack', 'Consulta rápida de reglas, ajustes y restricciones de las partidas del Favor de Jack.'); ?>
 <link rel="stylesheet" href="assets/regulations.css<?= favor_v(__DIR__ . '/assets/regulations.css') ?>">
-<?php favor_head('Reglamento · Favor de Jack'); ?>
 </head>
 <body>
 <?php favor_site_bar(); ?>
-<header class="topbar">
-    <div class="identity">
-        <?php if ($user): ?>
-            <span><?= rg_h((string)($user['displayName'] ?? $user['username'] ?? 'Aventurero')) ?></span>
-        <?php else: ?>
-            <span>Modo lectura</span>
-        <?php endif; ?>
-    </div>
-</header>
 
-<main class="shell">
-    <section class="masthead">
-        <div class="seal" aria-hidden="true">⚖</div>
+<header class="masthead">
+    <p class="motto motto-left" aria-hidden="true">Lex<br>Ludus<br>Societas<br>Aeterna</p>
+    <div class="masthead-center">
+        <div class="seal" aria-hidden="true"><?= reg_icon('scales') ?></div>
         <p class="eyebrow">Archivo oficial del gremio</p>
         <h1>Regulaciones</h1>
         <p class="lead">Consulta rápida de reglas, ajustes y restricciones registradas para las partidas de Favor de Jack.</p>
-        <?php if ($updated !== ''): ?>
-            <p class="updated">Actualizado: <?= rg_h($updated) ?></p>
+        <?php if ($updated !== ''): ?><p class="updated">Actualizado: <?= reg_h($updated) ?></p><?php endif; ?>
+    </div>
+    <p class="motto motto-right" aria-hidden="true">Mismas<br>reglas<br>más grandes<br>historias</p>
+</header>
+
+<main class="book" id="regBook">
+    <nav class="index" aria-label="Secciones del reglamento">
+        <button class="index-item active" type="button" data-filter="all">
+            <?= reg_icon('open-book') ?><span>Todas</span><b><?= count($rules) ?></b>
+        </button>
+        <?php foreach ($categories as $category): ?>
+            <button class="index-item" type="button" data-filter="cat:<?= reg_h($category) ?>">
+                <?= reg_icon(reg_category_icon($category)) ?><span><?= reg_h($category) ?></span><b><?= (int)($byCategory[$category] ?? 0) ?></b>
+            </button>
+        <?php endforeach; ?>
+        <hr>
+        <?php foreach (REG_TYPE_ICONS as $type => $icon): ?>
+            <button class="index-item" type="button" data-filter="type:<?= reg_h($type) ?>">
+                <?= reg_icon($icon) ?><span><?= reg_h(REG_TYPES[$type] . 's') ?></span><b><?= (int)$byType[$type] ?></b>
+            </button>
+        <?php endforeach; ?>
+        <p class="index-motto" aria-hidden="true"><?= reg_icon('scales') ?>Conocimiento<br>ordena<br>nuestra libertad</p>
+    </nav>
+
+    <section class="page page-list" aria-label="Lista de regulaciones">
+        <div class="list-head">
+            <label class="searchbox">
+                <svg class="reg-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m15.5 15.5 5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                <input id="ruleSearch" type="search" autocomplete="off" placeholder="Buscar regulación, acción, estado…" aria-label="Buscar regulación">
+            </label>
+            <p class="count"><strong id="visibleCount"><?= count($rules) ?></strong><span>regulaciones</span></p>
+        </div>
+        <div class="chips" role="group" aria-label="Filtrar por sección">
+            <button class="chip active" type="button" data-filter="all">Todas</button>
+            <?php foreach ($categories as $category): ?>
+                <button class="chip" type="button" data-filter="cat:<?= reg_h($category) ?>"><?= reg_h($category) ?></button>
+            <?php endforeach; ?>
+            <?php foreach (REG_TYPE_ICONS as $type => $icon): ?>
+                <button class="chip chip-type" type="button" data-filter="type:<?= reg_h($type) ?>"><?= reg_h(REG_TYPES[$type] . 's') ?></button>
+            <?php endforeach; ?>
+        </div>
+        <?php if ($isAdmin): ?>
+            <button class="new-rule" type="button" id="newRule"><span aria-hidden="true">+</span> Nueva regulación</button>
+        <?php endif; ?>
+
+        <ul class="rule-list" id="ruleList">
+            <?php foreach ($rules as $rule):
+                $id = (string)($rule['id'] ?? '');
+                $type = (string)($rule['type'] ?? 'regla');
+                $category = (string)($rule['category'] ?? '');
+                $title = (string)($rule['title'] ?? 'Sin título');
+                $summary = (string)($rule['summary'] ?? '');
+                $search = mb_strtolower($title . ' ' . $category . ' ' . $summary . ' ' . (string)($rule['body'] ?? ''), 'UTF-8');
+            ?>
+            <li class="rule-item" id="<?= reg_h($id) ?>"
+                data-type="<?= reg_h($type) ?>" data-category="<?= reg_h($category) ?>" data-search="<?= reg_h($search) ?>">
+                <button class="rule-open" type="button" aria-controls="ruleDetail">
+                    <span class="medal"><?= reg_icon((string)($rule['icon'] ?? '') ?: reg_category_icon($category)) ?></span>
+                    <span class="rule-text">
+                        <span class="rule-line">
+                            <span class="rule-title"><?= reg_h($title) ?></span>
+                            <span class="pill"><?= reg_h($category) ?></span>
+                            <?php if ($type !== 'regla'): ?><span class="pill pill-<?= reg_h($type) ?>"><?= reg_h(REG_TYPES[$type] ?? $type) ?></span><?php endif; ?>
+                            <?php if (!empty($rule['draft'])): ?><span class="pill pill-draft">Borrador</span><?php endif; ?>
+                        </span>
+                        <?php if ($summary !== ''): ?><span class="rule-summary"><?= reg_h($summary) ?></span><?php endif; ?>
+                    </span>
+                    <span class="rule-date"><?= reg_h((string)($rule['updated'] ?? '')) ?></span>
+                    <span class="chev" aria-hidden="true">›</span>
+                </button>
+                <template class="rule-tpl">
+                    <div class="detail-head">
+                        <span class="medal medal-big"><?= reg_icon((string)($rule['icon'] ?? '') ?: reg_category_icon($category)) ?></span>
+                        <div class="detail-titles">
+                            <p class="detail-tags">
+                                <span class="pill"><?= reg_h($category) ?></span>
+                                <?php if ($type !== 'regla'): ?><span class="pill pill-<?= reg_h($type) ?>"><?= reg_h(REG_TYPES[$type] ?? $type) ?></span><?php endif; ?>
+                                <?php if (!empty($rule['mesa'])): ?><span class="pill pill-mesa">Regla de la mesa</span><?php endif; ?>
+                                <?php if (!empty($rule['draft'])): ?><span class="pill pill-draft">Borrador · solo admin</span><?php endif; ?>
+                            </p>
+                            <h2 id="detailTitle"><?= reg_h($title) ?></h2>
+                            <p class="detail-date">Última actualización<br><strong><?= reg_h((string)($rule['updated'] ?? '')) ?></strong></p>
+                        </div>
+                    </div>
+                    <?php if ($summary !== ''): ?><p class="detail-summary"><?= reg_h($summary) ?></p><?php endif; ?>
+                    <div class="detail-body"><?= reg_render((string)($rule['body'] ?? '')) ?></div>
+                    <?php if (($rule['source'] ?? '') !== ''): ?><p class="detail-source">Fuente: <?= reg_h((string)$rule['source']) ?></p><?php endif; ?>
+                </template>
+            </li>
+            <?php endforeach; ?>
+        </ul>
+
+        <div id="emptyState" class="empty-state" hidden>
+            <?= reg_icon('scroll-unfurled', 'reg-icon empty-icon') ?>
+            <h2>No hay regulaciones aquí</h2>
+            <p id="emptyText">Prueba con otro filtro o término de búsqueda.</p>
+        </div>
+    </section>
+
+    <section class="page page-detail" id="ruleDetail" aria-live="polite" aria-labelledby="detailTitle" tabindex="-1">
+        <button class="detail-close" type="button" id="detailClose">‹ Volver a la lista</button>
+        <div id="detailContent" class="detail-content">
+            <div class="detail-placeholder">
+                <?= reg_icon('open-book', 'reg-icon empty-icon') ?>
+                <p>Elige una regulación de la lista para leerla.</p>
+            </div>
+        </div>
+        <?php if ($isAdmin): ?>
+            <div class="detail-admin" id="detailAdmin" hidden>
+                <button type="button" class="btn" id="editRule">Editar</button>
+                <button type="button" class="btn btn-danger" id="deleteRule">Borrar</button>
+            </div>
         <?php endif; ?>
     </section>
-
-    <section class="controls" aria-label="Filtros de regulaciones">
-        <label class="searchbox">
-            <span aria-hidden="true">⌕</span>
-            <input id="ruleSearch" type="search" autocomplete="off" placeholder="Buscar regulación, acción, estado...">
-        </label>
-
-        <div class="type-tabs" role="tablist" aria-label="Tipo de regulación">
-            <?php foreach ($tabs as $i => $tab): 
-                $id = (string)($tab['id'] ?? '');
-                $label = (string)($tab['label'] ?? $id);
-            ?>
-                <button class="type-tab<?= $i === 0 ? ' active' : '' ?>"
-                        type="button"
-                        data-type="<?= rg_h($id) ?>"
-                        role="tab"
-                        aria-selected="<?= $i === 0 ? 'true' : 'false' ?>">
-                    <?= rg_h($label) ?>
-                    <span class="tab-count" data-count-type="<?= rg_h($id) ?>">0</span>
-                </button>
-            <?php endforeach; ?>
-        </div>
-
-        <div class="category-row" id="categoryFilters">
-            <button class="category-chip active" type="button" data-category="">Todas</button>
-            <?php foreach ($categories as $category): ?>
-                <button class="category-chip" type="button" data-category="<?= rg_h($category) ?>"><?= rg_h($category) ?></button>
-            <?php endforeach; ?>
-        </div>
-    </section>
-
-    <div class="result-line">
-        <strong id="visibleCount"><?= count($rules) ?></strong>
-        <span>regulaciones visibles</span>
-    </div>
-
-    <section id="rulesGrid" class="rules-grid">
-        <?php foreach ($rules as $rule):
-            $id = (string)($rule['id'] ?? '');
-            $title = (string)($rule['title'] ?? 'Sin título');
-            $category = (string)($rule['category'] ?? 'General');
-            $type = (string)($rule['type'] ?? 'regla');
-            $content = (string)($rule['html'] ?? '');
-            $searchText = trim(strip_tags($title . ' ' . $category . ' ' . $content));
-        ?>
-            <article class="rule-card"
-                     id="<?= rg_h($id) ?>"
-                     data-type="<?= rg_h($type) ?>"
-                     data-category="<?= rg_h($category) ?>"
-                     data-search="<?= rg_h(mb_strtolower($searchText, 'UTF-8')) ?>">
-                <details>
-                    <summary>
-                        <span class="rule-heading">
-                            <span class="rule-category"><?= rg_h($category) ?></span>
-                            <span class="rule-title"><?= rg_h($title) ?></span>
-                        </span>
-                        <span class="chevron" aria-hidden="true">⌄</span>
-                    </summary>
-                    <div class="rule-content">
-                        <?= $content ?>
-                    </div>
-                </details>
-            </article>
-        <?php endforeach; ?>
-    </section>
-
-    <section id="emptyState" class="empty-state hidden">
-        <div class="empty-symbol">✦</div>
-        <h2>No hay regulaciones en esta sección</h2>
-        <p id="emptyText">Prueba con otro filtro o término de búsqueda.</p>
-    </section>
-
-    <footer>
-        Favor de Jack · Reglamento del Gremio
-    </footer>
 </main>
 
+<footer class="reg-footer">
+    Favor de Jack · Reglamento del Gremio · Iconos de <a href="https://game-icons.net" target="_blank" rel="noopener">game-icons.net</a> (CC BY 3.0)
+</footer>
+
+<?php if ($isAdmin): ?>
+<dialog class="editor" id="ruleEditor" aria-labelledby="editorTitle">
+    <form method="dialog" id="ruleForm" novalidate>
+        <h2 id="editorTitle">Nueva regulación</h2>
+        <div class="field-grid">
+            <label class="field field-wide">Título
+                <input name="title" maxlength="120" required autocomplete="off">
+            </label>
+            <label class="field">Categoría
+                <input name="category" maxlength="40" list="regCategories" required autocomplete="off" placeholder="Elige o escribe una nueva">
+                <datalist id="regCategories">
+                    <?php foreach ($categories as $category): ?><option value="<?= reg_h($category) ?>"><?php endforeach; ?>
+                </datalist>
+            </label>
+            <label class="field">Tipo
+                <select name="type">
+                    <?php foreach (REG_TYPES as $value => $label): ?><option value="<?= reg_h($value) ?>"><?= reg_h($label) ?></option><?php endforeach; ?>
+                </select>
+            </label>
+            <label class="field field-wide">Resumen <small>(una línea, sale en la lista)</small>
+                <input name="summary" maxlength="200" autocomplete="off">
+            </label>
+            <fieldset class="field field-wide icon-field">
+                <legend>Icono</legend>
+                <div class="icon-grid" id="iconGrid"></div>
+            </fieldset>
+            <label class="field field-wide">Texto
+                <textarea name="body" rows="12" maxlength="20000" required></textarea>
+                <small class="format-help">
+                    <code>## Título</code> apartado · <code>1. paso</code> pasos · <code>- punto</code> lista ·
+                    <code>&gt; nota</code> recuadro · <code>| a | b |</code> tabla · <code>**negrita**</code> · <code>*cursiva*</code>
+                </small>
+            </label>
+            <label class="field">Fuente <small>(opcional)</small>
+                <input name="source" maxlength="120" autocomplete="off" placeholder="PHB, pág. 192">
+            </label>
+            <div class="field checks">
+                <label><input type="checkbox" name="mesa"> Regla de la mesa</label>
+                <label><input type="checkbox" name="draft"> Borrador (solo lo ve el admin)</label>
+            </div>
+        </div>
+        <p class="editor-error" id="editorError" role="alert" hidden></p>
+        <div class="editor-actions">
+            <button type="button" class="btn" value="cancel" id="editorCancel">Cancelar</button>
+            <button type="submit" class="btn btn-gold" id="editorSave">Guardar</button>
+        </div>
+    </form>
+</dialog>
+<script>window.REG_ADMIN = <?= json_encode($config, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;</script>
+<?php endif; ?>
 <script src="assets/regulations.js<?= favor_v(__DIR__ . '/assets/regulations.js') ?>" defer></script>
 </body>
 </html>
