@@ -211,6 +211,7 @@ h1{
     font-family:'Cinzel',serif;font-size:.92rem;font-weight:600;letter-spacing:.04em;cursor:pointer;
 }
 .new-rule span{font-size:1.3rem;line-height:1}
+.new-rule em{font-style:normal}
 .new-rule:hover{background:#fff4d6;border-style:solid;border-color:var(--gold)}
 
 .rule-list{list-style:none;margin:0;padding:0;border-top:1px solid rgba(110,80,40,.35)}
@@ -358,7 +359,7 @@ h1{
 
 /* ── Editor (admin) ─────────────────────────────── */
 .editor{
-    width:min(780px,calc(100% - 24px));max-height:calc(100vh - 24px);
+    width:min(1080px,calc(100% - 24px));max-height:calc(100vh - 24px);
     padding:0;border:0;border-radius:10px;
     color:var(--ink);
     background:radial-gradient(ellipse at 50% 30%,var(--paper-hi),var(--paper) 70%,#dcc596);
@@ -396,6 +397,66 @@ h1{
 .checks input{width:18px;height:18px;accent-color:#7b5a22}
 .editor-error{margin:12px 0 0;padding:8px 12px;border-radius:6px;background:#f7d9cf;color:#7a2312;border:1px solid #c47a63}
 .editor-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:16px}
+
+/* ── Editor visual del texto (botones + vista previa) ── */
+.md-editor{display:flex;flex-direction:column;gap:6px;font-family:'EB Garamond',serif;font-weight:400}
+.md-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:4px;padding:5px;border:1px solid #a88655;border-radius:6px;background:#f3e3bd}
+.md-btn{
+    display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:4px 10px;
+    border:1px solid transparent;border-radius:5px;background:transparent;color:#3b2714;
+    font-family:'Cinzel',serif;font-size:.78rem;font-weight:600;cursor:pointer;
+    transition:background .15s,border-color .15s,transform .1s;
+}
+.md-btn:hover{background:#fffaf0;border-color:#a88655}
+.md-btn:active{transform:scale(.95)}
+.md-btn:focus-visible{outline:2px solid #c99a45;outline-offset:1px}
+.md-glyph{display:inline-grid;place-items:center;min-width:1.2em;color:#7b5a22;font-family:'EB Garamond',serif;font-size:1.1rem;font-weight:700;line-height:1}
+.md-b .md-glyph{font-weight:800;color:#1b1007}
+.md-i .md-glyph{font-style:italic;color:#1b1007}
+.md-sep{width:1px;height:24px;margin:0 4px;background:#b99a66}
+.md-sections{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:.92rem;color:var(--ink-soft)}
+.md-section{
+    min-height:32px;padding:2px 12px;border-radius:999px;cursor:pointer;
+    border:1px dashed #8b6a35;background:rgba(255,246,222,.7);color:#4a3015;
+    font-family:'EB Garamond',serif;font-size:.95rem;transition:background .15s,transform .1s;
+}
+.md-section:hover{background:#fff4d6;border-style:solid}
+.md-section:active{transform:scale(.95)}
+.md-tabs{display:none;gap:4px}
+.md-tabs button{
+    flex:1;min-height:36px;border:1px solid #a88655;border-radius:6px;background:#fffaf0;color:#3b2714;
+    font-family:'Cinzel',serif;font-size:.8rem;font-weight:600;cursor:pointer;
+}
+.md-tabs button[aria-selected="true"]{background:#2a1b0f;border-color:#2a1b0f;color:#f3dfb2}
+.md-panes{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+.md-panes textarea{min-height:280px;height:100%}
+.md-preview{
+    min-height:280px;max-height:52vh;overflow:auto;padding:10px 14px;
+    border:1px solid #a88655;border-radius:6px;
+    background:radial-gradient(ellipse at 50% 30%,var(--paper-hi),var(--paper) 80%);
+}
+.md-preview-title{margin:0 0 4px;font-family:'Cinzel',serif;font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint)}
+.md-preview .detail-body{font-size:1rem}
+.md-empty{color:var(--ink-faint);font-style:italic}
+.md-help{font-size:.92rem;color:var(--ink-soft)}
+.md-help summary{cursor:pointer;width:max-content;max-width:100%}
+.md-help ul{margin:4px 0 0;padding-left:18px;columns:2;column-gap:24px}
+.md-help code{padding:0 4px;border-radius:3px;background:rgba(90,60,25,.12);font-size:.85rem}
+.field-grid-patch{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+@media (max-width:900px){
+    .md-tabs{display:flex}
+    .md-panes{grid-template-columns:1fr}
+    .md-editor:not(.show-preview) .md-preview{display:none}
+    .md-editor.show-preview .md-panes textarea{display:none}
+    .md-preview{max-height:none}
+    .md-label{font-size:.72rem}
+    .md-help ul{columns:1}
+    .field-grid-patch{grid-template-columns:1fr 1fr}
+}
+@media (max-width:420px){
+    .md-btn{padding:4px 7px;gap:4px}
+    .md-sep{display:none}
+}
 
 /* ── Pantallas medianas ─────────────────────────────── */
 @media (max-width:1200px){

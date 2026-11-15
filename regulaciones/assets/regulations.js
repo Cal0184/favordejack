@@ -90,6 +90,7 @@
         });
         applyFilters();
         animateList();
+        document.dispatchEvent(new CustomEvent('reg:filter', { detail: value }));
     }
 
     const visibleItems = () => items.filter(i => !i.hidden);
@@ -144,7 +145,7 @@
         items.forEach(i => i.classList.toggle('selected', i === item));
         const tpl = item.querySelector('template');
         detailContent.replaceChildren(tpl.content.cloneNode(true), navFor(item));
-        if (detailAdmin) detailAdmin.hidden = item.dataset.type === 'parche';
+        if (detailAdmin) detailAdmin.hidden = false;
         setHome(false);
         detail.scrollTop = 0;
         if (mobile.matches) {
@@ -264,6 +265,8 @@
         return data;
     }
 
+    const bodyEditor = window.RegEditor?.enhance(form.querySelector('[data-md-editor]'));
+
     function openEditor(rule) {
         editingId = rule?.id || '';
         $('#editorTitle').textContent = editingId ? 'Editar regulación' : 'Nueva regulación';
@@ -283,23 +286,102 @@
         const radio = iconGrid.querySelector(`input[value="${CSS.escape(icon)}"]`);
         if (radio) { radio.checked = true; radio.closest('label').scrollIntoView({ block: 'nearest' }); }
         errorBox.hidden = true;
+        bodyEditor?.reset();
         dialog.showModal();
         f.title.focus();
     }
 
-    $('#newRule').addEventListener('click', () => openEditor(null));
+    // ── Patch Notes: crear, editar y borrar ──
+    const patchDialog = $('#patchEditor');
+    const patchForm = $('#patchForm');
+    const patchError = $('#patchError');
+    const patchSave = $('#patchSave');
+    const patchEditor = window.RegEditor?.enhance(patchForm.querySelector('[data-md-editor]'));
+    let editingPatch = '';
+    const isPatchView = () => filter === 'cat:Patch Notes';
+
+    // Siguiente número de versión: 1.8 → 1.9 (sobre la versión más alta que exista).
+    function nextVersion() {
+        const versions = Object.values(admin.patches || {}).map(p => p.version)
+            .filter(v => /^\d+(\.\d+)*$/.test(v))
+            .sort((a, b) => {
+                const pa = a.split('.').map(Number), pb = b.split('.').map(Number);
+                for (let i = 0; i < Math.max(pa.length, pb.length); i++) if ((pa[i] || 0) !== (pb[i] || 0)) return (pb[i] || 0) - (pa[i] || 0);
+                return 0;
+            });
+        if (!versions.length) return '1.0';
+        const parts = versions[0].split('.').map(Number);
+        if (parts.length === 1) parts.push(0);
+        parts[parts.length - 1] += 1;
+        return parts.join('.');
+    }
+
+    function openPatchEditor(patch) {
+        editingPatch = patch?.version || '';
+        $('#patchEditorTitle').textContent = editingPatch ? `Editar parche v${editingPatch}` : 'Nuevo parche';
+        patchForm.reset();
+        const f = patchForm.elements;
+        f.version.value = patch?.version || nextVersion();
+        f.date.value = patch?.date || admin.today;
+        f.name.value = patch?.name || '';
+        f.body.value = patch?.body || '';
+        f.body.placeholder = 'Pulsa un apartado de arriba (Reajustes, Baneos…) para empezar, o escribe libremente.';
+        patchError.hidden = true;
+        patchSave.disabled = false;
+        patchSave.textContent = 'Guardar parche';
+        patchEditor?.reset();
+        patchDialog.showModal();
+        (editingPatch ? f.body : f.name).focus();
+    }
+
+    const newLabel = $('#newRuleLabel');
+    const syncNewButton = () => { if (newLabel) newLabel.textContent = isPatchView() ? 'Nuevo parche' : 'Nueva regulación'; };
+    document.addEventListener('reg:filter', syncNewButton);
+    syncNewButton();
+
+    $('#newRule').addEventListener('click', () => (isPatchView() ? openPatchEditor(null) : openEditor(null)));
     $('#editorCancel').addEventListener('click', () => dialog.close());
-    $('#editRule')?.addEventListener('click', () => current && openEditor(admin.rules[current.id]));
+    $('#patchCancel').addEventListener('click', () => patchDialog.close());
+    $('#editRule')?.addEventListener('click', () => {
+        if (!current) return;
+        if (current.dataset.type === 'parche') openPatchEditor(admin.patches[current.id]);
+        else openEditor(admin.rules[current.id]);
+    });
 
     $('#deleteRule')?.addEventListener('click', async () => {
         if (!current) return;
-        const rule = admin.rules[current.id];
-        if (!confirm(`¿Borrar «${rule?.title || current.id}»? No se puede deshacer (salvo con un respaldo).`)) return;
+        const isPatch = current.dataset.type === 'parche';
+        const entry = isPatch ? admin.patches[current.id] : admin.rules[current.id];
+        const label = isPatch ? `el parche v${entry?.version || ''}${entry?.name ? ' «' + entry.name + '»' : ''}` : `«${entry?.title || current.id}»`;
+        if (!confirm(`¿Borrar ${label}? No se puede deshacer (salvo con un respaldo).`)) return;
         try {
-            await call({ action: 'delete', id: current.id });
+            if (isPatch) await call({ action: 'delete_patch', key: entry?.version || '' });
+            else await call({ action: 'delete', id: current.id });
             location.href = location.pathname;
         } catch (err) {
             alert(err.message);
+        }
+    });
+
+    patchForm.addEventListener('submit', async e => {
+        e.preventDefault();
+        const f = patchForm.elements;
+        const patch = { version: f.version.value.trim().replace(/^v/i, ''), date: f.date.value, name: f.name.value, body: f.body.value };
+        const missing = !/^[0-9][0-9A-Za-z.]{0,19}$/.test(patch.version) ? 'La versión debe ser un número, por ejemplo 1.9.'
+            : !patch.date ? 'Elige una fecha.'
+            : !patch.body.trim() ? 'Escribe los cambios de esta versión.' : '';
+        if (missing) { patchError.textContent = missing; patchError.hidden = false; return; }
+        patchSave.disabled = true;
+        patchSave.textContent = 'Guardando…';
+        try {
+            const data = await call({ action: 'save_patch', key: editingPatch, patch });
+            location.href = location.pathname + '#' + encodeURIComponent(data.id);
+            location.reload();
+        } catch (err) {
+            patchError.textContent = err.message;
+            patchError.hidden = false;
+            patchSave.disabled = false;
+            patchSave.textContent = 'Guardar parche';
         }
     });
 

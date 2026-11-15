@@ -34,23 +34,15 @@ if (!$isAdmin) $categories = array_values(array_filter($categories, static fn(st
 
 // Patch Notes: historial de versiones (el más nuevo primero).
 $patches = [];
-foreach ((array)(require __DIR__ . '/parches.php') as $patch) {
-    $version = (string)($patch['version'] ?? '');
-    if ($version === '') continue;
-    $date = (string)($patch['date'] ?? '');
-    $time = strtotime($date) ?: 0;
-    preg_match_all('/^## (.+)$/mu', (string)($patch['body'] ?? ''), $heads);
-    $patches[] = [
-        'id' => 'parche-' . str_replace('.', '-', $version),
-        'version' => $version,
-        'date' => $date,
-        'dateLabel' => $time ? date('d/m/Y', $time) : $date,
-        'name' => (string)($patch['name'] ?? ''),
+foreach (reg_patches($data) as $patch) {
+    $time = strtotime($patch['date']) ?: 0;
+    preg_match_all('/^## (.+)$/mu', $patch['body'], $heads);
+    $patches[] = $patch + [
+        'id' => reg_patch_id($patch['version']),
+        'dateLabel' => $time ? date('d/m/Y', $time) : $patch['date'],
         'summary' => implode(' · ', $heads[1] ?? []),
-        'body' => (string)($patch['body'] ?? ''),
     ];
 }
-usort($patches, static fn(array $a, array $b): int => strcmp($b['date'], $a['date']) ?: version_compare($b['version'], $a['version']));
 
 // Tarjetas de la portada móvil: secciones y tipos con su icono.
 $homeCards = [];
@@ -80,6 +72,10 @@ $config = $isAdmin ? [
         'mesa' => !empty($r['mesa']),
         'draft' => !empty($r['draft']),
     ], $rules), null, 'id'),
+    'patches' => array_column(array_map(static fn(array $p): array => [
+        'id' => $p['id'], 'version' => $p['version'], 'date' => $p['date'], 'name' => $p['name'], 'body' => $p['body'],
+    ], $patches), null, 'id'),
+    'today' => date('Y-m-d'),
 ] : null;
 ?>
 <!doctype html>
@@ -116,7 +112,7 @@ $config = $isAdmin ? [
         <button class="index-item active" type="button" data-filter="all">
             <?= reg_icon('open-book') ?><span>Todas</span><b><?= count($rules) ?></b>
         </button>
-        <?php if ($patches): ?>
+        <?php if ($patches || $isAdmin): ?>
             <button class="index-item index-item-patch" type="button" data-filter="cat:Patch Notes">
                 <?= reg_icon('scroll-quill') ?><span>Patch Notes</span><b><?= count($patches) ?></b>
             </button>
@@ -150,7 +146,7 @@ $config = $isAdmin ? [
         </div>
         <div class="chips" role="group" aria-label="Filtrar por sección">
             <button class="chip active" type="button" data-filter="all">Todas</button>
-            <?php if ($patches): ?><button class="chip chip-patch" type="button" data-filter="cat:Patch Notes">Patch Notes</button><?php endif; ?>
+            <?php if ($patches || $isAdmin): ?><button class="chip chip-patch" type="button" data-filter="cat:Patch Notes">Patch Notes</button><?php endif; ?>
             <?php foreach ($categories as $category): ?>
                 <button class="chip" type="button" data-filter="cat:<?= reg_h($category) ?>"><?= reg_h($category) ?></button>
             <?php endforeach; ?>
@@ -166,7 +162,7 @@ $config = $isAdmin ? [
                     <span class="home-name">Todas las reglas</span>
                     <span class="home-count"><?= count($rules) ?> reglas</span>
                 </button>
-                <?php if ($patches): ?>
+                <?php if ($patches || $isAdmin): ?>
                 <button class="home-card home-card-patch" type="button" data-filter="cat:Patch Notes">
                     <span class="home-medal"><?= reg_icon('scroll-quill') ?></span>
                     <span class="home-name">Patch Notes</span>
@@ -199,7 +195,7 @@ $config = $isAdmin ? [
             <?php endif; ?>
         </div>
         <?php if ($isAdmin): ?>
-            <button class="new-rule" type="button" id="newRule"><span aria-hidden="true">+</span> Nueva regulación</button>
+            <button class="new-rule" type="button" id="newRule"><span aria-hidden="true">+</span> <em id="newRuleLabel">Nueva regulación</em></button>
         <?php endif; ?>
 
         <ul class="rule-list" id="ruleList">
@@ -334,13 +330,12 @@ $config = $isAdmin ? [
                 <legend>Icono</legend>
                 <div class="icon-grid" id="iconGrid"></div>
             </fieldset>
-            <label class="field field-wide">Texto
-                <textarea name="body" rows="12" maxlength="20000" required></textarea>
-                <small class="format-help">
-                    <code>## Título</code> apartado · <code>1. paso</code> pasos · <code>- punto</code> lista ·
-                    <code>&gt; nota</code> recuadro · <code>| a | b |</code> tabla · <code>**negrita**</code> · <code>*cursiva*</code>
-                </small>
-            </label>
+            <div class="field field-wide">
+                <label for="ruleBody">Texto</label>
+                <div class="md-editor" data-md-editor>
+                    <textarea id="ruleBody" name="body" rows="12" maxlength="20000" required></textarea>
+                </div>
+            </div>
             <label class="field">Fuente <small>(opcional)</small>
                 <input name="source" maxlength="120" autocomplete="off" placeholder="PHB, pág. 192">
             </label>
@@ -356,8 +351,36 @@ $config = $isAdmin ? [
         </div>
     </form>
 </dialog>
+<dialog class="editor editor-patch" id="patchEditor" aria-labelledby="patchEditorTitle">
+    <form method="dialog" id="patchForm" novalidate>
+        <h2 id="patchEditorTitle">Nuevo parche</h2>
+        <div class="field-grid field-grid-patch">
+            <label class="field">Versión
+                <input name="version" maxlength="20" required autocomplete="off" inputmode="decimal" placeholder="1.9">
+            </label>
+            <label class="field">Fecha
+                <input name="date" type="date" required>
+            </label>
+            <label class="field field-wide">Nombre del parche <small>(opcional, por ejemplo «Sed incesante»)</small>
+                <input name="name" maxlength="120" autocomplete="off">
+            </label>
+            <div class="field field-wide">
+                <label for="patchBody">Cambios de esta versión</label>
+                <div class="md-editor" data-md-editor data-md-sections="Novedades|Reajustes|Rework|Buffs|Nerfeos|Baneos|Desbaneos">
+                    <textarea id="patchBody" name="body" rows="12" maxlength="20000" required></textarea>
+                </div>
+            </div>
+        </div>
+        <p class="editor-error" id="patchError" role="alert" hidden></p>
+        <div class="editor-actions">
+            <button type="button" class="btn" id="patchCancel">Cancelar</button>
+            <button type="submit" class="btn btn-gold" id="patchSave">Guardar parche</button>
+        </div>
+    </form>
+</dialog>
 <script>window.REG_ADMIN = <?= json_encode($config, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;</script>
 <?php endif; ?>
+<?php if ($isAdmin): ?><script src="assets/editor.js<?= favor_v(__DIR__ . '/assets/editor.js') ?>" defer></script><?php endif; ?>
 <script src="assets/regulations.js<?= favor_v(__DIR__ . '/assets/regulations.js') ?>" defer></script>
 </body>
 </html>
