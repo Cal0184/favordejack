@@ -1,58 +1,48 @@
 # Favor de Jack
 
-Portal digital de gestión del gremio de aventureros: personajes, economía, inventarios, relaciones, misiones, regulaciones, mapa y tiendas.
+Portal digital de administración del gremio: personajes, banca, inventario, misiones, regulaciones, mapa de Waterdeep y tiendas.
 
-> **Proyecto público, datos privados.** Este repositorio contiene el código y recursos públicos. Las contraseñas del servidor, respaldos, fichas privadas y datos generados en producción nunca deben incorporarse a Git.
+> **Repositorio público; datos privados.** Este repositorio contiene código y recursos públicos, no las credenciales ni los datos vivos del servidor.
 
-## Tecnologías y requisitos
+## Tecnologías
 
-- PHP 8.2 o superior recomendado, compatible con la base PHP 8 del proyecto.
-- MySQL o MariaDB; extensiones PHP `mysqli` y `mbstring`.
-- Apache con `AllowOverride All` **o** Nginx con reglas de acceso equivalentes (véase [SECURITY.md](SECURITY.md)).
-- Sin frameworks ni gestor de dependencias de terceros obligatorio.
+PHP 8 (8.2+ recomendado), MySQL/MariaDB y servidor web con PHP. La aplicación no requiere frameworks. La ruta base se detecta desde `includes/paths.php`, tanto en la raíz de un dominio como en una subcarpeta.
 
-## Módulos
+## Estructura
 
-| Directorio | Función |
+| Ruta | Contenido |
 | --- | --- |
-| `bancadigital/` | Banca y saldos de personajes |
-| `archivosdelgremio/` | Expedientes, personajes y relaciones |
-| `inventario/` | Inventario y equipo |
-| `tablon/` | Misiones y recompensas |
-| `regulaciones/` | Reglamento y parches |
-| `mapa/` | Mapa interactivo y tiendas |
-| `tiendas/` | Emporio, tienda del gremio y demás comercios |
-| `cronicas/` | Crónicas de la campaña |
-| `rolldice/` | Herramientas de dados |
+| `bancadigital/` | Banca y economía |
+| `archivosdelgremio/` | Personajes, fichas y relaciones |
+| `inventario/` | Equipo y objetos |
+| `tablon/` | Misiones |
+| `regulaciones/` | Reglas y parches |
+| `mapa/` | Mapa interactivo |
+| `tiendas/` | Emporio y comercios |
+| `cronicas/` | Crónicas |
+| `rolldice/` | Dados |
+| `timetoplay/` | Contenido del gremio |
 | `admin/` | Administración y respaldos |
-| `includes/` | Servicios y funciones compartidos |
-| `media/` y `assets/` | Recursos gráficos compartidos |
-| `instalar/` | Instalador y esquema inicial |
+| `includes/` | Código PHP compartido |
+| `assets/`, `media/` | Recursos gráficos |
+| `instalar/` | Instalación y esquema SQL |
 
-## Instalación local
+## Instalación y mantenimiento
 
-1. Instala PHP 8.2+, MySQL/MariaDB y un servidor web con PHP habilitado.
-2. Clona el repositorio en la raíz del sitio o una subcarpeta.
-3. Copia `config.example.php` a `config.local.php` y configura la base de datos. **No publiques ese archivo.**
-4. Importa `instalar/esquema.sql` en una base vacía, o restaura un respaldo confiable siguiendo [MUDANZA.md](MUDANZA.md).
-5. Configura las reglas de seguridad del servidor antes de publicar el sitio. Las reglas `.htaccess` **no funcionan en Nginx**.
-6. Comprueba inicio de sesión, banca, personajes, tiendas y carga de imágenes.
+1. Clona el repositorio en un servidor con PHP y MySQL/MariaDB.
+2. Copia `config.example.php` como **`config.local.php`** y configura la base de datos. Nunca subas la copia real a Git.
+3. Para instalar desde cero, importa `instalar/esquema.sql`. Para restaurar el sitio existente, exporta primero un paquete desde `admin/respaldo.php` y utiliza el instalador de `instalar/` con su clave de instalación privada.
+4. Configura HTTPS y las protecciones del servidor web. **Nginx no lee `.htaccess`**: si usas aaPanel/Nginx, aplica las reglas de [seguridad](.github/SECURITY.md) manualmente.
+5. Verifica inicio de sesión, imágenes, banca, inventario y tiendas tras los cambios.
 
-La ruta base se detecta automáticamente desde `includes/paths.php`. No es necesario modificar rutas para ejecutar el sitio en una subcarpeta.
+**Código y datos son independientes:** GitHub no contiene la base de datos, retratos privados, fichas ni los paquetes de respaldo. Conserva los respaldos fuera del repositorio y, cuando sea posible, fuera de la raíz pública del servidor.
 
-## Desarrollo y despliegue
+## Imágenes
 
-- Trabaja en ramas independientes; integra mediante pull requests.
-- No subas `config.local.php`, credenciales, exportaciones, datos de usuarios ni respaldos.
-- El código versionado y los datos vivos son cosas distintas: antes de actualizar, guarda un respaldo desde `admin/respaldo.php`.
-- GitHub Actions comprueba sintaxis PHP, JSON y posibles credenciales en commits.
-- Para migrar a otro servidor, consulta [MUDANZA.md](MUDANZA.md).
-- Para protección de archivos y respuesta a incidentes, consulta [SECURITY.md](SECURITY.md).
+Los recursos compartidos se gestionan en `assets/` y `media/`. Cada tienda mantiene sus propios recursos en su directorio; las miniaturas generadas y los archivos subidos por usuarios no deben incorporarse a Git.
 
-## Referencias
+## Desarrollo y seguridad
 
-- [Imágenes y rutas](IMAGENES.md)
-- [Mudanza y restauración](MUDANZA.md)
-- [Política de seguridad](SECURITY.md)
+Realiza los cambios en ramas y revisa los pull requests antes de integrarlos. GitHub Actions comprueba la sintaxis PHP/JSON y busca posibles credenciales; no sustituye las pruebas en el servidor.
 
-**Nota:** El repositorio no contiene una copia completa de la base de datos ni de los archivos privados de producción; clonar GitHub no equivale a restaurar el sitio.
+Consulta la [política de seguridad](.github/SECURITY.md) para proteger archivos internos y responder a una exposición de credenciales.
