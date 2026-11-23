@@ -5,8 +5,8 @@ Options -Indexes
   Require all denied
 </FilesMatch>
 
-# Archivos ocultos (.git, .env, volcados temporales «.volcado-…»). Hestia ya los
-# bloquea en Nginx; esto cubre el caso de que la petición llegue a Apache.
+# Archivos ocultos (.git, .env, volcados temporales «.volcado-…»).
+# Nginx ignora .htaccess: configurar equivalentes en el panel (SECURITY.md).
 <FilesMatch "^\.(?!well-known)">
   Require all denied
 </FilesMatch>

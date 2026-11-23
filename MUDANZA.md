@@ -44,3 +44,10 @@ Importa `instalar/esquema.sql` en una base vacía. Crea todas las tablas, sin us
 ## Qué archivos no están en GitHub
 
 Están en `.gitignore`: `config.local.php`, `bancadigital/config.php`, `respaldos/`, `media/characters|icons|profiles/`, `bancadigital/data/`, `bancadigital/icons|characters/` (copia antigua, vacía tras «Ordenar imágenes»), `archivosdelgremio/fichas/`, y los pedidos y decisiones del Emporio de Ecix's (`tiendas/emporio/data/`). Todo eso viaja en el paquete, junto con las cartas de `tiendas/emporio/Cartas/`.
+
+## Seguridad antes de desplegar o migrar
+
+- En **Nginx/aaPanel**, `.htaccess` no se aplica. Añade primero las reglas indicadas en [SECURITY.md](SECURITY.md) para impedir el acceso por HTTP a respaldos, JSON internos, fichas y configuraciones.
+- Mantén el ZIP de respaldo fuera de la carpeta pública siempre que sea posible. Si el instalador requiere temporalmente `respaldos/` dentro de la web, verifica el bloqueo HTTP y retira el ZIP cuando termine la restauración.
+- No publiques el archivo `config.local.php` ni `instalar/clave.php`. Si sospechas exposición, rota las credenciales antes de desplegar.
+- Realiza una copia externa del sitio y la base de datos **antes** de actualizar o restaurar.

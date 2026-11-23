@@ -14,7 +14,7 @@ return [
     'db' => [
         'host' => 'localhost',
         'port' => 3306,
-        'database' => 'cal_cal',
+        'database' => 'REEMPLAZAR_BASE_DE_DATOS',
         'username' => 'REEMPLAZAR_USUARIO',
         'password' => 'REEMPLAZAR_CONTRASEÑA',
     ],
