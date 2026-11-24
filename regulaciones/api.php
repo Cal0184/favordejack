@@ -61,6 +61,38 @@ try {
         reg_respond(true);
     }
 
+    // ── Patch Notes ── «key» es la versión original del parche que se edita (vacía = nuevo).
+    if ($action === 'save_patch') {
+        $patch = reg_clean_patch(is_array($data['patch'] ?? null) ? $data['patch'] : []);
+        $key = (string)($data['key'] ?? '');
+        reg_update(static function (array $file) use ($patch, $key): array {
+            $patches = reg_patches($file);
+            $versions = array_column($patches, 'version');
+            $at = $key !== '' ? array_search($key, $versions, true) : false;
+            if ($key !== '' && $at === false) throw new RuntimeException('Ese parche ya no existe. Recarga la página.');
+            $clash = array_search($patch['version'], $versions, true);
+            if ($clash !== false && $clash !== $at) throw new RuntimeException('Ya hay un parche con la versión ' . $patch['version'] . '. Usa otro número.');
+            if ($at !== false) $patches[$at] = $patch;
+            else $patches[] = $patch;
+            $file['patches'] = $patches;
+            $file['patches'] = reg_patches($file);
+            return $file;
+        });
+        reg_respond(true, ['id' => reg_patch_id($patch['version'])]);
+    }
+
+    if ($action === 'delete_patch') {
+        $key = (string)($data['key'] ?? '');
+        reg_update(static function (array $file) use ($key): array {
+            $patches = reg_patches($file);
+            $left = array_values(array_filter($patches, static fn(array $p): bool => $p['version'] !== $key));
+            if (count($left) === count($patches)) throw new RuntimeException('Ese parche ya no existe. Recarga la página.');
+            $file['patches'] = $left;
+            return $file;
+        });
+        reg_respond(true);
+    }
+
     reg_respond(false, ['error' => 'Acción desconocida.'], 400);
 } catch (Throwable $e) {
     $msg = $e instanceof RuntimeException ? $e->getMessage() : 'Error interno. Inténtalo otra vez.';

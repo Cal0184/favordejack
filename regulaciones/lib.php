@@ -12,6 +12,8 @@ declare(strict_types=1);
 require_once dirname(__DIR__) . '/includes/paths.php';
 
 const REG_FILE = __DIR__ . '/data/regulations.json';
+/** Patch Notes iniciales: solo se leen mientras regulations.json no tenga los suyos. */
+const REG_PATCH_SEED = __DIR__ . '/parches.php';
 const REG_SPRITE = __DIR__ . '/assets/iconos.svg';
 const REG_TYPES = ['regla' => 'Regla', 'buff' => 'Buff', 'nerf' => 'Nerf', 'ban' => 'Baneo'];
 const REG_DEFAULT_ICON = 'scroll-unfurled';
@@ -64,7 +66,55 @@ function reg_load(): array
     if (!is_array($data)) $data = [];
     $data['rules'] = array_values(array_filter(is_array($data['rules'] ?? null) ? $data['rules'] : [], 'is_array'));
     $data['categories'] = array_values(array_filter(is_array($data['categories'] ?? null) ? $data['categories'] : [], 'is_string'));
+    if (array_key_exists('patches', $data)) {
+        $data['patches'] = array_values(array_filter(is_array($data['patches']) ? $data['patches'] : [], 'is_array'));
+    }
     return $data;
+}
+
+/**
+ * Patch Notes guardados (el más nuevo primero). La primera vez que se edita uno
+ * desde la web, los de parches.php se copian a regulations.json y desde ahí
+ * viven en el archivo de datos, igual que las regulaciones.
+ */
+function reg_patches(array $data): array
+{
+    if (array_key_exists('patches', $data) && is_array($data['patches'])) {
+        $list = $data['patches'];
+    } else {
+        $list = is_file(REG_PATCH_SEED) ? (array)(require REG_PATCH_SEED) : [];
+    }
+    $out = [];
+    foreach ($list as $patch) {
+        if (!is_array($patch) || (string)($patch['version'] ?? '') === '') continue;
+        $out[] = [
+            'version' => (string)$patch['version'],
+            'date' => (string)($patch['date'] ?? ''),
+            'name' => (string)($patch['name'] ?? ''),
+            'body' => (string)($patch['body'] ?? ''),
+        ];
+    }
+    usort($out, static fn(array $a, array $b): int => strcmp($b['date'], $a['date']) ?: version_compare($b['version'], $a['version']));
+    return $out;
+}
+
+function reg_patch_id(string $version): string
+{
+    return 'parche-' . str_replace('.', '-', $version);
+}
+
+/** Valida lo que manda el formulario de Patch Notes. */
+function reg_clean_patch(array $in): array
+{
+    $version = preg_replace('/^v/i', '', reg_str($in, 'version', 20)) ?? '';
+    $date = reg_str($in, 'date', 10);
+    $name = preg_replace('/\s+/u', ' ', reg_str($in, 'name', 120)) ?? '';
+    $body = reg_str($in, 'body', 20000);
+    if (!preg_match('/^[0-9][0-9A-Za-z.]{0,19}$/', $version)) throw new RuntimeException('La versión debe ser un número, por ejemplo 1.9.');
+    $d = DateTimeImmutable::createFromFormat('!Y-m-d', $date);
+    if (!$d || $d->format('Y-m-d') !== $date) throw new RuntimeException('Elige una fecha válida.');
+    if ($body === '') throw new RuntimeException('Escribe los cambios de esta versión.');
+    return ['version' => $version, 'date' => $date, 'name' => $name, 'body' => $body];
 }
 
 /** Cambia el archivo bajo candado (dos admins a la vez no se pisan) y lo escribe entero o nada. */

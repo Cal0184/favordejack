@@ -7,9 +7,10 @@ declare(strict_types=1);
  * anterior (por ejemplo, los baneos y desbaneos del Libro del Sexo), así que el
  * texto de cada versión se conserva tal cual, sin aplicar cambios hacia atrás.
  *
- * Para añadir un parche nuevo, copia un bloque y ponlo ARRIBA del todo.
- * El texto usa el mismo formato que las regulaciones: «## Apartado», «- punto»,
- * «> cita», **negrita** y *cursiva*.
+ * Este archivo es solo el punto de partida: los parches se crean, editan y borran
+ * desde la propia página (admin → Patch Notes → «+ Nuevo parche» o «Editar»).
+ * La primera vez que se guarda uno, todos pasan a data/regulations.json y desde
+ * entonces este archivo ya no se lee (cambiarlo aquí no tendría efecto).
  */
 return [
     [
