@@ -175,6 +175,16 @@ $total = (int)($catalogo['total'] ?? 0); // COUNT(*) en MySQL, objetos activos
     </section>
 </main>
 
+<dialog class="arm-dialog arm-dialog-img" id="armImgDialog" aria-labelledby="armImgTitulo">
+    <div class="arm-parchment">
+        <h2 id="armImgTitulo"></h2>
+        <div class="arm-img-grande"><img id="armImgGrande" alt=""></div>
+        <div class="arm-dialog-actions">
+            <button type="button" class="arm-btn arm-btn-gold" data-cerrar>Cerrar</button>
+        </div>
+    </div>
+</dialog>
+
 <dialog class="arm-dialog arm-dialog-prop" id="armPropDialog" aria-labelledby="armPropTitulo">
     <div class="arm-parchment">
         <h2 id="armPropTitulo"></h2>

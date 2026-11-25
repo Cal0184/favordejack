@@ -256,7 +256,7 @@
         const page = st.porPagina ? visibles.slice(desde, desde + pp) : visibles;
         $('#armFilas').innerHTML = page.map(o => `
             <tr data-id="${o.id}" tabindex="0" aria-selected="${o.id === st.sel}"${o.activo === false ? ' class="inactivo"' : ''}>
-                <td class="arm-c-nombre"><div class="arm-c-in"><span class="arm-ico">${iconoDe(o)}</span><span class="arm-nombre">${esc(o.nombre)}${o.reglaId ? MARCA_REGLA : ''}${o.notas ? '<span class="arm-aviso" title="Tiene advertencias del documento">!</span>' : ''}</span><span class="arm-c-catm">${pill(o)}${badgeDe(o)}</span></div></td>
+                <td class="arm-c-nombre"><div class="arm-c-in"><span class="arm-ico">${iconoDe(o)}</span>${o.imagen ? `<span class="arm-mini"><img src="${esc(o.imagen.mini)}" alt="" loading="lazy" decoding="async" width="48" height="48"></span>` : `<span class="arm-mini sin-img" aria-hidden="true">${iconoDe(o)}</span>`}<span class="arm-nombre">${esc(o.nombre)}${o.reglaId ? MARCA_REGLA : ''}${o.notas ? '<span class="arm-aviso" title="Tiene advertencias del documento">!</span>' : ''}</span><span class="arm-c-catm">${pill(o)}${badgeDe(o)}</span></div></td>
                 <td class="arm-col-cat"><span class="arm-tipo">${pill(o)}${badgeDe(o)}</span></td>
                 <td class="arm-col-num arm-c-valor">${esc(valorTexto(o))}</td>
                 <td class="arm-col-num arm-c-coste">${esc(o.coste || '—')}</td>
@@ -362,7 +362,8 @@
         const notas = notasDe[o.id] || [];
         el.innerHTML = `<div class="arm-ficha-in">
             ${mobile() ? '<button type="button" class="arm-ficha-cerrar" data-cerrar-ficha>‹ Volver a la lista</button>' : ''}
-            <header class="arm-ficha-head">
+            <header class="arm-ficha-head${o.imagen ? ' con-img' : ''}">
+                ${o.imagen ? `<button type="button" class="arm-ilus" data-ampliar title="Ver la ilustración en grande"><img src="${esc(o.imagen.ficha)}" alt="Ilustración: ${esc(o.nombre)}" decoding="async"></button>` : ''}
                 <h2>${esc(o.nombre)}</h2>
                 <span class="arm-catpill">${esc(CAT_FICHA[o.categoria] || catByClave[o.categoria]?.nombre || '')}</span>${o.activo === false ? ' <em class="arm-muted">desactivado</em>' : ''}
             </header>
@@ -585,6 +586,14 @@
         if ((b = t.closest('#armFilas tr'))) return seleccionar(Number(b.dataset.id));
         if ((b = t.closest('[data-page]'))) { st.pagina = Number(b.dataset.page); renderLista(); guardarURL(); document.querySelector('.arm-lista').scrollIntoView({ block: 'start', behavior: 'auto' }); return; }
         if ((b = t.closest('[data-def]'))) return verDefinicion(b.dataset.def);
+        if ((b = t.closest('[data-ampliar]'))) {
+            const o = cat.objetos.find(x => x.id === st.sel);
+            if (!o?.imagen) return;
+            $('#armImgGrande').src = o.imagen.ficha;
+            $('#armImgGrande').alt = 'Ilustración: ' + o.nombre;
+            $('#armImgTitulo').textContent = o.nombre;
+            return abrirDialogo($('#armImgDialog'));
+        }
         if ((b = t.closest('[data-atq]'))) {
             const exp = $('#armAtqExp');
             exp.hidden = !exp.hidden;
