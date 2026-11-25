@@ -17,6 +17,8 @@ declare(strict_types=1);
  */
 
 const ARMERIA_DATA = __DIR__ . '/../armeria/data/armamento.json';
+/** Ilustraciones: armeria/img/armas/<clave>.webp (ficha) y mini/<clave>.webp (lista), sacadas del Word ilustrado. */
+const ARMERIA_IMG = __DIR__ . '/../armeria/img/armas';
 const ARMERIA_TIPOS = ['arma', 'armadura', 'escudo'];
 const ARMERIA_MOD_DES = ['completo', 'max', 'ninguno'];
 const ARMERIA_TIPOS_DANO = ['cortante', 'perforante', 'contundente', 'fuego', 'frío', 'ácido', 'veneno', 'relámpago', 'trueno', 'necrótico', 'radiante', 'psíquico', 'fuerza'];
@@ -477,6 +479,7 @@ function armeria_catalogo(mysqli $db, bool $admin): array
                 'editado' => (bool)$o['ClasifEditada'],
             ],
         ];
+        if ($img = armeria_imagen($o['Clave'])) $item['imagen'] = $img;
         if ($o['Tipo'] === 'arma') {
             $item += [
                 'dano' => $o['Dano'],
@@ -525,6 +528,17 @@ function armeria_catalogo(mysqli $db, bool $admin): array
 }
 
 /** Clave estable para un objeto nuevo: «espada-de-plata», «espada-de-plata-2»… */
+/** Rutas (relativas a /armeria/) de la ilustración del objeto, o null si no tiene. */
+function armeria_imagen(string $clave): ?array
+{
+    if (!preg_match('/^[a-z0-9-]+$/', $clave)) return null;
+    $f = ARMERIA_IMG . "/$clave.webp";
+    if (!is_file($f)) return null;
+    $v = '?v=' . filemtime($f);
+    $mini = is_file(ARMERIA_IMG . "/mini/$clave.webp") ? "img/armas/mini/$clave.webp$v" : "img/armas/$clave.webp$v";
+    return ['ficha' => "img/armas/$clave.webp$v", 'mini' => $mini];
+}
+
 function armeria_slug(string $text): string
 {
     $s = mb_strtolower(trim($text), 'UTF-8');
